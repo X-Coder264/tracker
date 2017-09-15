@@ -1,0 +1,53 @@
+language: php
+
+dist: xenial
+
+matrix:
+  fast_finish: true
+  include:
+    - php: 7.2
+
+cache:
+  directories:
+    - $HOME/.composer/cache
+    - $HOME/.app/cache
+env:
+  global:
+    - CHECK_PHP_SYNTAX="yes"
+
+services:
+  - redis-server
+  - mysql
+
+before_install:
+  - sudo mysql -e "use mysql; update user set authentication_string=PASSWORD('test') where User='root'; update user set plugin='mysql_native_password';FLUSH PRIVILEGES;"
+  - sudo mysql_upgrade --user=root --password=test
+  - sudo service mysql restart
+  - mysql --user=root --password=test -e 'CREATE DATABASE tracker CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;'
+
+install:
+  - composer self-update
+  - cp .env.testing .env
+  - travis_retry composer install --no-interaction --prefer-source
+  - php artisan storage:link
+  # Install coveralls.phar
+  - wget -c -nc --retry-connrefused --tries=0 https://github.com/php-coveralls/php-coveralls/releases/download/v2.1.0/php-coveralls.phar
+  - chmod +x php-coveralls.phar
+  - php php-coveralls.phar --version
+
+# Create a storage folder for test coverage report
+before_script:
+    - mkdir -p build/logs
+    - ls -al
+
+# Linting and running tests + generating code coverage report
+script:
+  - if [[ "$CHECK_PHP_SYNTAX" == "yes" ]]; then php vendor/bin/php-cs-fixer fix --no-interaction --dry-run --diff -v; fi;
+  - if [[ "$CHECK_PHP_SYNTAX" == "yes" ]]; then mv ./.php_cs.cache $HOME/.app/cache/.php_cs.cache 2> /dev/null; fi;
+  - vendor/bin/phpunit --coverage-text --coverage-clover=build/logs/clover.xml
+
+after_success:
+  # Submit coverage report to Coveralls servers
+  - travis_retry php php-coveralls.phar -v
+  # Submit coverage report to codecov.io
+  - bash <(curl -s https://codecov.io/bash)

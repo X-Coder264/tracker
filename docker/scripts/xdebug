@@ -1,0 +1,3 @@
+#!/usr/bin/env sh
+
+php -dxdebug.remote_autostart=1 "$@"

@@ -1,0 +1,11 @@
+version: '3.7'
+
+services:
+  redis:
+    hostname: redis
+    image: redis:5.0-alpine
+    volumes:
+      - redis:/data
+
+volumes:
+  redis:

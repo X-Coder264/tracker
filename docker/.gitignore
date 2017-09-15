@@ -1,0 +1,4 @@
+# exclude main .env file
+/.env
+# exclude all environments specific .env files
+/environments/*/.env

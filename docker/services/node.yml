@@ -1,0 +1,19 @@
+version: '3.7'
+
+services:
+  node:
+    image: tracker-node:1.0
+    hostname: node
+    build:
+      context: ../
+      dockerfile: ./images/node.Dockerfile
+      args:
+        HOST_USER_ID: ${DOKMAN_HOST_USER_ID}
+        HOST_GROUP_ID: ${DOKMAN_HOST_GROUP_ID}
+    user: app
+    working_dir: /app
+    volumes:
+    # application
+    - ../../:/app
+    # ssh keys
+    - ~/.ssh/:/home/app/.ssh/

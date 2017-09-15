@@ -1,0 +1,12 @@
+version: '3.7'
+
+services:
+  nginx:
+    hostname: nginx
+    image: nginx:1.15-alpine
+    working_dir: /app
+    volumes:
+      # configuration
+      - ../configurations/nginx.conf:/etc/nginx/conf.d/default.conf
+      # application
+      - ../../:/app/
