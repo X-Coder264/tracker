@@ -50,15 +50,12 @@ class TorrentUploadService
         }
 
         $decodedTorrent = $this->decoder->decode($torrentContent);
-        //dd($decodedTorrent);
 
         $bytes = random_bytes(64);
         // add entropy to randomize info_hash in order to prevent peer leaking attacks
         $decodedTorrent['info']['entropy'] = bin2hex($bytes);
 
         $decodedTorrent['announce'] = route('announce');
-
-        dd($this->encoder->encode($decodedTorrent));
 
         $torrent = new Torrent();
         $torrent->name = pathinfo($torrentFile->getClientOriginalName(), PATHINFO_FILENAME);

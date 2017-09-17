@@ -97,6 +97,6 @@ class TorrentController extends Controller
         Storage::put($filePath, $encoder->encode($decodedTorrent));
         $url = Storage::url($filePath);
         $path = public_path($url);
-        return response()->download($path, $torrent->name . '.torrent');
+        return response()->download($path, $torrent->name . '.torrent', ['content-type' => 'application/x-bittorrent']);
     }
 }

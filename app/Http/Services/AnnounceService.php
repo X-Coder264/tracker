@@ -35,6 +35,11 @@ class AnnounceService
     protected $peer = null;
 
     /**
+     * @var string
+     */
+    protected $peerID;
+
+    /**
      * @var Torrent
      */
     protected $torrent;
@@ -47,7 +52,7 @@ class AnnounceService
     /**
      * @var int
      */
-    protected $numberOfWantedPeers;
+    protected $numberOfWantedPeers = 50;
 
     /**
      * @var string|null
@@ -96,6 +101,7 @@ class AnnounceService
         if (null !== $validation) {
             return $validation;
         }
+
         if ('stopped' !== $event) {
             // in order to support IPv6 peers (BEP 7) a more complex IP validation logic was needed
             $validation = $this->validateAndSetIPAddress();
@@ -109,6 +115,8 @@ class AnnounceService
             }
         }
 
+        $this->peerID = bin2hex($this->request->input('peer_id'));
+
         $this->user = User::with('language')
                             ->where('passkey', '=', $this->request->input('passkey'))
                             ->select(['id', 'slug'])
@@ -119,7 +127,7 @@ class AnnounceService
                                 ->first();
 
         if ('started' !== $event) {
-            $this->peer = Peer::where('peer_id', '=', bin2hex($this->request->input('peer_id')))
+            $this->peer = Peer::where('peer_id', '=', $this->peerID)
                 ->where('torrent_id', '=', $this->torrent->id)
                 ->where('user_id', '=', $this->user->id)
                 ->first();
@@ -127,8 +135,6 @@ class AnnounceService
 
         if ($this->request->has('numwant')) {
             $this->numberOfWantedPeers = (int) $this->request->input('numwant');
-        } else {
-            $this->numberOfWantedPeers = 50;
         }
 
         $left = (int) $this->request->input('left');
@@ -146,6 +152,7 @@ class AnnounceService
     }
 
     /**
+     * Returns null if the validation is successful or a string if it is not
      * @return null|string
      */
     protected function validateInfoHashAndPeerID(): ?string
@@ -174,6 +181,7 @@ class AnnounceService
     }
 
     /**
+     * Returns null if the validation is successful or a string if it is not
      * @return null|string
      */
     protected function validateRequest(): ?string
@@ -346,7 +354,7 @@ class AnnounceService
         // TODO: cast to int
         $this->peer = Peer::firstOrCreate(
             [
-                'peer_id' => bin2hex($this->request->input('peer_id')),
+                'peer_id' => $this->peerID,
                 'torrent_id' => $this->torrent->id,
                 'user_id' => $this->user->id,
             ],
@@ -362,7 +370,7 @@ class AnnounceService
 
         $this->insertPeerIPs();
 
-        Torrent::where('id', '=', $this->torrent->id)->update(['leechers' => $this->torrent->leechers + 1]);
+        $this->torrent->update(['leechers' => $this->torrent->leechers + 1]);
 
         return $this->announceSuccessResponse();
     }
@@ -375,9 +383,9 @@ class AnnounceService
         $this->peer->delete();
 
         if (true === $this->seeder) {
-            Torrent::where('id', '=', $this->torrent->id)->update(['seeders' => $this->torrent->seeders - 1]);
+            $this->torrent->update(['seeders' => $this->torrent->seeders - 1]);
         } else {
-            Torrent::where('id', '=', $this->torrent->id)->update(['leechers' => $this->torrent->leechers - 1]);
+            $this->torrent->update(['leechers' => $this->torrent->leechers - 1]);
         }
 
         return $this->announceSuccessResponse();
@@ -401,7 +409,7 @@ class AnnounceService
 
         $this->insertPeerIPs();
 
-        Torrent::where('id', '=', $this->torrent->id)->update(
+        $this->torrent->update(
             [
                 'seeders' => $this->torrent->seeders + 1,
                 'leechers' => $this->torrent->leechers - 1
@@ -419,7 +427,7 @@ class AnnounceService
         // TODO: cast to int
         $this->peer = Peer::updateOrCreate(
             [
-                'peer_id' => bin2hex($this->request->input('peer_id')),
+                'peer_id' => $this->peerID,
                 'torrent_id' => $this->torrent->id,
                 'user_id' => $this->user->id,
             ],
@@ -456,7 +464,7 @@ class AnnounceService
     protected function compactResponse(): string
     {
         $response['interval'] = 40 * 60; // 40 minutes
-        $response['min interval'] = 15 * 60; // 15 minutes
+        $response['min interval'] = 5 * 60; // 5 minutes
         $response['peers'] = '';
         // BEP 7 -> IPv6 peers support
         $response['peers6'] = '';
