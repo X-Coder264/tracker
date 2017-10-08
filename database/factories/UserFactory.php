@@ -1,7 +1,9 @@
 <?php
 
+use App\Http\Models\Locale;
 use App\Http\Models\User;
 use Faker\Generator as Faker;
+use Illuminate\Support\Facades\Hash;
 
 /*
 |--------------------------------------------------------------------------
@@ -20,9 +22,11 @@ $factory->define(User::class, function (Faker $faker) {
     return [
         'name' => $faker->name,
         'email' => $faker->unique()->safeEmail,
-        'password' => $password ?: $password = bcrypt('secret'),
+        'password' => $password ?: $password = Hash::make('secret', ['rounds' => 15]),
         'passkey' => bin2hex(random_bytes(32)),
         'remember_token' => str_random(10),
-        'locale_id' => $faker->numberBetween(1, 2)
+        'locale_id' => function () {
+            return factory(Locale::class)->create()->id;
+        }
     ];
 });

@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="col-10 mx-auto">
+<div class="col-12 mx-auto">
     <div class="card">
         <div class="card-header">
             {{ __('messages.torrent.create.page_title') }}
@@ -10,11 +10,11 @@
         <div class="card-body">
             @include('partials.flash_messages')
             <br>
-            <form enctype="multipart/form-data" method="POST" action="{{ route('torrent.store') }}">
-                {{csrf_field()}}
+            <form enctype="multipart/form-data" method="POST" action="{{ route('torrents.store') }}">
+                {{ csrf_field() }}
                 <div class="form-group row">
                     <label for="torrent" class="col custom-file">
-                        <input type="file" id="torrent" name="torrent" class="custom-file-input" onchange="getName()" required>
+                        <input type="file" id="torrent" name="torrent" class="custom-file-input" onchange="getName()" accept="application/x-bittorrent" required>
                         <span id="torrentName" class="custom-file-control form-control-file">{{ __('messages.torrent.create.choose_torrent_file') }}</span>
                     </label>
                 </div>

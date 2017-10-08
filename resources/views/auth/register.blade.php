@@ -6,48 +6,32 @@
         <div class="card-header">Register</div>
 
         <div class="card-body">
+            @include('partials.flash_messages')
+            <br>
             <form class="form-horizontal" method="POST" action="{{ route('register') }}">
                 {{ csrf_field() }}
 
-                <div class="form-group{{ $errors->has('name') ? ' has-error' : '' }}">
+                <div class="form-group">
                     <label for="name" class="col control-label">Name</label>
 
                     <div class="col">
                         <input id="name" type="text" class="form-control" name="name" value="{{ old('name') }}" required autofocus>
-
-                        @if ($errors->has('name'))
-                            <span class="help-block">
-                                <strong>{{ $errors->first('name') }}</strong>
-                            </span>
-                        @endif
                     </div>
                 </div>
 
-                <div class="form-group{{ $errors->has('email') ? ' has-error' : '' }}">
+                <div class="form-group">
                     <label for="email" class="col control-label">E-Mail Address</label>
 
                     <div class="col">
                         <input id="email" type="email" class="form-control" name="email" value="{{ old('email') }}" required>
-
-                        @if ($errors->has('email'))
-                            <span class="help-block">
-                                <strong>{{ $errors->first('email') }}</strong>
-                            </span>
-                        @endif
                     </div>
                 </div>
 
-                <div class="form-group{{ $errors->has('password') ? ' has-error' : '' }}">
+                <div class="form-group">
                     <label for="password" class="col control-label">Password</label>
 
                     <div class="col">
                         <input id="password" type="password" class="form-control" name="password" required>
-
-                        @if ($errors->has('password'))
-                            <span class="help-block">
-                                <strong>{{ $errors->first('password') }}</strong>
-                            </span>
-                        @endif
                     </div>
                 </div>
 
@@ -58,6 +42,20 @@
                         <input id="password-confirm" type="password" class="form-control" name="password_confirmation" required>
                     </div>
                 </div>
+
+                <div class="form-group">
+                    <label for="locale" class="col control-label">Language</label>
+
+                    <div class="col">
+                        <select class="form-control" name="locale" id="locale" required>
+                            @foreach($locales as $locale)
+                                <option value="{{ $locale->id }}">{{ $locale->locale }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                </div>
+
+                @include('partials.timezones_select')
 
                 <div class="form-group">
                     <div class="col">

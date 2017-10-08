@@ -17,8 +17,12 @@ Route::get('announce', 'AnnounceController@store')->name('announce');
 Route::middleware(['auth'])->group(function () {
     Route::get('/', 'HomeController@index')->name('home.index');
 
-    Route::get('browse', 'TorrentController@index')->name('torrent.index');
-    Route::get('upload', 'TorrentController@create')->name('torrent.create');
-    Route::post('upload', 'TorrentController@store')->name('torrent.store');
-    Route::get('download/{torrent}', 'TorrentController@download')->name('torrent.download');
+    Route::get('torrents', 'TorrentController@index')->name('torrents.index');
+    Route::get('torrents/create', 'TorrentController@create')->name('torrents.create');
+    Route::get('torrents/{torrent}', 'TorrentController@show')->name('torrents.show');
+    Route::post('torrents/upload', 'TorrentController@store')->name('torrents.store');
+    Route::get('torrents/download/{torrent}', 'TorrentController@download')->name('torrents.download');
+
+    Route::get('users/{user}/edit', 'UserController@edit')->name('users.edit');
+    Route::put('users/{user}', 'UserController@update')->name('users.update');
 });

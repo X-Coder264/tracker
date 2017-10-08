@@ -2,8 +2,12 @@
 
 namespace App\Http\Controllers\Auth;
 
+use DateTimeZone;
 use App\Http\Models\User;
+use App\Http\Models\Locale;
+use Illuminate\Validation\Rule;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Foundation\Auth\RegistersUsers;
 
@@ -40,6 +44,17 @@ class RegisterController extends Controller
     }
 
     /**
+     * Show the application registration form.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function showRegistrationForm()
+    {
+        $locales = Locale::all();
+        return view('auth.register', compact('locales'));
+    }
+
+    /**
      * Get a validator for an incoming registration request.
      *
      * @param  array  $data
@@ -47,10 +62,22 @@ class RegisterController extends Controller
      */
     protected function validator(array $data)
     {
+        $locales = Locale::select('id')->get();
+        $localeIDs = $locales->pluck('id')->toArray();
+        $timezoneIdentifiers = DateTimeZone::listIdentifiers();
+
         return Validator::make($data, [
-            'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users',
-            'password' => 'required|string|min:6|confirmed',
+            'name'     => 'required|string|max:255',
+            'email'    => 'required|string|email|max:255|unique:users',
+            'password' => 'required|string|min:8|confirmed',
+            'locale' => [
+                'required',
+                Rule::in($localeIDs),
+            ],
+            'timezone' => [
+                'required',
+                Rule::in($timezoneIdentifiers),
+            ],
         ]);
     }
 
@@ -65,7 +92,9 @@ class RegisterController extends Controller
         return User::create([
             'name' => $data['name'],
             'email' => $data['email'],
-            'password' => bcrypt($data['password'], ['rounds' => 15]),
+            'password' => Hash::make($data['password'], ['rounds' => 15]),
+            'timezone' => $data['timezone'],
+            'locale_id' => $data['locale'],
         ]);
     }
 }

@@ -11,7 +11,6 @@ class AnnounceController extends Controller
 {
     public function store(Request $request, AnnounceService $announceService)
     {
-        //Storage::put('filename2.txt', print_r($request->all(), true));
-        return $announceService->announce($request);
+        return response($announceService->announce($request))->header('Content-Type', 'text/plain');
     }
 }

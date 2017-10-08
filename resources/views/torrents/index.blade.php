@@ -16,11 +16,12 @@
                         </div>
                     </div>
                 @else
-                    <table class="table table-hover table-responsive-sm">
+                    <table class="table table-hover table-responsive-sm table-responsive-md table-responsive-lg">
                         <thead>
                         <tr>
                             <th>{{ __('messages.torrent.index.table_category') }}</th>
                             <th>{{ __('messages.torrent.index.table_torrent_name') }}</th>
+                            <th>{{ __('messages.common.size') }}</th>
                             <th>{{ __('messages.torrent.index.table_torrent_seeders') }}</th>
                             <th>{{ __('messages.torrent.index.table_torrent_leechers') }}</th>
                             <th>{{ __('messages.torrent.index.table_torrent_uploader') }}</th>
@@ -30,7 +31,16 @@
                         @foreach($torrents as $torrent)
                             <tr class="bg-warning">
                                 <th>XYZ</th>
-                                <td><a href="{{ route('torrent.download', $torrent->slug) }}">{{ $torrent->name }}</a></td>
+                                <td>
+                                    <a href="{{ route('torrents.show', $torrent->slug) }}">{{ $torrent->name }}</a>
+                                    <br>
+                                    {{ $torrent->created_at->timezone($timezone) }}
+                                    @php
+                                        \Carbon\Carbon::setLocale($userLocale);
+                                    @endphp
+                                    {{ $torrent->created_at->diffForHumans() }}
+                                </td>
+                                <td>{{ $torrent->size }}</td>
                                 <td>{{ $torrent->seeders }}</td>
                                 <td>{{ $torrent->leechers }}</td>
                                 <td>{{ $torrent->uploader->name }}</td>
@@ -38,6 +48,7 @@
                         @endforeach
                         </tbody>
                     </table>
+                    {{ $torrents->render() }}
                 @endif
             </div>
         </div>

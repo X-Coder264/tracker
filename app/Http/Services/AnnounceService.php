@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Services;
 
 use App\Http\Models\Peer;
+use App\Http\Models\Snatch;
 use App\Http\Models\Torrent;
 use App\Http\Models\User;
 use Illuminate\Http\Request;
@@ -30,7 +31,7 @@ class AnnounceService
     protected $user;
 
     /**
-     * @var Peer|null
+     * @var null|Peer
      */
     protected $peer = null;
 
@@ -50,29 +51,54 @@ class AnnounceService
     protected $seeder;
 
     /**
+     * @var null|Snatch
+     */
+    protected $snatch;
+
+    /**
      * @var int
      */
     protected $numberOfWantedPeers = 50;
 
     /**
-     * @var string|null
+     * @var null|string
      */
     protected $ipv4Address = null;
 
     /**
-     * @var string|null
+     * @var null|string
      */
     protected $ipv6Address = null;
 
     /**
-     * @var int|null
+     * @var null|int
      */
     protected $ipv4Port = null;
 
     /**
-     * @var int|null
+     * @var null|int
      */
     protected $ipv6Port = null;
+
+    /**
+     * @var int
+     */
+    protected $seedTime = 0;
+
+    /**
+     * @var int
+     */
+    protected $leechTime = 0;
+
+    /**
+     * @var int
+     */
+    protected $downloadedInThisAnnounceCycle = 0;
+
+    /**
+     * @var int
+     */
+    protected $uploadedInThisAnnounceCycle = 0;
 
     /**
      * @param BencodingService $encoder
@@ -89,29 +115,33 @@ class AnnounceService
     public function announce(Request $request): string
     {
         $this->request = $request;
+        $timeNow = Carbon::now();
 
         $event = $this->request->input('event');
 
-        Storage::put('request.txt', print_r($request->all(), true));
+        //Storage::put('request.txt', print_r($request->all(), true));
 
         // info_hash and peer_id are validated separately because the Laravel validator uses
         // mb_strlen to get the length of the string which returns a wrong number
         // when used on those two properties so strlen must be used
-        $validation = $this->validateInfoHashAndPeerID();
-        if (null !== $validation) {
-            return $validation;
+        // mb_strlen returns a "wrong" number because it counts code points instead of characters
+        $validationMessage = $this->validateInfoHashAndPeerID();
+        if (null !== $validationMessage) {
+            return $validationMessage;
         }
 
+        // if we get the stopped event there is no need to validate the entire request,
+        // since we are just going to delete the peer from the DB
         if ('stopped' !== $event) {
-            // in order to support IPv6 peers (BEP 7) a more complex IP validation logic was needed
-            $validation = $this->validateAndSetIPAddress();
-            if (null !== $validation) {
-                return $validation;
+            // in order to support IPv6 peers (BEP 7) a more complex IP validation logic is needed
+            $validationMessage = $this->validateAndSetIPAddress();
+            if (null !== $validationMessage) {
+                return $validationMessage;
             }
 
-            $validation = $this->validateRequest();
-            if (null !== $validation) {
-                return $validation;
+            $validationMessage = $this->validateRequest();
+            if (null !== $validationMessage) {
+                return $validationMessage;
             }
         }
 
@@ -122,9 +152,20 @@ class AnnounceService
                             ->select(['id', 'slug'])
                             ->first();
 
+        if (null === $this->user) {
+            return $this->announceErrorResponse('Invalid passkey.');
+        }
+
         $this->torrent = Torrent::where('infoHash', bin2hex($this->request->input('info_hash')))
-                                ->select(['id', 'seeders', 'leechers'])
+                                ->select(['id', 'seeders', 'leechers', 'slug'])
                                 ->first();
+
+        if (null === $this->torrent) {
+            return $this->announceErrorResponse('Invalid info_hash.');
+        }
+
+        $left = (int) $this->request->input('left');
+        $this->seeder = $left === 0 ? true : false;
 
         if ('started' !== $event) {
             $this->peer = Peer::where('peer_id', '=', $this->peerID)
@@ -133,12 +174,26 @@ class AnnounceService
                 ->first();
         }
 
+        if (null === $this->peer) {
+            $this->downloadedInThisAnnounceCycle = max(0, $this->request->input('downloaded'));
+            $this->uploadedInThisAnnounceCycle = max(0, $this->request->input('uploaded'));
+        } else {
+            $this->downloadedInThisAnnounceCycle = max(0, $this->request->input('downloaded') - $this->peer->downloaded);
+            $this->uploadedInThisAnnounceCycle = max(0, $this->request->input('uploaded') - $this->peer->uploaded);
+            if (false === $this->seeder || (true === $this->seeder && 'completed' === $event)) {
+                $this->leechTime = $timeNow->diffInSeconds($this->peer->updated_at);
+            } else {
+                $this->seedTime = $timeNow->diffInSeconds($this->peer->updated_at);
+            }
+        }
+
+        $this->snatch = Snatch::where('torrent_id', '=', $this->torrent->id)
+                                ->where('user_id', '=', $this->user->id)
+                                ->first();
+
         if ($this->request->has('numwant')) {
             $this->numberOfWantedPeers = (int) $this->request->input('numwant');
         }
-
-        $left = (int) $this->request->input('left');
-        $this->seeder = $left === 0 ? true : false;
 
         if ('started' === $event) {
             return $this->startedEventAnnounceResponse();
@@ -231,74 +286,99 @@ class AnnounceService
         $this->ipv6Port = $this->request->input('port');
 
         if ($this->request->has('ip')) {
-            $ip = $this->request->input('ip');
-            if (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
-                $this->ipv4Address = $ip;
-            } elseif (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6)) {
-                $this->ipv6Address = $ip;
+            $IP = $this->request->input('ip');
+
+            if (true === $this->validateIPv4Address($IP)) {
+                $this->ipv4Address = $IP;
+            }
+
+            if (true === $this->validateIPv6Address($IP)) {
+                $this->ipv6Address = $IP;
             }
         }
 
         if ($this->request->has('ipv4')) {
-            $ip = $this->request->input('ipv4');
-            $explodedIPString = explode(':', $ip);
+            $IP = $this->request->input('ipv4');
+            $explodedIPString = explode(':', $IP);
             // check if the ipv4 field has the IP address and the port
             // if it contains only the IP address the port is read from the port field
             if (2 === count($explodedIPString)) {
-                if (filter_var($explodedIPString[0], FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
+                if (true === $this->validateIPv4Address($explodedIPString[0])) {
                     $this->ipv4Address = $explodedIPString[0];
                     $this->ipv4Port = (int) $explodedIPString[1];
                 }
             } else {
-                if (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
-                    $this->ipv4Address = $ip;
+                if (true === $this->validateIPv4Address($IP)) {
+                    $this->ipv4Address = $IP;
                 }
             }
         }
 
         if ($this->request->has('ipv6')) {
-            $ip = $this->request->input('ipv6');
-            $explodedIPString = explode(':', $ip);
+            $IP = $this->request->input('ipv6');
+            $explodedIPString = explode(':', $IP);
             // check if the ipv6 field has the IP address and the port
             // if it contains only the IP address the port is read from the port field
-            if (4 <= count($explodedIPString) && '[' === $ip[0] && false !== strpos($ip, ']')) {
-                $ip = str_replace(['[',']'], '', $ip);
-                $ip = substr($ip, 0, strrpos($ip, ':'));
-                if (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6)) {
-                    $this->ipv6Address = $ip;
-                    $this->ipv6Port = (int) substr($ip, strrpos($ip, ':') + 1);
+            if (4 <= count($explodedIPString) && '[' === $IP[0] && false !== strpos($IP, ']')) {
+                $IP = str_replace(['[',']'], '', $IP);
+                $IP = substr($IP, 0, strrpos($IP, ':'));
+                if (true === $this->validateIPv6Address($IP)) {
+                    $this->ipv6Address = $IP;
+                    $this->ipv6Port = (int) substr($IP, strrpos($IP, ':') + 1);
                 }
             } else {
-                if (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6)) {
-                    $this->ipv6Address = $ip;
+                if (true === $this->validateIPv6Address($IP)) {
+                    $this->ipv6Address = $IP;
                 }
             }
         }
 
-        // the most secure way to get the real IP address because for example
+        // this is the most secure way to get the real IP address because for example
         // uTorrent with Teredo enabled sends only an "IPv6" address even though the peer
         // has actually only an IPv4 address
-        $ip = $this->request->getClientIp();
-        //Storage::put('ip.txt', print_r($ip, true));
+        $IP = $this->request->getClientIp();
 
-        if (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
-            $this->ipv4Address = $ip;
-            //Storage::put('ipv4.txt', print_r($ip, true));
+        if (true === $this->validateIPv4Address($IP)) {
+            $this->ipv4Address = $IP;
         }
 
-        if (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6)) {
-            $this->ipv6Address = $ip;
-            //Storage::put('ipv6.txt', print_r($ip, true));
+        if (true === $this->validateIPv6Address($IP)) {
+            $this->ipv6Address = $IP;
         }
 
-
-        // if there is not at least one IP address set, return an error
+        // return an error if there is not at least one IP address and port set
         if (false === ((null !== $this->ipv4Address && null !== $this->ipv4Port) ||
                 (null !== $this->ipv6Address && null !== $this->ipv6Port))) {
             return $this->announceErrorResponse('The IP or port was not sent.');
         }
 
         return null;
+    }
+
+    /**
+     * @param string $IP
+     * @return bool
+     */
+    protected function validateIPv4Address(string $IP): bool
+    {
+        if (filter_var($IP, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * @param string $IP
+     * @return bool
+     */
+    protected function validateIPv6Address(string $IP): bool
+    {
+        if (filter_var($IP, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6)) {
+            return true;
+        }
+
+        return false;
     }
 
     /**
@@ -337,11 +417,11 @@ class AnnounceService
      */
     protected function isPeerConnectable(string $IP, int $port): bool
     {
-        $sockres = @fsockopen($IP, $port, $errno, $errstr, 5);
-        if (!$sockres) {
+        $connection = @fsockopen($IP, $port, $errno, $errstr, 5);
+        if (false === $connection) {
             return false;
         } else {
-            @fclose($sockres);
+            @fclose($connection);
             return true;
         }
     }
@@ -352,25 +432,42 @@ class AnnounceService
     protected function startedEventAnnounceResponse(): string
     {
         // TODO: cast to int
-        $this->peer = Peer::firstOrCreate(
+        $this->peer = Peer::updateOrCreate(
             [
                 'peer_id' => $this->peerID,
                 'torrent_id' => $this->torrent->id,
                 'user_id' => $this->user->id,
             ],
             [
-                'uploaded' => $this->request->input('uploaded'),
-                'downloaded' => $this->request->input('downloaded'),
-                'left' => $this->request->input('left'),
+                'uploaded' => $this->uploadedInThisAnnounceCycle,
+                'downloaded' => $this->downloadedInThisAnnounceCycle,
+                'seeder' => $this->seeder,
                 'userAgent' => $this->request->userAgent(),
             ]
         );
 
-        Storage::put('peerStartedEvent.txt', print_r($this->peer, true));
-
         $this->insertPeerIPs();
 
-        $this->torrent->update(['leechers' => $this->torrent->leechers + 1]);
+        if (true === $this->seeder) {
+            $this->torrent->update(['seeders' => $this->torrent->seeders + 1]);
+        } else {
+            $this->torrent->update(['leechers' => $this->torrent->leechers + 1]);
+
+            $this->snatch = Snatch::updateOrCreate(
+                [
+                    'torrent_id' => $this->torrent->id,
+                    'user_id' => $this->user->id,
+                ],
+                [
+                    'uploaded' => ($this->snatch->uploaded ?? 0) + $this->uploadedInThisAnnounceCycle,
+                    'downloaded' => ($this->snatch->downloaded ?? 0) + $this->downloadedInThisAnnounceCycle,
+                    'left' => $this->request->input('left'),
+                    'leechTime' => ($this->snatch->leechTime ?? 0) + $this->leechTime,
+                    'timesAnnounced' => ($this->snatch->timesAnnounced ?? 0) + 1,
+                    'userAgent' => $this->request->userAgent(),
+                ]
+            );
+        }
 
         return $this->announceSuccessResponse();
     }
@@ -388,6 +485,20 @@ class AnnounceService
             $this->torrent->update(['leechers' => $this->torrent->leechers - 1]);
         }
 
+        if (null !== $this->snatch) {
+            $this->snatch->update(
+                [
+                    'uploaded' => $this->snatch->uploaded + $this->uploadedInThisAnnounceCycle,
+                    'downloaded' => $this->snatch->downloaded + $this->downloadedInThisAnnounceCycle,
+                    'left' => $this->request->input('left'),
+                    'seedTime' => $this->snatch->seedTime + $this->seedTime,
+                    'leechTime' => $this->snatch->leechTime + $this->leechTime,
+                    'timesAnnounced' => $this->snatch->timesAnnounced + 1,
+                    'userAgent' => $this->request->userAgent(),
+                ]
+            );
+        }
+
         return $this->announceSuccessResponse();
     }
 
@@ -399,10 +510,9 @@ class AnnounceService
         // TODO: cast to int
         $this->peer->update(
             [
-                'uploaded' => $this->request->input('uploaded'),
-                'downloaded' => $this->request->input('downloaded'),
-                'left' => 0,
-                'finishedAt' => Carbon::now(),
+                'uploaded' => $this->peer->uploaded + $this->uploadedInThisAnnounceCycle,
+                'downloaded' => $this->peer->downloaded + $this->downloadedInThisAnnounceCycle,
+                'seeder' => $this->seeder,
                 'userAgent' => $this->request->userAgent(),
             ]
         );
@@ -415,6 +525,20 @@ class AnnounceService
                 'leechers' => $this->torrent->leechers - 1
             ]
         );
+
+        if (null !== $this->snatch) {
+            $this->snatch->update(
+                [
+                    'uploaded' => $this->snatch->uploaded + $this->uploadedInThisAnnounceCycle,
+                    'downloaded' => $this->snatch->downloaded + $this->downloadedInThisAnnounceCycle,
+                    'left' => 0,
+                    'leechTime' => $this->snatch->leechTime + $this->leechTime,
+                    'timesAnnounced' => $this->snatch->timesAnnounced + 1,
+                    'finishedAt' => Carbon::now(),
+                    'userAgent' => $this->request->userAgent(),
+                ]
+            );
+        }
 
         return $this->announceSuccessResponse();
     }
@@ -432,16 +556,34 @@ class AnnounceService
                 'user_id' => $this->user->id,
             ],
             [
-                'uploaded' => $this->request->input('uploaded'),
-                'downloaded' => $this->request->input('downloaded'),
-                'left' => $this->request->input('left'),
+                'uploaded' => $this->peer->uploaded + $this->uploadedInThisAnnounceCycle,
+                'downloaded' => $this->peer->downloaded + $this->downloadedInThisAnnounceCycle,
+                'seeder' => $this->seeder,
                 'userAgent' => $this->request->userAgent(),
             ]
         );
 
-        Storage::put('peerNoEvent.txt', print_r($this->peer, true));
+        $logString = 'Current seedtime: ' . $this->snatch->seedTime . ' \n';
+        $logString .= 'Seedtime in this cycle ' . $this->seedTime . ' \n';
+        $logString .= 'Total new seedtime ' . ($this->snatch->seedTime + $this->seedTime) . ' \n';
+
+        Storage::put('peerNoEventSeedTime.txt', print_r($logString, true));
 
         $this->insertPeerIPs();
+
+        if (null !== $this->snatch) {
+            $this->snatch->update(
+                [
+                    'uploaded' => $this->snatch->uploaded + $this->uploadedInThisAnnounceCycle,
+                    'downloaded' => $this->snatch->downloaded + $this->downloadedInThisAnnounceCycle,
+                    'left' => $this->request->input('left'),
+                    'seedTime' => $this->snatch->seedTime + $this->seedTime,
+                    'leechTime' => $this->snatch->leechTime + $this->leechTime,
+                    'timesAnnounced' => $this->snatch->timesAnnounced + 1,
+                    'userAgent' => $this->request->userAgent(),
+                ]
+            );
+        }
 
         return $this->announceSuccessResponse();
     }
@@ -461,18 +603,20 @@ class AnnounceService
         }
     }
 
+    /**
+     * @return string
+     */
     protected function compactResponse(): string
     {
         $response['interval'] = 40 * 60; // 40 minutes
-        $response['min interval'] = 5 * 60; // 5 minutes
+        $response['min interval'] = 1 * 60; // 1 minutes
         $response['peers'] = '';
         // BEP 7 -> IPv6 peers support
         $response['peers6'] = '';
 
         if (true === $this->seeder) {
             $peers = Peer::with('IPs')
-                            ->where('left', '!=', 0)
-                            ->whereNull('finishedAt')
+                            ->where('seeder', '!=', true)
                             ->where('user_id', '!=', $this->user->id)
                             ->where('torrent_id', '=', $this->torrent->id)
                             ->limit($this->numberOfWantedPeers)
@@ -505,18 +649,15 @@ class AnnounceService
             }
         }
 
-        //Storage::put('filename2.txt', print_r($peersArray, true));
-
-        $response = $this->encoder->encode($response);
-
-        Storage::put('filename2.txt', print_r($response, true));
-
-        return $response;
+        return $this->encoder->encode($response);
     }
 
+    /**
+     * @return string
+     */
     protected function nonCompactResponse(): string
     {
-        return $this->encoder->encode('5');
+        return $this->announceErrorResponse('The tracker does not support non-compact response.');
     }
 
     /**

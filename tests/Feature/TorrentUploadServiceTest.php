@@ -7,48 +7,43 @@ use App\Http\Services\BdecodingService;
 use App\Http\Services\BencodingService;
 use Illuminate\Support\Facades\App;
 use Tests\TestCase;
-use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithoutMiddleware;
+use Illuminate\Http\Testing\File;
 
 class TorrentUploadServiceTest extends TestCase
 {
-    /**
-     * A basic test example.
-     *
-     * @return void
-     */
-    public function testExample()
+    use RefreshDatabase;
+
+    public function testTorrentUpload()
     {
         $user = factory(User::class)->create();
         $this->actingAs($user);
 
         Storage::fake('public');
 
-        $stub = $this->createMock(BdecodingService::class);
-        //$stub->method('decode')->willReturn(['test' => 'test']);
-        //$stub->expects($this->any())->method('decode')->will($this->returnValue([]));
-        App::instance(BdecodingService::class, $stub);
+        $decoderStub = $this->createMock(BdecodingService::class);
+        App::instance(BdecodingService::class, $decoderStub);
 
-        $stub->method('decode')->willReturn(['test' => 'test']);
+        $decoderStub->method('decode')->willReturn(['test' => 'test']);
 
-        $stub2 = $this->createMock(BencodingService::class);
-        App::instance(BencodingService::class, $stub2);
+        $encoderStub = $this->createMock(BencodingService::class);
+        App::instance(BencodingService::class, $encoderStub);
 
-        $stub2->method('encode')->willReturn('123456');
+        $torrentValue = '123456';
+        $encoderStub->method('encode')->willReturn($torrentValue);
 
         $response = $this->json('POST', route('torrent.store'), [
-            'torrent' => UploadedFile::fake()->create('file.torrent', 500),
+            'torrent' => File::create('file.torrent'),
+            'name' => 'Test',
             'description' => 'Test',
         ]);
-
-        //dd($response->getContent());
 
         $response->assertRedirect();
         $response->assertSessionHas('success');
 
         // Assert the file was stored...
-        Storage::disk('public')->assertExists('/public/torrents/44.torrent');
+        Storage::disk('public')->assertExists('torrents/1.torrent');
+        $this->assertSame($torrentValue, Storage::disk('public')->get('torrents/1.torrent'));
     }
 }

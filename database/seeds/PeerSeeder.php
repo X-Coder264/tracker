@@ -16,8 +16,7 @@ class PeerSeeder extends Seeder
         $peer->user_id = rand(1, 3);
         $peer->peer_id = '1234';
         $peer->torrent_id = 1;
-        $peer->left = 4432432;
-        $peer->userAgent = "qBittorrent 3.3.16";
+        $peer->userAgent = 'qBittorrent/3.3.16';
         $peer->save();
 
         $peer->IPs()->create(
@@ -33,8 +32,7 @@ class PeerSeeder extends Seeder
         $peer->user_id = rand(1, 3);
         $peer->peer_id = '12345';
         $peer->torrent_id = 1;
-        $peer->left = 44324322;
-        $peer->userAgent = "qBittorrent 3.3.16";
+        $peer->userAgent = 'qBittorrent/3.3.16';
         $peer->save();
 
         $peer->IPs()->createMany(

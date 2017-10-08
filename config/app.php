@@ -65,6 +65,8 @@ return [
     |
     */
 
+    /* Do NOT change this. All values must be stored in UTC in the database so that
+       they can be properly converted to the user's timezone */
     'timezone' => 'UTC',
 
     /*
@@ -176,6 +178,7 @@ return [
         // App\Providers\BroadcastServiceProvider::class,
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
+        App\Providers\ComposerServiceProvider::class,
 
     ],
 

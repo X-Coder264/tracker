@@ -22,3 +22,13 @@
         </div>
     </div>
 @endif
+@if($errors->any())
+    <div class="card text-white bg-danger">
+        <div class="card-body">
+            <h4 class="card-title">{{ __('messages.flash_messages.error') }}</h4>
+            @foreach ($errors->all() as $error)
+                <p class="card-text">{{ $error }}</p>
+            @endforeach
+        </div>
+    </div>
+@endif

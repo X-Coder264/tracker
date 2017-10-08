@@ -24,7 +24,7 @@
 
             <!-- Brand -->
             <a class="navbar-brand" href="{{ route('home.index') }}">
-                {{ config('app.name', 'Laravel') }}
+                {{ config('app.name', 'Tracker') }}
             </a>
 
             <!-- Links -->
@@ -40,11 +40,11 @@
                         </li>
                     @else
                             <li class="nav-item">
-                                <a class="nav-item nav-link" href="{{ route('torrent.index') }}">{{ __('messages.navigation.torrent.index') }}</a>
+                                <a class="nav-item nav-link" href="{{ route('torrents.index') }}">{{ __('messages.navigation.torrent.index') }}</a>
                             </li>
 
                             <li class="nav-item">
-                                <a class="nav-item nav-link" href="{{ route('torrent.create') }}">{{ __('messages.navigation.torrent.create') }}</a>
+                                <a class="nav-item nav-link" href="{{ route('torrents.create') }}">{{ __('messages.navigation.torrent.create') }}</a>
                             </li>
 
                             <li class="dropdown show nav-item ml-auto">
@@ -53,6 +53,7 @@
                                 </a>
 
                                 <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuLink">
+                                    <a class="dropdown-item" href="{{ route('users.edit', Auth::user()) }}">{{ __('messages.navigation.users.edit_page') }}</a>
                                     <a class="dropdown-item" href="{{ route('logout') }}" onclick="event.preventDefault();
                                                  document.getElementById('logout-form').submit();">{{ __('messages.navigation.logout') }}</a>
                                     <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">

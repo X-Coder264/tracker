@@ -1,0 +1,20 @@
+<?php
+
+use App\Http\Models\Torrent;
+use App\Http\Models\User;
+use Faker\Generator as Faker;
+
+$factory->define(Torrent::class, function (Faker $faker) {
+
+    return [
+        'name' => $faker->unique()->name,
+        'infoHash' => $faker->unique()->text(40),
+        'size' => $faker->numberBetween(500, 500000),
+        'uploader_id' => function () {
+            return factory(User::class)->create()->id;
+        },
+        'description' => $faker->text(500),
+        'seeders' => $faker->numberBetween(0, 100),
+        'leechers' => $faker->numberBetween(0, 100)
+    ];
+});

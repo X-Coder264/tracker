@@ -12,6 +12,7 @@ class DatabaseSeeder extends Seeder
     public function run()
     {
         $this->call(LocaleSeeder::class);
+        $this->call(RolesAndPermissionsSeeder::class);
         $this->call(UserSeeder::class);
         $this->call(TorrentSeeder::class);
         $this->call(PeerSeeder::class);

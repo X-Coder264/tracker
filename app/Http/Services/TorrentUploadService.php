@@ -4,12 +4,10 @@ declare(strict_types=1);
 
 namespace App\Http\Services;
 
-use Illuminate\Http\Request;
-use Illuminate\Http\UploadedFile;
-use Illuminate\Support\Facades\File;
-use Illuminate\Validation\Validator;
 use Exception;
+use Illuminate\Http\Request;
 use App\Http\Models\Torrent;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
 
 class TorrentUploadService
@@ -25,13 +23,23 @@ class TorrentUploadService
     protected $decoder;
 
     /**
+     * @var TorrentInfoService
+     */
+    protected $torrentInfoService;
+
+    /**
      * @param BencodingService $encoder
      * @param BdecodingService $decoder
+     * @param TorrentInfoService $torrentInfoService
      */
-    public function __construct(BencodingService $encoder, BdecodingService $decoder)
-    {
+    public function __construct(
+        BencodingService $encoder,
+        BdecodingService $decoder,
+        TorrentInfoService $torrentInfoService
+    ) {
         $this->encoder = $encoder;
         $this->decoder = $decoder;
+        $this->torrentInfoService = $torrentInfoService;
     }
 
     /**
@@ -55,15 +63,22 @@ class TorrentUploadService
         // add entropy to randomize info_hash in order to prevent peer leaking attacks
         $decodedTorrent['info']['entropy'] = bin2hex($bytes);
 
+        // the torrent must be private
+        $decodedTorrent['info']['private'] = 1;
+
+        $torrentSize = $this->torrentInfoService->getTorrentSize($decodedTorrent['info']);
+
+        // TODO: add support for multiple announce URLs
         $decodedTorrent['announce'] = route('announce');
 
         $torrent = new Torrent();
-        $torrent->name = pathinfo($torrentFile->getClientOriginalName(), PATHINFO_FILENAME);
+        $torrent->name = $request->input('name');
+        $torrent->size = $torrentSize;
         $torrent->description = $request->input('description');
         $torrent->uploader_id = auth()->id();
         $torrent->infoHash = sha1($this->encoder->encode($decodedTorrent['info']));
         if (true === $torrent->save()) {
-            $stored = Storage::put("public/torrents/{$torrent->id}.torrent", $this->encoder->encode($decodedTorrent));
+            $stored = Storage::disk('public')->put("/torrents/{$torrent->id}.torrent", $this->encoder->encode($decodedTorrent));
             if (false !== $stored) {
                 return $torrent;
             } else {

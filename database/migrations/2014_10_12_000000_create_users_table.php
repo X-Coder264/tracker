@@ -18,7 +18,8 @@ class CreateUsersTable extends Migration
             $table->string('name');
             $table->string('email')->unique();
             $table->string('password');
-            $table->string('passkey', 64);
+            $table->string('passkey', 64)->nullable();
+            $table->string('timezone', 30);
             $table->integer('locale_id')->unsigned()->index();
             $table->foreign('locale_id')->references('id')->on('locales')->onUpdate('cascade')->onDelete('cascade');
             $table->rememberToken();
