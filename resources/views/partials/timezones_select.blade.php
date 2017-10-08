@@ -1,5 +1,5 @@
 <div class="form-group">
-    <label for="timezone" class="col control-label">Timezone</label>
+    <label for="timezone" class="col control-label">{{ __('messages.timezones_select.timezone') }}</label>
     <div class="col">
         <select class="form-control" name="timezone" id="timezone" required>
             <option value='Pacific/Midway' @if(Auth::check() && 'Pacific/Midway' === Auth::user()->timezone) selected @endif>(UTC-11:00) Midway Island</option>

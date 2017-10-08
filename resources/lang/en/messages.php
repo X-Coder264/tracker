@@ -45,4 +45,5 @@ return [
     'common.language' => 'Language',
     'common.save_changes' => 'Save changes',
     'common.save_changes_successful' => 'The changes were successfully saved.',
+    'timezones_select.timezone' => 'Timezone',
 ];

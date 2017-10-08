@@ -45,4 +45,5 @@ return [
     'common.language' => 'Jezik',
     'common.save_changes' => 'Spremi promjene',
     'common.save_changes_successful' => 'Promjene su uspješno spremljene.',
+    'timezones_select.timezone' => 'Vremenska zona',
 ];
