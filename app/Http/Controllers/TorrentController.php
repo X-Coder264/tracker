@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
-use App\Http\Services\TorrentInfoService;
 use Exception;
 use Illuminate\Http\Request;
 use App\Http\Models\Torrent;
@@ -15,6 +14,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Storage;
 use App\Http\Services\BdecodingService;
 use App\Http\Services\BencodingService;
+use App\Http\Services\TorrentInfoService;
 use App\Http\Services\TorrentUploadService;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
@@ -27,7 +27,7 @@ class TorrentController extends Controller
      */
     public function index(Request $request): Response
     {
-        Cache::forget('torrents');
+        //Cache::forget('torrents');
         $torrents = Cache::remember('torrents', 10, function () {
             return Torrent::with(['uploader'])->orderby('id', 'desc')->paginate(3);
         });
@@ -57,7 +57,7 @@ class TorrentController extends Controller
         $numberOfPeers = $torrent->peers->count();
 
         $torrentFileNamesAndSizes = Cache::rememberForever(
-            'torrents' . $torrent->id . 'files',
+            'torrent' . $torrent->id . 'files',
             function () use ($torrent, $bdecodingService, $torrentInfoService) {
                 $torrentFile = Storage::disk('public')->get("/torrents/{$torrent->id}.torrent");
                 $decodedTorrent = $bdecodingService->decode($torrentFile);
@@ -101,10 +101,14 @@ class TorrentController extends Controller
         $decodedTorrent = $decoder->decode($torrentFile);
         $passkey = Auth::user()->passkey;
         $decodedTorrent['announce'] = route('announce') . '?passkey=' . $passkey;
-        $filePath = "torrents/{$torrent->id}-55.torrent";
+        $filePath = "torrents/{$torrent->id}-" . Auth::id() . ".torrent";
         Storage::disk('public')->put($filePath, $encoder->encode($decodedTorrent));
         $url = Storage::url($filePath);
         $path = public_path($url);
-        return response()->download($path, $torrent->name . '.torrent', ['content-type' => 'application/x-bittorrent']);
+        return response()->download(
+            $path,
+            $torrent->name . '.torrent',
+            ['content-type' => 'application/x-bittorrent']
+        )->deleteFileAfterSend(true);
     }
 }

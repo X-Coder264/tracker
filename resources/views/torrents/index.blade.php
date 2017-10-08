@@ -32,7 +32,7 @@
                             <tr class="bg-warning">
                                 <th>XYZ</th>
                                 <td>
-                                    <a href="{{ route('torrents.show', $torrent->slug) }}">{{ $torrent->name }}</a>
+                                    <a href="{{ route('torrents.show', $torrent) }}">{{ $torrent->name }}</a>
                                     <br>
                                     {{ $torrent->created_at->timezone($timezone) }}
                                     @php
