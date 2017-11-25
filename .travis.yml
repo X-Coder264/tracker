@@ -9,12 +9,24 @@ matrix:
   allow_failures:
     - php: nightly
 
+cache:
+  directories:
+    - $HOME/.composer/cache
+    - $HOME/.app/cache
+env:
+  global:
+    - CHECK_PHP_SYNTAX="yes"
+
 sudo: false
 
 install:
   - cp .env.example .env
   - composer self-update
+  - if [[ "$CHECK_PHP_SYNTAX" == "yes" ]]; then composer require --dev --no-update friendsofphp/php-cs-fixer; fi;
   - travis_retry composer install --no-interaction --prefer-source
   - php artisan key:generate
 
-script: vendor/bin/phpunit
+script:
+  - if [[ "$CHECK_PHP_SYNTAX" == "yes" ]]; then php vendor/bin/php-cs-fixer --no-interaction --dry-run --diff -v fix; fi;
+  - if [[ "$CHECK_PHP_SYNTAX" == "yes" ]]; then mv ./.php_cs.cache $HOME/.app/cache/.php_cs.cache 2> /dev/null; fi;
+  - vendor/bin/phpunit
