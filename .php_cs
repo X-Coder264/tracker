@@ -18,8 +18,7 @@ return PhpCsFixer\Config::create()
         'array_syntax' => ['syntax' => 'short'],
         'no_useless_else' => true,
         'no_useless_return' => true,
-        'ordered_imports' => true,
-        'declare_strict_types' => true,
+        'ordered_imports' => ['sortAlgorithm' => 'length'],
         'strict_comparison' => true,
     ])
 ;
