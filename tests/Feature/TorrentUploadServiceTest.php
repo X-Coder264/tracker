@@ -40,13 +40,18 @@ class TorrentUploadServiceTest extends TestCase
         $torrentValue = '123456';
         $encoderStub->method('encode')->willReturn($torrentValue);
 
-        $response = $this->json('POST', route('torrents.store'), [
+        $torrentName = 'Test name';
+        $torrentDescription = 'Test description';
+
+        $response = $this->post(route('torrents.store'), [
             'torrent' => File::create('file.torrent'),
-            'name' => 'Test',
-            'description' => 'Test',
+            'name' => $torrentName,
+            'description' => $torrentDescription,
         ]);
 
-        $response->assertRedirect();
+        $torrent = Torrent::find(1);
+
+        $response->assertRedirect(route('torrents.show', $torrent));
         $response->assertSessionHas('success');
 
         // Assert the file was stored...
@@ -55,9 +60,8 @@ class TorrentUploadServiceTest extends TestCase
 
         $formatter = new SizeFormattingService();
 
-        $torrent = Torrent::find(1);
         $this->assertSame($formatter->getFormattedSize($torrentSize), $torrent->size);
-        $this->assertSame('Test', $torrent->name);
-        $this->assertSame('Test', $torrent->description);
+        $this->assertSame($torrentName, $torrent->name);
+        $this->assertSame($torrentDescription, $torrent->description);
     }
 }
