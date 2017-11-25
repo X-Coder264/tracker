@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace App\Http\Services;
 
@@ -23,7 +23,7 @@ class TorrentInfoService
 
     /**
      * @param SizeFormattingService $sizeFormattingService
-     * @param BdecodingService $bdecodingService
+     * @param BdecodingService      $bdecodingService
      */
     public function __construct(SizeFormattingService $sizeFormattingService, BdecodingService $bdecodingService)
     {
@@ -33,6 +33,7 @@ class TorrentInfoService
 
     /**
      * @param array $torrentInfoDict
+     *
      * @return int
      */
     public function getTorrentSize(array $torrentInfoDict)
@@ -54,6 +55,7 @@ class TorrentInfoService
 
     /**
      * @param array $torrentInfoDict
+     *
      * @return array
      */
     public function getTorrentFileNamesAndSizesFromTorrentInfoDict(array $torrentInfoDict): array
@@ -84,6 +86,7 @@ class TorrentInfoService
 
     /**
      * @param Torrent $torrent
+     *
      * @return mixed
      */
     public function getTorrentFileNamesAndSizes(Torrent $torrent)
@@ -97,6 +100,7 @@ class TorrentInfoService
                     abort(404, 'You requested an unavailable .torrent file.');
                 }
                 $decodedTorrent = $this->bdecodingService->decode($torrentFile);
+
                 return $this->getTorrentFileNamesAndSizesFromTorrentInfoDict($decodedTorrent['info']);
             }
         );

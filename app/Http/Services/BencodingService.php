@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace App\Http\Services;
 
@@ -8,6 +8,7 @@ class BencodingService
 {
     /**
      * @param mixed $data
+     *
      * @return string|null
      */
     public function encode($data): ?string
@@ -28,29 +29,32 @@ class BencodingService
     /**
      * Encode an integer
      *
-     * @param  integer|float $data
+     * @param int|float $data
+     *
      * @return string
      */
     private function encodeInteger($data): string
     {
-        return sprintf("i%.0fe", $data);
+        return sprintf('i%.0fe', $data);
     }
 
     /**
      * Encode a string
      *
      * @param  string
+     *
      * @return string
      */
     private function encodeString(string $data): string
     {
-        return sprintf("%d:%s", strlen($data), $data);
+        return sprintf('%d:%s', strlen($data), $data);
     }
 
     /**
      * Encode a list
      *
      * @param  array
+     *
      * @return string
      */
     private function encodeList(array $data = []): string
@@ -60,14 +64,15 @@ class BencodingService
             $list .= $this->encode($value);
         }
 
-        return sprintf("l%se", $list);
+        return sprintf('l%se', $list);
     }
 
     /**
      * Encode a dictionary
      *
-     * @param  null|array   $info The dictionary to be encoded.
-     * @return string  Returns the bencode encoded dictionary.
+     * @param null|array $info The dictionary to be encoded.
+     *
+     * @return string Returns the bencode encoded dictionary.
      */
     private function encodeDictionary(array $info = []): string
     {
@@ -78,6 +83,6 @@ class BencodingService
             $dictionary .= $this->encodeString($key) . $this->encode($value);
         }
 
-        return sprintf("d%se", $dictionary);
+        return sprintf('d%se', $dictionary);
     }
 }

@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace App\Http\Models;
 
@@ -49,11 +49,13 @@ class Torrent extends Model
      * Get the torrent's size.
      *
      * @param $value
+     *
      * @return string
      */
     public function getSizeAttribute($value)
     {
         $formatter = new SizeFormattingService();
+
         return $formatter->getFormattedSize($value);
     }
 

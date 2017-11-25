@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace App\Http\Services;
 
@@ -28,8 +28,8 @@ class TorrentUploadService
     protected $torrentInfoService;
 
     /**
-     * @param BencodingService $encoder
-     * @param BdecodingService $decoder
+     * @param BencodingService   $encoder
+     * @param BdecodingService   $decoder
      * @param TorrentInfoService $torrentInfoService
      */
     public function __construct(
@@ -44,13 +44,16 @@ class TorrentUploadService
 
     /**
      * @param Request $request
-     * @return Torrent
+     *
      * @throws Exception
+     *
+     * @return Torrent
      */
     public function upload(Request $request): Torrent
     {
         $torrentFile = $request->file('torrent');
         $torrentFilePath = $torrentFile->getRealPath();
+
         try {
             $torrentContent = File::get($torrentFilePath);
         } catch (Exception $e) {
@@ -86,6 +89,7 @@ class TorrentUploadService
                 return $torrent;
             } else {
                 $torrent->delete();
+
                 throw new Exception();
             }
         } else {

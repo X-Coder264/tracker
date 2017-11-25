@@ -31,7 +31,6 @@ return PhpCsFixer\Config::create()
         'new_with_braces' => true,
         'no_blank_lines_after_class_opening' => true,
         'no_blank_lines_after_phpdoc' => true,
-        'no_empty_comment' => true,
         'no_empty_statement' => true,
         'no_leading_import_slash' => true,
         'no_leading_namespace_whitespace' => true,

@@ -19,7 +19,6 @@ class BencodingTest extends TestCase
         $this->encoder = new BencodingService();
     }
 
-
     public function testStringEncoding()
     {
         $this->assertSame('4:spam', $this->encoder->encode('spam'));

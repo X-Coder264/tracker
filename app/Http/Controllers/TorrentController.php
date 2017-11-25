@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace App\Http\Controllers;
 
@@ -23,6 +23,7 @@ class TorrentController extends Controller
 {
     /**
      * @param Request $request
+     *
      * @return Response
      */
     public function index(Request $request): Response
@@ -31,6 +32,7 @@ class TorrentController extends Controller
         $torrents = Cache::remember('torrents', 10, function () {
             return Torrent::with(['uploader'])->orderby('id', 'desc')->paginate(3);
         });
+
         return response()->view('torrents.index', compact('torrents'));
     }
 
@@ -43,8 +45,9 @@ class TorrentController extends Controller
     }
 
     /**
-     * @param Torrent $torrent
+     * @param Torrent            $torrent
      * @param TorrentInfoService $torrentInfoService
+     *
      * @return Response
      */
     public function show(
@@ -60,8 +63,9 @@ class TorrentController extends Controller
     }
 
     /**
-     * @param Request $request
+     * @param Request              $request
      * @param TorrentUploadService $torrentUploadService
+     *
      * @return RedirectResponse
      */
     public function store(Request $request, TorrentUploadService $torrentUploadService): RedirectResponse
@@ -76,9 +80,10 @@ class TorrentController extends Controller
     }
 
     /**
-     * @param Torrent $torrent
+     * @param Torrent          $torrent
      * @param BencodingService $encoder
      * @param BdecodingService $decoder
+     *
      * @return BinaryFileResponse
      */
     public function download(Torrent $torrent, BencodingService $encoder, BdecodingService $decoder): BinaryFileResponse
@@ -92,10 +97,11 @@ class TorrentController extends Controller
         $decodedTorrent = $decoder->decode($torrentFile);
         $passkey = Auth::user()->passkey;
         $decodedTorrent['announce'] = route('announce') . '?passkey=' . $passkey;
-        $filePath = "torrents/{$torrent->id}-" . Auth::id() . ".torrent";
+        $filePath = "torrents/{$torrent->id}-" . Auth::id() . '.torrent';
         Storage::disk('public')->put($filePath, $encoder->encode($decodedTorrent));
         $url = Storage::url($filePath);
         $path = public_path($url);
+
         return response()->download(
             $path,
             $torrent->name . '.torrent',

@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace App\Http\Controllers;
 
@@ -17,17 +17,20 @@ class UserController extends Controller
 {
     /**
      * @param User $user
+     *
      * @return Response
      */
     public function edit(User $user): Response
     {
         $locales = Locale::all();
+
         return response()->view('users.edit', compact('user', 'locales'));
     }
 
     /**
      * @param Request $request
-     * @param User $user
+     * @param User    $user
+     *
      * @return RedirectResponse
      */
     public function update(Request $request, User $user): RedirectResponse

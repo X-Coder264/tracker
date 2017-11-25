@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace App\Http\Models;
 
@@ -22,11 +22,13 @@ class Peer extends Model
      * Get the peer's uploaded attribute.
      *
      * @param $value
+     *
      * @return string
      */
     public function getUploadedAttribute($value)
     {
         $formatter = new SizeFormattingService();
+
         return $formatter->getFormattedSize($value);
     }
 
@@ -34,11 +36,13 @@ class Peer extends Model
      * Get the peer's downloaded attribute.
      *
      * @param $value
+     *
      * @return string
      */
     public function getDownloadedAttribute($value)
     {
         $formatter = new SizeFormattingService();
+
         return $formatter->getFormattedSize($value);
     }
 

@@ -17,6 +17,7 @@ class SizeFormattingService
 
     /**
      * @param $sizeInBytes
+     *
      * @return string
      */
     public function getFormattedSize($sizeInBytes): string

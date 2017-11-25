@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace App\Http\Services;
 
@@ -31,6 +31,7 @@ class BdecodingService
 
     /**
      * @param string $data
+     *
      * @return array|int|string
      */
     public function decode(string $data)
@@ -43,20 +44,24 @@ class BdecodingService
     }
 
     /**
-     * @return array|int|string
      * @throws Exception
+     *
+     * @return array|int|string
      */
     private function doDecode()
     {
         switch ($this->getCharacterAtPosition()) {
-            case "i":
+            case 'i':
                 $this->position++;
+
                 return $this->decodeInteger();
-            case "l":
+            case 'l':
                 $this->position++;
+
                 return $this->decodeList();
-            case "d":
+            case 'd':
                 $this->position++;
+
                 return $this->decodeDictionary();
             default:
                 if (ctype_digit($this->getCharacterAtPosition())) {
@@ -69,6 +74,7 @@ class BdecodingService
 
     /**
      * @param int|null $position
+     *
      * @return null|string
      */
     private function getCharacterAtPosition(?int $position = null): ?string
@@ -85,18 +91,19 @@ class BdecodingService
     }
 
     /**
-     * @return int
      * @throws Exception
+     *
+     * @return int
      */
     private function decodeInteger(): int
     {
-        $positionOfIntegerEndingDelimiter = strpos($this->encodedString, "e", $this->position);
+        $positionOfIntegerEndingDelimiter = strpos($this->encodedString, 'e', $this->position);
         if (false === $positionOfIntegerEndingDelimiter) {
             throw new Exception("Integer value does not have an ending delimiter at position $this->position");
         }
 
         $currentPosition = $this->position;
-        if ("-" === $this->getCharacterAtPosition($currentPosition)) {
+        if ('-' === $this->getCharacterAtPosition($currentPosition)) {
             $currentPosition++;
         }
 
@@ -118,7 +125,7 @@ class BdecodingService
             $positionOfIntegerEndingDelimiter - $this->position
         );
         // Check for zero-padded integers
-        if (strlen($decodedValue) > 1 && "0" === $decodedValue[0]) {
+        if (strlen($decodedValue) > 1 && '0' === $decodedValue[0]) {
             throw new Exception("Illegal zero-padding for an integer value found at position $this->position");
         }
 
@@ -128,16 +135,17 @@ class BdecodingService
     }
 
     /**
-     * @return string
      * @throws Exception
+     *
+     * @return string
      */
     private function decodeString(): string
     {
-        if ("0" === $this->getCharacterAtPosition() && ":" !== $this->getCharacterAtPosition($this->position + 1)) {
+        if ('0' === $this->getCharacterAtPosition() && ':' !== $this->getCharacterAtPosition($this->position + 1)) {
             throw new Exception("Illegal zero-padding for a string length declaration at position $this->position");
         }
 
-        $positionOfColon = strpos($this->encodedString, ":", $this->position);
+        $positionOfColon = strpos($this->encodedString, ':', $this->position);
         if (false === $positionOfColon) {
             throw new Exception("The string value at position $this->position does not have a colon");
         }
@@ -154,8 +162,9 @@ class BdecodingService
     }
 
     /**
-     * @return array
      * @throws Exception
+     *
+     * @return array
      */
     private function decodeList(): array
     {
@@ -163,8 +172,9 @@ class BdecodingService
         $endingDelimiter = false;
         $listPosition = $this->position;
         while (null !== $this->getCharacterAtPosition()) {
-            if ("e" === $this->getCharacterAtPosition()) {
+            if ('e' === $this->getCharacterAtPosition()) {
                 $endingDelimiter = true;
+
                 break;
             }
 
@@ -181,8 +191,9 @@ class BdecodingService
     }
 
     /**
-     * @return array
      * @throws Exception
+     *
+     * @return array
      */
     private function decodeDictionary(): array
     {
@@ -190,8 +201,9 @@ class BdecodingService
         $endingDelimiter = false;
         $dictionaryPosition = $this->position;
         while (null !== $this->getCharacterAtPosition()) {
-            if ("e" === $this->getCharacterAtPosition()) {
+            if ('e' === $this->getCharacterAtPosition()) {
                 $endingDelimiter = true;
+
                 break;
             }
 

@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace App\Http\Services;
 
@@ -110,6 +110,7 @@ class AnnounceService
 
     /**
      * @param Request $request
+     *
      * @return string
      */
     public function announce(Request $request): string
@@ -208,6 +209,7 @@ class AnnounceService
 
     /**
      * Returns null if the validation is successful or a string if it is not
+     *
      * @return null|string
      */
     protected function validateInfoHashAndPeerID(): ?string
@@ -215,20 +217,24 @@ class AnnounceService
         if ($this->request->has('info_hash')) {
             if (20 !== strlen($this->request->input('info_hash'))) {
                 $errorMessage = __('messages.validation.variable.size', ['var' => 'info_hash']);
+
                 return $this->announceErrorResponse($errorMessage);
             }
         } else {
             $errorMessage = __('messages.validation.variable.required', ['var' => 'info_hash']);
+
             return $this->announceErrorResponse($errorMessage);
         }
 
         if ($this->request->has('peer_id')) {
             if (20 !== strlen($this->request->input('peer_id'))) {
                 $errorMessage = __('messages.validation.variable.size', ['var' => 'peer_id']);
+
                 return $this->announceErrorResponse($errorMessage);
             }
         } else {
             $errorMessage = __('messages.validation.variable.required', ['var' => 'peer_id']);
+
             return $this->announceErrorResponse($errorMessage);
         }
 
@@ -237,6 +243,7 @@ class AnnounceService
 
     /**
      * Returns null if the validation is successful or a string if it is not
+     *
      * @return null|string
      */
     protected function validateRequest(): ?string
@@ -271,6 +278,7 @@ class AnnounceService
 
         if ($validator->fails()) {
             $errors = $validator->errors();
+
             return $this->announceErrorResponse($errors->all());
         }
 
@@ -357,6 +365,7 @@ class AnnounceService
 
     /**
      * @param string $IP
+     *
      * @return bool
      */
     protected function validateIPv4Address(string $IP): bool
@@ -370,6 +379,7 @@ class AnnounceService
 
     /**
      * @param string $IP
+     *
      * @return bool
      */
     protected function validateIPv6Address(string $IP): bool
@@ -411,8 +421,10 @@ class AnnounceService
 
     /**
      * Check if the peer is connectable
+     *
      * @param string $IP
-     * @param int $port
+     * @param int    $port
+     *
      * @return bool
      */
     protected function isPeerConnectable(string $IP, int $port): bool
@@ -422,6 +434,7 @@ class AnnounceService
             return false;
         } else {
             @fclose($connection);
+
             return true;
         }
     }
@@ -631,7 +644,7 @@ class AnnounceService
         foreach ($peers as $peer) {
             foreach ($peer->IPs as $peerAddress) {
                 $peerIPAddress = inet_pton($peerAddress->IP);
-                $peerPort = pack("n*", $peerAddress->port);
+                $peerPort = pack('n*', $peerAddress->port);
 
                 if (true === $peerAddress->isIPv6) {
                     $response['peers6'] .= $peerIPAddress . $peerPort;
@@ -662,6 +675,7 @@ class AnnounceService
 
     /**
      * @param array|string $error
+     *
      * @return string
      */
     protected function announceErrorResponse($error): string
