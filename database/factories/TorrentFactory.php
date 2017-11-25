@@ -1,11 +1,10 @@
 <?php
 
-use App\Http\Models\Torrent;
 use App\Http\Models\User;
+use App\Http\Models\Torrent;
 use Faker\Generator as Faker;
 
 $factory->define(Torrent::class, function (Faker $faker) {
-
     return [
         'name' => $faker->unique()->name,
         'infoHash' => $faker->unique()->text(40),

@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace App\Http\Services;
 
 use App\Http\Models\Peer;
+use App\Http\Models\User;
 use App\Http\Models\Snatch;
 use App\Http\Models\Torrent;
-use App\Http\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Storage;
@@ -598,9 +598,9 @@ class AnnounceService
         // specify what kind of response it wants, else return non-compact response
         if (null === $compact || 1 === (int) $compact) {
             return $this->compactResponse();
-        } else {
-            return $this->nonCompactResponse();
         }
+
+        return $this->nonCompactResponse();
     }
 
     /**

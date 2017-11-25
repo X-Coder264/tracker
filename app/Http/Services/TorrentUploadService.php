@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\Http\Services;
 
 use Exception;
-use Illuminate\Http\Request;
 use App\Http\Models\Torrent;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
 

@@ -1,7 +1,7 @@
 <?php
 
-use App\Http\Models\Locale;
 use App\Http\Models\User;
+use App\Http\Models\Locale;
 use Faker\Generator as Faker;
 use Illuminate\Support\Facades\Hash;
 

@@ -5,15 +5,15 @@ declare(strict_types=1);
 namespace App\Http\Controllers;
 
 use Exception;
-use Illuminate\Http\Request;
 use App\Http\Models\Torrent;
+use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Cache;
 use App\Http\Services\BdecodingService;
 use App\Http\Services\BencodingService;
+use Illuminate\Support\Facades\Storage;
 use App\Http\Services\TorrentInfoService;
 use App\Http\Services\TorrentUploadService;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;

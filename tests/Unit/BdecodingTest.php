@@ -2,9 +2,9 @@
 
 namespace Tests\Unit;
 
-use App\Http\Services\BdecodingService;
-use Tests\TestCase;
 use Exception;
+use Tests\TestCase;
+use App\Http\Services\BdecodingService;
 
 class BdecodingTest extends TestCase
 {

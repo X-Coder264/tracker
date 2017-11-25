@@ -2,8 +2,8 @@
 
 namespace Tests\Unit;
 
-use App\Http\Services\BencodingService;
 use Tests\TestCase;
+use App\Http\Services\BencodingService;
 
 class BencodingTest extends TestCase
 {

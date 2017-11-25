@@ -2,11 +2,11 @@
 
 namespace Tests\Feature;
 
-use App\Http\Models\Torrent;
+use Tests\TestCase;
 use App\Http\Models\User;
+use App\Http\Models\Torrent;
 use App\Http\Services\TorrentInfoService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\TestCase;
 
 class TorrentControllerTest extends TestCase
 {

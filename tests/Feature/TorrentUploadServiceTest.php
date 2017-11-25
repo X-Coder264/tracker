@@ -2,16 +2,16 @@
 
 namespace Tests\Feature;
 
-use App\Http\Models\Torrent;
+use Tests\TestCase;
 use App\Http\Models\User;
+use App\Http\Models\Torrent;
+use Illuminate\Http\Testing\File;
 use App\Http\Services\BdecodingService;
 use App\Http\Services\BencodingService;
-use App\Http\Services\SizeFormattingService;
-use App\Http\Services\TorrentInfoService;
-use Tests\TestCase;
 use Illuminate\Support\Facades\Storage;
+use App\Http\Services\TorrentInfoService;
+use App\Http\Services\SizeFormattingService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Http\Testing\File;
 
 class TorrentUploadServiceTest extends TestCase
 {

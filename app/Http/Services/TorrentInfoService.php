@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace App\Http\Services;
 
 use App\Http\Models\Torrent;
-use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Contracts\Filesystem\FileNotFoundException;
 
 class TorrentInfoService
 {

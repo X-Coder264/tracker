@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
-use App\Http\Services\AnnounceService;
 use Illuminate\Http\Request;
+use App\Http\Services\AnnounceService;
 
 class AnnounceController extends Controller
 {
