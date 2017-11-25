@@ -33,7 +33,7 @@ class TorrentUploadServiceTest extends TestCase
         $torrentValue = '123456';
         $encoderStub->method('encode')->willReturn($torrentValue);
 
-        $response = $this->json('POST', route('torrent.store'), [
+        $response = $this->json('POST', route('torrents.store'), [
             'torrent' => File::create('file.torrent'),
             'name' => 'Test',
             'description' => 'Test',

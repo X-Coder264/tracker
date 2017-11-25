@@ -51,8 +51,8 @@ class BdecodingTest extends TestCase
             $this->assertSame(4147483647.0, $this->decoder->decode('i4147483647e'));
             $this->assertSame(-4147483647.0, $this->decoder->decode('i-4147483647e'));
         } else {
-            $this->assertSame(41474836470, $this->decoder->decode('i4147483647e'));
-            $this->assertSame(-41474836470, $this->decoder->decode('i-4147483647e'));
+            $this->assertSame(4147483647, $this->decoder->decode('i4147483647e'));
+            $this->assertSame(-4147483647, $this->decoder->decode('i-4147483647e'));
         }
     }
 
