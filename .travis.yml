@@ -23,7 +23,7 @@ install:
   - cp .env.example .env
   - composer self-update
   - if [[ "$CHECK_PHP_SYNTAX" == "yes" ]]; then composer require --dev --no-update friendsofphp/php-cs-fixer; fi;
-  - travis_retry composer install --no-interaction --prefer-source
+  - travis_retry composer install --dev --no-interaction --prefer-source
   - php artisan key:generate
 
 script:
