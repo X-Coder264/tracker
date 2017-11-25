@@ -18,6 +18,7 @@ sudo: false
 install:
   - composer self-update
   - travis_retry composer install --no-interaction --prefer-source
+  - php artisan key:generate
 
 before_script: git reset --hard HEAD
 
