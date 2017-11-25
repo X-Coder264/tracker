@@ -15,6 +15,7 @@ $factory->define(Torrent::class, function (Faker $faker) {
         },
         'description' => $faker->text(500),
         'seeders' => $faker->numberBetween(0, 100),
-        'leechers' => $faker->numberBetween(0, 100)
+        'leechers' => $faker->numberBetween(0, 100),
+        //'slug' => str_random(100),
     ];
 });

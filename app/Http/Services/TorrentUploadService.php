@@ -78,7 +78,10 @@ class TorrentUploadService
         $torrent->uploader_id = auth()->id();
         $torrent->infoHash = sha1($this->encoder->encode($decodedTorrent['info']));
         if (true === $torrent->save()) {
-            $stored = Storage::disk('public')->put("/torrents/{$torrent->id}.torrent", $this->encoder->encode($decodedTorrent));
+            $stored = Storage::disk('public')->put(
+                "/torrents/{$torrent->id}.torrent",
+                $this->encoder->encode($decodedTorrent)
+            );
             if (false !== $stored) {
                 return $torrent;
             } else {

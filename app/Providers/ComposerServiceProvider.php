@@ -13,7 +13,7 @@ class ComposerServiceProvider extends ServiceProvider
     /**
      * @var array
      */
-    private $viewsThatNeedLocaleAndTimezoneInfo = ['torrents.index', 'torrents.show'];
+    private $viewsThatNeedTimezoneInfo = ['torrents.index', 'torrents.show'];
 
     /**
      * Bootstrap any application services.
@@ -22,15 +22,13 @@ class ComposerServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        view()->composer($this->viewsThatNeedLocaleAndTimezoneInfo, function (View $view) {
+        view()->composer($this->viewsThatNeedTimezoneInfo, function (View $view) {
             if (Cache::has('user.' . Auth::id())) {
                 $user = Cache::get('user.' . Auth::id());
             } else {
                 $user = User::with('language')->find(Auth::id());
                 Cache::forever('user.' . Auth::id(), $user);
             }
-            $userLocale = $user->language->localeShort;
-            $view->with('userLocale', $userLocale);
             $view->with('timezone', $user->timezone);
         });
     }

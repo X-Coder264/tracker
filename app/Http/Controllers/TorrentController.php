@@ -27,7 +27,7 @@ class TorrentController extends Controller
      */
     public function index(Request $request): Response
     {
-        //Cache::forget('torrents');
+        Cache::forget('torrents');
         $torrents = Cache::remember('torrents', 10, function () {
             return Torrent::with(['uploader'])->orderby('id', 'desc')->paginate(3);
         });
@@ -44,26 +44,17 @@ class TorrentController extends Controller
 
     /**
      * @param Torrent $torrent
-     * @param BdecodingService $bdecodingService
      * @param TorrentInfoService $torrentInfoService
      * @return Response
      */
     public function show(
         Torrent $torrent,
-        BdecodingService $bdecodingService,
         TorrentInfoService $torrentInfoService
     ): Response {
         $torrent->load(['uploader', 'peers.user']);
         $numberOfPeers = $torrent->peers->count();
 
-        $torrentFileNamesAndSizes = Cache::rememberForever(
-            'torrent' . $torrent->id . 'files',
-            function () use ($torrent, $bdecodingService, $torrentInfoService) {
-                $torrentFile = Storage::disk('public')->get("/torrents/{$torrent->id}.torrent");
-                $decodedTorrent = $bdecodingService->decode($torrentFile);
-                return $torrentInfoService->getTorrentFileNamesAndSizes($decodedTorrent['info']);
-            }
-        );
+        $torrentFileNamesAndSizes = $torrentInfoService->getTorrentFileNamesAndSizes($torrent);
 
         return response()->view('torrents.show', compact('torrent', 'numberOfPeers', 'torrentFileNamesAndSizes'));
     }
@@ -81,7 +72,7 @@ class TorrentController extends Controller
             return back()->with('error', $e->getMessage());
         }
 
-        return redirect()->route('torrents.show', $torrent);
+        return redirect()->route('torrents.show', $torrent)->with('success', 'Bla');
     }
 
     /**
@@ -95,7 +86,7 @@ class TorrentController extends Controller
         try {
             $torrentFile = Storage::disk('public')->get("torrents/{$torrent->id}.torrent");
         } catch (FileNotFoundException $e) {
-            return 'Error, you requested an unavailable .torrent file.';
+            abort(404, 'Error, you requested an unavailable .torrent file.');
         }
 
         $decodedTorrent = $decoder->decode($torrentFile);

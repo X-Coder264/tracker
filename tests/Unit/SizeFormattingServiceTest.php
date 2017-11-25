@@ -11,6 +11,7 @@ class SizeFormattingServiceTest extends TestCase
     {
         $formatter = new SizeFormattingService();
         $this->assertSame('4.00 B', $formatter->getFormattedSize(4));
+        $this->assertSame('1023.00 B', $formatter->getFormattedSize(1023));
         $this->assertSame('1.00 KiB', $formatter->getFormattedSize(1024));
         $this->assertSame('4.00 KiB', $formatter->getFormattedSize(4096));
         $this->assertSame('4.00 MiB', $formatter->getFormattedSize(4194304));

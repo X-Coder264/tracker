@@ -16,36 +16,33 @@
                         </div>
                     </div>
                 @else
-                    <table class="table table-hover table-responsive-sm table-responsive-md table-responsive-lg">
+                    <table class="table table-hover table-bordered table-responsive-sm table-responsive-md table-responsive-lg">
                         <thead>
-                        <tr>
-                            <th>{{ __('messages.torrent.index.table_category') }}</th>
-                            <th>{{ __('messages.torrent.index.table_torrent_name') }}</th>
-                            <th>{{ __('messages.common.size') }}</th>
-                            <th>{{ __('messages.torrent.index.table_torrent_seeders') }}</th>
-                            <th>{{ __('messages.torrent.index.table_torrent_leechers') }}</th>
-                            <th>{{ __('messages.torrent.index.table_torrent_uploader') }}</th>
-                        </tr>
+                            <tr>
+                                <th>{{ __('messages.torrent.index.table_category') }}</th>
+                                <th>{{ __('messages.torrent.index.table_torrent_name') }}</th>
+                                <th>{{ __('messages.common.size') }}</th>
+                                <th>{{ __('messages.torrent.index.table_torrent_seeders') }}</th>
+                                <th>{{ __('messages.torrent.index.table_torrent_leechers') }}</th>
+                                <th>{{ __('messages.torrent.index.table_torrent_uploader') }}</th>
+                            </tr>
                         </thead>
                         <tbody>
-                        @foreach($torrents as $torrent)
-                            <tr class="bg-warning">
-                                <th>XYZ</th>
-                                <td>
-                                    <a href="{{ route('torrents.show', $torrent) }}">{{ $torrent->name }}</a>
-                                    <br>
-                                    {{ $torrent->created_at->timezone($timezone) }}
-                                    @php
-                                        \Carbon\Carbon::setLocale($userLocale);
-                                    @endphp
-                                    {{ $torrent->created_at->diffForHumans() }}
-                                </td>
-                                <td>{{ $torrent->size }}</td>
-                                <td>{{ $torrent->seeders }}</td>
-                                <td>{{ $torrent->leechers }}</td>
-                                <td>{{ $torrent->uploader->name }}</td>
-                            </tr>
-                        @endforeach
+                            @foreach($torrents as $torrent)
+                                <tr>
+                                    <td>XYZ</td>
+                                    <td>
+                                        <a href="{{ route('torrents.show', $torrent) }}">{{ $torrent->name }}</a>
+                                        <br>
+                                        {{ $torrent->created_at->timezone($timezone) }}
+                                        {{ $torrent->created_at->diffForHumans() }}
+                                    </td>
+                                    <td>{{ $torrent->size }}</td>
+                                    <td>{{ $torrent->seeders }}</td>
+                                    <td>{{ $torrent->leechers }}</td>
+                                    <td>{{ $torrent->uploader->name }}</td>
+                                </tr>
+                            @endforeach
                         </tbody>
                     </table>
                     {{ $torrents->render() }}

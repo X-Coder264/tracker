@@ -614,24 +614,16 @@ class AnnounceService
         // BEP 7 -> IPv6 peers support
         $response['peers6'] = '';
 
-        if (true === $this->seeder) {
-            $peers = Peer::with('IPs')
-                            ->where('seeder', '!=', true)
-                            ->where('user_id', '!=', $this->user->id)
-                            ->where('torrent_id', '=', $this->torrent->id)
-                            ->limit($this->numberOfWantedPeers)
-                            ->inRandomOrder()
-                            ->select(['id', 'peer_id'])
-                            ->get();
-        } else {
-            $peers = Peer::with('IPs')
-                            ->where('user_id', '!=', $this->user->id)
-                            ->where('torrent_id', '=', $this->torrent->id)
-                            ->select(['id', 'peer_id'])
-                            ->limit($this->numberOfWantedPeers)
-                            ->inRandomOrder()
-                            ->get();
-        }
+        $peers = Peer::with('IPs')
+                    ->when($this->seeder, function ($query) {
+                        return $query->where('seeder', '!=', true);
+                    })
+                    ->where('user_id', '!=', $this->user->id)
+                    ->where('torrent_id', '=', $this->torrent->id)
+                    ->limit($this->numberOfWantedPeers)
+                    ->inRandomOrder()
+                    ->select(['id', 'peer_id'])
+                    ->get();
 
         $response['complete'] = $peers->where('left', '=', 0)->count();
         $response['incomplete'] = $peers->where('left', '!=', 0)->count();
@@ -657,6 +649,14 @@ class AnnounceService
      */
     protected function nonCompactResponse(): string
     {
+        /* IPv6 peers are not separate for non-compact responses
+        response.peers = response.peers.map(function (peer) {
+                return {
+                    'peer id': common.hexToBinary(peer.peerId),
+            ip: peer.ip,
+            port: peer.port
+          }
+})*/
         return $this->announceErrorResponse('The tracker does not support non-compact response.');
     }
 

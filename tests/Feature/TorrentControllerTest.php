@@ -4,7 +4,9 @@ namespace Tests\Feature;
 
 use App\Http\Models\Torrent;
 use App\Http\Models\User;
+use App\Http\Services\TorrentInfoService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\App;
 use Tests\TestCase;
 
 class TorrentControllerTest extends TestCase
@@ -22,7 +24,7 @@ class TorrentControllerTest extends TestCase
     {
         $torrent = factory(Torrent::class)->create();
 
-        $response = $this->get(route('torrent.index'));
+        $response = $this->get(route('torrents.index'));
 
         $response->assertSee($torrent->name);
         $response->assertSee($torrent->uploader->name);
@@ -32,8 +34,23 @@ class TorrentControllerTest extends TestCase
 
     public function testCreate()
     {
-        $response = $this->get(route('torrent.create'));
+        $response = $this->get(route('torrents.create'));
 
         $response->assertStatus(200);
+    }
+
+    public function testShow()
+    {
+        $torrent = factory(Torrent::class)->create();
+
+        $torrentInfoStub = $this->createMock(TorrentInfoService::class);
+        App::instance(TorrentInfoService::class, $torrentInfoStub);
+
+        $returnValue = ['55.55 MB', 'Test.txt'];
+        $torrentInfoStub->method('getTorrentFileNamesAndSizes')->willReturn($returnValue);
+
+        $response = $this->get(route('torrents.show', $torrent));
+        $response->assertStatus(200);
+        $response->assertViewHas('torrentFileNamesAndSizes', $returnValue);
     }
 }

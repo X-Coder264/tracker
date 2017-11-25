@@ -8,6 +8,7 @@
             </div>
 
             <div class="card-body">
+                @include('partials.flash_messages')
                 {!! nl2br($torrent->description, false) !!}
             </div>
         </div>
@@ -31,7 +32,7 @@
                                     {{ __('messages.torrents.show.no_peers') }}
                                 </div>
                             @else
-                                <table class="table table-hover table-responsive-sm table-responsive-md table-responsive-lg">
+                                <table class="table table-hover table-bordered table-responsive-sm table-responsive-md table-responsive-lg">
                                     <thead>
                                         <tr>
                                             <th>Name</th>
@@ -44,7 +45,7 @@
                                     </thead>
                                     <tbody>
                                         @foreach($torrent->peers as $peer)
-                                            <tr class="bg-warning">
+                                            <tr>
                                                 <td>{{ $peer->user->name }}</td>
                                                 <td>{{ $peer->uploaded }}</td>
                                                 <td>{{ $peer->downloaded }}</td>
@@ -53,9 +54,6 @@
                                                 @else
                                                     <td>{{ number_format((int) $peer->uploaded / (int) $peer->downloaded, 2) }}</td>
                                                 @endif
-                                                @php
-                                                    \Carbon\Carbon::setLocale($userLocale);
-                                                @endphp
                                                 <td>{{ $peer->updated_at->diffForHumans() }}</td>
                                                 <td>{{ $peer->userAgent }}</td>
                                             </tr>
@@ -77,16 +75,16 @@
                             @if(count($torrentFileNamesAndSizes) === 0)
                                 Error.
                             @else
-                                <table class="table table-hover table-responsive-sm table-responsive-md table-responsive-lg">
+                                <table class="table table-hover table-bordered table-responsive-sm table-responsive-md table-responsive-lg">
                                     <thead>
-                                    <tr>
-                                        <th>{{ __('messages.torrents.show.file_name') }}</th>
-                                        <th>{{ __('messages.common.size') }}</th>
-                                    </tr>
+                                        <tr>
+                                            <th>{{ __('messages.torrents.show.file_name') }}</th>
+                                            <th>{{ __('messages.common.size') }}</th>
+                                        </tr>
                                     </thead>
                                     <tbody>
                                     @foreach($torrentFileNamesAndSizes as $file)
-                                        <tr class="bg-warning">
+                                        <tr>
                                             <td>{{ $file[0] }}</td>
                                             <td>{{ $file[1] }}</td>
                                         </tr>

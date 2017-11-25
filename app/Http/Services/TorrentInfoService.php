@@ -4,6 +4,11 @@ declare(strict_types=1);
 
 namespace App\Http\Services;
 
+use App\Http\Models\Torrent;
+use Illuminate\Contracts\Filesystem\FileNotFoundException;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Storage;
+
 class TorrentInfoService
 {
     /**
@@ -12,11 +17,18 @@ class TorrentInfoService
     private $sizeFormattingService;
 
     /**
-     * @param SizeFormattingService $sizeFormattingService
+     * @var BdecodingService
      */
-    public function __construct(SizeFormattingService $sizeFormattingService)
+    private $bdecodingService;
+
+    /**
+     * @param SizeFormattingService $sizeFormattingService
+     * @param BdecodingService $bdecodingService
+     */
+    public function __construct(SizeFormattingService $sizeFormattingService, BdecodingService $bdecodingService)
     {
         $this->sizeFormattingService = $sizeFormattingService;
+        $this->bdecodingService = $bdecodingService;
     }
 
     /**
@@ -25,6 +37,7 @@ class TorrentInfoService
      */
     public function getTorrentSize(array $torrentInfoDict)
     {
+        // TODO: add return type hint
         $size = 0;
         if (isset($torrentInfoDict['files'])) {
             // multiple file mode
@@ -43,7 +56,7 @@ class TorrentInfoService
      * @param array $torrentInfoDict
      * @return array
      */
-    public function getTorrentFileNamesAndSizes(array $torrentInfoDict)
+    public function getTorrentFileNamesAndSizesFromTorrentInfoDict(array $torrentInfoDict): array
     {
         $fileNamesAndSizes = [];
 
@@ -67,5 +80,27 @@ class TorrentInfoService
         }
 
         return $fileNamesAndSizes;
+    }
+
+    /**
+     * @param Torrent $torrent
+     * @return mixed
+     */
+    public function getTorrentFileNamesAndSizes(Torrent $torrent)
+    {
+        $torrentFileNamesAndSizes = Cache::rememberForever(
+            'torrent' . $torrent->id . 'files',
+            function () use ($torrent) {
+                try {
+                    $torrentFile = Storage::disk('public')->get("torrents/{$torrent->id}.torrent");
+                } catch (FileNotFoundException $e) {
+                    abort(404, 'You requested an unavailable .torrent file.');
+                }
+                $decodedTorrent = $this->bdecodingService->decode($torrentFile);
+                return $this->getTorrentFileNamesAndSizesFromTorrentInfoDict($decodedTorrent['info']);
+            }
+        );
+
+        return $torrentFileNamesAndSizes;
     }
 }

@@ -16,7 +16,7 @@
 
 </head>
 <body>
-    <div id="container-fluid">
+    <div class="container-fluid">
         <nav class="navbar navbar-expand-sm navbar-light bg-light">
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#nav-content" aria-controls="nav-content" aria-expanded="false">
                 <span class="navbar-toggler-icon"></span>
