@@ -3,11 +3,6 @@ language: php
 php:
   - 7.1
   - 7.2
-  - nightly
-
-matrix:
-  allow_failures:
-    - php: nightly
 
 cache:
   directories:
@@ -22,7 +17,7 @@ sudo: false
 install:
   - cp .env.example .env
   - composer self-update
-  - travis_retry composer install --dev --no-interaction --prefer-source
+  - travis_retry composer install --no-interaction --prefer-source
   - php artisan key:generate
 
 script:
