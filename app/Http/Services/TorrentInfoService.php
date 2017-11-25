@@ -87,9 +87,9 @@ class TorrentInfoService
     /**
      * @param Torrent $torrent
      *
-     * @return mixed
+     * @return array
      */
-    public function getTorrentFileNamesAndSizes(Torrent $torrent)
+    public function getTorrentFileNamesAndSizes(Torrent $torrent): array
     {
         $torrentFileNamesAndSizes = Cache::rememberForever(
             'torrent' . $torrent->id . 'files',

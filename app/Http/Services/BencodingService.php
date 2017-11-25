@@ -70,9 +70,9 @@ class BencodingService
     /**
      * Encode a dictionary
      *
-     * @param null|array $info The dictionary to be encoded.
+     * @param array $info
      *
-     * @return string Returns the bencode encoded dictionary.
+     * @return string
      */
     private function encodeDictionary(array $info = []): string
     {

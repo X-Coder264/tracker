@@ -56,7 +56,7 @@ class Torrent extends Model
     {
         $formatter = new SizeFormattingService();
 
-        return $formatter->getFormattedSize($value);
+        return $formatter->getFormattedSize((int) $value);
     }
 
     /**

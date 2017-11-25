@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types = 1);
+
 namespace App\Http\Services;
 
 class SizeFormattingService
@@ -16,11 +18,11 @@ class SizeFormattingService
     ];
 
     /**
-     * @param $sizeInBytes
+     * @param int $sizeInBytes
      *
      * @return string
      */
-    public function getFormattedSize($sizeInBytes): string
+    public function getFormattedSize(int $sizeInBytes): string
     {
         $count = 0;
         $size = $sizeInBytes;

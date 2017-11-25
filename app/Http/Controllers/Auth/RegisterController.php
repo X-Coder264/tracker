@@ -1,15 +1,19 @@
 <?php
 
+declare(strict_types = 1);
+
 namespace App\Http\Controllers\Auth;
 
 use DateTimeZone;
 use App\Http\Models\User;
 use App\Http\Models\Locale;
+use Illuminate\Http\Response;
 use Illuminate\Validation\Rule;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Foundation\Auth\RegistersUsers;
+use Illuminate\Contracts\Validation\Validator as ValidatorContract;
 
 class RegisterController extends Controller
 {
@@ -44,9 +48,9 @@ class RegisterController extends Controller
     /**
      * Show the application registration form.
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
-    public function showRegistrationForm()
+    public function showRegistrationForm(): Response
     {
         $locales = Locale::all();
 
@@ -58,9 +62,9 @@ class RegisterController extends Controller
      *
      * @param array $data
      *
-     * @return \Illuminate\Contracts\Validation\Validator
+     * @return ValidatorContract
      */
-    protected function validator(array $data)
+    protected function validator(array $data): ValidatorContract
     {
         $locales = Locale::select('id')->get();
         $localeIDs = $locales->pluck('id')->toArray();
@@ -88,7 +92,7 @@ class RegisterController extends Controller
      *
      * @return User
      */
-    protected function create(array $data)
+    protected function create(array $data): User
     {
         return User::create([
             'name' => $data['name'],
