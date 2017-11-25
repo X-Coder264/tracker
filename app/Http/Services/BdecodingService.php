@@ -85,13 +85,10 @@ class BdecodingService
     }
 
     /**
-     * Note: this function should return an integer but
-     * the int return type hint is not specified because
-     * on 32 bit systems it would overflow
-     * @return int|float
+     * @return int
      * @throws Exception
      */
-    private function decodeInteger()
+    private function decodeInteger(): int
     {
         $positionOfIntegerEndingDelimiter = strpos($this->encodedString, "e", $this->position);
         if (false === $positionOfIntegerEndingDelimiter) {
@@ -127,11 +124,6 @@ class BdecodingService
 
         $this->position = $positionOfIntegerEndingDelimiter + 1;
 
-        $floatValue = (float) $decodedValue;
-
-        if (4 === constant('PHP_INT_SIZE') && ($floatValue > 2147483647 || $floatValue < -2147483647)) {
-            return $floatValue;
-        }
         return (int) $decodedValue;
     }
 
