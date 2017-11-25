@@ -8,7 +8,6 @@ use App\Http\Services\BdecodingService;
 use App\Http\Services\BencodingService;
 use App\Http\Services\SizeFormattingService;
 use App\Http\Services\TorrentInfoService;
-use Illuminate\Support\Facades\App;
 use Tests\TestCase;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -26,17 +25,17 @@ class TorrentUploadServiceTest extends TestCase
         Storage::fake('public');
 
         $decoderStub = $this->createMock(BdecodingService::class);
-        App::instance(BdecodingService::class, $decoderStub);
+        $this->app->instance(BdecodingService::class, $decoderStub);
 
         $decoderStub->method('decode')->willReturn(['test' => 'test']);
 
         $encoderStub = $this->createMock(BencodingService::class);
-        App::instance(BencodingService::class, $encoderStub);
+        $this->app->instance(BencodingService::class, $encoderStub);
 
         $infoService = $this->createMock(TorrentInfoService::class);
         $torrentSize = 5000;
         $infoService->method('getTorrentSize')->willReturn($torrentSize);
-        App::instance(TorrentInfoService::class, $infoService);
+        $this->app->instance(TorrentInfoService::class, $infoService);
 
         $torrentValue = '123456';
         $encoderStub->method('encode')->willReturn($torrentValue);

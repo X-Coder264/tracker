@@ -6,7 +6,6 @@ use App\Http\Models\Torrent;
 use App\Http\Models\User;
 use App\Http\Services\TorrentInfoService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\App;
 use Tests\TestCase;
 
 class TorrentControllerTest extends TestCase
@@ -44,7 +43,7 @@ class TorrentControllerTest extends TestCase
         $torrent = factory(Torrent::class)->create();
 
         $torrentInfoStub = $this->createMock(TorrentInfoService::class);
-        App::instance(TorrentInfoService::class, $torrentInfoStub);
+        $this->app->instance(TorrentInfoService::class, $torrentInfoStub);
 
         $returnValue = ['55.55 MB', 'Test.txt'];
         $torrentInfoStub->method('getTorrentFileNamesAndSizes')->willReturn($returnValue);
