@@ -18,14 +18,14 @@ class BdecodingService
     /**
      * The length of the encoded source string
      *
-     * @var integer
+     * @var int
      */
     private $length;
 
     /**
      * The current position of the parser.
      *
-     * @var integer
+     * @var int
      */
     private $position;
 
