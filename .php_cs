@@ -19,5 +19,6 @@ return PhpCsFixer\Config::create()
         'no_useless_return' => true,
         'ordered_imports' => ['sortAlgorithm' => 'length'],
         'strict_comparison' => true,
+        'yoda_style' => true,
     ])
 ;
