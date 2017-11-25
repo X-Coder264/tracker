@@ -17,6 +17,7 @@
         "barryvdh/laravel-debugbar": "^3.0",
         "barryvdh/laravel-ide-helper": "^2.4",
         "filp/whoops": "~2.0",
+        "friendsofphp/php-cs-fixer": "^2.8",
         "fzaninotto/faker": "~1.4",
         "mockery/mockery": "0.9.*",
         "phpunit/phpunit": "~6.0"
