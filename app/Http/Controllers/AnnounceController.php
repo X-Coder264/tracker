@@ -11,8 +11,9 @@ use App\Http\Services\AnnounceService;
 class AnnounceController extends Controller
 {
     /**
-     * @param Request $request
+     * @param Request         $request
      * @param AnnounceService $announceService
+     *
      * @return Response
      */
     public function store(Request $request, AnnounceService $announceService): Response
