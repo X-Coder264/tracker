@@ -165,7 +165,7 @@ class AnnounceService
         }
 
         $left = (int) $this->request->input('left');
-        $this->seeder = $left === 0 ? true : false;
+        $this->seeder = 0 === $left ? true : false;
 
         if ('started' !== $event) {
             $this->peer = Peer::where('peer_id', '=', $this->peerID)
