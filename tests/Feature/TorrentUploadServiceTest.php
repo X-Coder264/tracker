@@ -17,6 +17,11 @@ class TorrentUploadServiceTest extends TestCase
 {
     use RefreshDatabase;
 
+    // TODO: add a test that shows that non private torrents get the private flag set to 1
+    // TODO: add a test that shows that all torrents have an entropy value set to randomize the info_hash
+    // TODO: add a test that shows that the info_hash must be unique in the DB (if it's not then a new entropy is calculated until it is)
+    // TODO: add a test that shows that the correct announce URL is set
+
     public function testTorrentUpload()
     {
         $user = factory(User::class)->create();
@@ -54,7 +59,6 @@ class TorrentUploadServiceTest extends TestCase
         $response->assertRedirect(route('torrents.show', $torrent));
         $response->assertSessionHas('success');
 
-        // Assert the file was stored...
         Storage::disk('public')->assertExists('torrents/1.torrent');
         $this->assertSame($torrentValue, Storage::disk('public')->get('torrents/1.torrent'));
 
