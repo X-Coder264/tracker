@@ -36,9 +36,8 @@ class TorrentInfoService
      *
      * @return int
      */
-    public function getTorrentSize(array $torrentInfoDict)
+    public function getTorrentSize(array $torrentInfoDict): int
     {
-        // TODO: add return type hint
         $size = 0;
         if (isset($torrentInfoDict['files'])) {
             // multiple file mode

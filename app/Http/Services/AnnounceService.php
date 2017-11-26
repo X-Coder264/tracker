@@ -444,7 +444,6 @@ class AnnounceService
      */
     protected function startedEventAnnounceResponse(): string
     {
-        // TODO: cast to int
         $this->peer = Peer::updateOrCreate(
             [
                 'peer_id' => $this->peerID,
@@ -520,7 +519,6 @@ class AnnounceService
      */
     protected function completedEventAnnounceResponse(): string
     {
-        // TODO: cast to int
         $this->peer->update(
             [
                 'uploaded' => $this->peer->uploaded + $this->uploadedInThisAnnounceCycle,
@@ -561,7 +559,6 @@ class AnnounceService
      */
     protected function noEventAnnounceResponse(): string
     {
-        // TODO: cast to int
         $this->peer = Peer::updateOrCreate(
             [
                 'peer_id' => $this->peerID,
@@ -670,7 +667,7 @@ class AnnounceService
             port: peer.port
           }
 })*/
-        return $this->announceErrorResponse('The tracker does not support non-compact response.');
+        return $this->announceErrorResponse('At the moment the tracker does not support non-compact response.');
     }
 
     /**
