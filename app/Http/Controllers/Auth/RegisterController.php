@@ -54,7 +54,7 @@ class RegisterController extends Controller
     {
         $locales = Locale::all();
 
-        return view('auth.register', compact('locales'));
+        return response()->view('auth.register', compact('locales'));
     }
 
     /**
