@@ -176,8 +176,8 @@ class AnnounceService
         }
 
         if (null === $this->peer) {
-            $this->downloadedInThisAnnounceCycle = max(0, $this->request->input('downloaded'));
-            $this->uploadedInThisAnnounceCycle = max(0, $this->request->input('uploaded'));
+            $this->downloadedInThisAnnounceCycle = $this->request->input('downloaded', 0);
+            $this->uploadedInThisAnnounceCycle = $this->request->input('uploaded', 0);
         } else {
             $this->downloadedInThisAnnounceCycle = max(0, $this->request->input('downloaded') - $this->peer->getOriginal('downloaded'));
             $this->uploadedInThisAnnounceCycle = max(0, $this->request->input('uploaded') - $this->peer->getOriginal('uploaded'));
