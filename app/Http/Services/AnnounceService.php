@@ -179,8 +179,8 @@ class AnnounceService
             $this->downloadedInThisAnnounceCycle = max(0, $this->request->input('downloaded'));
             $this->uploadedInThisAnnounceCycle = max(0, $this->request->input('uploaded'));
         } else {
-            $this->downloadedInThisAnnounceCycle = max(0, $this->request->input('downloaded') - $this->peer->downloaded);
-            $this->uploadedInThisAnnounceCycle = max(0, $this->request->input('uploaded') - $this->peer->uploaded);
+            $this->downloadedInThisAnnounceCycle = max(0, $this->request->input('downloaded') - $this->peer->getOriginal('downloaded'));
+            $this->uploadedInThisAnnounceCycle = max(0, $this->request->input('uploaded') - $this->peer->getOriginal('uploaded'));
             if (false === $this->seeder || (true === $this->seeder && 'completed' === $event)) {
                 $this->leechTime = $timeNow->diffInSeconds($this->peer->updated_at);
             } else {
