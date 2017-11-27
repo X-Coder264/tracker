@@ -521,8 +521,8 @@ class AnnounceService
     {
         $this->peer->update(
             [
-                'uploaded' => $this->peer->uploaded + $this->uploadedInThisAnnounceCycle,
-                'downloaded' => $this->peer->downloaded + $this->downloadedInThisAnnounceCycle,
+                'uploaded' => $this->peer->getOriginal('uploaded') + $this->uploadedInThisAnnounceCycle,
+                'downloaded' => $this->peer->getOriginal('downloaded') + $this->downloadedInThisAnnounceCycle,
                 'seeder' => $this->seeder,
                 'userAgent' => $this->request->userAgent(),
             ]
@@ -540,8 +540,8 @@ class AnnounceService
         if (null !== $this->snatch) {
             $this->snatch->update(
                 [
-                    'uploaded' => $this->snatch->uploaded + $this->uploadedInThisAnnounceCycle,
-                    'downloaded' => $this->snatch->downloaded + $this->downloadedInThisAnnounceCycle,
+                    'uploaded' => $this->snatch->getOriginal('uploaded') + $this->uploadedInThisAnnounceCycle,
+                    'downloaded' => $this->snatch->getOriginal('downloaded') + $this->downloadedInThisAnnounceCycle,
                     'left' => 0,
                     'leechTime' => $this->snatch->leechTime + $this->leechTime,
                     'timesAnnounced' => $this->snatch->timesAnnounced + 1,
@@ -566,8 +566,8 @@ class AnnounceService
                 'user_id' => $this->user->id,
             ],
             [
-                'uploaded' => $this->peer->uploaded + $this->uploadedInThisAnnounceCycle,
-                'downloaded' => $this->peer->downloaded + $this->downloadedInThisAnnounceCycle,
+                'uploaded' => $this->peer->getOriginal('uploaded') + $this->uploadedInThisAnnounceCycle,
+                'downloaded' => $this->peer->getOriginal('downloaded') + $this->downloadedInThisAnnounceCycle,
                 'seeder' => $this->seeder,
                 'userAgent' => $this->request->userAgent(),
             ]
