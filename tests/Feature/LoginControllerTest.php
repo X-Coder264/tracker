@@ -6,10 +6,14 @@ use Tests\TestCase;
 use App\Http\Models\User;
 use App\Http\Models\Locale;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class LoginControllerTest extends TestCase
 {
+    use RefreshDatabase;
+
     public function testIndex()
     {
         $response = $this->get(route('login'));
@@ -35,5 +39,10 @@ class LoginControllerTest extends TestCase
             'email'    => $email,
             'password' => $password
         ]);
+
+        $response->assertStatus(Response::HTTP_FOUND);
+        $response->assertRedirect(route('home.index'));
+        $this->assertSame(true, Auth::check());
+        $this->assertSame($user->id, Auth::id());
     }
 }
