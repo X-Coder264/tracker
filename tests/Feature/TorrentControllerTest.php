@@ -102,7 +102,7 @@ class TorrentControllerTest extends TestCase
     public function testNameMustContainAtLeast5Chars()
     {
         $response = $this->from(route('torrents.create'))->post(route('torrents.store'), $this->validParams([
-            'name' => str_repeat("X", 4),
+            'name' => str_repeat('X', 4),
         ]));
         $response->assertStatus(Response::HTTP_FOUND);
         $response->assertRedirect(route('torrents.create'));
@@ -113,7 +113,7 @@ class TorrentControllerTest extends TestCase
     public function testNameMustBeLessThan256CharsLong()
     {
         $response = $this->from(route('torrents.create'))->post(route('torrents.store'), $this->validParams([
-            'name' => str_repeat("X", 256),
+            'name' => str_repeat('X', 256),
         ]));
         $response->assertStatus(Response::HTTP_FOUND);
         $response->assertRedirect(route('torrents.create'));
