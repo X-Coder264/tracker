@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use Tests\TestCase;
 use App\Http\Models\User;
 use App\Http\Models\Torrent;
+use Illuminate\Http\Response;
 use Illuminate\Http\Testing\File;
 use App\Http\Services\BdecodingService;
 use App\Http\Services\BencodingService;
@@ -29,13 +30,13 @@ class TorrentUploadServiceTest extends TestCase
 
         Storage::fake('public');
 
-        $decoderStub = $this->createMock(BdecodingService::class);
-        $this->app->instance(BdecodingService::class, $decoderStub);
+        $decoder = $this->createMock(BdecodingService::class);
+        $this->app->instance(BdecodingService::class, $decoder);
 
-        $decoderStub->method('decode')->willReturn(['test' => 'test']);
+        $decoder->method('decode')->willReturn(['test' => 'test']);
 
-        $encoderStub = $this->createMock(BencodingService::class);
-        $this->app->instance(BencodingService::class, $encoderStub);
+        $encoder = $this->createMock(BencodingService::class);
+        $this->app->instance(BencodingService::class, $encoder);
 
         $infoService = $this->createMock(TorrentInfoService::class);
         $torrentSize = 5000;
@@ -43,7 +44,7 @@ class TorrentUploadServiceTest extends TestCase
         $this->app->instance(TorrentInfoService::class, $infoService);
 
         $torrentValue = '123456';
-        $encoderStub->method('encode')->willReturn($torrentValue);
+        $encoder->method('encode')->willReturn($torrentValue);
 
         $torrentName = 'Test name';
         $torrentDescription = 'Test description';
@@ -56,6 +57,7 @@ class TorrentUploadServiceTest extends TestCase
 
         $torrent = Torrent::find(1);
 
+        $response->assertStatus(Response::HTTP_FOUND);
         $response->assertRedirect(route('torrents.show', $torrent));
         $response->assertSessionHas('success');
 
@@ -64,6 +66,7 @@ class TorrentUploadServiceTest extends TestCase
 
         $formatter = new SizeFormattingService();
 
+        $this->assertSame($torrentSize, $torrent->getOriginal('size'));
         $this->assertSame($formatter->getFormattedSize($torrentSize), $torrent->size);
         $this->assertSame($torrentName, $torrent->name);
         $this->assertSame($torrentDescription, $torrent->description);

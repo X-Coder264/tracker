@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use Tests\TestCase;
 use App\Http\Models\User;
 use App\Http\Models\Torrent;
+use Illuminate\Http\Response;
 use App\Http\Services\TorrentInfoService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
@@ -28,28 +29,28 @@ class TorrentControllerTest extends TestCase
         $response->assertSee($torrent->name);
         $response->assertSee($torrent->uploader->name);
 
-        $response->assertStatus(200);
+        $response->assertStatus(Response::HTTP_OK);
     }
 
     public function testCreate()
     {
         $response = $this->get(route('torrents.create'));
 
-        $response->assertStatus(200);
+        $response->assertStatus(Response::HTTP_OK);
     }
 
     public function testShow()
     {
         $torrent = factory(Torrent::class)->create();
 
-        $torrentInfoStub = $this->createMock(TorrentInfoService::class);
-        $this->app->instance(TorrentInfoService::class, $torrentInfoStub);
+        $torrentInfo = $this->createMock(TorrentInfoService::class);
+        $this->app->instance(TorrentInfoService::class, $torrentInfo);
 
         $returnValue = ['55.55 MB', 'Test.txt'];
-        $torrentInfoStub->method('getTorrentFileNamesAndSizes')->willReturn($returnValue);
+        $torrentInfo->method('getTorrentFileNamesAndSizes')->willReturn($returnValue);
 
         $response = $this->get(route('torrents.show', $torrent));
-        $response->assertStatus(200);
+        $response->assertStatus(Response::HTTP_OK);
         $response->assertViewHas('torrentFileNamesAndSizes', $returnValue);
     }
 }

@@ -5,8 +5,8 @@
     "license": "MIT",
     "type": "project",
     "require": {
-        "php": ">=7.1.0",
-        "cviebrock/eloquent-sluggable": "^4.2",
+        "php": ">=7.2.0",
+        "cviebrock/eloquent-sluggable": "^4.3",
         "fideloper/proxy": "~3.3",
         "laravel/framework": "5.5.*",
         "laravel/tinker": "~1.0",
@@ -14,12 +14,12 @@
         "spatie/laravel-permission": "^2.7"
     },
     "require-dev": {
-        "barryvdh/laravel-debugbar": "^3.0",
+        "barryvdh/laravel-debugbar": "^3.1",
         "barryvdh/laravel-ide-helper": "^2.4",
         "filp/whoops": "~2.0",
         "friendsofphp/php-cs-fixer": "^2.8",
         "fzaninotto/faker": "~1.4",
-        "mockery/mockery": "0.9.*",
+        "mockery/mockery": "~1.0",
         "phpunit/phpunit": "~6.0"
     },
     "autoload": {
