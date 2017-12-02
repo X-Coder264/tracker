@@ -66,7 +66,7 @@ class TorrentUploadServiceTest extends TestCase
 
         $formatter = new SizeFormattingService();
 
-        $this->assertSame($torrentSize, $torrent->getOriginal('size'));
+        $this->assertSame($torrentSize, (int) $torrent->getOriginal('size'));
         $this->assertSame($formatter->getFormattedSize($torrentSize), $torrent->size);
         $this->assertSame($torrentName, $torrent->name);
         $this->assertSame($torrentDescription, $torrent->description);
