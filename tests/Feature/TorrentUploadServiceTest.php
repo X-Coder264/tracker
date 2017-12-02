@@ -71,4 +71,12 @@ class TorrentUploadServiceTest extends TestCase
         $this->assertSame($torrentName, $torrent->name);
         $this->assertSame($torrentDescription, $torrent->description);
     }
+
+    public function testGuestsCannotUploadTorrents()
+    {
+        $response = $this->post(route('torrents.store'), []);
+        $response->assertStatus(Response::HTTP_FOUND);
+        $response->assertRedirect(route('login'));
+        $this->assertSame(0, Torrent::count());
+    }
 }
