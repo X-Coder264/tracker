@@ -35,7 +35,7 @@ class LoginControllerTest extends TestCase
         $user->timezone = 'Europe/Zagreb';
         $user->save();
 
-        $response = $this->post(action('Auth\LoginController@login'), [
+        $response = $this->post(route('login'), [
             'email'    => $email,
             'password' => $password
         ]);

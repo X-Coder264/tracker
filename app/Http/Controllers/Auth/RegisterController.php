@@ -4,7 +4,6 @@ declare(strict_types = 1);
 
 namespace App\Http\Controllers\Auth;
 
-use DateTimeZone;
 use App\Http\Models\User;
 use App\Http\Models\Locale;
 use Illuminate\Http\Response;
@@ -68,7 +67,6 @@ class RegisterController extends Controller
     {
         $locales = Locale::select('id')->get();
         $localeIDs = $locales->pluck('id')->toArray();
-        $timezoneIdentifiers = DateTimeZone::listIdentifiers();
 
         return Validator::make($data, [
             'name'     => 'required|string|max:255',
@@ -78,10 +76,7 @@ class RegisterController extends Controller
                 'required',
                 Rule::in($localeIDs),
             ],
-            'timezone' => [
-                'required',
-                Rule::in($timezoneIdentifiers),
-            ],
+            'timezone' => 'required|timezone',
         ]);
     }
 

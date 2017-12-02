@@ -27,7 +27,7 @@ class RegisterControllerTest extends TestCase
         $locale = factory(Locale::class)->create();
         $timezone = 'Europe/Zagreb';
 
-        $response = $this->post(action('Auth\RegisterController@register'), [
+        $response = $this->post(route('register'), [
             'name'                  => $name,
             'password'              => 'test password',
             'password_confirmation' => 'test password',
@@ -43,8 +43,8 @@ class RegisterControllerTest extends TestCase
         $this->assertSame($user->name, $name);
         $this->assertSame($user->email, $email);
         $this->assertSame(60, strlen($user->password));
-        $this->assertSame((int) $user->locale_id, $locale->id);
         $this->assertSame($user->timezone, $timezone);
+        $this->assertTrue($user->language->is($locale));
         $this->assertNull($user->passkey);
         $this->assertNotNull($user->slug);
     }

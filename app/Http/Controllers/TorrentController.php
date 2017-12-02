@@ -70,6 +70,25 @@ class TorrentController extends Controller
      */
     public function store(Request $request, TorrentUploadService $torrentUploadService): RedirectResponse
     {
+        $this->validate(
+            $request,
+            [
+                'torrent' => 'required|file|mimetypes:application/x-bittorrent',
+                'name' => 'required|string|min:5|max:255|unique:torrents',
+                'description' => 'required|string',
+            ],
+            [
+                'torrent.required' => 'Test',
+                'torrent.file' => 'Test',
+                'torrent.mimetypes' => 'Test',
+                'name.required' => 'Test',
+                'name.min' => 'Test',
+                'name.max' => 'Test',
+                'name.unique' => 'Test',
+                'description.required' => 'Test',
+            ]
+        );
+
         try {
             $torrent = $torrentUploadService->upload($request);
         } catch (Exception $e) {
@@ -84,9 +103,9 @@ class TorrentController extends Controller
      * @param BencodingService $encoder
      * @param BdecodingService $decoder
      *
-     * @return BinaryFileResponse
+     * @return Response
      */
-    public function download(Torrent $torrent, BencodingService $encoder, BdecodingService $decoder): BinaryFileResponse
+    public function download(Torrent $torrent, BencodingService $encoder, BdecodingService $decoder): Response
     {
         try {
             $torrentFile = Storage::disk('public')->get("torrents/{$torrent->id}.torrent");
@@ -95,17 +114,15 @@ class TorrentController extends Controller
         }
 
         $decodedTorrent = $decoder->decode($torrentFile);
-        $passkey = Auth::user()->passkey;
-        $decodedTorrent['announce'] = route('announce') . '?passkey=' . $passkey;
-        $filePath = "torrents/{$torrent->id}-" . Auth::id() . '.torrent';
-        Storage::disk('public')->put($filePath, $encoder->encode($decodedTorrent));
-        $url = Storage::url($filePath);
-        $path = public_path($url);
+        $decodedTorrent['announce'] = route('announce', ['passkey' => Auth::user()->passkey]);
 
-        return response()->download(
-            $path,
-            $torrent->name . '.torrent',
-            ['content-type' => 'application/x-bittorrent']
-        )->deleteFileAfterSend(true);
+        return response(
+            $encoder->encode($decodedTorrent),
+            200,
+            [
+                'Content-Type'        => 'application/x-bittorrent',
+                'Content-Disposition' => 'attachment; filename="' . $torrent->name . '.torrent"',
+            ]
+        );
     }
 }
