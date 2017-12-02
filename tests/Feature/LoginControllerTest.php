@@ -2,11 +2,11 @@
 
 namespace Tests\Feature;
 
-use App\Http\Models\Locale;
-use App\Http\Models\User;
-use Illuminate\Support\Facades\Hash;
 use Tests\TestCase;
+use App\Http\Models\User;
+use App\Http\Models\Locale;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Hash;
 
 class LoginControllerTest extends TestCase
 {
