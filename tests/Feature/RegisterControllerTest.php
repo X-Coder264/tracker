@@ -18,6 +18,7 @@ class RegisterControllerTest extends TestCase
         $response = $this->get(route('register'));
 
         $response->assertStatus(Response::HTTP_OK);
+        $response->assertViewIs('auth.register');
         $response->assertViewHas('locales');
     }
 

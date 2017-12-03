@@ -31,6 +31,9 @@ class TorrentControllerTest extends TestCase
         $response->assertSee($torrent->uploader->name);
 
         $response->assertStatus(Response::HTTP_OK);
+        $response->assertViewIs('torrents.index');
+        $response->assertViewHas('torrents');
+        $response->assertViewHas('timezone');
     }
 
     public function testCreate()
@@ -38,6 +41,7 @@ class TorrentControllerTest extends TestCase
         $response = $this->get(route('torrents.create'));
 
         $response->assertStatus(Response::HTTP_OK);
+        $response->assertViewIs('torrents.create');
     }
 
     public function testShow()
@@ -52,7 +56,9 @@ class TorrentControllerTest extends TestCase
 
         $response = $this->get(route('torrents.show', $torrent));
         $response->assertStatus(Response::HTTP_OK);
+        $response->assertViewIs('torrents.show');
         $response->assertViewHas('torrentFileNamesAndSizes', $returnValue);
+        $response->assertViewHas('timezone');
     }
 
     public function testGuestsCannotUploadTorrents()

@@ -18,6 +18,7 @@ class LoginControllerTest extends TestCase
         $response = $this->get(route('login'));
 
         $response->assertStatus(Response::HTTP_OK);
+        $response->assertViewIs('auth.login');
     }
 
     public function testLogin()
