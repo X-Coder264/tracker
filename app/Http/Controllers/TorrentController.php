@@ -16,7 +16,6 @@ use App\Http\Services\BencodingService;
 use Illuminate\Support\Facades\Storage;
 use App\Http\Services\TorrentInfoService;
 use App\Http\Services\TorrentUploadService;
-use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
 
 class TorrentController extends Controller
