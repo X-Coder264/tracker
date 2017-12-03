@@ -61,6 +61,23 @@ class TorrentControllerTest extends TestCase
         $response->assertViewHas('timezone');
     }
 
+    public function testGuestsCannotSeeTheTorrentsIndexPage()
+    {
+        $this->app->make('auth')->guard()->logout();
+        $response = $this->get(route('torrents.index'));
+        $response->assertStatus(Response::HTTP_FOUND);
+        $response->assertRedirect(route('login'));
+    }
+
+    public function testGuestsCannotSeeTheTorrentPage()
+    {
+        $this->app->make('auth')->guard()->logout();
+        $torrent = factory(Torrent::class)->create();
+        $response = $this->get(route('torrents.show', $torrent));
+        $response->assertStatus(Response::HTTP_FOUND);
+        $response->assertRedirect(route('login'));
+    }
+
     public function testGuestsCannotUploadTorrents()
     {
         $this->app->make('auth')->guard()->logout();
