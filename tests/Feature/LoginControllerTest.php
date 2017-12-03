@@ -47,17 +47,52 @@ class LoginControllerTest extends TestCase
 
     public function testEmailIsRequired()
     {
-        $response = $this->from(route('login'))->post(route('login'), ['email' => '']);
+        $response = $this->from(route('login'))->post(route('login'), $this->validParams([
+            'email' => '',
+        ]));
         $response->assertStatus(Response::HTTP_FOUND);
         $response->assertRedirect(route('login'));
         $response->assertSessionHasErrors('email');
+        $this->assertFalse(session()->hasOldInput('email'));
+        $this->assertFalse(session()->hasOldInput('password'));
+        $this->assertGuest();
     }
 
     public function testPasswordIsRequired()
     {
-        $response = $this->from(route('login'))->post(route('login'), ['password' => '']);
+        $response = $this->from(route('login'))->post(route('login'), $this->validParams([
+            'password' => '',
+        ]));
         $response->assertStatus(Response::HTTP_FOUND);
         $response->assertRedirect(route('login'));
         $response->assertSessionHasErrors('password');
+        $this->assertTrue(session()->hasOldInput('email'));
+        $this->assertFalse(session()->hasOldInput('password'));
+        $this->assertGuest();
+    }
+
+    /**
+     * @param array $overrides
+     *
+     * @return array
+     */
+    private function validParams($overrides = []): array
+    {
+        $locale = factory(Locale::class)->create();
+        $email = 'test@gmail.com';
+        $password = '12345678';
+
+        $user = new User();
+        $user->name = 'test';
+        $user->email = $email;
+        $user->password = Hash::make($password, ['rounds' => 15]);
+        $user->locale_id = $locale->id;
+        $user->timezone = 'Europe/Zagreb';
+        $user->save();
+
+        return array_merge([
+            'email'    => $user->email,
+            'password' => $password,
+        ], $overrides);
     }
 }

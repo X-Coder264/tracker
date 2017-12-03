@@ -61,6 +61,7 @@ class RegisterControllerTest extends TestCase
         $response->assertRedirect(route('register'));
         $response->assertSessionHasErrors('name');
         $this->assertSame(0, User::count());
+        $this->assertGuest();
     }
 
     public function testNameMustBeLessThan256CharsLong()
@@ -72,6 +73,7 @@ class RegisterControllerTest extends TestCase
         $response->assertRedirect(route('register'));
         $response->assertSessionHasErrors('name');
         $this->assertSame(0, User::count());
+        $this->assertGuest();
     }
 
     public function testNameMustBeUnique()
@@ -84,6 +86,7 @@ class RegisterControllerTest extends TestCase
         $response->assertRedirect(route('register'));
         $response->assertSessionHasErrors('name');
         $this->assertSame(1, User::count());
+        $this->assertGuest();
     }
 
     public function testEmailIsRequired()
@@ -95,6 +98,7 @@ class RegisterControllerTest extends TestCase
         $response->assertRedirect(route('register'));
         $response->assertSessionHasErrors('email');
         $this->assertSame(0, User::count());
+        $this->assertGuest();
     }
 
     public function testEmailMustBeLessThan256CharsLong()
@@ -106,6 +110,7 @@ class RegisterControllerTest extends TestCase
         $response->assertRedirect(route('register'));
         $response->assertSessionHasErrors('email');
         $this->assertSame(0, User::count());
+        $this->assertGuest();
     }
 
     public function testEmailMustBeUnique()
@@ -118,6 +123,7 @@ class RegisterControllerTest extends TestCase
         $response->assertRedirect(route('register'));
         $response->assertSessionHasErrors('email');
         $this->assertSame(1, User::count());
+        $this->assertGuest();
     }
 
     public function testEmailMustBeAValidEmail()
@@ -129,6 +135,7 @@ class RegisterControllerTest extends TestCase
         $response->assertRedirect(route('register'));
         $response->assertSessionHasErrors('email');
         $this->assertSame(0, User::count());
+        $this->assertGuest();
     }
 
     public function testPasswordIsRequired()
@@ -141,6 +148,7 @@ class RegisterControllerTest extends TestCase
         $response->assertRedirect(route('register'));
         $response->assertSessionHasErrors('password');
         $this->assertSame(0, User::count());
+        $this->assertGuest();
     }
 
     public function testPasswordMustHaveAtLeast8Chars()
@@ -153,6 +161,7 @@ class RegisterControllerTest extends TestCase
         $response->assertRedirect(route('register'));
         $response->assertSessionHasErrors('password');
         $this->assertSame(0, User::count());
+        $this->assertGuest();
     }
 
     public function testPasswordMustBeConfirmed()
@@ -164,6 +173,7 @@ class RegisterControllerTest extends TestCase
         $response->assertRedirect(route('register'));
         $response->assertSessionHasErrors('password');
         $this->assertSame(0, User::count());
+        $this->assertGuest();
     }
 
     public function testLocaleIsRequired()
@@ -175,6 +185,7 @@ class RegisterControllerTest extends TestCase
         $response->assertRedirect(route('register'));
         $response->assertSessionHasErrors('locale');
         $this->assertSame(0, User::count());
+        $this->assertGuest();
     }
 
     public function testLocaleMustBeAValidLocale()
@@ -186,6 +197,7 @@ class RegisterControllerTest extends TestCase
         $response->assertRedirect(route('register'));
         $response->assertSessionHasErrors('locale');
         $this->assertSame(0, User::count());
+        $this->assertGuest();
     }
 
     public function testTimezoneIsRequired()
@@ -197,6 +209,7 @@ class RegisterControllerTest extends TestCase
         $response->assertRedirect(route('register'));
         $response->assertSessionHasErrors('timezone');
         $this->assertSame(0, User::count());
+        $this->assertGuest();
     }
 
     public function testTimezoneMustBeAValidTimezone()
@@ -208,6 +221,7 @@ class RegisterControllerTest extends TestCase
         $response->assertRedirect(route('register'));
         $response->assertSessionHasErrors('timezone');
         $this->assertSame(0, User::count());
+        $this->assertGuest();
     }
 
     /**
