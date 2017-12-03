@@ -32,8 +32,7 @@ class TorrentControllerTest extends TestCase
 
         $response->assertStatus(Response::HTTP_OK);
         $response->assertViewIs('torrents.index');
-        $response->assertViewHas('torrents');
-        $response->assertViewHas('timezone');
+        $response->assertViewHas(['torrents', 'timezone']);
     }
 
     public function testCreate()

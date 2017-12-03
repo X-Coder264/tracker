@@ -4,7 +4,6 @@ declare(strict_types = 1);
 
 namespace App\Http\Controllers;
 
-use DateTimeZone;
 use App\Http\Models\User;
 use App\Http\Models\Locale;
 use Illuminate\Http\Request;
@@ -37,7 +36,6 @@ class UserController extends Controller
     {
         $locales = Locale::select('id')->get();
         $localeIDs = $locales->pluck('id')->toArray();
-        $timezoneIdentifiers = DateTimeZone::listIdentifiers();
 
         $this->validate(
             $request,
@@ -51,10 +49,7 @@ class UserController extends Controller
                     'required',
                     Rule::in($localeIDs),
                 ],
-                'timezone' => [
-                    'required',
-                    Rule::in($timezoneIdentifiers),
-                ],
+                'timezone' => 'required|timezone',
             ],
             [
                 'email.required' => __('messages.validation.variable.required', ['var' => 'email']),
@@ -63,7 +58,7 @@ class UserController extends Controller
                 'locale_id.required' => __('messages.validation.variable.required', ['var' => 'language']),
                 'locale_id.in' => __('messages.validation.variable.invalid_value', ['var' => 'language']),
                 'timezone.required' => __('messages.validation.variable.required', ['var' => 'timezone']),
-                'timezone.in' => __('messages.validation.variable.invalid_value', ['var' => 'timezone']),
+                'timezone.timezone' => __('messages.validation.variable.invalid_value', ['var' => 'timezone']),
             ]
         );
 
