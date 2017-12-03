@@ -9,7 +9,7 @@
 @if(session('error'))
     <div class="card text-white bg-danger">
         <div class="card-body">
-            <h4 class="card-title">{{ __('messages.flash_messages.error') }}</h4>
+            <h4 class="card-title">{{ __('messages.common.error') }}</h4>
             <p class="card-text">{{ session('error') }}</p>
         </div>
     </div>
@@ -25,7 +25,7 @@
 @if($errors->any())
     <div class="card text-white bg-danger">
         <div class="card-body">
-            <h4 class="card-title">{{ __('messages.flash_messages.error') }}</h4>
+            <h4 class="card-title">{{ __('messages.common.error') }}</h4>
             @foreach ($errors->all() as $error)
                 <p class="card-text">{{ $error }}</p>
             @endforeach

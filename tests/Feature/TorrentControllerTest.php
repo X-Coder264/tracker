@@ -55,6 +55,15 @@ class TorrentControllerTest extends TestCase
         $response->assertViewHas('torrentFileNamesAndSizes', $returnValue);
     }
 
+    public function testGuestsCannotUploadTorrents()
+    {
+        $this->app->make('auth')->guard()->logout();
+        $response = $this->post(route('torrents.store'), $this->validParams());
+        $response->assertStatus(Response::HTTP_FOUND);
+        $response->assertRedirect(route('login'));
+        $this->assertSame(0, Torrent::count());
+    }
+
     public function testTorrentFileIsRequired()
     {
         $response = $this->from(route('torrents.create'))->post(route('torrents.store'), $this->validParams([
@@ -144,7 +153,11 @@ class TorrentControllerTest extends TestCase
         $this->assertSame(0, Torrent::count());
     }
 
-    private function validParams($overrides = [])
+    /**
+     * @param array $overrides
+     * @return array
+     */
+    private function validParams($overrides = []): array
     {
         return array_merge([
             'name' => 'Test name',

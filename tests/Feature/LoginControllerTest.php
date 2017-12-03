@@ -6,7 +6,6 @@ use Tests\TestCase;
 use App\Http\Models\User;
 use App\Http\Models\Locale;
 use Illuminate\Http\Response;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
@@ -42,7 +41,22 @@ class LoginControllerTest extends TestCase
 
         $response->assertStatus(Response::HTTP_FOUND);
         $response->assertRedirect(route('home.index'));
-        $this->assertSame(true, Auth::check());
-        $this->assertSame($user->id, Auth::id());
+        $this->assertAuthenticatedAs($user);
+    }
+
+    public function testEmailIsRequired()
+    {
+        $response = $this->from(route('login'))->post(route('login'), ['email' => '']);
+        $response->assertStatus(Response::HTTP_FOUND);
+        $response->assertRedirect(route('login'));
+        $response->assertSessionHasErrors('email');
+    }
+
+    public function testPasswordIsRequired()
+    {
+        $response = $this->from(route('login'))->post(route('login'), ['password' => '']);
+        $response->assertStatus(Response::HTTP_FOUND);
+        $response->assertRedirect(route('login'));
+        $response->assertSessionHasErrors('password');
     }
 }
