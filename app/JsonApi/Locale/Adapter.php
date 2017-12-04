@@ -10,7 +10,6 @@ use CloudCreativity\LaravelJsonApi\Pagination\StandardStrategy;
 
 class Adapter extends EloquentAdapter
 {
-
     /**
      * @var array
      */

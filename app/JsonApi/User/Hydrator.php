@@ -24,5 +24,4 @@ class Hydrator extends EloquentHydrator
         'torrents',
         'locale' => 'language',
     ];
-
 }

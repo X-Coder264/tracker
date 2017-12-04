@@ -36,18 +36,5 @@ class Schema extends EloquentSchema
         }
 
         return [];
-
-        /*return [
-            'torrents' => [
-                self::SHOW_SELF => true,
-                self::SHOW_RELATED => true,
-                self::DATA => $resource->torrents
-            ],
-            'language' => [
-                self::SHOW_SELF => true,
-                self::SHOW_RELATED => true,
-                self::DATA => $resource->language,
-            ],
-        ];*/
     }
 }

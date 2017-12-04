@@ -9,7 +9,6 @@ use CloudCreativity\LaravelJsonApi\Validators\AbstractValidatorProvider;
 
 class Validators extends AbstractValidatorProvider
 {
-
     /**
      * @var string
      */
@@ -71,5 +70,4 @@ class Validators extends AbstractValidatorProvider
     {
         //$relationships->hasOne('author', 'people', is_null($record), false);
     }
-
 }
