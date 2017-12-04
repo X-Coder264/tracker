@@ -4,6 +4,7 @@ declare(strict_types = 1);
 
 namespace App\Http\Models;
 
+use Illuminate\Support\Facades\Hash;
 use Spatie\Permission\Traits\HasRoles;
 use Illuminate\Notifications\Notifiable;
 use Cviebrock\EloquentSluggable\Sluggable;
@@ -57,11 +58,21 @@ class User extends Authenticatable
     }
 
     /**
+     * Set the user's password.
+     *
+     * @param  string  $password
+     */
+    public function setPasswordAttribute($password): void
+    {
+        $this->attributes['password'] = Hash::make($password, ['rounds' => 15]);
+    }
+
+    /**
      * @return HasMany
      */
     public function torrents(): HasMany
     {
-        return $this->hasMany(Torrent::class, 'uploader');
+        return $this->hasMany(Torrent::class, 'uploader_id');
     }
 
     /**

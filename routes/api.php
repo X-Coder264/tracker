@@ -16,3 +16,8 @@ use Illuminate\Http\Request;
 /*Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });*/
+
+JsonApi::register('default', ['namespace' => 'Admin'], function ($api, $router) {
+    $api->resource('user');
+    $api->resource('locale');
+});
