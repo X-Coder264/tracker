@@ -3,8 +3,8 @@
 namespace Tests\Feature\Admin;
 
 use App\Http\Models\User;
-use Tests\AdminApiTestCase;
 use App\Http\Models\Locale;
+use Tests\AdminApiTestCase;
 use App\JsonApi\ResourceTypes;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 

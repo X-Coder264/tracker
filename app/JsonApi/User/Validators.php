@@ -4,8 +4,8 @@ namespace App\JsonApi\User;
 
 use App\Http\Models\User;
 use App\JsonApi\ResourceTypes;
-use CloudCreativity\JsonApi\Contracts\Validators\RelationshipsValidatorInterface;
 use CloudCreativity\LaravelJsonApi\Validators\AbstractValidatorProvider;
+use CloudCreativity\JsonApi\Contracts\Validators\RelationshipsValidatorInterface;
 
 class Validators extends AbstractValidatorProvider
 {

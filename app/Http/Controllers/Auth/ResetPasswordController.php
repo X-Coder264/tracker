@@ -60,7 +60,7 @@ class ResetPasswordController extends Controller
      * Reset the given user's password.
      *
      * @param  CanResetPassword|Authenticatable|User  $user
-     * @param  string  $password
+     * @param  string                                 $password
      * @return void
      */
     protected function resetPassword($user, $password)

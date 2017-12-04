@@ -9,7 +9,6 @@ use CloudCreativity\LaravelJsonApi\Http\Controllers\EloquentController;
 class UserController extends EloquentController
 {
     /**
-     *
      * @param Hydrator $hydrator
      */
     public function __construct(Hydrator $hydrator)

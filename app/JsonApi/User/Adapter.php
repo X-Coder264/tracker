@@ -3,8 +3,8 @@
 namespace App\JsonApi\User;
 
 use App\Http\Models\User;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
+use Illuminate\Database\Eloquent\Builder;
 use CloudCreativity\LaravelJsonApi\Store\EloquentAdapter;
 use CloudCreativity\LaravelJsonApi\Pagination\StandardStrategy;
 

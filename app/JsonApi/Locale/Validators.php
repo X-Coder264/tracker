@@ -4,8 +4,8 @@ namespace App\JsonApi\Locale;
 
 use App\Http\Models\Locale;
 use App\JsonApi\ResourceTypes;
-use CloudCreativity\JsonApi\Contracts\Validators\RelationshipsValidatorInterface;
 use CloudCreativity\LaravelJsonApi\Validators\AbstractValidatorProvider;
+use CloudCreativity\JsonApi\Contracts\Validators\RelationshipsValidatorInterface;
 
 class Validators extends AbstractValidatorProvider
 {

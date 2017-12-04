@@ -60,7 +60,7 @@ class User extends Authenticatable
     /**
      * Set the user's password.
      *
-     * @param  string  $password
+     * @param string $password
      */
     public function setPasswordAttribute($password): void
     {

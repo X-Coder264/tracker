@@ -10,8 +10,8 @@ class AdminApiTestCase extends TestCase
     /**
      * @param string $method
      * @param string $uri
-     * @param array $data
-     * @param array $headers
+     * @param array  $data
+     * @param array  $headers
      * @return JsonApiResponse|null
      */
     protected function makeRequest(string $method, string $uri, array $data = [], array $headers = []): ?JsonApiResponse
