@@ -61,7 +61,6 @@ class ResetPasswordController extends Controller
      *
      * @param  CanResetPassword|Authenticatable|User  $user
      * @param  string                                 $password
-     * @return void
      */
     protected function resetPassword($user, $password)
     {

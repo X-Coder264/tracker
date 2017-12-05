@@ -27,6 +27,7 @@ class Schema extends EloquentSchema
      * @param object $resource
      * @param bool   $isPrimary
      * @param array  $includeRelationships
+     *
      * @return array
      */
     public function getRelationships($resource, $isPrimary, array $includeRelationships)
