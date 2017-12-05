@@ -30,7 +30,7 @@ class LoginControllerTest extends TestCase
         $user = new User();
         $user->name = 'test';
         $user->email = $email;
-        $user->password = Hash::make($password, ['rounds' => 15]);
+        $user->password = $password;
         $user->locale_id = $locale->id;
         $user->timezone = 'Europe/Zagreb';
         $user->save();
