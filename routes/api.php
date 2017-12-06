@@ -18,6 +18,6 @@ use Illuminate\Http\Request;
 });*/
 
 JsonApi::register('default', ['namespace' => 'Admin'], function ($api, $router) {
-    $api->resource('user');
-    $api->resource('locale');
+    $api->resource('users');
+    $api->resource('locales');
 });

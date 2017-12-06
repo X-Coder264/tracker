@@ -35,7 +35,7 @@ class AdminApiTestCase extends TestCase
         $validResponseStatusCodes = [Response::HTTP_OK, Response::HTTP_CREATED, Response::HTTP_NO_CONTENT];
         $this->assertContains($response->getStatusCode(), $validResponseStatusCodes);
         if ('DELETE' !== $method) {
-            $response->assertHeader('Content-Type', MediaTypeInterface::JSON_API_MEDIA_TYPE);
+            $response->assertHeader('CONTENT_TYPE', MediaTypeInterface::JSON_API_MEDIA_TYPE);
 
             $jsonApiResponse = new JsonApiResponse($response);
 

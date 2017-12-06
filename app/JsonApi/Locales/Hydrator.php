@@ -1,6 +1,6 @@
 <?php
 
-namespace App\JsonApi\Locale;
+namespace App\JsonApi\Locales;
 
 use CloudCreativity\LaravelJsonApi\Hydrator\EloquentHydrator;
 

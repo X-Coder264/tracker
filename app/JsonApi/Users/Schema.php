@@ -1,11 +1,12 @@
 <?php
 
-namespace App\JsonApi\User;
+namespace App\JsonApi\Users;
 
 use App\Http\Models\User;
 use App\JsonApi\ResourceTypes;
 use CloudCreativity\JsonApi\Exceptions\RuntimeException;
 use CloudCreativity\LaravelJsonApi\Schema\EloquentSchema;
+use Illuminate\Support\Carbon;
 
 class Schema extends EloquentSchema
 {

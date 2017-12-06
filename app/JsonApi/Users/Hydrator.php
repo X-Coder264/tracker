@@ -1,6 +1,6 @@
 <?php
 
-namespace App\JsonApi\User;
+namespace App\JsonApi\Users;
 
 use CloudCreativity\LaravelJsonApi\Hydrator\EloquentHydrator;
 

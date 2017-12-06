@@ -6,6 +6,7 @@ use Tests\TestCase;
 use App\Http\Models\User;
 use App\Http\Models\Locale;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class RegisterControllerTest extends TestCase
@@ -26,13 +27,14 @@ class RegisterControllerTest extends TestCase
     {
         $name = 'test name';
         $email = 'test@gmail.com';
+        $password = 'test password';
         $locale = factory(Locale::class)->create();
         $timezone = 'Europe/Zagreb';
 
         $response = $this->post(route('register'), [
             'name'                  => $name,
-            'password'              => 'test password',
-            'password_confirmation' => 'test password',
+            'password'              => $password,
+            'password_confirmation' => $password,
             'email'                 => $email,
             'locale'                => $locale->id,
             'timezone'              => $timezone,
@@ -45,6 +47,7 @@ class RegisterControllerTest extends TestCase
         $this->assertSame($user->name, $name);
         $this->assertSame($user->email, $email);
         $this->assertSame(60, strlen($user->password));
+        $this->assertTrue(Hash::check($password, $user->password));
         $this->assertSame($user->timezone, $timezone);
         $this->assertTrue($user->language->is($locale));
         $this->assertNull($user->passkey);

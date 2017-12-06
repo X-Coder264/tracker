@@ -1,8 +1,8 @@
 <?php
 
-namespace App\JsonApi\Locale;
+namespace App\JsonApi\Users;
 
-use App\Http\Models\Locale;
+use App\Http\Models\User;
 use Illuminate\Support\Collection;
 use Illuminate\Database\Eloquent\Builder;
 use CloudCreativity\LaravelJsonApi\Store\EloquentAdapter;
@@ -25,7 +25,7 @@ class Adapter extends EloquentAdapter
     public function __construct(StandardStrategy $paging)
     {
         $paging->withMetaKey(null);
-        parent::__construct(new Locale(), $paging);
+        parent::__construct(new User(), $paging);
     }
 
     /**
@@ -33,6 +33,13 @@ class Adapter extends EloquentAdapter
      */
     protected function filter(Builder $builder, Collection $filters)
     {
+        if ($filters->has('name')) {
+            $builder->where('users.name', '=', $filters->get('name'));
+        }
+
+        if ($filters->has('slug')) {
+            $builder->where('users.slug', $filters->get('slug'));
+        }
     }
 
     /**
@@ -40,6 +47,6 @@ class Adapter extends EloquentAdapter
      */
     protected function isSearchOne(Collection $filters)
     {
-        return $filters->has('id');
+        return false;
     }
 }
