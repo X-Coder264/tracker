@@ -77,7 +77,7 @@ class BdecodingTest extends TestCase
     }
 
     /**
-     * Test that a string which is not valid triggers an exception
+     * Test that a string which is not valid triggers an exception.
      */
     public function testNotValidStringThrowsException()
     {
@@ -86,7 +86,7 @@ class BdecodingTest extends TestCase
     }
 
     /**
-     * Test that a zero-padded string length triggers an exception
+     * Test that a zero-padded string length triggers an exception.
      */
     public function testZeroPaddedStringLengthThrowsException()
     {
@@ -95,7 +95,7 @@ class BdecodingTest extends TestCase
     }
 
     /**
-     * Test that a string without a colon triggers an exception
+     * Test that a string without a colon triggers an exception.
      */
     public function testStringWithoutColonThrowsException()
     {
@@ -104,7 +104,7 @@ class BdecodingTest extends TestCase
     }
 
     /**
-     * Test that an empty integer triggers an exception
+     * Test that an empty integer triggers an exception.
      */
     public function testEmptyIntegerThrowsException()
     {
@@ -113,7 +113,7 @@ class BdecodingTest extends TestCase
     }
 
     /**
-     * Test that a non-digit in an integer trigger an exception
+     * Test that a non-digit in an integer trigger an exception.
      */
     public function testNonDigitCharInIntegerThrowsException()
     {
@@ -122,7 +122,7 @@ class BdecodingTest extends TestCase
     }
 
     /**
-     * Test that a zero-padded integer triggers an exception
+     * Test that a zero-padded integer triggers an exception.
      */
     public function testLeadingZeroInIntegerThrowsException()
     {
@@ -131,7 +131,7 @@ class BdecodingTest extends TestCase
     }
 
     /**
-     * Test that an unterminated integer triggers an exception
+     * Test that an unterminated integer triggers an exception.
      */
     public function testUnterminatedIntegerThrowsException()
     {
@@ -140,7 +140,7 @@ class BdecodingTest extends TestCase
     }
 
     /**
-     * Test that an unterminated lists triggers an exception
+     * Test that an unterminated lists triggers an exception.
      */
     public function testUnterminatedListThrowsException()
     {
@@ -149,7 +149,7 @@ class BdecodingTest extends TestCase
     }
 
     /**
-     * Test that an unterminated dictionary triggers an exception
+     * Test that an unterminated dictionary triggers an exception.
      */
     public function testUnterminatedDictThrowsException()
     {
@@ -158,7 +158,7 @@ class BdecodingTest extends TestCase
     }
 
     /**
-     * Test that a duplicate dictionary key triggers an exception
+     * Test that a duplicate dictionary key triggers an exception.
      */
     public function testDuplicateDictionaryKeyThrowsException()
     {
@@ -167,7 +167,7 @@ class BdecodingTest extends TestCase
     }
 
     /**
-     * Test that a non-string dictionary key triggers an exception
+     * Test that a non-string dictionary key triggers an exception.
      */
     public function testNonStringDictKeyThrowsException()
     {
@@ -176,7 +176,7 @@ class BdecodingTest extends TestCase
     }
 
     /**
-     * Test that an unknown type triggers an exception
+     * Test that an unknown type triggers an exception.
      */
     public function testUnknownTypeThrowsException()
     {

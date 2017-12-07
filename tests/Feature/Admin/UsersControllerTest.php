@@ -67,7 +67,7 @@ class UsersControllerTest extends AdminApiTestCase
                     'email' => $email,
                     'name' => $name,
                     'password' => $password,
-                    'timezone' => $timezone
+                    'timezone' => $timezone,
                 ],
                 'relationships' => [
                     'locale' => [
@@ -75,8 +75,8 @@ class UsersControllerTest extends AdminApiTestCase
                             'type' => ResourceTypes::LOCALE, 'id' => (string) $locale->id,
                         ],
                     ],
-                ]
-            ]
+                ],
+            ],
         ];
 
         $response = $this->makeRequest('POST', route('admin.users.create'), $data);
@@ -123,8 +123,8 @@ class UsersControllerTest extends AdminApiTestCase
                             'type' => ResourceTypes::LOCALE, 'id' => (string) $locale->id,
                         ],
                     ],
-                ]
-            ]
+                ],
+            ],
         ];
 
         $response = $this->makeRequest('PATCH', route('admin.users.update', $user->id), $data);

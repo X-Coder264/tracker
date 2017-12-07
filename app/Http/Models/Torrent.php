@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace App\Http\Models;
 
@@ -30,8 +30,8 @@ class Torrent extends Model
     {
         return [
             'slug' => [
-                'source' => ['name']
-            ]
+                'source' => ['name'],
+            ],
         ];
     }
 

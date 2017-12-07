@@ -31,7 +31,7 @@ class Schema extends EloquentSchema
      */
     public function getRelationships($resource, $isPrimary, array $includeRelationships)
     {
-        if (!$resource instanceof Locale) {
+        if (! $resource instanceof Locale) {
             throw new RuntimeException('Expecting a locale model.');
         }
 

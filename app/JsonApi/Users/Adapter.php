@@ -29,7 +29,7 @@ class Adapter extends EloquentAdapter
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     protected function filter(Builder $builder, Collection $filters)
     {
@@ -43,7 +43,7 @@ class Adapter extends EloquentAdapter
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     protected function isSearchOne(Collection $filters)
     {
