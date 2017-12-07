@@ -29,14 +29,14 @@ class Adapter extends EloquentAdapter
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     protected function filter(Builder $builder, Collection $filters)
     {
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     protected function isSearchOne(Collection $filters)
     {

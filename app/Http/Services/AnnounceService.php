@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace App\Http\Services;
 
@@ -208,7 +208,7 @@ class AnnounceService
     }
 
     /**
-     * Returns null if the validation is successful or a string if it is not
+     * Returns null if the validation is successful or a string if it is not.
      *
      * @return null|string
      */
@@ -242,7 +242,7 @@ class AnnounceService
     }
 
     /**
-     * Returns null if the validation is successful or a string if it is not
+     * Returns null if the validation is successful or a string if it is not.
      *
      * @return null|string
      */
@@ -256,7 +256,7 @@ class AnnounceService
                 'uploaded' => 'required|numeric',
                 'downloaded' => 'required|numeric',
                 'left' => 'required|numeric',
-                'numwant' => 'sometimes|numeric'
+                'numwant' => 'sometimes|numeric',
             ],
             [
                 'passkey.required' => __('messages.validation.variable.required', ['var' => 'passkey']),
@@ -392,7 +392,7 @@ class AnnounceService
     }
 
     /**
-     * Insert the peer IP address(es)
+     * Insert the peer IP address(es).
      */
     protected function insertPeerIPs(): void
     {
@@ -420,7 +420,7 @@ class AnnounceService
     }
 
     /**
-     * Check if the peer is connectable
+     * Check if the peer is connectable.
      *
      * @param string $IP
      * @param int    $port
@@ -533,7 +533,7 @@ class AnnounceService
         $this->torrent->update(
             [
                 'seeders' => $this->torrent->seeders + 1,
-                'leechers' => $this->torrent->leechers - 1
+                'leechers' => $this->torrent->leechers - 1,
             ]
         );
 

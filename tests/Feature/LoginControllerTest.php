@@ -37,7 +37,7 @@ class LoginControllerTest extends TestCase
 
         $response = $this->post(route('login'), [
             'email'    => $email,
-            'password' => $password
+            'password' => $password,
         ]);
 
         $response->assertStatus(Response::HTTP_FOUND);

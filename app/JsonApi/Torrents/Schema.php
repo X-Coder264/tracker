@@ -33,7 +33,7 @@ class Schema extends EloquentSchema
      */
     public function getRelationships($resource, $isPrimary, array $includeRelationships)
     {
-        if (!$resource instanceof Torrent) {
+        if (! $resource instanceof Torrent) {
             throw new RuntimeException('Expecting a torrent model.');
         }
 
@@ -45,7 +45,7 @@ class Schema extends EloquentSchema
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function getIncludePaths()
     {

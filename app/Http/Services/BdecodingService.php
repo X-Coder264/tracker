@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace App\Http\Services;
 
@@ -9,14 +9,14 @@ use Exception;
 class BdecodingService
 {
     /**
-     * The encoded string
+     * The encoded string.
      *
      * @var string
      */
     private $encodedString;
 
     /**
-     * The length of the encoded source string
+     * The length of the encoded source string.
      *
      * @var int
      */
@@ -112,7 +112,7 @@ class BdecodingService
         }
 
         while ($currentPosition < $positionOfIntegerEndingDelimiter) {
-            if (!ctype_digit($this->getCharacterAtPosition($currentPosition))) {
+            if (! ctype_digit($this->getCharacterAtPosition($currentPosition))) {
                 throw new Exception("Non-numeric character found in an integer value at position $this->position");
             }
 
@@ -208,7 +208,7 @@ class BdecodingService
             }
 
             $keyPosition = $this->position;
-            if (!ctype_digit($this->getCharacterAtPosition())) {
+            if (! ctype_digit($this->getCharacterAtPosition())) {
                 throw new Exception("A dictionary contains an invalid key at position $keyPosition");
             }
 
