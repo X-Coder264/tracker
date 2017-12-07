@@ -20,13 +20,13 @@ class SetUserLocale
     public function handle($request, Closure $next)
     {
         if (true === auth()->check()) {
-            if (Cache::has('user.' . auth()->user()->slug . '.locale')) {
-                $locale = Cache::get('user.' . auth()->user()->slug . '.locale');
+            if (Cache::has('user.'.auth()->user()->slug.'.locale')) {
+                $locale = Cache::get('user.'.auth()->user()->slug.'.locale');
                 app()->setLocale($locale);
                 Carbon::setLocale($locale);
             } else {
                 $locale = auth()->user()->language->localeShort;
-                Cache::forever('user.' . auth()->user()->slug . '.locale', $locale);
+                Cache::forever('user.'.auth()->user()->slug.'.locale', $locale);
                 app()->setLocale($locale);
                 Carbon::setLocale($locale);
             }

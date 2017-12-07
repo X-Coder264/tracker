@@ -21,11 +21,11 @@ class ComposerServiceProvider extends ServiceProvider
     public function boot()
     {
         view()->composer($this->viewsThatNeedTimezoneInfo, function (View $view) {
-            if (Cache::has('user.' . Auth::id())) {
-                $user = Cache::get('user.' . Auth::id());
+            if (Cache::has('user.'.Auth::id())) {
+                $user = Cache::get('user.'.Auth::id());
             } else {
                 $user = User::with('language')->find(Auth::id());
-                Cache::forever('user.' . Auth::id(), $user);
+                Cache::forever('user.'.Auth::id(), $user);
             }
             $view->with('timezone', $user->timezone);
         });

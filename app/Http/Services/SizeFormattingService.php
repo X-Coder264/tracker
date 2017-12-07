@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace App\Http\Services;
 
@@ -32,7 +32,7 @@ class SizeFormattingService
             $count++;
         }
 
-        $formattedString = number_format($size, 2, '.', '') . ' ' . $this->map[$count];
+        $formattedString = number_format($size, 2, '.', '').' '.$this->map[$count];
 
         return $formattedString;
     }

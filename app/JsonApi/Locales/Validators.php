@@ -44,7 +44,7 @@ class Validators extends AbstractValidatorProvider
     ];
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     protected function attributeRules($record = null)
     {
@@ -63,7 +63,7 @@ class Validators extends AbstractValidatorProvider
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     protected function relationshipRules(RelationshipsValidatorInterface $relationships, $record = null)
     {

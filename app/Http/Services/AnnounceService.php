@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace App\Http\Services;
 
@@ -208,7 +208,7 @@ class AnnounceService
     }
 
     /**
-     * Returns null if the validation is successful or a string if it is not
+     * Returns null if the validation is successful or a string if it is not.
      *
      * @return null|string
      */
@@ -242,7 +242,7 @@ class AnnounceService
     }
 
     /**
-     * Returns null if the validation is successful or a string if it is not
+     * Returns null if the validation is successful or a string if it is not.
      *
      * @return null|string
      */
@@ -256,7 +256,7 @@ class AnnounceService
                 'uploaded' => 'required|numeric',
                 'downloaded' => 'required|numeric',
                 'left' => 'required|numeric',
-                'numwant' => 'sometimes|numeric'
+                'numwant' => 'sometimes|numeric',
             ],
             [
                 'passkey.required' => __('messages.validation.variable.required', ['var' => 'passkey']),
@@ -328,7 +328,7 @@ class AnnounceService
             // check if the ipv6 field has the IP address and the port
             // if it contains only the IP address the port is read from the port field
             if (4 <= count($explodedIPString) && '[' === $IP[0] && false !== strpos($IP, ']')) {
-                $IP = str_replace(['[',']'], '', $IP);
+                $IP = str_replace(['[', ']'], '', $IP);
                 $IP = substr($IP, 0, strrpos($IP, ':'));
                 if (true === $this->validateIPv6Address($IP)) {
                     $this->ipv6Address = $IP;
@@ -392,7 +392,7 @@ class AnnounceService
     }
 
     /**
-     * Insert the peer IP address(es)
+     * Insert the peer IP address(es).
      */
     protected function insertPeerIPs(): void
     {
@@ -420,7 +420,7 @@ class AnnounceService
     }
 
     /**
-     * Check if the peer is connectable
+     * Check if the peer is connectable.
      *
      * @param string $IP
      * @param int    $port
@@ -533,7 +533,7 @@ class AnnounceService
         $this->torrent->update(
             [
                 'seeders' => $this->torrent->seeders + 1,
-                'leechers' => $this->torrent->leechers - 1
+                'leechers' => $this->torrent->leechers - 1,
             ]
         );
 
@@ -573,9 +573,9 @@ class AnnounceService
             ]
         );
 
-        $logString = 'Current seedtime: ' . $this->snatch->seedTime . ' \n';
-        $logString .= 'Seedtime in this cycle ' . $this->seedTime . ' \n';
-        $logString .= 'Total new seedtime ' . ($this->snatch->seedTime + $this->seedTime) . ' \n';
+        $logString = 'Current seedtime: '.$this->snatch->seedTime.' \n';
+        $logString .= 'Seedtime in this cycle '.$this->seedTime.' \n';
+        $logString .= 'Total new seedtime '.($this->snatch->seedTime + $this->seedTime).' \n';
 
         Storage::put('peerNoEventSeedTime.txt', print_r($logString, true));
 
@@ -644,9 +644,9 @@ class AnnounceService
                 $peerPort = pack('n*', $peerAddress->port);
 
                 if (true === $peerAddress->isIPv6) {
-                    $response['peers6'] .= $peerIPAddress . $peerPort;
+                    $response['peers6'] .= $peerIPAddress.$peerPort;
                 } else {
-                    $response['peers'] .= $peerIPAddress . $peerPort;
+                    $response['peers'] .= $peerIPAddress.$peerPort;
                 }
             }
         }
@@ -680,7 +680,7 @@ class AnnounceService
         $response['failure reason'] = '';
         if (is_array($error)) {
             foreach ($error as $message) {
-                $response['failure reason'] .= $message . ' ';
+                $response['failure reason'] .= $message.' ';
             }
         } else {
             $response['failure reason'] = $error;

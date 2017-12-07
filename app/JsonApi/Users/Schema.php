@@ -32,13 +32,13 @@ class Schema extends EloquentSchema
      */
     public function getRelationships($resource, $isPrimary, array $includeRelationships)
     {
-        if (!$resource instanceof User) {
+        if (! $resource instanceof User) {
             throw new RuntimeException('Expecting a user model.');
         }
 
         return [
             'torrents' => [
-                self::DATA => $resource->torrents
+                self::DATA => $resource->torrents,
             ],
             'locale' => [
                 self::DATA => $resource->language,
@@ -47,7 +47,7 @@ class Schema extends EloquentSchema
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function getIncludePaths()
     {
