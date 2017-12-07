@@ -4,13 +4,13 @@ namespace Tests\Feature\Admin;
 
 use App\Http\Models\User;
 use App\Http\Models\Locale;
-use Illuminate\Support\Carbon;
 use Tests\AdminApiTestCase;
 use App\JsonApi\ResourceTypes;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
-class UserControllerTest extends AdminApiTestCase
+class UsersControllerTest extends AdminApiTestCase
 {
     use RefreshDatabase;
 

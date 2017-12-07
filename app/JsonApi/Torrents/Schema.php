@@ -1,26 +1,27 @@
 <?php
 
-namespace App\JsonApi\Users;
+namespace App\JsonApi\Torrents;
 
-use App\Http\Models\User;
+use App\Http\Models\Torrent;
 use App\JsonApi\ResourceTypes;
 use CloudCreativity\JsonApi\Exceptions\RuntimeException;
 use CloudCreativity\LaravelJsonApi\Schema\EloquentSchema;
+use Illuminate\Database\Eloquent\Model;
 
 class Schema extends EloquentSchema
 {
     /**
      * @var string
      */
-    protected $resourceType = ResourceTypes::USER;
+    protected $resourceType = ResourceTypes::TORRENT;
 
     /**
      * @var array
      */
     protected $attributes = [
         'name',
+        'size',
         'slug',
-        'email',
     ];
 
     /**
@@ -32,16 +33,13 @@ class Schema extends EloquentSchema
      */
     public function getRelationships($resource, $isPrimary, array $includeRelationships)
     {
-        if (!$resource instanceof User) {
-            throw new RuntimeException('Expecting a user model.');
+        if (!$resource instanceof Torrent) {
+            throw new RuntimeException('Expecting a torrent model.');
         }
 
         return [
-            'torrents' => [
-                self::DATA => $resource->torrents
-            ],
-            'locale' => [
-                self::DATA => $resource->language,
+            'uploader' => [
+                self::DATA => $resource->uploader,
             ],
         ];
     }
@@ -52,7 +50,7 @@ class Schema extends EloquentSchema
     public function getIncludePaths()
     {
         return [
-            'torrents', 'locale',
+            'uploader',
         ];
     }
 }
