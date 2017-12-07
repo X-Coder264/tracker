@@ -23,6 +23,7 @@ class TorrentsControllerTest extends AdminApiTestCase
         $this->assertSame(2, $jsonResponse['meta']['total']);
         $this->assertSame($torrents[0]->name, $jsonResponse['data'][0]['attributes']['name']);
         $this->assertSame($torrents[0]->size, $jsonResponse['data'][0]['attributes']['size']);
+        $this->assertSame($torrents[0]->description, $jsonResponse['data'][0]['attributes']['description']);
         $this->assertSame($torrents[0]->slug, $jsonResponse['data'][0]['attributes']['slug']);
         $this->assertSame(
             $torrents[0]->uploader->id,
@@ -39,6 +40,7 @@ class TorrentsControllerTest extends AdminApiTestCase
         $this->assertSame(route('admin.torrents.read', $torrents[0]->id), $jsonResponse['data'][0]['links']['self']);
         $this->assertSame($torrents[1]->name, $jsonResponse['data'][1]['attributes']['name']);
         $this->assertSame($torrents[1]->size, $jsonResponse['data'][1]['attributes']['size']);
+        $this->assertSame($torrents[1]->description, $jsonResponse['data'][1]['attributes']['description']);
         $this->assertSame($torrents[1]->slug, $jsonResponse['data'][1]['attributes']['slug']);
         $this->assertSame(
             $torrents[1]->created_at->format(Carbon::W3C),
