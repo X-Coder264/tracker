@@ -46,7 +46,7 @@ class PeerSeeder extends Seeder
                     'port' => 60755,
                     'isIPv6' => true,
                     'connectable' => false,
-                ]
+                ],
             ]
         );
     }

@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
@@ -120,7 +120,7 @@ class TorrentController extends Controller
             200,
             [
                 'Content-Type'        => 'application/x-bittorrent',
-                'Content-Disposition' => 'attachment; filename="' . $torrent->name . '.torrent"',
+                'Content-Disposition' => 'attachment; filename="'.$torrent->name.'.torrent"',
             ]
         );
     }

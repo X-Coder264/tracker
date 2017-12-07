@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace App\Http\Models;
 
@@ -23,7 +23,7 @@ class User extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'name', 'email', 'password', 'timezone', 'locale_id'
+        'name', 'email', 'password', 'timezone', 'locale_id',
     ];
 
     /**
@@ -42,8 +42,8 @@ class User extends Authenticatable
     {
         return [
             'slug' => [
-                'source' => ['name']
-            ]
+                'source' => ['name'],
+            ],
         ];
     }
 

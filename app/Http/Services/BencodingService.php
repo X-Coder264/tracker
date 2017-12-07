@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace App\Http\Services;
 
@@ -27,7 +27,7 @@ class BencodingService
     }
 
     /**
-     * Encode an integer
+     * Encode an integer.
      *
      * @param int|float $data
      *
@@ -39,7 +39,7 @@ class BencodingService
     }
 
     /**
-     * Encode a string
+     * Encode a string.
      *
      * @param  string
      *
@@ -51,7 +51,7 @@ class BencodingService
     }
 
     /**
-     * Encode a list
+     * Encode a list.
      *
      * @param  array
      *
@@ -68,7 +68,7 @@ class BencodingService
     }
 
     /**
-     * Encode a dictionary
+     * Encode a dictionary.
      *
      * @param array $info
      *
@@ -80,7 +80,7 @@ class BencodingService
         ksort($info, SORT_STRING);
         $dictionary = '';
         foreach ($info as $key => $value) {
-            $dictionary .= $this->encodeString($key) . $this->encode($value);
+            $dictionary .= $this->encodeString($key).$this->encode($value);
         }
 
         return sprintf('d%se', $dictionary);

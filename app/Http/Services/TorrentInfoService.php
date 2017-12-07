@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace App\Http\Services;
 
@@ -67,7 +67,7 @@ class TorrentInfoService
                 $size = $this->sizeFormattingService->getFormattedSize($file['length']);
                 $fileName = '';
                 foreach ($file['path'] as $path) {
-                    $fileName .= $path . '/';
+                    $fileName .= $path.'/';
                 }
 
                 $fileName = pathinfo($fileName, PATHINFO_BASENAME);
@@ -91,7 +91,7 @@ class TorrentInfoService
     public function getTorrentFileNamesAndSizes(Torrent $torrent): array
     {
         $torrentFileNamesAndSizes = Cache::rememberForever(
-            'torrent' . $torrent->id . 'files',
+            'torrent'.$torrent->id.'files',
             function () use ($torrent) {
                 try {
                     $torrentFile = Storage::disk('public')->get("torrents/{$torrent->id}.torrent");

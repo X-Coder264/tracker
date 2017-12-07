@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
@@ -67,8 +67,8 @@ class UserController extends Controller
 
         app()->setLocale($user->language->localeShort);
 
-        Cache::forget('user.' . $user->id);
-        Cache::forget('user.' . $user->slug . '.locale');
+        Cache::forget('user.'.$user->id);
+        Cache::forget('user.'.$user->slug.'.locale');
 
         return back()->with('success', __('messages.common.save_changes_successful'));
     }
