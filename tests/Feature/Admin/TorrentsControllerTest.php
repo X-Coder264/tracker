@@ -25,6 +25,10 @@ class TorrentsControllerTest extends AdminApiTestCase
         $this->assertSame($torrents[0]->size, $jsonResponse['data'][0]['attributes']['size']);
         $this->assertSame($torrents[0]->slug, $jsonResponse['data'][0]['attributes']['slug']);
         $this->assertSame(
+            $torrents[0]->uploader->id,
+            (int) $jsonResponse['data'][0]['relationships']['uploader']['data']['id']
+        );
+        $this->assertSame(
             $torrents[0]->created_at->format(Carbon::W3C),
             $jsonResponse['data'][0]['attributes']['created-at']
         );

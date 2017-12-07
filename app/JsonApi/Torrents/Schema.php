@@ -6,7 +6,6 @@ use App\Http\Models\Torrent;
 use App\JsonApi\ResourceTypes;
 use CloudCreativity\JsonApi\Exceptions\RuntimeException;
 use CloudCreativity\LaravelJsonApi\Schema\EloquentSchema;
-use Illuminate\Database\Eloquent\Model;
 
 class Schema extends EloquentSchema
 {
