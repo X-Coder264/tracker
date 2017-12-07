@@ -21,7 +21,7 @@ return PhpCsFixer\Config::create()
         'cast_spaces' => ['space' => 'single'],
         'compact_nullable_typehint' => true,
         'concat_space' => ['spacing' => 'one'],
-        'declare_equal_normalize' => ['space' => 'single'],
+        'declare_equal_normalize' => ['space' => 'none'],
         'function_typehint_space' => true,
         'linebreak_after_opening_tag' => true,
         'array_syntax' => ['syntax' => 'short'],
