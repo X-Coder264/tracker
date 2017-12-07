@@ -11,7 +11,7 @@ $finder = PhpCsFixer\Finder::create()
 
 return PhpCsFixer\Config::create()
     ->setUsingCache(true)
-    ->setRiskyAllowed(false)
+    ->setRiskyAllowed(true)
     ->setFinder($finder)
     ->setRules([
         '@PSR2' => true,
