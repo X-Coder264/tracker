@@ -39,11 +39,11 @@ class UsersControllerTest extends AdminApiTestCase
         $this->assertSame($users[1]->slug, $jsonResponse['data'][1]['attributes']['slug']);
         $this->assertSame(
             $users[1]->created_at->format(Carbon::W3C),
-            $jsonResponse['data'][0]['attributes']['created-at']
+            $jsonResponse['data'][1]['attributes']['created-at']
         );
         $this->assertSame(
             $users[1]->updated_at->format(Carbon::W3C),
-            $jsonResponse['data'][0]['attributes']['updated-at']
+            $jsonResponse['data'][1]['attributes']['updated-at']
         );
         $this->assertSame(route('admin.users.read', $users[1]->id), $jsonResponse['data'][1]['links']['self']);
     }

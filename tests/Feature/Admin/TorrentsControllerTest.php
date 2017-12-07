@@ -42,11 +42,11 @@ class TorrentsControllerTest extends AdminApiTestCase
         $this->assertSame($torrents[1]->slug, $jsonResponse['data'][1]['attributes']['slug']);
         $this->assertSame(
             $torrents[1]->created_at->format(Carbon::W3C),
-            $jsonResponse['data'][0]['attributes']['created-at']
+            $jsonResponse['data'][1]['attributes']['created-at']
         );
         $this->assertSame(
             $torrents[1]->updated_at->format(Carbon::W3C),
-            $jsonResponse['data'][0]['attributes']['updated-at']
+            $jsonResponse['data'][1]['attributes']['updated-at']
         );
         $this->assertSame(route('admin.torrents.read', $torrents[1]->id), $jsonResponse['data'][1]['links']['self']);
     }
