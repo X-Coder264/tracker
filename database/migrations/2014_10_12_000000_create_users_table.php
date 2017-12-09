@@ -13,10 +13,10 @@ class CreateUsersTable extends Migration
     {
         Schema::create('users', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('name');
+            $table->string('name')->unique();
             $table->string('email')->unique();
             $table->string('password');
-            $table->string('passkey', 64)->nullable();
+            $table->string('passkey', 64)->unique()->nullable();
             $table->string('timezone', 30);
             $table->integer('locale_id')->unsigned()->index();
             $table->foreign('locale_id')->references('id')->on('locales')->onUpdate('cascade')->onDelete('cascade');

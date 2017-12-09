@@ -20,7 +20,7 @@ $factory->define(User::class, function (Faker $faker) {
     static $password;
 
     return [
-        'name' => $faker->name,
+        'name' => $faker->unique()->firstName,
         'email' => $faker->unique()->safeEmail,
         'password' => $password ?: $password = Hash::make('secret', ['rounds' => 15]),
         'passkey' => bin2hex(random_bytes(32)),
