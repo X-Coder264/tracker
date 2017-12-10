@@ -227,6 +227,15 @@ class RegisterControllerTest extends TestCase
         $this->assertGuest();
     }
 
+    public function testLoggedInUserGetsRedirectedToTheHomePage()
+    {
+        $user = factory(User::class)->create();
+        $this->actingAs($user);
+        $response = $this->get(route('register'));
+        $response->assertStatus(Response::HTTP_FOUND);
+        $response->assertRedirect(route('home.index'));
+    }
+
     /**
      * @param array $overrides
      *

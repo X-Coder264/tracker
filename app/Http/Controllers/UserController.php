@@ -9,6 +9,7 @@ use App\Http\Models\Locale;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\App;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Cache;
 
@@ -62,10 +63,13 @@ class UserController extends Controller
             ]
         );
 
-        $user->fill($request->all());
-        $user->save();
+        $user->update([
+            'email' => $request->input('email'),
+            'locale_id' => $request->input('locale_id'),
+            'timezone' => $request->input('timezone'),
+        ]);
 
-        app()->setLocale($user->language->localeShort);
+        App::setLocale($user->language->localeShort);
 
         Cache::forget('user.' . $user->id);
         Cache::forget('user.' . $user->slug . '.locale');

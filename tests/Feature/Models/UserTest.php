@@ -67,5 +67,6 @@ class UserTest extends TestCase
         $user = User::findOrFail(1);
         $this->assertInstanceOf(BelongsTo::class, $user->language());
         $this->assertInstanceOf(Locale::class, $user->language);
+        $this->assertSame(1, $user->language->id);
     }
 }

@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace App\Http\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use App\Http\Services\SizeFormattingService;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Facades\App\Http\Services\SizeFormattingService;
 
 class Peer extends Model
 {
@@ -25,11 +25,9 @@ class Peer extends Model
      *
      * @return string
      */
-    public function getUploadedAttribute($value)
+    public function getUploadedAttribute($value): string
     {
-        $formatter = new SizeFormattingService();
-
-        return $formatter->getFormattedSize($value);
+        return SizeFormattingService::getFormattedSize((int) $value);
     }
 
     /**
@@ -39,11 +37,9 @@ class Peer extends Model
      *
      * @return string
      */
-    public function getDownloadedAttribute($value)
+    public function getDownloadedAttribute($value): string
     {
-        $formatter = new SizeFormattingService();
-
-        return $formatter->getFormattedSize($value);
+        return SizeFormattingService::getFormattedSize((int) $value);
     }
 
     /**

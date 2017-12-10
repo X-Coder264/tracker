@@ -6,8 +6,8 @@ namespace App\Http\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Cviebrock\EloquentSluggable\Sluggable;
-use App\Http\Services\SizeFormattingService;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Facades\App\Http\Services\SizeFormattingService;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Cviebrock\EloquentSluggable\SluggableScopeHelpers;
 
@@ -52,11 +52,9 @@ class Torrent extends Model
      *
      * @return string
      */
-    public function getSizeAttribute($value)
+    public function getSizeAttribute($value): string
     {
-        $formatter = new SizeFormattingService();
-
-        return $formatter->getFormattedSize((int) $value);
+        return SizeFormattingService::getFormattedSize((int) $value);
     }
 
     /**
@@ -64,7 +62,7 @@ class Torrent extends Model
      */
     public function uploader(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'uploader_id')->select(['id', 'name', 'slug']);
+        return $this->belongsTo(User::class)->select(['id', 'name', 'slug']);
     }
 
     /**
