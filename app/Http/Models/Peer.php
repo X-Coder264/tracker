@@ -6,8 +6,8 @@ namespace App\Http\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Facades\App\Http\Services\SizeFormattingService;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Peer extends Model
 {

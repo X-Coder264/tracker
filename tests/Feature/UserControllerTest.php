@@ -2,12 +2,12 @@
 
 namespace Tests\Feature;
 
-use App\Http\Middleware\SetUserLocale;
 use Tests\TestCase;
 use App\Http\Models\User;
 use App\Http\Models\Locale;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Cache;
+use App\Http\Middleware\SetUserLocale;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class UserControllerTest extends TestCase
