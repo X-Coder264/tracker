@@ -12,12 +12,10 @@ class TorrentInfoServiceTest extends TestCase
 {
     public function testGettingTorrentSize()
     {
-        /** @var BdecodingService $decoder */
+        /** @var BdecodingService|MockObject $decoder */
         $decoder = $this->createMock(BdecodingService::class);
-        $this->app->instance(BdecodingService::class, $decoder);
-        /** @var SizeFormattingService $formatter */
+        /** @var SizeFormattingService|MockObject $formatter */
         $formatter = $this->createMock(SizeFormattingService::class);
-        $this->app->instance(SizeFormattingService::class, $decoder);
 
         $torrentInfoService = new TorrentInfoService($formatter, $decoder);
         // multiple file mode
@@ -34,14 +32,19 @@ class TorrentInfoServiceTest extends TestCase
 
     public function testGettingTorrentFileNamesAndSizesFromTorrentInfoDict()
     {
-        /** @var BdecodingService $decoder */
+        /** @var BdecodingService|MockObject $decoder */
         $decoder = $this->createMock(BdecodingService::class);
         $this->app->instance(BdecodingService::class, $decoder);
         /** @var SizeFormattingService|MockObject $formatter */
         $formatter = $this->createMock(SizeFormattingService::class);
-        $formatterReturnValue = '500 MiB';
-        $formatter->method('getFormattedSize')->willReturn($formatterReturnValue);
-        $this->app->instance(SizeFormattingService::class, $decoder);
+        $map = [
+            [10, '10 B'],
+            [25, '25 B'],
+            [500, '500 B'],
+        ];
+        $formatter->expects($this->exactly(3))
+            ->method('getFormattedSize')
+            ->will($this->returnValueMap($map));
 
         $torrentInfoService = new TorrentInfoService($formatter, $decoder);
         // multiple file mode
@@ -56,8 +59,8 @@ class TorrentInfoServiceTest extends TestCase
             ],
         ];
         $expectedResult = [
-            ['filename.txt', $formatterReturnValue],
-            ['filename2.txt', $formatterReturnValue],
+            ['filename.txt', '10 B'],
+            ['filename2.txt', '25 B'],
         ];
 
         $this->assertSame(
@@ -68,7 +71,7 @@ class TorrentInfoServiceTest extends TestCase
         // single file mode
         $torrentInfoDict2 = ['name' => 'filename.txt', 'length' => 500];
         $expectedResult2 = [
-            ['filename.txt', $formatterReturnValue],
+            ['filename.txt', '500 B'],
         ];
         $this->assertSame(
             $expectedResult2,
