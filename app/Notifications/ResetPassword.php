@@ -17,8 +17,7 @@ class ResetPassword extends Notification
     /**
      * Create a notification instance.
      *
-     * @param  string  $token
-     * @return void
+     * @param string $token
      */
     public function __construct($token)
     {
@@ -28,10 +27,11 @@ class ResetPassword extends Notification
     /**
      * Get the notification's channels.
      *
-     * @param  mixed  $notifiable
-     * @return array|string
+     * @param mixed $notifiable
+     *
+     * @return array
      */
-    public function via($notifiable)
+    public function via($notifiable): array
     {
         return ['mail'];
     }
@@ -39,12 +39,13 @@ class ResetPassword extends Notification
     /**
      * Build the mail representation of the notification.
      *
-     * @param  mixed  $notifiable
-     * @return \Illuminate\Notifications\Messages\MailMessage
+     * @param mixed $notifiable
+     *
+     * @return MailMessage
      */
-    public function toMail($notifiable)
+    public function toMail($notifiable): MailMessage
     {
-        return (new MailMessage)
+        return (new MailMessage())
             ->subject(__('messages.reset_password.subject'))
             ->greeting(__('messages.reset_password.greeting', ['name' => $notifiable->name]))
             ->salutation(__('messages.reset_password.salutation', ['site' => config('app.name')]))

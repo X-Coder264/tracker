@@ -43,7 +43,7 @@ class ResetPasswordControllerTest extends TestCase
         $this->assertAuthenticatedAs($user);
 
         $updatedUser = User::findOrFail(1);
-        $this->assertNotEquals($user->password, $updatedUser->password);
+        $this->assertNotSame($user->password, $updatedUser->password);
         $this->assertTrue(Hash::check($newPassword, $updatedUser->password));
 
         Event::assertDispatched(PasswordReset::class, function (PasswordReset $event) use ($user) {
