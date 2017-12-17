@@ -28,6 +28,6 @@ $factory->define(User::class, function (Faker $faker) {
             return factory(Locale::class)->create()->id;
         },
         'timezone' => 'Europe/Zagreb',
-        'slug' => $faker->unique()->text(255)
+        'slug' => $faker->unique()->text(255),
     ];
 });
