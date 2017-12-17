@@ -22,12 +22,13 @@ $factory->define(User::class, function (Faker $faker) {
     return [
         'name' => $faker->unique()->firstName,
         'email' => $faker->unique()->safeEmail,
-        'password' => $password ?: $password = Hash::make('secret', ['rounds' => 15]),
+        'password' => $password ?: $password = 'secret',
         'passkey' => bin2hex(random_bytes(32)),
         'remember_token' => str_random(10),
         'locale_id' => function () {
             return factory(Locale::class)->create()->id;
         },
         'timezone' => 'Europe/Zagreb',
+        'slug' => $faker->unique()->text(255)
     ];
 });

@@ -2,8 +2,8 @@
 
 return [
 
-    'navigation.login' => 'Login',
-    'navigation.register' => 'Register',
+    'common.login' => 'Login',
+    'common.register' => 'Register',
     'navigation.logout' => 'Logout',
     'navigation.torrent.index' => 'Browse',
     'navigation.torrent.create' => 'Upload',
@@ -43,8 +43,22 @@ return [
     'users.edit.page_title' => 'User options',
     'navigation.users.edit_page' => 'Edit your settings',
     'common.email' => 'E-Mail address',
+    'common.password' => 'Password',
+    'common.confirm-password' => 'Confirm password',
     'common.language' => 'Language',
     'common.save_changes' => 'Save changes',
     'common.save_changes_successful' => 'The changes were successfully saved.',
     'timezones_select.timezone' => 'Timezone',
+    'reset_password.subject' => 'Reset password',
+    'reset_password.greeting' => 'Hello, :name',
+    'reset_password.salutation' => 'Regards, :site',
+    'reset_password.email-line-1' => 'You are receiving this email because we received a password reset request for your account.',
+    'reset_password.action' => 'Reset password',
+    'reset_password.email-line-2' => 'If you did not request a password reset, no further action is required.',
+    'common.reset-password' => 'Reset password',
+    'reset-password.message' => 'Send password reset link',
+    'login.remember-me' => 'Remember me',
+    'login.register-link-text' => 'You do not have an account yet?',
+    'login.reset-password-link-text' => 'Forgot your password?',
+    'register.username' => 'Username',
 ];

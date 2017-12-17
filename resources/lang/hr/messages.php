@@ -2,8 +2,8 @@
 
 return [
 
-    'navigation.login' => 'Prijava',
-    'navigation.register' => 'Registracija',
+    'common.login' => 'Prijava',
+    'common.register' => 'Registracija',
     'navigation.logout' => 'Odjava',
     'navigation.torrent.index' => 'Pregled torrenata',
     'navigation.torrent.create' => 'Upload',
@@ -43,8 +43,22 @@ return [
     'users.edit.page_title' => 'Korisničke opcije',
     'navigation.users.edit_page' => 'Promjeni svoje postavke',
     'common.email' => 'E-Mail adresa',
+    'common.password' => 'Lozinka',
+    'common.confirm-password' => 'Potvrdi lozinku',
     'common.language' => 'Jezik',
     'common.save_changes' => 'Spremi promjene',
     'common.save_changes_successful' => 'Promjene su uspješno spremljene.',
     'timezones_select.timezone' => 'Vremenska zona',
+    'reset_password.subject' => 'Resetiranje lozinke',
+    'reset_password.greeting' => 'Pozdrav, :name',
+    'reset_password.salutation' => 'S poštovanjem, :site',
+    'reset_password.email-line-1' => 'Dobili ste ovaj email jer smo zaprimili zahtjev za resetiranjem lozinke za ovaj račun.',
+    'reset_password.action' => 'Resetiranje lozinke',
+    'reset_password.email-line-2' => 'Ako vi niste zatražili resetiranje lozinke, možete ignorirati ovaj email.',
+    'common.reset-password' => 'Resetiranje lozinke',
+    'reset-password.message' => 'Pošalji link za resetiranje lozinke',
+    'login.remember-me' => 'Zapamti me',
+    'login.register-link-text' => 'Nemate još račun?',
+    'login.reset-password-link-text' => 'Zaboravili ste lozinku?',
+    'register.username' => 'Korisničko ime',
 ];

@@ -33,10 +33,10 @@
                     <!-- Authentication Links -->
                     @guest
                         <li class="nav-item nav-item">
-                            <a class="nav-item nav-link" href="{{ route('login') }}">{{ __('messages.navigation.login') }}</a>
+                            <a class="nav-item nav-link" href="{{ route('login') }}">{{ __('messages.common.login') }}</a>
                         </li>
                         <li class="nav-item nav-item">
-                            <a class="nav-item nav-link" href="{{ route('register') }}">{{ __('messages.navigation.register') }}</a>
+                            <a class="nav-item nav-link" href="{{ route('register') }}">{{ __('messages.common.register') }}</a>
                         </li>
                     @else
                             <li class="nav-item">

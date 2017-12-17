@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Models;
 
+use App\Notifications\ResetPassword;
 use Illuminate\Support\Facades\Hash;
 use Spatie\Permission\Traits\HasRoles;
 use Illuminate\Notifications\Notifiable;
@@ -62,9 +63,19 @@ class User extends Authenticatable
      *
      * @param string $password
      */
-    public function setPasswordAttribute($password): void
+    public function setPasswordAttribute(string $password): void
     {
         $this->attributes['password'] = Hash::make($password, ['rounds' => 15]);
+    }
+
+    /**
+     * Send the password reset notification.
+     *
+     * @param string $token
+     */
+    public function sendPasswordResetNotification($token): void
+    {
+        $this->notify(new ResetPassword($token));
     }
 
     /**

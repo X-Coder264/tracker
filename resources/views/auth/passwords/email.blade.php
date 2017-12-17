@@ -3,7 +3,7 @@
 @section('content')
 <div class="col-12 mx-auto">
     <div class="card">
-        <div class="card-header">Reset Password</div>
+        <div class="card-header">{{ __('messages.common.reset-password') }}</div>
 
         <div class="card-body">
             @if (session('status'))
@@ -16,7 +16,7 @@
                 {{ csrf_field() }}
 
                 <div class="form-group{{ $errors->has('email') ? ' has-error' : '' }}">
-                    <label for="email" class="col control-label">E-Mail Address</label>
+                    <label for="email" class="col control-label">{{ __('messages.common.email') }}</label>
 
                     <div class="col">
                         <input id="email" type="email" class="form-control" name="email" value="{{ old('email') }}" required>
@@ -32,7 +32,7 @@
                 <div class="form-group">
                     <div class="col">
                         <button type="submit" class="btn btn-primary">
-                            Send Password Reset Link
+                            {{ __('messages.reset-password.message') }}
                         </button>
                     </div>
                 </div>
