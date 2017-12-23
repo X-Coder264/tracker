@@ -22,7 +22,7 @@ class SetUserLocale
     public function handle($request, Closure $next)
     {
         if (true === Auth::check()) {
-            $locale = Cache::rememberForever('user.' . Auth::user()->slug . '.locale', function() {
+            $locale = Cache::rememberForever('user.' . Auth::user()->slug . '.locale', function () {
                 return Auth::user()->language->localeShort;
             });
             App::setLocale($locale);
