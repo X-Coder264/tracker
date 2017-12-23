@@ -5,6 +5,8 @@ namespace App\Http\Middleware;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 
 class SetUserLocale
@@ -19,17 +21,12 @@ class SetUserLocale
      */
     public function handle($request, Closure $next)
     {
-        if (true === auth()->check()) {
-            if (Cache::has('user.' . auth()->user()->slug . '.locale')) {
-                $locale = Cache::get('user.' . auth()->user()->slug . '.locale');
-                app()->setLocale($locale);
-                Carbon::setLocale($locale);
-            } else {
-                $locale = auth()->user()->language->localeShort;
-                Cache::forever('user.' . auth()->user()->slug . '.locale', $locale);
-                app()->setLocale($locale);
-                Carbon::setLocale($locale);
-            }
+        if (true === Auth::check()) {
+            $locale = Cache::rememberForever('user.' . Auth::user()->slug . '.locale', function() {
+                return Auth::user()->language->localeShort;
+            });
+            App::setLocale($locale);
+            Carbon::setLocale($locale);
         }
 
         return $next($request);
