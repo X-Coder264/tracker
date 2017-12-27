@@ -16,7 +16,7 @@
                 <div class="form-group row">
                     <div class="custom-file">
                         <input type="file" class="custom-file-input" id="torrent" name="torrent" onchange="getName()" accept="application/x-bittorrent" required>
-                        <label class="custom-file-label" for="torrent">{{ __('messages.torrent.create.choose_torrent_file') }}</label>
+                        <label id="torrent-file-label" class="custom-file-label" for="torrent">{{ __('messages.torrent.create.choose_torrent_file') }}</label>
                     </div>
                 </div>
 
