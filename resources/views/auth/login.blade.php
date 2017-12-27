@@ -39,13 +39,10 @@
 
                 <div class="form-group">
                     <div class="col">
-                        <div class="checkbox">
-                            <label class="custom-control custom-checkbox mb-2 mr-sm-2 mb-sm-0">
-                                <input type="checkbox" class="custom-control-input" name="remember" {{ old('remember') ? 'checked' : '' }}>
-                                <span class="custom-control-indicator"></span>
-                                <span class="custom-control-description">{{ __('messages.login.remember-me') }}</span>
-                            </label>
-                        </div>
+                          <div class="custom-control custom-checkbox mb-2 mr-sm-2 mb-sm-0">
+                               <input type="checkbox" class="custom-control-input" id="remember" name="remember" {{ old('remember') ? 'checked' : '' }}>
+                               <label class="custom-control-label" for="remember">{{ __('messages.login.remember-me') }}</label>
+                          </div>
                     </div>
                 </div>
 
