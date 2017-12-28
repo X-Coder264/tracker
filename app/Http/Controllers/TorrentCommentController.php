@@ -15,6 +15,7 @@ class TorrentCommentController extends Controller
 {
     /**
      * @param Torrent $torrent
+     *
      * @return Response
      */
     public function create(Torrent $torrent): Response
@@ -25,6 +26,7 @@ class TorrentCommentController extends Controller
     /**
      * @param Request $request
      * @param Torrent $torrent
+     *
      * @return RedirectResponse
      */
     public function store(Request $request, Torrent $torrent): RedirectResponse
