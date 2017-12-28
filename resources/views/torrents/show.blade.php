@@ -27,7 +27,7 @@
                             </h5>
                         </div>
                         <div class="collapse" id="peersTable" role="tabpanel" aria-labelledby="peers">
-                            @if($numberOfPeers === 0)
+                            @if (0 === $numberOfPeers)
                                 <div class="card-body">
                                     {{ __('messages.torrents.show.no_peers') }}
                                 </div>
@@ -44,12 +44,12 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        @foreach($torrent->peers as $peer)
+                                        @foreach ($torrent->peers as $peer)
                                             <tr>
                                                 <td>{{ $peer->user->name }}</td>
                                                 <td>{{ $peer->uploaded }}</td>
                                                 <td>{{ $peer->downloaded }}</td>
-                                                @if($peer->downloaded == 0)
+                                                @if ($peer->downloaded == 0)
                                                     <td>Inf.</td>
                                                 @else
                                                     <td>{{ number_format((int) $peer->uploaded / (int) $peer->downloaded, 2) }}</td>
@@ -72,7 +72,7 @@
                             </h5>
                         </div>
                         <div class="collapse" id="filesTable" role="tabpanel" aria-labelledby="files">
-                            @if(count($torrentFileNamesAndSizes) === 0)
+                            @if (count($torrentFileNamesAndSizes) === 0)
                                 Error.
                             @else
                                 <table class="table table-hover table-bordered table-responsive-sm table-responsive-md table-responsive-lg">
@@ -83,7 +83,7 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                    @foreach($torrentFileNamesAndSizes as $file)
+                                    @foreach ($torrentFileNamesAndSizes as $file)
                                         <tr>
                                             <td>{{ $file[0] }}</td>
                                             <td>{{ $file[1] }}</td>
@@ -95,6 +95,52 @@
                         </div>
                     </div>
                 </div>
+            </div>
+        </div>
+        <br>
+        <div class="card">
+            <div class="card-header">
+                Torrent comments
+            </div>
+
+            <div class="card-body">
+                @if (session('torrentCommentSuccess'))
+                    <div class="card text-white bg-success">
+                        <div class="card-body">
+                            <h4 class="card-title">{{ __('messages.flash_messages.success') }}</h4>
+                            <p class="card-text">{{ session('torrentCommentSuccess') }}</p>
+                        </div>
+                    </div>
+                    <br>
+                @endif
+                <a href="{{ route('torrent-comments.create', $torrent) }}" class="btn btn-primary btn-block">New comment</a><br>
+                @if ($torrentComments->isEmpty())
+                        <div class="card text-dark bg-warning">
+                            <div class="card-body">
+                                <p class="card-text">{{ __('messages.torrents.show.no_comments') }}</p>
+                            </div>
+                        </div>
+                @else
+                    @foreach ($torrentComments as $torrentComment)
+                        <br>
+                        <div class="card">
+                            <div class="card-header">
+                                {{ $torrentComment->user->name }} - {{ $torrentComment->created_at }} ({{ $torrentComment->created_at->diffForHumans() }})
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-2 d-none d-sm-block">
+                                        <img src="https://i.imgur.com/eJhRU6c.jpg" class="img-fluid">
+                                    </div>
+                                    <div class="col-10">
+                                        <p class="card-text">{{ $torrentComment->comment }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    @endforeach
+                    {{ $torrentComments->render() }}
+                @endif
             </div>
         </div>
     </div>

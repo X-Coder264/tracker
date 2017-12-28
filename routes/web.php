@@ -23,6 +23,9 @@ Route::middleware(['auth'])->group(function () {
     Route::post('torrents/upload', 'TorrentController@store')->name('torrents.store');
     Route::get('torrents/download/{torrent}', 'TorrentController@download')->name('torrents.download');
 
+    Route::get('torrent-comments/{torrent}/create', 'TorrentCommentController@create')->name('torrent-comments.create');
+    Route::post('torrent-comments/{torrent}', 'TorrentCommentController@store')->name('torrent-comments.store');
+
     Route::get('users/{user}/edit', 'UserController@edit')->name('users.edit');
     Route::put('users/{user}', 'UserController@update')->name('users.update');
 });

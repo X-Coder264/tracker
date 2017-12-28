@@ -3,7 +3,9 @@
 use App\Http\Models\User;
 use App\Http\Models\Torrent;
 use Faker\Generator as Faker;
+use Illuminate\Database\Eloquent\Factory;
 
+/** @var Factory $factory */
 $factory->define(Torrent::class, function (Faker $faker) {
     return [
         'name' => $faker->unique()->name,

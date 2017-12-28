@@ -8,7 +8,7 @@
             </div>
 
             <div class="card-body">
-                @if($torrents->isEmpty())
+                @if ($torrents->isEmpty())
                     <div class="card text-dark bg-warning">
                         <div class="card-body">
                             <h4 class="card-title">{{ __('messages.torrent.index.notice_no_active_torrents_title') }}</h4>
@@ -29,7 +29,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                @foreach($torrents as $torrent)
+                                @foreach ($torrents as $torrent)
                                     <tr>
                                         <td>XYZ</td>
                                         <td>

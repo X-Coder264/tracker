@@ -48,7 +48,7 @@
 
                     <div class="col">
                         <select class="form-control" name="locale" id="locale" required>
-                            @foreach($locales as $locale)
+                            @foreach ($locales as $locale)
                                 <option value="{{ $locale->id }}">{{ $locale->locale }}</option>
                             @endforeach
                         </select>

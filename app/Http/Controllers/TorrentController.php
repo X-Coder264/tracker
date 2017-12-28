@@ -55,10 +55,14 @@ class TorrentController extends Controller
     ): Response {
         $torrent->load(['uploader', 'peers.user']);
         $numberOfPeers = $torrent->peers->count();
+        $torrentComments = $torrent->comments()->with('user')->paginate(10);
 
         $torrentFileNamesAndSizes = $torrentInfoService->getTorrentFileNamesAndSizes($torrent);
 
-        return response()->view('torrents.show', compact('torrent', 'numberOfPeers', 'torrentFileNamesAndSizes'));
+        return response()->view(
+            'torrents.show',
+            compact('torrent', 'numberOfPeers', 'torrentFileNamesAndSizes', 'torrentComments')
+        );
     }
 
     /**

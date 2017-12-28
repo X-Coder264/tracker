@@ -27,7 +27,7 @@
 
                         <div class="col">
                             <select class="form-control" name="locale_id" id="locale" required>
-                                @foreach($locales as $locale)
+                                @foreach ($locales as $locale)
                                     <option value="{{ $locale->id }}" @if($locale->id === $user->locale_id) selected @endif>{{ $locale->locale }}</option>
                                 @endforeach
                             </select>

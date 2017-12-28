@@ -74,4 +74,12 @@ class Torrent extends Model
             ['id', 'torrent_id', 'user_id', 'uploaded', 'downloaded', 'userAgent', 'seeder', 'updated_at']
         );
     }
+
+    /**
+     * @return HasMany
+     */
+    public function comments(): HasMany
+    {
+        return $this->hasMany(TorrentComment::class);
+    }
 }

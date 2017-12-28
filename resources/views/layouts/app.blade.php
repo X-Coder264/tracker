@@ -22,15 +22,12 @@
                 <span class="navbar-toggler-icon"></span>
             </button>
 
-            <!-- Brand -->
             <a class="navbar-brand" href="{{ route('home.index') }}">
                 {{ config('app.name', 'Tracker') }}
             </a>
 
-            <!-- Links -->
             <div class="collapse navbar-collapse" id="nav-content">
                 <ul class="navbar-nav w-100">
-                    <!-- Authentication Links -->
                     @guest
                         <li class="nav-item nav-item">
                             <a class="nav-item nav-link" href="{{ route('login') }}">{{ __('messages.common.login') }}</a>

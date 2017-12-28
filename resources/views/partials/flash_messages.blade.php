@@ -1,4 +1,4 @@
-@if(session('success'))
+@if (session('success'))
     <div class="card text-white bg-success">
         <div class="card-body">
             <h4 class="card-title">{{ __('messages.flash_messages.success') }}</h4>
@@ -6,7 +6,7 @@
         </div>
     </div>
 @endif
-@if(session('error'))
+@if (session('error'))
     <div class="card text-white bg-danger">
         <div class="card-body">
             <h4 class="card-title">{{ __('messages.common.error') }}</h4>
@@ -22,7 +22,7 @@
         </div>
     </div>
 @endif
-@if($errors->any())
+@if ($errors->any())
     <div class="card text-white bg-danger">
         <div class="card-body">
             <h4 class="card-title">{{ __('messages.common.error') }}</h4>

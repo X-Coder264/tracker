@@ -3,6 +3,7 @@
 use App\Http\Models\User;
 use App\Http\Models\Locale;
 use Faker\Generator as Faker;
+use Illuminate\Database\Eloquent\Factory;
 
 /*
 |--------------------------------------------------------------------------
@@ -15,6 +16,7 @@ use Faker\Generator as Faker;
 |
 */
 
+/** @var Factory $factory */
 $factory->define(User::class, function (Faker $faker) {
     static $password;
 
