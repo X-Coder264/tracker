@@ -2,11 +2,11 @@
 
 namespace Tests\Feature\Models;
 
-use App\Http\Models\TorrentComment;
 use Tests\TestCase;
 use App\Http\Models\Peer;
 use App\Http\Models\User;
 use App\Http\Models\Torrent;
+use App\Http\Models\TorrentComment;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Database\Eloquent\Relations\HasMany;
