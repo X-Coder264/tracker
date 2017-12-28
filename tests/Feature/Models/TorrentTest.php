@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Models;
 
+use App\Http\Models\TorrentComment;
 use Tests\TestCase;
 use App\Http\Models\Peer;
 use App\Http\Models\User;
@@ -67,5 +68,20 @@ class TorrentTest extends TestCase
         $this->assertSame($torrent->peers[0]->userAgent, $peer->userAgent);
         $this->assertSame($torrent->peers[0]->seeder, $peer->seeder);
         $this->assertSame($torrent->peers[0]->updated_at->format('Y-m-d H:i:s'), $peer->updated_at->format('Y-m-d H:i:s'));
+    }
+
+    public function testCommentsRelationship()
+    {
+        factory(TorrentComment::class)->create();
+
+        $torrent = Torrent::findOrFail(1);
+        $torrentComment = TorrentComment::findOrFail(1);
+        $this->assertInstanceOf(HasMany::class, $torrent->comments());
+        $this->assertInstanceOf(Collection::class, $torrent->comments);
+        $this->assertSame($torrent->comments[0]->id, $torrentComment->id);
+        $this->assertSame($torrent->comments[0]->user_id, $torrentComment->user_id);
+        $this->assertSame($torrent->comments[0]->comment, $torrentComment->comment);
+        $this->assertSame($torrent->comments[0]->created_at->format('Y-m-d H:i:s'), $torrentComment->created_at->format('Y-m-d H:i:s'));
+        $this->assertSame($torrent->comments[0]->updated_at->format('Y-m-d H:i:s'), $torrentComment->updated_at->format('Y-m-d H:i:s'));
     }
 }
