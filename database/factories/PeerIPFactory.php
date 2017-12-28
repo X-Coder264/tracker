@@ -5,7 +5,7 @@ use App\Http\Models\PeerIP;
 use Faker\Generator as Faker;
 use Illuminate\Database\Eloquent\Factory;
 
-/** @var Factory $factory */
+/* @var Factory $factory */
 $factory->define(PeerIP::class, function (Faker $faker) {
     return [
         'peerID' => function () {
