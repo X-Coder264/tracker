@@ -37,7 +37,7 @@
                     </div>
                 </div>
 
-                <div class="form-group row">
+                <div class="form-group">
                     <div class="col">
                           <div class="custom-control custom-checkbox mb-2 mr-sm-2 mb-sm-0">
                                <input type="checkbox" class="custom-control-input" id="remember" name="remember" {{ old('remember') ? 'checked' : '' }}>
