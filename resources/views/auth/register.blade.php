@@ -6,8 +6,6 @@
         <div class="card-header">{{ __('messages.common.register') }}</div>
 
         <div class="card-body">
-            @include('partials.flash_messages')
-            <br>
             <form class="form-horizontal" method="POST" action="{{ route('register') }}">
                 {{ csrf_field() }}
 
