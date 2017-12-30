@@ -9,35 +9,35 @@
             <form class="form-horizontal" method="POST" action="{{ route('login') }}">
                 {{ csrf_field() }}
 
-                <div class="form-group{{ $errors->has('email') ? ' has-error' : '' }}">
+                <div class="form-group">
                     <label for="email" class="col control-label">{{ __('messages.common.email') }}</label>
 
                     <div class="col">
-                        <input id="email" type="email" class="form-control" name="email" value="{{ old('email') }}" required>
+                        <input id="email" type="email" class="form-control{{ $errors->has('email') ? ' is-invalid' : '' }}" name="email" value="{{ old('email') }}" required>
 
                         @if ($errors->has('email'))
-                            <span class="help-block">
+                            <div class="invalid-feedback">
                                 <strong>{{ $errors->first('email') }}</strong>
-                            </span>
-                        @endif
-                    </div>
-                </div>
-
-                <div class="form-group{{ $errors->has('password') ? ' has-error' : '' }}">
-                    <label for="password" class="col control-label">{{ __('messages.common.password') }}</label>
-
-                    <div class="col">
-                        <input id="password" type="password" class="form-control" name="password" required>
-
-                        @if ($errors->has('password'))
-                            <span class="help-block">
-                                <strong>{{ $errors->first('password') }}</strong>
-                            </span>
+                            </div>
                         @endif
                     </div>
                 </div>
 
                 <div class="form-group">
+                    <label for="password" class="col control-label">{{ __('messages.common.password') }}</label>
+
+                    <div class="col">
+                        <input id="password" type="password" class="form-control{{ $errors->has('password') ? ' is-invalid' : '' }}" name="password" required>
+
+                        @if ($errors->has('password'))
+                            <div class="invalid-feedback">
+                                <strong>{{ $errors->first('password') }}</strong>
+                            </div>
+                        @endif
+                    </div>
+                </div>
+
+                <div class="form-group row">
                     <div class="col">
                           <div class="custom-control custom-checkbox mb-2 mr-sm-2 mb-sm-0">
                                <input type="checkbox" class="custom-control-input" id="remember" name="remember" {{ old('remember') ? 'checked' : '' }}>

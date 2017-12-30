@@ -11,43 +11,43 @@
 
                 <input type="hidden" name="token" value="{{ $token }}">
 
-                <div class="form-group{{ $errors->has('email') ? ' has-error' : '' }}">
+                <div class="form-group">
                     <label for="email" class="col control-label">{{ __('messages.common.email') }}</label>
 
                     <div class="col">
-                        <input id="email" type="email" class="form-control" name="email" value="{{ $email or old('email') }}" required>
+                        <input id="email" type="email" class="form-control{{ $errors->has('email') ? ' is-invalid' : '' }}" name="email" value="{{ $email or old('email') }}" required>
 
                         @if ($errors->has('email'))
-                            <span class="help-block">
+                            <div class="invalid-feedback">
                                 <strong>{{ $errors->first('email') }}</strong>
-                            </span>
+                            </div>
                         @endif
                     </div>
                 </div>
 
-                <div class="form-group{{ $errors->has('password') ? ' has-error' : '' }}">
+                <div class="form-group">
                     <label for="password" class="col control-label">{{ __('messages.common.password') }}</label>
 
                     <div class="col">
-                        <input id="password" type="password" class="form-control" name="password" required>
+                        <input id="password" type="password" class="form-control{{ $errors->has('password') ? ' is-invalid' : '' }}" name="password" required>
 
                         @if ($errors->has('password'))
-                            <span class="help-block">
+                            <div class="invalid-feedback">
                                 <strong>{{ $errors->first('password') }}</strong>
-                            </span>
+                            </div>
                         @endif
                     </div>
                 </div>
 
-                <div class="form-group{{ $errors->has('password_confirmation') ? ' has-error' : '' }}">
+                <div class="form-group">
                     <label for="password-confirm" class="col control-label">{{ __('messages.common.confirm-password') }}</label>
                     <div class="col">
-                        <input id="password-confirm" type="password" class="form-control" name="password_confirmation" required>
+                        <input id="password-confirm" type="password" class="form-control{{ $errors->has('password_confirmation') ? ' is-invalid' : '' }}" name="password_confirmation" required>
 
                         @if ($errors->has('password_confirmation'))
-                            <span class="help-block">
+                            <div class="invalid-feedback">
                                 <strong>{{ $errors->first('password_confirmation') }}</strong>
-                            </span>
+                            </div>
                         @endif
                     </div>
                 </div>

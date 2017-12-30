@@ -1,7 +1,7 @@
 <div class="form-group">
     <label for="timezone" class="col control-label">{{ __('messages.timezones_select.timezone') }}</label>
     <div class="col">
-        <select class="form-control" name="timezone" id="timezone" required>
+        <select class="form-control{{ $errors->has('timezone') ? ' is-invalid' : '' }}" name="timezone" id="timezone" required>
             <option value='Pacific/Midway' @if (Auth::check() && 'Pacific/Midway' === Auth::user()->timezone) selected @endif>(UTC-11:00) Midway Island</option>
             <option value='Pacific/Samoa' @if (Auth::check() && 'Pacific/Samoa' === Auth::user()->timezone) selected @endif>(UTC-11:00) Samoa</option>
             <option value='Pacific/Honolulu' @if (Auth::check() && 'Pacific/Honolulu' === Auth::user()->timezone) selected @endif>(UTC-10:00) Hawaii</option>
@@ -123,5 +123,11 @@
             <option value='Asia/Magadan' @if (Auth::check() && 'Asia/Magadan' === Auth::user()->timezone) selected @endif>(UTC+12:00) Magadan, New Caledonia, Solomon Is.</option>
             <option value='Pacific/Tongatapu' @if (Auth::check() && 'Pacific/Tongatapu' === Auth::user()->timezone) selected @endif>(UTC+13:00) Nuku'alofa</option>
         </select>
+
+        @if ($errors->has('timezone'))
+            <div class="invalid-feedback">
+                <strong>{{ $errors->first('timezone') }}</strong>
+            </div>
+        @endif
     </div>
 </div>

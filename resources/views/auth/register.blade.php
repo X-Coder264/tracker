@@ -15,7 +15,13 @@
                     <label for="name" class="col control-label">{{ __('messages.register.username') }}</label>
 
                     <div class="col">
-                        <input id="name" type="text" class="form-control" name="name" value="{{ old('name') }}" required>
+                        <input id="name" type="text" class="form-control{{ $errors->has('name') ? ' is-invalid' : '' }}" name="name" value="{{ old('name') }}" required>
+
+                        @if ($errors->has('name'))
+                            <div class="invalid-feedback">
+                                <strong>{{ $errors->first('name') }}</strong>
+                            </div>
+                        @endif
                     </div>
                 </div>
 
@@ -23,7 +29,13 @@
                     <label for="email" class="col control-label">{{ __('messages.common.email') }}</label>
 
                     <div class="col">
-                        <input id="email" type="email" class="form-control" name="email" value="{{ old('email') }}" required>
+                        <input id="email" type="email" class="form-control{{ $errors->has('email') ? ' is-invalid' : '' }}" name="email" value="{{ old('email') }}" required>
+
+                        @if ($errors->has('email'))
+                            <div class="invalid-feedback">
+                                <strong>{{ $errors->first('email') }}</strong>
+                            </div>
+                        @endif
                     </div>
                 </div>
 
@@ -31,7 +43,13 @@
                     <label for="password" class="col control-label">{{ __('messages.common.password') }}</label>
 
                     <div class="col">
-                        <input id="password" type="password" class="form-control" name="password" required>
+                        <input id="password" type="password" class="form-control{{ $errors->has('password') ? ' is-invalid' : '' }}" name="password" required>
+
+                        @if ($errors->has('password'))
+                            <div class="invalid-feedback">
+                                <strong>{{ $errors->first('password') }}</strong>
+                            </div>
+                        @endif
                     </div>
                 </div>
 
@@ -47,11 +65,17 @@
                     <label for="locale" class="col control-label">{{ __('messages.common.language') }}</label>
 
                     <div class="col">
-                        <select class="form-control" name="locale" id="locale" required>
+                        <select class="form-control{{ $errors->has('locale') ? ' is-invalid' : '' }}" name="locale" id="locale" required>
                             @foreach ($locales as $locale)
                                 <option value="{{ $locale->id }}">{{ $locale->locale }}</option>
                             @endforeach
                         </select>
+
+                        @if ($errors->has('locale'))
+                            <div class="invalid-feedback">
+                                <strong>{{ $errors->first('locale') }}</strong>
+                            </div>
+                        @endif
                     </div>
                 </div>
 
