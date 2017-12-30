@@ -15,7 +15,7 @@
                     <label for="name" class="col control-label">{{ __('messages.register.username') }}</label>
 
                     <div class="col">
-                        <input id="name" type="text" class="form-control" name="name" value="{{ old('name') }}" required autofocus>
+                        <input id="name" type="text" class="form-control" name="name" value="{{ old('name') }}" required>
                     </div>
                 </div>
 

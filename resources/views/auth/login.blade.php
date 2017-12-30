@@ -13,7 +13,7 @@
                     <label for="email" class="col control-label">{{ __('messages.common.email') }}</label>
 
                     <div class="col">
-                        <input id="email" type="email" class="form-control" name="email" value="{{ old('email') }}" required autofocus>
+                        <input id="email" type="email" class="form-control" name="email" value="{{ old('email') }}" required>
 
                         @if ($errors->has('email'))
                             <span class="help-block">
