@@ -645,8 +645,8 @@ class AnnounceService
 
         $peers = $this->getPeers();
 
-        $response['complete'] = $peers->where('left', '=', 0)->count();
-        $response['incomplete'] = $peers->where('left', '!=', 0)->count();
+        $response['complete'] = $peers->where('seeder', '=', true)->count();
+        $response['incomplete'] = $peers->where('seeder', '=', false)->count();
 
         foreach ($peers as $peer) {
             foreach ($peer->IPs as $peerAddress) {
