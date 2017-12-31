@@ -20,7 +20,7 @@ class TorrentComment extends Model
      * @var array
      */
     protected $fillable = [
-        'comment', 'torrent_id', 'user_id'
+        'comment', 'torrent_id', 'user_id',
     ];
 
     /**
