@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Middleware;
 
+use Carbon\Carbon;
 use Tests\TestCase;
 use App\Http\Models\User;
 use App\Http\Models\Locale;
@@ -29,6 +30,7 @@ class SetUserLocaleTest extends TestCase
 
         $this->get('test');
         $this->assertSame('hr', $this->app->getLocale());
+        $this->assertSame('hr', Carbon::getLocale());
         $this->assertSame('hr', Cache::get('user.' . $user->slug . '.locale'));
     }
 }
