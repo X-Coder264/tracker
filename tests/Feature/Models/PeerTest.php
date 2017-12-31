@@ -21,16 +21,18 @@ class PeerTest extends TestCase
     {
         factory(Peer::class)->create();
         $peer = Peer::findOrFail(1);
-        SizeFormattingService::shouldReceive('getFormattedSize')->once()->with($peer->getOriginal('uploaded'));
-        $peer->uploaded;
+        $returnValue = '500 MB';
+        SizeFormattingService::shouldReceive('getFormattedSize')->once()->with($peer->getOriginal('uploaded'))->andReturn($returnValue);
+        $this->assertSame($returnValue, $peer->uploaded);
     }
 
     public function testDownloadedAccessor()
     {
         factory(Peer::class)->create();
         $peer = Peer::findOrFail(1);
-        SizeFormattingService::shouldReceive('getFormattedSize')->once()->with($peer->getOriginal('downloaded'));
-        $peer->downloaded;
+        $returnValue = '500 MB';
+        SizeFormattingService::shouldReceive('getFormattedSize')->once()->with($peer->getOriginal('downloaded'))->andReturn($returnValue);
+        $this->assertSame($returnValue, $peer->downloaded);
     }
 
     public function testUserRelationship()

@@ -21,8 +21,9 @@ class TorrentTest extends TestCase
     {
         factory(Torrent::class)->create();
         $torrent = Torrent::findOrFail(1);
-        SizeFormattingService::shouldReceive('getFormattedSize')->once()->with($torrent->getOriginal('size'));
-        $torrent->size;
+        $returnValue = '500 MB';
+        SizeFormattingService::shouldReceive('getFormattedSize')->once()->with($torrent->getOriginal('size'))->andReturn($returnValue);
+        $this->assertSame($returnValue, $torrent->size);
     }
 
     public function testTorrentHasSlug()
