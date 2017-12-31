@@ -43,6 +43,7 @@ class AnnounceServiceTest extends TestCase
             ]
         ),
             [
+                'REMOTE_ADDR'     => $IP,
                 'HTTP_USER_AGENT' => $userAgent,
             ]
         );
@@ -64,6 +65,11 @@ class AnnounceServiceTest extends TestCase
         $this->assertSame($userAgent, $peer->userAgent);
         $this->assertInstanceOf(Carbon::class, $peer->created_at);
         $this->assertInstanceOf(Carbon::class, $peer->updated_at);
+        $this->assertSame(1, PeerIP::count());
+        $peerIP = PeerIP::findOrFail(1);
+        $this->assertSame($IP, $peerIP->IP);
+        $this->assertSame($port, (int) $peerIP->port);
+        $this->assertFalse((bool) $peerIP->isIPv6);
         $this->assertSame(1, Snatch::count());
         $snatch = Snatch::findOrFail(1);
         $this->assertSame($user->id, (int) $snatch->user_id);
@@ -113,6 +119,7 @@ class AnnounceServiceTest extends TestCase
                 ]
             ),
             [
+                'REMOTE_ADDR'     => $IP,
                 'HTTP_USER_AGENT' => $userAgent,
             ]
         );
@@ -163,6 +170,11 @@ class AnnounceServiceTest extends TestCase
         $this->assertSame($userAgent, $peer->userAgent);
         $this->assertInstanceOf(Carbon::class, $peer->created_at);
         $this->assertInstanceOf(Carbon::class, $peer->updated_at);
+        $this->assertSame(3, PeerIP::count());
+        $peerIP = PeerIP::findOrFail(3);
+        $this->assertSame($IP, $peerIP->IP);
+        $this->assertSame($port, (int) $peerIP->port);
+        $this->assertFalse((bool) $peerIP->isIPv6);
         $this->assertSame(1, Snatch::count());
         $snatch = Snatch::findOrFail(1);
         $this->assertSame($user->id, (int) $snatch->user_id);
@@ -206,6 +218,7 @@ class AnnounceServiceTest extends TestCase
                 ]
             ),
             [
+                'REMOTE_ADDR'     => $IP,
                 'HTTP_USER_AGENT' => $userAgent,
             ]
         );
@@ -227,6 +240,11 @@ class AnnounceServiceTest extends TestCase
         $this->assertSame($userAgent, $peer->userAgent);
         $this->assertInstanceOf(Carbon::class, $peer->created_at);
         $this->assertInstanceOf(Carbon::class, $peer->updated_at);
+        $this->assertSame(1, PeerIP::count());
+        $peerIP = PeerIP::findOrFail(1);
+        $this->assertSame($IP, $peerIP->IP);
+        $this->assertSame($port, (int) $peerIP->port);
+        $this->assertFalse((bool) $peerIP->isIPv6);
         $this->assertSame(0, Snatch::count());
         $torrent = $torrent->fresh();
         $this->assertSame(0, (int) $torrent->leechers);
