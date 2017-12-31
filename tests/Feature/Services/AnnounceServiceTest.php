@@ -56,8 +56,8 @@ class AnnounceServiceTest extends TestCase
         $this->assertSame($peerId, $peer->peer_id);
         $this->assertSame($user->id, (int) $peer->user_id);
         $this->assertSame($torrent->id, (int) $peer->torrent_id);
-        $this->assertSame(0, $peer->getOriginal('uploaded'));
-        $this->assertSame(0, $peer->getOriginal('downloaded'));
+        $this->assertSame(0, (int) $peer->getOriginal('uploaded'));
+        $this->assertSame(0, (int) $peer->getOriginal('downloaded'));
         $this->assertFalse((bool) $peer->seeder);
         $this->assertSame($userAgent, $peer->userAgent);
         $this->assertInstanceOf(Carbon::class, $peer->created_at);
