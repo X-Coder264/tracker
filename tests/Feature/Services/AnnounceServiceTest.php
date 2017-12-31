@@ -22,7 +22,7 @@ class AnnounceServiceTest extends TestCase
         $IP = '98.165.38.50';
         $port = 60000;
         $userAgent = 'my test user agent';
-        $torrent = factory(Torrent::class)->create(['infoHash' => $infoHash]);
+        $torrent = factory(Torrent::class)->create(['infoHash' => $infoHash, 'seeders' => 0, 'leechers' => 0]);
         $user = factory(User::class)->create();
 
         $response = $this->get(
@@ -74,5 +74,8 @@ class AnnounceServiceTest extends TestCase
         $this->assertSame(1, $snatch->timesAnnounced);
         $this->assertNull($snatch->finishedAt);
         $this->assertSame($userAgent, $snatch->userAgent);
+        $torrent = $torrent->fresh();
+        $this->assertSame(1, $torrent->leechers);
+        $this->assertSame(0, $torrent->seeders);
     }
 }
