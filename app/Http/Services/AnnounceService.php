@@ -155,7 +155,7 @@ class AnnounceService
                             ->first();
 
         if (null === $this->user) {
-            return $this->announceErrorResponse('Invalid passkey.');
+            return $this->announceErrorResponse(__('messages.announce.invalid_passkey'));
         }
 
         $this->torrent = Torrent::where('infoHash', bin2hex($this->request->input('info_hash')))
@@ -163,7 +163,7 @@ class AnnounceService
                                 ->first();
 
         if (null === $this->torrent) {
-            return $this->announceErrorResponse('Invalid info_hash.');
+            return $this->announceErrorResponse(__('messages.announce.invalid_info_hash'));
         }
 
         $left = (int) $this->request->input('left');
@@ -359,7 +359,7 @@ class AnnounceService
         // return an error if there is not at least one IP address and port set
         if (false === ((null !== $this->ipv4Address && null !== $this->ipv4Port) ||
                 (null !== $this->ipv6Address && null !== $this->ipv6Port))) {
-            return $this->announceErrorResponse('The IP or port was not sent.');
+            return $this->announceErrorResponse(__('messages.announce.invalid_ip_or_port'));
         }
 
         return null;

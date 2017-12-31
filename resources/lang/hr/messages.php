@@ -62,4 +62,7 @@ return [
     'login.register-link-text' => 'Nemate još račun?',
     'login.reset-password-link-text' => 'Zaboravili ste lozinku?',
     'register.username' => 'Korisničko ime',
+    'announce.invalid_passkey' => 'Neispravan passkey.',
+    'announce.invalid_info_hash' => 'Neispravan info_hash.',
+    'announce.invalid_ip_or_port' => 'Nije poslana ispravna IP adresa ili port.',
 ];

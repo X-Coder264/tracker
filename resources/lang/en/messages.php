@@ -62,4 +62,7 @@ return [
     'login.register-link-text' => 'You do not have an account yet?',
     'login.reset-password-link-text' => 'Forgot your password?',
     'register.username' => 'Username',
+    'announce.invalid_passkey' => 'Invalid passkey.',
+    'announce.invalid_info_hash' => 'Invalid info_hash.',
+    'announce.invalid_ip_or_port' => 'A valid IP or port was not sent.',
 ];
