@@ -7,7 +7,9 @@ use App\Http\Models\User;
 use App\Http\Models\Torrent;
 use Illuminate\Http\Response;
 use Illuminate\Http\Testing\File;
+use App\Http\Models\TorrentComment;
 use App\Http\Services\TorrentInfoService;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class TorrentControllerTest extends TestCase
@@ -46,6 +48,9 @@ class TorrentControllerTest extends TestCase
     public function testShow()
     {
         $torrent = factory(Torrent::class)->create();
+        $torrentComment = factory(TorrentComment::class)->create(
+            ['torrent_id' => $torrent->id, 'user_id' => $torrent->uploader_id]
+        );
 
         $torrentInfo = $this->createMock(TorrentInfoService::class);
         $this->app->instance(TorrentInfoService::class, $torrentInfo);
@@ -56,8 +61,13 @@ class TorrentControllerTest extends TestCase
         $response = $this->get(route('torrents.show', $torrent));
         $response->assertStatus(Response::HTTP_OK);
         $response->assertViewIs('torrents.show');
+        $response->assertViewHas('torrent');
+        $response->assertViewHas('numberOfPeers');
         $response->assertViewHas('torrentFileNamesAndSizes', $returnValue);
+        $response->assertViewHas('torrentComments');
         $response->assertViewHas('timezone');
+        $this->assertInstanceOf(LengthAwarePaginator::class, $response->original->torrentComments);
+        $response->assertSee($torrentComment->comment);
     }
 
     public function testGuestsCannotSeeTheTorrentsIndexPage()
