@@ -8,6 +8,7 @@ use App\Http\Models\Peer;
 use App\Http\Models\User;
 use App\Http\Models\Snatch;
 use App\Http\Models\Torrent;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Storage;
@@ -248,6 +249,7 @@ class AnnounceService
      */
     protected function validateRequest(): ?string
     {
+        /* @var \Illuminate\Validation\Validator $validator */
         $validator = Validator::make(
             $this->request->all(),
             [
@@ -599,6 +601,23 @@ class AnnounceService
     }
 
     /**
+     * @return Collection
+     */
+    protected function getPeers(): Collection
+    {
+        return Peer::with('IPs')
+            ->when($this->seeder, function ($query) {
+                return $query->where('seeder', '!=', true);
+            })
+            ->where('user_id', '!=', $this->user->id)
+            ->where('torrent_id', '=', $this->torrent->id)
+            ->limit($this->numberOfWantedPeers)
+            ->inRandomOrder()
+            ->select(['id', 'peer_id'])
+            ->get();
+    }
+
+    /**
      * @return string
      */
     protected function announceSuccessResponse(): string
@@ -619,21 +638,12 @@ class AnnounceService
     protected function compactResponse(): string
     {
         $response['interval'] = 40 * 60; // 40 minutes
-        $response['min interval'] = 1 * 60; // 1 minutes
+        $response['min interval'] = 1 * 60; // 1 minute
         $response['peers'] = '';
         // BEP 7 -> IPv6 peers support
         $response['peers6'] = '';
 
-        $peers = Peer::with('IPs')
-                    ->when($this->seeder, function ($query) {
-                        return $query->where('seeder', '!=', true);
-                    })
-                    ->where('user_id', '!=', $this->user->id)
-                    ->where('torrent_id', '=', $this->torrent->id)
-                    ->limit($this->numberOfWantedPeers)
-                    ->inRandomOrder()
-                    ->select(['id', 'peer_id'])
-                    ->get();
+        $peers = $this->getPeers();
 
         $response['complete'] = $peers->where('left', '=', 0)->count();
         $response['incomplete'] = $peers->where('left', '!=', 0)->count();

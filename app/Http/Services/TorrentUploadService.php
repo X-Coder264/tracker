@@ -7,8 +7,10 @@ namespace App\Http\Services;
 use Exception;
 use App\Http\Models\Torrent;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Contracts\Filesystem\FileNotFoundException;
 
 class TorrentUploadService
 {
@@ -56,7 +58,7 @@ class TorrentUploadService
 
         try {
             $torrentContent = File::get($torrentFilePath);
-        } catch (Exception $e) {
+        } catch (FileNotFoundException $e) {
             throw new Exception('The file could not be read.');
         }
 
@@ -78,7 +80,7 @@ class TorrentUploadService
         $torrent->name = $request->input('name');
         $torrent->size = $torrentSize;
         $torrent->description = $request->input('description');
-        $torrent->uploader_id = auth()->id();
+        $torrent->uploader_id = Auth::id();
         $torrent->infoHash = sha1($this->encoder->encode($decodedTorrent['info']));
         if (true === $torrent->save()) {
             $stored = Storage::disk('public')->put(
