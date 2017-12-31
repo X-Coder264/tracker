@@ -8,11 +8,11 @@ use App\Http\Models\Peer;
 use App\Http\Models\User;
 use App\Http\Models\Snatch;
 use App\Http\Models\Torrent;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Database\Eloquent\Collection;
 
 class AnnounceService
 {
