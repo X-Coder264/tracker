@@ -66,8 +66,8 @@ class AnnounceServiceTest extends TestCase
         $snatch = Snatch::findOrFail(1);
         $this->assertSame($user->id, (int) $snatch->user_id);
         $this->assertSame($torrent->id, (int) $snatch->torrent_id);
-        $this->assertSame(0, $snatch->getOriginal('uploaded'));
-        $this->assertSame(0, $snatch->getOriginal('downloaded'));
+        $this->assertSame(0, (int) $snatch->getOriginal('uploaded'));
+        $this->assertSame(0, (int) $snatch->getOriginal('downloaded'));
         $this->assertSame($torrent->getOriginal('size'), $snatch->getOriginal('left'));
         $this->assertSame(0, $snatch->seedTime);
         $this->assertSame(0, $snatch->leechTime);
