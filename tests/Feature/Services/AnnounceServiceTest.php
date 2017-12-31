@@ -126,7 +126,7 @@ class AnnounceServiceTest extends TestCase
             "interval" => 2400,
             "min interval" => 60,
             "peers" => bin2hex(inet_pton($peerOneIP->IP) . pack('n*', $peerOneIP->port) . inet_pton($peerTwoIP->IP) . pack('n*', $peerTwoIP->port)),
-            "peers6" => "",
+            "peers6" => '',
         ];
         $expectedResponseTwo = [
             "complete" => 1,
@@ -134,7 +134,7 @@ class AnnounceServiceTest extends TestCase
             "interval" => 2400,
             "min interval" => 60,
             "peers" => bin2hex(inet_pton($peerTwoIP->IP) . pack('n*', $peerTwoIP->port) . inet_pton($peerOneIP->IP) . pack('n*', $peerOneIP->port)),
-            "peers6" => "",
+            "peers6" => '',
         ];
         $response->assertStatus(Response::HTTP_OK);
         $response->assertHeader('Content-Type', 'text/plain; charset=UTF-8');
