@@ -144,7 +144,8 @@ class AnnounceServiceTest extends TestCase
         if (! empty($responseContent['peers'])) {
             $responseContent['peers'] = bin2hex($responseContent['peers']);
         }
-        $this->assertThat($responseContent,
+        $this->assertThat(
+            $responseContent,
             $this->logicalOr(
                 $this->equalTo($expectedResponseOne),
                 $this->equalTo($expectedResponseTwo)
