@@ -613,7 +613,7 @@ class AnnounceService
             ->where('torrent_id', '=', $this->torrent->id)
             ->limit($this->numberOfWantedPeers)
             ->inRandomOrder()
-            ->select(['id', 'peer_id'])
+            ->select(['id', 'peer_id', 'seeder'])
             ->get();
     }
 

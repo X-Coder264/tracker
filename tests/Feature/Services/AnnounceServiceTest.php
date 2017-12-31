@@ -10,6 +10,7 @@ use App\Http\Models\PeerIP;
 use App\Http\Models\Snatch;
 use App\Http\Models\Torrent;
 use Illuminate\Http\Response;
+use App\Http\Services\BdecodingService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class AnnounceServiceTest extends TestCase
@@ -76,11 +77,11 @@ class AnnounceServiceTest extends TestCase
         $this->assertNull($snatch->finishedAt);
         $this->assertSame($userAgent, $snatch->userAgent);
         $torrent = $torrent->fresh();
-        $this->assertSame(1, $torrent->leechers);
-        $this->assertSame(0, $torrent->seeders);
+        $this->assertSame(1, (int) $torrent->leechers);
+        $this->assertSame(0, (int) $torrent->seeders);
     }
 
-    /*public function testStartLeechingWithOtherPeersPresentOnTheTorrent()
+    public function testStartLeechingWithOtherPeersPresentOnTheTorrent()
     {
         $infoHash = 'ccd285bd6d7fc749e9ed34d8b1e8a0f1b582d977';
         $peerId = '2d7142333345302d64354e334474384672517776';
@@ -94,7 +95,7 @@ class AnnounceServiceTest extends TestCase
         $peerOne = factory(Peer::class)->create(['torrent_id' => $torrent->id, 'seeder' => true, 'peer_id' => $peerIdOne]);
         $peerOneIP = factory(PeerIP::class)->create(['peerID' => $peerOne->id, 'IP' => '98.165.38.51', 'port' => 55555]);
         $peerTwo = factory(Peer::class)->create(['torrent_id' => $torrent->id, 'seeder' => false, 'peer_id' => $peerIdTwo]);
-        $peerTwoIP = factory(PeerIP::class)->create(['peerID' => $peerOne->id, 'IP' => '98.165.38.52', 'port' => 55556]);
+        $peerTwoIP = factory(PeerIP::class)->create(['peerID' => $peerTwo->id, 'IP' => '98.165.38.52', 'port' => 55556]);
 
         $response = $this->get(
             route(
@@ -116,22 +117,42 @@ class AnnounceServiceTest extends TestCase
             ]
         );
 
-        $expectedResponse = [
+        // Note 1: because we use the "inRandomOrder" method in the getPeers method there can be two possible responses
+        // Note 2: PHPUnit has some problems when asserting binary strings
+        // so we use bin2hex on the expected and actual responses as a workaround
+        $expectedResponseOne = [
             "complete" => 1,
             "incomplete" => 1,
             "interval" => 2400,
             "min interval" => 60,
-            "peers" => "",
+            "peers" => bin2hex(inet_pton($peerOneIP->IP) . pack('n*', $peerOneIP->port) . inet_pton($peerTwoIP->IP) . pack('n*', $peerTwoIP->port)),
+            "peers6" => "",
+        ];
+        $expectedResponseTwo = [
+            "complete" => 1,
+            "incomplete" => 1,
+            "interval" => 2400,
+            "min interval" => 60,
+            "peers" => bin2hex(inet_pton($peerTwoIP->IP) . pack('n*', $peerTwoIP->port) . inet_pton($peerOneIP->IP) . pack('n*', $peerOneIP->port)),
             "peers6" => "",
         ];
         $response->assertStatus(Response::HTTP_OK);
         $response->assertHeader('Content-Type', 'text/plain; charset=UTF-8');
-        $this->assertSame(
-            'd8:completei0e10:incompletei0e8:intervali2400e12:min intervali60e5:peers0:6:peers60:e',
-            $response->getContent()
+        $responseContent = $response->getContent();
+        $decoder = new BdecodingService();
+        $responseContent = $decoder->decode($responseContent);
+        if (!empty($responseContent['peers'])) {
+            $responseContent['peers'] = bin2hex($responseContent['peers']);
+        }
+        $this->assertThat($responseContent,
+            $this->logicalOr(
+                $this->equalTo($expectedResponseOne),
+                $this->equalTo($expectedResponseTwo)
+            )
         );
-        $this->assertSame(1, Peer::count());
-        $peer = Peer::findOrFail(1);
+        $this->assertContains($responseContent, [$expectedResponseOne, $expectedResponseTwo]);
+        $this->assertSame(3, Peer::count());
+        $peer = Peer::findOrFail(3);
         $this->assertSame($peerId, $peer->peer_id);
         $this->assertSame($user->id, (int) $peer->user_id);
         $this->assertSame($torrent->id, (int) $peer->torrent_id);
@@ -154,9 +175,9 @@ class AnnounceServiceTest extends TestCase
         $this->assertNull($snatch->finishedAt);
         $this->assertSame($userAgent, $snatch->userAgent);
         $torrent = $torrent->fresh();
-        $this->assertSame(2, $torrent->leechers);
-        $this->assertSame(1, $torrent->seeders);
-    }*/
+        $this->assertSame(2, (int) $torrent->leechers);
+        $this->assertSame(1, (int) $torrent->seeders);
+    }
 
     public function testStartSeedingWithNoOtherPeersPresentOnTheTorrent()
     {
@@ -207,7 +228,7 @@ class AnnounceServiceTest extends TestCase
         $this->assertInstanceOf(Carbon::class, $peer->updated_at);
         $this->assertSame(0, Snatch::count());
         $torrent = $torrent->fresh();
-        $this->assertSame(0, $torrent->leechers);
-        $this->assertSame(1, $torrent->seeders);
+        $this->assertSame(0, (int) $torrent->leechers);
+        $this->assertSame(1, (int) $torrent->seeders);
     }
 }
