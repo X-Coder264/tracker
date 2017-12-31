@@ -54,8 +54,8 @@ class AnnounceServiceTest extends TestCase
         $this->assertSame(1, Peer::count());
         $peer = Peer::findOrFail(1);
         $this->assertSame($peerId, $peer->peer_id);
-        $this->assertSame($user->id, $peer->user_id);
-        $this->assertSame($torrent->id, $peer->torrent_id);
+        $this->assertSame($user->id, (int) $peer->user_id);
+        $this->assertSame($torrent->id, (int) $peer->torrent_id);
         $this->assertSame(0, $peer->getOriginal('uploaded'));
         $this->assertSame(0, $peer->getOriginal('downloaded'));
         $this->assertFalse((bool) $peer->seeder);
@@ -64,8 +64,8 @@ class AnnounceServiceTest extends TestCase
         $this->assertInstanceOf(Carbon::class, $peer->updated_at);
         $this->assertSame(1, Snatch::count());
         $snatch = Snatch::findOrFail(1);
-        $this->assertSame($user->id, $snatch->user_id);
-        $this->assertSame($torrent->id, $snatch->torrent_id);
+        $this->assertSame($user->id, (int) $snatch->user_id);
+        $this->assertSame($torrent->id, (int) $snatch->torrent_id);
         $this->assertSame(0, $snatch->getOriginal('uploaded'));
         $this->assertSame(0, $snatch->getOriginal('downloaded'));
         $this->assertSame($torrent->getOriginal('size'), $snatch->getOriginal('left'));
