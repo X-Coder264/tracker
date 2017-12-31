@@ -121,27 +121,27 @@ class AnnounceServiceTest extends TestCase
         // Note 2: PHPUnit has some problems when asserting binary strings
         // so we use bin2hex on the expected and actual responses as a workaround
         $expectedResponseOne = [
-            "complete" => 1,
-            "incomplete" => 1,
-            "interval" => 2400,
-            "min interval" => 60,
-            "peers" => bin2hex(inet_pton($peerOneIP->IP) . pack('n*', $peerOneIP->port) . inet_pton($peerTwoIP->IP) . pack('n*', $peerTwoIP->port)),
-            "peers6" => '',
+            'complete' => 1,
+            'incomplete' => 1,
+            'interval' => 2400,
+            'min interval' => 60,
+            'peers' => bin2hex(inet_pton($peerOneIP->IP) . pack('n*', $peerOneIP->port) . inet_pton($peerTwoIP->IP) . pack('n*', $peerTwoIP->port)),
+            'peers6' => '',
         ];
         $expectedResponseTwo = [
-            "complete" => 1,
-            "incomplete" => 1,
-            "interval" => 2400,
-            "min interval" => 60,
-            "peers" => bin2hex(inet_pton($peerTwoIP->IP) . pack('n*', $peerTwoIP->port) . inet_pton($peerOneIP->IP) . pack('n*', $peerOneIP->port)),
-            "peers6" => '',
+            'complete' => 1,
+            'incomplete' => 1,
+            'interval' => 2400,
+            'min interval' => 60,
+            'peers' => bin2hex(inet_pton($peerTwoIP->IP) . pack('n*', $peerTwoIP->port) . inet_pton($peerOneIP->IP) . pack('n*', $peerOneIP->port)),
+            'peers6' => '',
         ];
         $response->assertStatus(Response::HTTP_OK);
         $response->assertHeader('Content-Type', 'text/plain; charset=UTF-8');
         $responseContent = $response->getContent();
         $decoder = new BdecodingService();
         $responseContent = $decoder->decode($responseContent);
-        if (!empty($responseContent['peers'])) {
+        if (! empty($responseContent['peers'])) {
             $responseContent['peers'] = bin2hex($responseContent['peers']);
         }
         $this->assertThat($responseContent,
