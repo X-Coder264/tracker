@@ -11,11 +11,12 @@ use App\Http\Models\Torrent;
 use Illuminate\Http\Response;
 use Illuminate\Support\Carbon;
 use App\Http\Services\BdecodingService;
+use Tests\Traits\EnableForeignKeyConstraints;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class AnnounceServiceTest extends TestCase
 {
-    use RefreshDatabase;
+    use RefreshDatabase, EnableForeignKeyConstraints;
 
     public function testStartLeechingWithNoOtherPeersPresentOnTheTorrent()
     {
