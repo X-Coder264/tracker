@@ -35,12 +35,12 @@
                                 <table class="table table-hover table-bordered table-responsive-sm table-responsive-md table-responsive-lg">
                                     <thead>
                                         <tr>
-                                            <th>Name</th>
-                                            <th>Uploaded</th>
-                                            <th>Downloaded</th>
-                                            <th>Ratio</th>
-                                            <th>Last announce</th>
-                                            <th>Client</th>
+                                            <th>{{ __('messages.common.torrent_table_username') }}</th>
+                                            <th>{{ __('messages.common.torrent_table_uploaded') }}</th>
+                                            <th>{{ __('messages.common.torrent_table_downloaded') }}</th>
+                                            <th>{{ __('messages.common.torrent_table_ratio') }}</th>
+                                            <th>{{ __('messages.common.torrent_table_last_announce') }}</th>
+                                            <th>{{ __('messages.common.torrent_table_torrent_client') }}</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -73,7 +73,7 @@
                         </div>
                         <div class="collapse" id="filesTable" role="tabpanel" aria-labelledby="files">
                             @if (count($torrentFileNamesAndSizes) === 0)
-                                Error.
+                                {{ __('messages.common.error') }}
                             @else
                                 <table class="table table-hover table-bordered table-responsive-sm table-responsive-md table-responsive-lg">
                                     <thead>
@@ -100,7 +100,7 @@
         <br>
         <div class="card">
             <div class="card-header">
-                Torrent comments
+                {{ __('messages.torrents.show.torrent_comments') }}
             </div>
 
             <div class="card-body">

@@ -32,6 +32,7 @@ return [
     'torrents.show.file_name' => 'Naziv datoteke',
     'torrents.show.no_peers' => 'Nema peerova na torrentu. To znači da je trenutno ovaj torrent mrtav.',
     'torrents.show.no_comments' => 'Ovaj torrent nema komentara.',
+    'torrents.show.torrent_comments' => 'Torrent komentari',
     'validation.variable.required' => ':var ne postoji u vašem zahtjevu.',
     'validation.variable.string' => ':var mora biti string.',
     'validation.variable.size' => ':var mora imati 20 znakova.',
@@ -65,4 +66,10 @@ return [
     'announce.invalid_passkey' => 'Neispravan passkey.',
     'announce.invalid_info_hash' => 'Neispravan info_hash.',
     'announce.invalid_ip_or_port' => 'Nije poslana ispravna IP adresa ili port.',
+    'common.torrent_table_username' => 'Korisničko ime',
+    'common.torrent_table_uploaded' => 'Uploadao',
+    'common.torrent_table_downloaded' => 'Downloadao',
+    'common.torrent_table_ratio' => 'Omjer',
+    'common.torrent_table_last_announce' => 'Zadnji put kontaktirao tracker',
+    'common.torrent_table_torrent_client' => 'Torrent klijent',
 ];

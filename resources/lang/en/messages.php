@@ -32,6 +32,7 @@ return [
     'torrents.show.file_name' => 'File name',
     'torrents.show.no_peers' => 'There are no peers on this torrent. This means that at the moment the torrent is dead.',
     'torrents.show.no_comments' => 'There are no comments on this torrent.',
+    'torrents.show.torrent_comments' => 'Torrent comments',
     'validation.variable.required' => 'The :var is not present in the request.',
     'validation.variable.string' => 'The :var must be a string.',
     'validation.variable.size' => 'The :var must have exactly 20 characters.',
@@ -65,4 +66,10 @@ return [
     'announce.invalid_passkey' => 'Invalid passkey.',
     'announce.invalid_info_hash' => 'Invalid info_hash.',
     'announce.invalid_ip_or_port' => 'A valid IP or port was not sent.',
+    'common.torrent_table_username' => 'Username',
+    'common.torrent_table_uploaded' => 'Uploaded',
+    'common.torrent_table_downloaded' => 'Downloaded',
+    'common.torrent_table_ratio' => 'Ratio',
+    'common.torrent_table_last_announce' => 'Last announce',
+    'common.torrent_table_torrent_client' => 'Torrent client',
 ];
