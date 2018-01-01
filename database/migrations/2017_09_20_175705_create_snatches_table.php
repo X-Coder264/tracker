@@ -24,7 +24,7 @@ class CreateSnatchesTable extends Migration
             $table->integer('seedTime')->unsigned()->default(0);
             $table->integer('leechTime')->unsigned()->default(0);
             $table->integer('timesAnnounced')->unsigned()->default(0);
-            $table->timestamp('finishedAt')->nullable();
+            $table->timestamp('finished_at')->nullable();
             $table->string('userAgent');
             $table->timestamps();
         });

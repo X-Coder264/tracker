@@ -526,7 +526,7 @@ class AnnounceService
                     'left'           => 0,
                     'leechTime'      => $this->snatch->leechTime + $this->leechTime,
                     'timesAnnounced' => $this->snatch->timesAnnounced + 1,
-                    'finishedAt'     => Carbon::now(),
+                    'finished_at'     => Carbon::now(),
                     'userAgent'      => $this->request->userAgent(),
                 ]
             );

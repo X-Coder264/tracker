@@ -21,7 +21,7 @@ $factory->define(Snatch::class, function (Faker $faker) {
         'seedTime' => 0,
         'leechTime' => 0,
         'timesAnnounced' => 1,
-        'finishedAt' => null,
+        'finished_at' => null,
         'userAgent' => $faker->text(255),
     ];
 });

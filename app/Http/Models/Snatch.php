@@ -14,4 +14,15 @@ class Snatch extends Model
      * @var array
      */
     protected $guarded = [];
+
+    /**
+     * The attributes that should be mutated to dates.
+     *
+     * @var array
+     */
+    protected $dates = [
+        'created_at',
+        'updated_at',
+        'finished_at'
+    ];
 }
