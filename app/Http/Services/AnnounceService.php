@@ -10,7 +10,6 @@ use App\Http\Models\Snatch;
 use App\Http\Models\Torrent;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Database\Eloquent\Collection;
 
@@ -119,8 +118,6 @@ class AnnounceService
         $this->request = $request;
 
         $event = $this->request->input('event');
-
-        //Storage::put('request.txt', print_r($request->all(), true));
 
         // info_hash and peer_id are validated separately because the Laravel validator uses
         // mb_strlen to get the length of the string which returns a wrong number
@@ -553,12 +550,6 @@ class AnnounceService
                 'userAgent'  => $this->request->userAgent(),
             ]
         );
-
-        $logString = 'Current seedtime: ' . $this->snatch->seedTime . ' \n';
-        $logString .= 'Seedtime in this cycle ' . $this->seedTime . ' \n';
-        $logString .= 'Total new seedtime ' . ($this->snatch->seedTime + $this->seedTime) . ' \n';
-
-        Storage::put('peerNoEventSeedTime.txt', print_r($logString, true));
 
         $this->insertPeerIPs();
 
