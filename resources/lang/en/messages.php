@@ -37,7 +37,6 @@ return [
     'validation.variable.required' => 'The :var is not present in the request.',
     'validation.variable.string' => 'The :var must be a string.',
     'validation.variable.size' => 'The :var must have exactly 20 characters.',
-    'validation.ip.ip' => 'The IP sent in the request is not valid.',
     'validation.variable.port' => 'The received port (:port) is not valid.',
     'validation.variable.integer' => 'The :var variable must be a valid integer.',
     'validation.variable.email' => 'The :var variable must be a valid e-mail address.',

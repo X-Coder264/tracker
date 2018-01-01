@@ -37,7 +37,6 @@ return [
     'validation.variable.required' => ':var ne postoji u vašem zahtjevu.',
     'validation.variable.string' => ':var mora biti string.',
     'validation.variable.size' => ':var mora imati 20 znakova.',
-    'validation.ip.ip' => 'Poslana IP adresa nije ispravna.',
     'validation.variable.port' => 'Poslani port (:port) nije ispravan.',
     'validation.variable.integer' => ':var varijabla mora biti cijeli broj.',
     'validation.variable.email' => ':var varijabla mora biti ispravna e-mail adresa.',

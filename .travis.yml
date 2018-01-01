@@ -33,7 +33,7 @@ before_script:
 script:
   - if [[ "$CHECK_PHP_SYNTAX" == "yes" ]]; then php vendor/bin/php-cs-fixer --no-interaction --dry-run --diff -v fix; fi;
   - if [[ "$CHECK_PHP_SYNTAX" == "yes" ]]; then mv ./.php_cs.cache $HOME/.app/cache/.php_cs.cache 2> /dev/null; fi;
-  - vendor/bin/phpunit --coverage-clover=build/logs/clover.xml
+  - vendor/bin/phpunit --coverage-text --coverage-clover=build/logs/clover.xml
 
 after_success:
   # Submit coverage report to Coveralls servers

@@ -262,8 +262,6 @@ class AnnounceService
                 'passkey.required' => __('messages.validation.variable.required', ['var' => 'passkey']),
                 'passkey.string' => __('messages.validation.variable.string', ['var' => 'passkey']),
                 'passkey.size' => __('messages.validation.variable.size', ['var' => 'passkey']),
-                'ip.required' => __('messages.validation.variable.required', ['var' => 'IP']),
-                'ip.ip' => __('messages.validation.ip.ip', ['var' => 'IP']),
                 'port.required' => __('messages.validation.variable.required', ['var' => 'port']),
                 'port.integer' => __('messages.validation.variable.port', ['port' => $this->request->input('port')]),
                 'uploaded.required' => __('messages.validation.variable.required', ['var' => 'uploaded']),
@@ -328,11 +326,11 @@ class AnnounceService
             // check if the ipv6 field has the IP address and the port
             // if it contains only the IP address the port is read from the port field
             if (4 <= count($explodedIPString) && '[' === $IP[0] && false !== strpos($IP, ']')) {
-                $IP = str_replace(['[',']'], '', $IP);
-                $IP = substr($IP, 0, strrpos($IP, ':'));
+                $IPWithPort = str_replace(['[',']'], '', $IP);
+                $IP = substr($IPWithPort, 0, strrpos($IPWithPort, ':'));
                 if (true === $this->validateIPv6Address($IP)) {
                     $this->ipv6Address = $IP;
-                    $this->ipv6Port = (int) substr($IP, strrpos($IP, ':') + 1);
+                    $this->ipv6Port = (int) substr($IPWithPort, strrpos($IPWithPort, ':') + 1);
                 }
             } else {
                 if (true === $this->validateIPv6Address($IP)) {
@@ -623,7 +621,7 @@ class AnnounceService
                 $peerIPAddress = inet_pton($peerAddress->IP);
                 $peerPort = pack('n*', $peerAddress->port);
 
-                if (true === $peerAddress->isIPv6) {
+                if (true === (bool) $peerAddress->isIPv6) {
                     $response['peers6'] .= $peerIPAddress . $peerPort;
                 } else {
                     $response['peers'] .= $peerIPAddress . $peerPort;

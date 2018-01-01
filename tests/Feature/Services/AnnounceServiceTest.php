@@ -747,4 +747,402 @@ class AnnounceServiceTest extends TestCase
         $this->assertSame(0, (int) $torrent->leechers);
         $this->assertSame(1, (int) $torrent->seeders);
     }
+
+    public function testPeerWithIPv4AndIPv6Address()
+    {
+        $infoHash = 'ccd285bd6d7fc749e9ed34d8b1e8a0f1b582d977';
+        $peerId = '2d7142333345302d64354e334474384672517776';
+        $IPv4 = '98.165.38.50';
+        $IPv6 = '2001::53aa:64c:0:7f83:bc43:dec9';
+        $port = 60000;
+        $userAgent = 'my test user agent';
+        $torrent = factory(Torrent::class)->create(['infoHash' => $infoHash, 'seeders' => 2, 'leechers' => 0]);
+        $user = factory(User::class)->create();
+        $peerOne = factory(Peer::class)->create(['torrent_id' => $torrent->id, 'seeder' => true]);
+        $peerOneIP = factory(PeerIP::class)->create(['peerID' => $peerOne->id, 'IP' => '98.165.38.51', 'port' => 55555]);
+        $peerTwo = factory(Peer::class)->create(['torrent_id' => $torrent->id, 'seeder' => true]);
+        $peerTwoIP = factory(PeerIP::class)->create(
+            [
+                'peerID' => $peerTwo->id,
+                'IP' => '2001::53aa:64c:0:7f83:bc43:ded9',
+                'isIPv6' => true,
+                'port' => 55556,
+            ]
+        );
+
+        $response = $this->get(
+            route(
+                'announce',
+                [
+                    'info_hash'  => hex2bin($infoHash),
+                    'passkey'    => $user->passkey,
+                    'peer_id'    => hex2bin($peerId),
+                    'event'      => 'started',
+                    'ipv4'       => $IPv4,
+                    'ipv6'       => $IPv6,
+                    'port'       => $port,
+                    'downloaded' => 0,
+                    'uploaded'   => 0,
+                    'left'       => $torrent->getOriginal('size'),
+                ]
+            ),
+            [
+                'REMOTE_ADDR'     => $IPv4,
+                'HTTP_USER_AGENT' => $userAgent,
+            ]
+        );
+
+        // Note: PHPUnit has some problems when asserting binary strings
+        // so we use bin2hex on the expected and actual responses as a workaround
+        $expectedResponse = [
+            'complete'     => 2,
+            'incomplete'   => 0,
+            'interval'     => 2400,
+            'min interval' => 60,
+            'peers'        => bin2hex(inet_pton($peerOneIP->IP) . pack('n*', $peerOneIP->port)),
+            'peers6'       => bin2hex(inet_pton($peerTwoIP->IP) . pack('n*', $peerTwoIP->port)),
+        ];
+        $response->assertStatus(Response::HTTP_OK);
+        $response->assertHeader('Content-Type', 'text/plain; charset=UTF-8');
+        $responseContent = $response->getContent();
+        $decoder = new BdecodingService();
+        $responseContent = $decoder->decode($responseContent);
+        if (! empty($responseContent['peers'])) {
+            $responseContent['peers'] = bin2hex($responseContent['peers']);
+        }
+        if (! empty($responseContent['peers6'])) {
+            $responseContent['peers6'] = bin2hex($responseContent['peers6']);
+        }
+        $this->assertSame($expectedResponse, $responseContent);
+        $this->assertSame(3, Peer::count());
+        $peer = Peer::findOrFail(3);
+        $this->assertSame($peerId, $peer->peer_id);
+        $this->assertSame($user->id, (int) $peer->user_id);
+        $this->assertSame($torrent->id, (int) $peer->torrent_id);
+        $this->assertSame(0, (int) $peer->getOriginal('uploaded'));
+        $this->assertSame(0, (int) $peer->getOriginal('downloaded'));
+        $this->assertFalse((bool) $peer->seeder);
+        $this->assertSame($userAgent, $peer->userAgent);
+        $this->assertInstanceOf(Carbon::class, $peer->created_at);
+        $this->assertInstanceOf(Carbon::class, $peer->updated_at);
+        $this->assertSame(4, PeerIP::count());
+        $peerIP = PeerIP::findOrFail(3);
+        $this->assertSame($IPv4, $peerIP->IP);
+        $this->assertSame($port, (int) $peerIP->port);
+        $this->assertFalse((bool) $peerIP->isIPv6);
+        $peerIP = PeerIP::findOrFail(4);
+        $this->assertSame($IPv6, $peerIP->IP);
+        $this->assertSame($port, (int) $peerIP->port);
+        $this->assertTrue((bool) $peerIP->isIPv6);
+        $this->assertSame(1, Snatch::count());
+        $snatch = Snatch::findOrFail(1);
+        $this->assertSame($user->id, (int) $snatch->user_id);
+        $this->assertSame($torrent->id, (int) $snatch->torrent_id);
+        $this->assertSame(0, (int) $snatch->getOriginal('uploaded'));
+        $this->assertSame(0, (int) $snatch->getOriginal('downloaded'));
+        $this->assertSame($torrent->getOriginal('size'), (int) $snatch->getOriginal('left'));
+        $this->assertSame(0, (int) $snatch->seedTime);
+        $this->assertSame(0, (int) $snatch->leechTime);
+        $this->assertSame(1, (int) $snatch->timesAnnounced);
+        $this->assertNull($snatch->finished_at);
+        $this->assertSame($userAgent, $snatch->userAgent);
+        $torrent = $torrent->fresh();
+        $this->assertSame(1, (int) $torrent->leechers);
+        $this->assertSame(2, (int) $torrent->seeders);
+    }
+
+    public function testPeerWithIPv6Address()
+    {
+        $infoHash = 'ccd285bd6d7fc749e9ed34d8b1e8a0f1b582d977';
+        $peerId = '2d7142333345302d64354e334474384672517776';
+        $IPv6 = '2001::53aa:64c:0:7f83:bc43:dec9';
+        $port = 60000;
+        $userAgent = 'my test user agent';
+        $torrent = factory(Torrent::class)->create(['infoHash' => $infoHash, 'seeders' => 2, 'leechers' => 0]);
+        $user = factory(User::class)->create();
+        $peerOne = factory(Peer::class)->create(['torrent_id' => $torrent->id, 'seeder' => true]);
+        $peerOneIP = factory(PeerIP::class)->create(['peerID' => $peerOne->id, 'IP' => '98.165.38.51', 'port' => 55555]);
+        $peerTwo = factory(Peer::class)->create(['torrent_id' => $torrent->id, 'seeder' => true]);
+        $peerTwoIP = factory(PeerIP::class)->create(
+            [
+                'peerID' => $peerTwo->id,
+                'IP' => '2001::53aa:64c:0:7f83:bc43:ded9',
+                'isIPv6' => true,
+                'port' => 55556,
+            ]
+        );
+
+        $response = $this->get(
+            route(
+                'announce',
+                [
+                    'info_hash'  => hex2bin($infoHash),
+                    'passkey'    => $user->passkey,
+                    'peer_id'    => hex2bin($peerId),
+                    'event'      => 'started',
+                    'ipv6'       => $IPv6,
+                    'port'       => $port,
+                    'downloaded' => 0,
+                    'uploaded'   => 0,
+                    'left'       => $torrent->getOriginal('size'),
+                ]
+            ),
+            [
+                'REMOTE_ADDR'     => $IPv6,
+                'HTTP_USER_AGENT' => $userAgent,
+            ]
+        );
+
+        // Note: PHPUnit has some problems when asserting binary strings
+        // so we use bin2hex on the expected and actual responses as a workaround
+        $expectedResponse = [
+            'complete'     => 2,
+            'incomplete'   => 0,
+            'interval'     => 2400,
+            'min interval' => 60,
+            'peers'        => bin2hex(inet_pton($peerOneIP->IP) . pack('n*', $peerOneIP->port)),
+            'peers6'       => bin2hex(inet_pton($peerTwoIP->IP) . pack('n*', $peerTwoIP->port)),
+        ];
+        $response->assertStatus(Response::HTTP_OK);
+        $response->assertHeader('Content-Type', 'text/plain; charset=UTF-8');
+        $responseContent = $response->getContent();
+        $decoder = new BdecodingService();
+        $responseContent = $decoder->decode($responseContent);
+        if (! empty($responseContent['peers'])) {
+            $responseContent['peers'] = bin2hex($responseContent['peers']);
+        }
+        if (! empty($responseContent['peers6'])) {
+            $responseContent['peers6'] = bin2hex($responseContent['peers6']);
+        }
+        $this->assertSame($expectedResponse, $responseContent);
+        $this->assertSame(3, Peer::count());
+        $peer = Peer::findOrFail(3);
+        $this->assertSame($peerId, $peer->peer_id);
+        $this->assertSame($user->id, (int) $peer->user_id);
+        $this->assertSame($torrent->id, (int) $peer->torrent_id);
+        $this->assertSame(0, (int) $peer->getOriginal('uploaded'));
+        $this->assertSame(0, (int) $peer->getOriginal('downloaded'));
+        $this->assertFalse((bool) $peer->seeder);
+        $this->assertSame($userAgent, $peer->userAgent);
+        $this->assertInstanceOf(Carbon::class, $peer->created_at);
+        $this->assertInstanceOf(Carbon::class, $peer->updated_at);
+        $this->assertSame(3, PeerIP::count());
+        $peerIP = PeerIP::findOrFail(3);
+        $this->assertSame($IPv6, $peerIP->IP);
+        $this->assertSame($port, (int) $peerIP->port);
+        $this->assertTrue((bool) $peerIP->isIPv6);
+        $this->assertSame(1, Snatch::count());
+        $snatch = Snatch::findOrFail(1);
+        $this->assertSame($user->id, (int) $snatch->user_id);
+        $this->assertSame($torrent->id, (int) $snatch->torrent_id);
+        $this->assertSame(0, (int) $snatch->getOriginal('uploaded'));
+        $this->assertSame(0, (int) $snatch->getOriginal('downloaded'));
+        $this->assertSame($torrent->getOriginal('size'), (int) $snatch->getOriginal('left'));
+        $this->assertSame(0, (int) $snatch->seedTime);
+        $this->assertSame(0, (int) $snatch->leechTime);
+        $this->assertSame(1, (int) $snatch->timesAnnounced);
+        $this->assertNull($snatch->finished_at);
+        $this->assertSame($userAgent, $snatch->userAgent);
+        $torrent = $torrent->fresh();
+        $this->assertSame(1, (int) $torrent->leechers);
+        $this->assertSame(2, (int) $torrent->seeders);
+    }
+
+    public function testPeerWithIPv6Endpoint()
+    {
+        $infoHash = 'ccd285bd6d7fc749e9ed34d8b1e8a0f1b582d977';
+        $peerId = '2d7142333345302d64354e334474384672517776';
+        $IPv6 = '2001::53aa:64c:0:7f83:bc43:dec9';
+        $IPv6Port = 60001;
+        $port = 60000;
+        $IPv6Endpoint = '[' . $IPv6 . ']:' . $IPv6Port;
+        $userAgent = 'my test user agent';
+        $torrent = factory(Torrent::class)->create(['infoHash' => $infoHash, 'seeders' => 2, 'leechers' => 0]);
+        $user = factory(User::class)->create();
+        $peerOne = factory(Peer::class)->create(['torrent_id' => $torrent->id, 'seeder' => true]);
+        $peerOneIP = factory(PeerIP::class)->create(['peerID' => $peerOne->id, 'IP' => '98.165.38.51', 'port' => 55555]);
+        $peerTwo = factory(Peer::class)->create(['torrent_id' => $torrent->id, 'seeder' => true]);
+        $peerTwoIP = factory(PeerIP::class)->create(
+            [
+                'peerID' => $peerTwo->id,
+                'IP' => '2001::53aa:64c:0:7f83:bc43:ded9',
+                'isIPv6' => true,
+                'port' => 55556,
+            ]
+        );
+
+        $response = $this->get(
+            route(
+                'announce',
+                [
+                    'info_hash'  => hex2bin($infoHash),
+                    'passkey'    => $user->passkey,
+                    'peer_id'    => hex2bin($peerId),
+                    'event'      => 'started',
+                    'ipv6'       => $IPv6Endpoint,
+                    'port'       => $port,
+                    'downloaded' => 0,
+                    'uploaded'   => 0,
+                    'left'       => $torrent->getOriginal('size'),
+                ]
+            ),
+            [
+                'REMOTE_ADDR'     => $IPv6,
+                'HTTP_USER_AGENT' => $userAgent,
+            ]
+        );
+
+        // Note: PHPUnit has some problems when asserting binary strings
+        // so we use bin2hex on the expected and actual responses as a workaround
+        $expectedResponse = [
+            'complete'     => 2,
+            'incomplete'   => 0,
+            'interval'     => 2400,
+            'min interval' => 60,
+            'peers'        => bin2hex(inet_pton($peerOneIP->IP) . pack('n*', $peerOneIP->port)),
+            'peers6'       => bin2hex(inet_pton($peerTwoIP->IP) . pack('n*', $peerTwoIP->port)),
+        ];
+        $response->assertStatus(Response::HTTP_OK);
+        $response->assertHeader('Content-Type', 'text/plain; charset=UTF-8');
+        $responseContent = $response->getContent();
+        $decoder = new BdecodingService();
+        $responseContent = $decoder->decode($responseContent);
+        if (! empty($responseContent['peers'])) {
+            $responseContent['peers'] = bin2hex($responseContent['peers']);
+        }
+        if (! empty($responseContent['peers6'])) {
+            $responseContent['peers6'] = bin2hex($responseContent['peers6']);
+        }
+        $this->assertSame($expectedResponse, $responseContent);
+        $this->assertSame(3, Peer::count());
+        $peer = Peer::findOrFail(3);
+        $this->assertSame($peerId, $peer->peer_id);
+        $this->assertSame($user->id, (int) $peer->user_id);
+        $this->assertSame($torrent->id, (int) $peer->torrent_id);
+        $this->assertSame(0, (int) $peer->getOriginal('uploaded'));
+        $this->assertSame(0, (int) $peer->getOriginal('downloaded'));
+        $this->assertFalse((bool) $peer->seeder);
+        $this->assertSame($userAgent, $peer->userAgent);
+        $this->assertInstanceOf(Carbon::class, $peer->created_at);
+        $this->assertInstanceOf(Carbon::class, $peer->updated_at);
+        $this->assertSame(3, PeerIP::count());
+        $peerIP = PeerIP::findOrFail(3);
+        $this->assertSame($IPv6, $peerIP->IP);
+        $this->assertSame($IPv6Port, (int) $peerIP->port);
+        $this->assertTrue((bool) $peerIP->isIPv6);
+        $this->assertSame(1, Snatch::count());
+        $snatch = Snatch::findOrFail(1);
+        $this->assertSame($user->id, (int) $snatch->user_id);
+        $this->assertSame($torrent->id, (int) $snatch->torrent_id);
+        $this->assertSame(0, (int) $snatch->getOriginal('uploaded'));
+        $this->assertSame(0, (int) $snatch->getOriginal('downloaded'));
+        $this->assertSame($torrent->getOriginal('size'), (int) $snatch->getOriginal('left'));
+        $this->assertSame(0, (int) $snatch->seedTime);
+        $this->assertSame(0, (int) $snatch->leechTime);
+        $this->assertSame(1, (int) $snatch->timesAnnounced);
+        $this->assertNull($snatch->finished_at);
+        $this->assertSame($userAgent, $snatch->userAgent);
+        $torrent = $torrent->fresh();
+        $this->assertSame(1, (int) $torrent->leechers);
+        $this->assertSame(2, (int) $torrent->seeders);
+    }
+
+    public function testPeerWithIPv4Endpoint()
+    {
+        $infoHash = 'ccd285bd6d7fc749e9ed34d8b1e8a0f1b582d977';
+        $peerId = '2d7142333345302d64354e334474384672517776';
+        $IPv4 = '98.165.38.50';
+        $IPv4Port = 60001;
+        $port = 60000;
+        $IPv4Endpoint = $IPv4 . ':' . $IPv4Port;
+        $userAgent = 'my test user agent';
+        $torrent = factory(Torrent::class)->create(['infoHash' => $infoHash, 'seeders' => 2, 'leechers' => 0]);
+        $user = factory(User::class)->create();
+        $peerOne = factory(Peer::class)->create(['torrent_id' => $torrent->id, 'seeder' => true]);
+        $peerOneIP = factory(PeerIP::class)->create(['peerID' => $peerOne->id, 'IP' => '98.165.38.51', 'port' => 55555]);
+        $peerTwo = factory(Peer::class)->create(['torrent_id' => $torrent->id, 'seeder' => true]);
+        $peerTwoIP = factory(PeerIP::class)->create(
+            [
+                'peerID' => $peerTwo->id,
+                'IP' => '2001::53aa:64c:0:7f83:bc43:ded9',
+                'isIPv6' => true,
+                'port' => 55556,
+            ]
+        );
+
+        $response = $this->get(
+            route(
+                'announce',
+                [
+                    'info_hash'  => hex2bin($infoHash),
+                    'passkey'    => $user->passkey,
+                    'peer_id'    => hex2bin($peerId),
+                    'event'      => 'started',
+                    'ipv4'       => $IPv4Endpoint,
+                    'port'       => $port,
+                    'downloaded' => 0,
+                    'uploaded'   => 0,
+                    'left'       => $torrent->getOriginal('size'),
+                ]
+            ),
+            [
+                'REMOTE_ADDR'     => $IPv4,
+                'HTTP_USER_AGENT' => $userAgent,
+            ]
+        );
+
+        // Note: PHPUnit has some problems when asserting binary strings
+        // so we use bin2hex on the expected and actual responses as a workaround
+        $expectedResponse = [
+            'complete'     => 2,
+            'incomplete'   => 0,
+            'interval'     => 2400,
+            'min interval' => 60,
+            'peers'        => bin2hex(inet_pton($peerOneIP->IP) . pack('n*', $peerOneIP->port)),
+            'peers6'       => bin2hex(inet_pton($peerTwoIP->IP) . pack('n*', $peerTwoIP->port)),
+        ];
+        $response->assertStatus(Response::HTTP_OK);
+        $response->assertHeader('Content-Type', 'text/plain; charset=UTF-8');
+        $responseContent = $response->getContent();
+        $decoder = new BdecodingService();
+        $responseContent = $decoder->decode($responseContent);
+        if (! empty($responseContent['peers'])) {
+            $responseContent['peers'] = bin2hex($responseContent['peers']);
+        }
+        if (! empty($responseContent['peers6'])) {
+            $responseContent['peers6'] = bin2hex($responseContent['peers6']);
+        }
+        $this->assertSame($expectedResponse, $responseContent);
+        $this->assertSame(3, Peer::count());
+        $peer = Peer::findOrFail(3);
+        $this->assertSame($peerId, $peer->peer_id);
+        $this->assertSame($user->id, (int) $peer->user_id);
+        $this->assertSame($torrent->id, (int) $peer->torrent_id);
+        $this->assertSame(0, (int) $peer->getOriginal('uploaded'));
+        $this->assertSame(0, (int) $peer->getOriginal('downloaded'));
+        $this->assertFalse((bool) $peer->seeder);
+        $this->assertSame($userAgent, $peer->userAgent);
+        $this->assertInstanceOf(Carbon::class, $peer->created_at);
+        $this->assertInstanceOf(Carbon::class, $peer->updated_at);
+        $this->assertSame(3, PeerIP::count());
+        $peerIP = PeerIP::findOrFail(3);
+        $this->assertSame($IPv4, $peerIP->IP);
+        $this->assertSame($IPv4Port, (int) $peerIP->port);
+        $this->assertFalse((bool) $peerIP->isIPv6);
+        $this->assertSame(1, Snatch::count());
+        $snatch = Snatch::findOrFail(1);
+        $this->assertSame($user->id, (int) $snatch->user_id);
+        $this->assertSame($torrent->id, (int) $snatch->torrent_id);
+        $this->assertSame(0, (int) $snatch->getOriginal('uploaded'));
+        $this->assertSame(0, (int) $snatch->getOriginal('downloaded'));
+        $this->assertSame($torrent->getOriginal('size'), (int) $snatch->getOriginal('left'));
+        $this->assertSame(0, (int) $snatch->seedTime);
+        $this->assertSame(0, (int) $snatch->leechTime);
+        $this->assertSame(1, (int) $snatch->timesAnnounced);
+        $this->assertNull($snatch->finished_at);
+        $this->assertSame($userAgent, $snatch->userAgent);
+        $torrent = $torrent->fresh();
+        $this->assertSame(1, (int) $torrent->leechers);
+        $this->assertSame(2, (int) $torrent->seeders);
+    }
 }
