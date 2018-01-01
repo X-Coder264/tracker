@@ -33,6 +33,7 @@ return [
     'torrents.show.no_peers' => 'Nema peerova na torrentu. To znači da je trenutno ovaj torrent mrtav.',
     'torrents.show.no_comments' => 'Ovaj torrent nema komentara.',
     'torrents.show.torrent_comments' => 'Torrent komentari',
+    'torrents.show.add_comment' => 'Napiši komentar',
     'validation.variable.required' => ':var ne postoji u vašem zahtjevu.',
     'validation.variable.string' => ':var mora biti string.',
     'validation.variable.size' => ':var mora imati 20 znakova.',

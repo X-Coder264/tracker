@@ -33,6 +33,7 @@ return [
     'torrents.show.no_peers' => 'There are no peers on this torrent. This means that at the moment the torrent is dead.',
     'torrents.show.no_comments' => 'There are no comments on this torrent.',
     'torrents.show.torrent_comments' => 'Torrent comments',
+    'torrents.show.add_comment' => 'Add comment',
     'validation.variable.required' => 'The :var is not present in the request.',
     'validation.variable.string' => 'The :var must be a string.',
     'validation.variable.size' => 'The :var must have exactly 20 characters.',
