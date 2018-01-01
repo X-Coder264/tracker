@@ -72,4 +72,6 @@ return [
     'common.torrent_table_ratio' => 'Omjer',
     'common.torrent_table_last_announce' => 'Zadnji put kontaktirao tracker',
     'common.torrent_table_torrent_client' => 'Torrent klijent',
+    'common.submit' => 'Pošalji',
+    'torrent-comments.show.header' => 'Napiši komentar za :torrent',
 ];

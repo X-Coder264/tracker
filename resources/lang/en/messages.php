@@ -72,4 +72,6 @@ return [
     'common.torrent_table_ratio' => 'Ratio',
     'common.torrent_table_last_announce' => 'Last announce',
     'common.torrent_table_torrent_client' => 'Torrent client',
+    'common.submit' => 'Submit',
+    'torrent-comments.show.header' => 'Write a comment for :torrent',
 ];
