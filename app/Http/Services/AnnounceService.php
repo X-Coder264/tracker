@@ -254,11 +254,11 @@ class AnnounceService
             $this->request->all(),
             [
                 'passkey' => 'required|string|size:64',
-                'port' => 'required|numeric',
-                'uploaded' => 'required|numeric',
-                'downloaded' => 'required|numeric',
-                'left' => 'required|numeric',
-                'numwant' => 'sometimes|numeric',
+                'port' => 'required|integer',
+                'uploaded' => 'required|integer',
+                'downloaded' => 'required|integer',
+                'left' => 'required|integer',
+                'numwant' => 'sometimes|integer',
             ],
             [
                 'passkey.required' => __('messages.validation.variable.required', ['var' => 'passkey']),
@@ -267,14 +267,14 @@ class AnnounceService
                 'ip.required' => __('messages.validation.variable.required', ['var' => 'IP']),
                 'ip.ip' => __('messages.validation.ip.ip', ['var' => 'IP']),
                 'port.required' => __('messages.validation.variable.required', ['var' => 'port']),
-                'port.numeric' => __('messages.validation.variable.port', ['port' => $this->request->input('port')]),
+                'port.integer' => __('messages.validation.variable.port', ['port' => $this->request->input('port')]),
                 'uploaded.required' => __('messages.validation.variable.required', ['var' => 'uploaded']),
                 'uploaded.integer' => __('messages.validation.variable.integer', ['var' => $this->request->input('uploaded')]),
                 'downloaded.required' => __('messages.validation.variable.required', ['var' => 'downloaded']),
-                'downloaded.numeric' => __('messages.validation.variable.integer', ['var' => $this->request->input('downloaded')]),
+                'downloaded.integer' => __('messages.validation.variable.integer', ['var' => $this->request->input('downloaded')]),
                 'left.required' => __('messages.validation.variable.required', ['var' => 'left']),
-                'left.numeric' => __('messages.validation.variable.integer', ['var' => $this->request->input('left')]),
-                'numwant.numeric' => __('messages.validation.variable.integer', ['var' => $this->request->input('numwant')]),
+                'left.integer' => __('messages.validation.variable.integer', ['var' => $this->request->input('left')]),
+                'numwant.integer' => __('messages.validation.variable.integer', ['var' => $this->request->input('numwant')]),
             ]
         );
 
@@ -404,7 +404,6 @@ class AnnounceService
                     'IP'          => $this->ipv4Address,
                     'port'        => $this->ipv4Port,
                     'isIPv6'      => false,
-                    'connectable' => $this->isPeerConnectable($this->ipv4Address, (int) $this->ipv4Port),
                 ]
             );
         }
@@ -415,29 +414,8 @@ class AnnounceService
                     'IP'          => $this->ipv6Address,
                     'port'        => $this->ipv6Port,
                     'isIPv6'      => true,
-                    'connectable' => $this->isPeerConnectable($this->ipv6Address, (int) $this->ipv6Port),
                 ]
             );
-        }
-    }
-
-    /**
-     * Check if the peer is connectable.
-     *
-     * @param string $IP
-     * @param int    $port
-     *
-     * @return bool
-     */
-    protected function isPeerConnectable(string $IP, int $port): bool
-    {
-        $connection = @fsockopen($IP, $port, $errno, $errstr, 5);
-        if (false === $connection) {
-            return false;
-        } else {
-            @fclose($connection);
-
-            return true;
         }
     }
 

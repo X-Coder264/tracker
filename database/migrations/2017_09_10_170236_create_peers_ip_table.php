@@ -18,7 +18,6 @@ class CreatePeersIpTable extends Migration
             $table->string('IP', 39);
             $table->unsignedSmallInteger('port');
             $table->boolean('isIPv6')->default(false);
-            $table->boolean('connectable')->default(false);
         });
     }
 

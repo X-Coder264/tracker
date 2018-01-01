@@ -14,6 +14,5 @@ $factory->define(PeerIP::class, function (Faker $faker) {
         'IP' => $faker->ipv4,
         'isIPv6' => false,
         'port' => $faker->numberBetween(50000, 60000),
-        'connectable' => true,
     ];
 });
