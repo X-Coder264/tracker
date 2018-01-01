@@ -2,7 +2,6 @@
 
 namespace Tests\Feature\Services;
 
-use Carbon\Carbon;
 use Tests\TestCase;
 use App\Http\Models\Peer;
 use App\Http\Models\User;
@@ -10,6 +9,7 @@ use App\Http\Models\PeerIP;
 use App\Http\Models\Snatch;
 use App\Http\Models\Torrent;
 use Illuminate\Http\Response;
+use Illuminate\Support\Carbon;
 use App\Http\Services\BdecodingService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
@@ -249,5 +249,87 @@ class AnnounceServiceTest extends TestCase
         $torrent = $torrent->fresh();
         $this->assertSame(0, (int) $torrent->leechers);
         $this->assertSame(1, (int) $torrent->seeders);
+    }
+
+    public function testSeederDroppingOutOfTheSwarm()
+    {
+        $infoHash = 'ccd285bd6d7fc749e9ed34d8b1e8a0f1b582d977';
+        $peerId = '2d7142333345302d64354e334474384672517776';
+        $IP = '98.165.38.50';
+        $port = 60000;
+        $userAgent = 'my test user agent';
+        $torrent = factory(Torrent::class)->create(['infoHash' => $infoHash, 'seeders' => 1, 'leechers' => 0]);
+        $user = factory(User::class)->create();
+        $peer = factory(Peer::class)->create(
+            [
+                'torrent_id' => $torrent->id,
+                'seeder' => true,
+                'peer_id' => $peerId,
+                'user_id' => $user->id,
+                'uploaded' => 2000,
+                'downloaded' => $torrent->getOriginal('size'),
+                'created_at' => Carbon::now()->subMinutes(300),
+                'updated_at' => Carbon::now()->subMinutes(40),
+            ]
+        );
+        factory(PeerIP::class)->create(['peerID' => $peer->id, 'IP' => $IP, 'port' => $port]);
+        $snatch = factory(Snatch::class)->create(
+            [
+                'torrent_id' => $torrent->id,
+                'user_id' => $user->id,
+                'left' => 0,
+                'seedTime' => 500,
+                'leechTime' => 1200,
+                'timesAnnounced' => 2,
+                'uploaded' => 2000,
+                'downloaded' => $torrent->getOriginal('size'),
+                'finishedAt' => Carbon::yesterday(),
+            ]
+        );
+
+        $response = $this->get(
+            route(
+                'announce',
+                [
+                    'info_hash'  => hex2bin($infoHash),
+                    'passkey'    => $user->passkey,
+                    'peer_id'    => hex2bin($peerId),
+                    'event'      => 'stopped',
+                    'ip'         => $IP,
+                    'port'       => $port,
+                    'downloaded' => 0,
+                    'uploaded'   => 3000,
+                    'left'       => 0,
+                ]
+            ),
+            [
+                'REMOTE_ADDR'     => $IP,
+                'HTTP_USER_AGENT' => $userAgent,
+            ]
+        );
+
+        $response->assertStatus(Response::HTTP_OK);
+        $response->assertHeader('Content-Type', 'text/plain; charset=UTF-8');
+        $this->assertSame(
+            'd8:completei0e10:incompletei0e8:intervali2400e12:min intervali60e5:peers0:6:peers60:e',
+            $response->getContent()
+        );
+        $this->assertSame(0, Peer::count());
+        $this->assertSame(0, PeerIP::count());
+        $this->assertSame(1, Snatch::count());
+        $freshSnatch = $snatch->fresh();
+        $this->assertSame($user->id, (int) $freshSnatch->user_id);
+        $this->assertSame($torrent->id, (int) $freshSnatch->torrent_id);
+        $this->assertSame(3000, (int) $freshSnatch->getOriginal('uploaded'));
+        $this->assertSame($torrent->getOriginal('size'), (int) $freshSnatch->getOriginal('downloaded'));
+        $this->assertSame(0, (int) $freshSnatch->getOriginal('left'));
+        $this->assertGreaterThanOrEqual(2900, (int) $freshSnatch->seedTime);
+        $this->assertSame(1200, (int) $freshSnatch->leechTime);
+        $this->assertSame(3, (int) $freshSnatch->timesAnnounced);
+        $this->assertSame($snatch->finishedAt->toDateTimeString(), $freshSnatch->finishedAt);
+        $this->assertSame($userAgent, $freshSnatch->userAgent);
+        $torrent = $torrent->fresh();
+        $this->assertSame(0, (int) $torrent->leechers);
+        $this->assertSame(0, (int) $torrent->seeders);
     }
 }

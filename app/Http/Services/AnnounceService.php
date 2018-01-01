@@ -117,7 +117,6 @@ class AnnounceService
     public function announce(Request $request): string
     {
         $this->request = $request;
-        $timeNow = Carbon::now();
 
         $event = $this->request->input('event');
 
@@ -175,6 +174,8 @@ class AnnounceService
                 ->where('user_id', '=', $this->user->id)
                 ->first();
         }
+
+        $timeNow = Carbon::now();
 
         if (null === $this->peer) {
             $this->downloadedInThisAnnounceCycle = $this->request->input('downloaded', 0);
