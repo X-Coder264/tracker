@@ -5,7 +5,7 @@ namespace Tests\Traits;
 trait EnableForeignKeyConstraints
 {
     /**
-     * Enables foreign key constraints (which are disabled by default for SQLite DBs which is used in the test env.
+     * Enables foreign key constraints (which are disabled by default for SQLite which is used in the test env).
      */
     public function enableForeignKeys(): void
     {

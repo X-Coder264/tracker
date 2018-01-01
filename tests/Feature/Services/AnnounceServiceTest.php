@@ -333,4 +333,92 @@ class AnnounceServiceTest extends TestCase
         $this->assertSame(0, (int) $torrent->leechers);
         $this->assertSame(0, (int) $torrent->seeders);
     }
+
+    public function testLeecherDroppingOutOfTheSwarm()
+    {
+        $infoHash = 'ccd285bd6d7fc749e9ed34d8b1e8a0f1b582d977';
+        $peerId = '2d7142333345302d64354e334474384672517776';
+        $IP = '98.165.38.50';
+        $port = 60000;
+        $userAgent = 'my test user agent';
+        $torrent = factory(Torrent::class)->create(
+            [
+                'infoHash' => $infoHash,
+                'seeders' => 0,
+                'leechers' => 1,
+                'size' => 3000,
+            ]
+        );
+        $user = factory(User::class)->create();
+        $peer = factory(Peer::class)->create(
+            [
+                'torrent_id' => $torrent->id,
+                'seeder' => false,
+                'peer_id' => $peerId,
+                'user_id' => $user->id,
+                'uploaded' => 2000,
+                'downloaded' => 1000,
+                'created_at' => Carbon::now()->subMinutes(300),
+                'updated_at' => Carbon::now()->subMinutes(40),
+            ]
+        );
+        factory(PeerIP::class)->create(['peerID' => $peer->id, 'IP' => $IP, 'port' => $port]);
+        $snatch = factory(Snatch::class)->create(
+            [
+                'torrent_id' => $torrent->id,
+                'user_id' => $user->id,
+                'left' => 2000,
+                'seedTime' => 0,
+                'leechTime' => 1200,
+                'timesAnnounced' => 2,
+                'uploaded' => 2000,
+                'downloaded' => 1000,
+            ]
+        );
+
+        $response = $this->get(
+            route(
+                'announce',
+                [
+                    'info_hash'  => hex2bin($infoHash),
+                    'passkey'    => $user->passkey,
+                    'peer_id'    => hex2bin($peerId),
+                    'event'      => 'stopped',
+                    'ip'         => $IP,
+                    'port'       => $port,
+                    'downloaded' => 2200,
+                    'uploaded'   => 3000,
+                    'left'       => 800,
+                ]
+            ),
+            [
+                'REMOTE_ADDR'     => $IP,
+                'HTTP_USER_AGENT' => $userAgent,
+            ]
+        );
+
+        $response->assertStatus(Response::HTTP_OK);
+        $response->assertHeader('Content-Type', 'text/plain; charset=UTF-8');
+        $this->assertSame(
+            'd8:completei0e10:incompletei0e8:intervali2400e12:min intervali60e5:peers0:6:peers60:e',
+            $response->getContent()
+        );
+        $this->assertSame(0, Peer::count());
+        $this->assertSame(0, PeerIP::count());
+        $this->assertSame(1, Snatch::count());
+        $freshSnatch = $snatch->fresh();
+        $this->assertSame($user->id, (int) $freshSnatch->user_id);
+        $this->assertSame($torrent->id, (int) $freshSnatch->torrent_id);
+        $this->assertSame(3000, (int) $freshSnatch->getOriginal('uploaded'));
+        $this->assertSame(2200, (int) $freshSnatch->getOriginal('downloaded'));
+        $this->assertSame(800, (int) $freshSnatch->getOriginal('left'));
+        $this->assertSame(0, (int) $freshSnatch->seedTime);
+        $this->assertGreaterThanOrEqual(3600, (int) $freshSnatch->leechTime);
+        $this->assertSame(3, (int) $freshSnatch->timesAnnounced);
+        $this->assertNull($freshSnatch->finishedAt);
+        $this->assertSame($userAgent, $freshSnatch->userAgent);
+        $torrent = $torrent->fresh();
+        $this->assertSame(0, (int) $torrent->leechers);
+        $this->assertSame(0, (int) $torrent->seeders);
+    }
 }
