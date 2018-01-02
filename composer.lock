@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "c1e5d220cb22347c9e4657328e08a82e",
+    "content-hash": "119b91bef7cfd95421a2ea3182100472",
     "packages": [
         {
             "name": "cloudcreativity/json-api",
@@ -1734,16 +1734,16 @@
         },
         {
             "name": "spatie/laravel-permission",
-            "version": "2.7.6",
+            "version": "2.7.7",
             "source": {
                 "type": "git",
                 "url": "https://github.com/spatie/laravel-permission.git",
-                "reference": "03eb748141432b5d94eb1613b99f818aac1f5070"
+                "reference": "afce2b8892877af2fe80c31670a102a36016fb32"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/spatie/laravel-permission/zipball/03eb748141432b5d94eb1613b99f818aac1f5070",
-                "reference": "03eb748141432b5d94eb1613b99f818aac1f5070",
+                "url": "https://api.github.com/repos/spatie/laravel-permission/zipball/afce2b8892877af2fe80c31670a102a36016fb32",
+                "reference": "afce2b8892877af2fe80c31670a102a36016fb32",
                 "shasum": ""
             },
             "require": {
@@ -1795,7 +1795,7 @@
                 "security",
                 "spatie"
             ],
-            "time": "2017-11-27T10:22:46+00:00"
+            "time": "2017-12-31T21:28:46+00:00"
         },
         {
             "name": "swiftmailer/swiftmailer",
@@ -5387,7 +5387,7 @@
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
-        "php": ">=7.1.0"
+        "php": ">=7.1.3"
     },
     "platform-dev": []
 }
