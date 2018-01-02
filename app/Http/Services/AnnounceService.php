@@ -251,26 +251,30 @@ class AnnounceService
         $validator = Validator::make(
             $this->request->all(),
             [
-                'passkey' => 'required|string|size:64',
-                'port' => 'required|integer',
-                'uploaded' => 'required|integer',
+                'passkey'    => 'required|string|size:64',
+                'port'       => 'required|integer|min:1|max:65535',
+                'uploaded'   => 'required|integer',
                 'downloaded' => 'required|integer',
-                'left' => 'required|integer',
-                'numwant' => 'sometimes|integer',
+                'left'       => 'required|integer|min:0',
+                'numwant'    => 'sometimes|integer|min:1',
             ],
             [
-                'passkey.required' => __('messages.validation.variable.required', ['var' => 'passkey']),
-                'passkey.string' => __('messages.validation.variable.string', ['var' => 'passkey']),
-                'passkey.size' => __('messages.validation.variable.size', ['var' => 'passkey']),
-                'port.required' => __('messages.validation.variable.required', ['var' => 'port']),
-                'port.integer' => __('messages.validation.variable.port', ['port' => $this->request->input('port')]),
-                'uploaded.required' => __('messages.validation.variable.required', ['var' => 'uploaded']),
-                'uploaded.integer' => __('messages.validation.variable.integer', ['var' => $this->request->input('uploaded')]),
+                'passkey.required'    => __('messages.validation.variable.required', ['var' => 'passkey']),
+                'passkey.string'      => __('messages.validation.variable.string', ['var' => 'passkey']),
+                'passkey.size'        => __('messages.validation.variable.size', ['var' => 'passkey']),
+                'port.required'       => __('messages.validation.variable.required', ['var' => 'port']),
+                'port.integer'        => __('messages.validation.variable.port', ['port' => $this->request->input('port')]),
+                'port.min'            => __('messages.validation.variable.port', ['port' => $this->request->input('port')]),
+                'port.max'            => __('messages.validation.variable.port', ['port' => $this->request->input('port')]),
+                'uploaded.required'   => __('messages.validation.variable.required', ['var' => 'uploaded']),
+                'uploaded.integer'    => __('messages.validation.variable.integer', ['var' => $this->request->input('uploaded')]),
                 'downloaded.required' => __('messages.validation.variable.required', ['var' => 'downloaded']),
-                'downloaded.integer' => __('messages.validation.variable.integer', ['var' => $this->request->input('downloaded')]),
-                'left.required' => __('messages.validation.variable.required', ['var' => 'left']),
-                'left.integer' => __('messages.validation.variable.integer', ['var' => $this->request->input('left')]),
-                'numwant.integer' => __('messages.validation.variable.integer', ['var' => $this->request->input('numwant')]),
+                'downloaded.integer'  => __('messages.validation.variable.integer', ['var' => $this->request->input('downloaded')]),
+                'left.required'       => __('messages.validation.variable.required', ['var' => 'left']),
+                'left.integer'        => __('messages.validation.variable.integer', ['var' => $this->request->input('left')]),
+                'left.min'            => __('messages.validation.variable.integer', ['var' => $this->request->input('left')]),
+                'numwant.integer'     => __('messages.validation.variable.integer', ['var' => $this->request->input('numwant')]),
+                'numwant.min'         => __('messages.validation.variable.integer', ['var' => $this->request->input('numwant')]),
             ]
         );
 
@@ -311,7 +315,10 @@ class AnnounceService
             if (2 === count($explodedIPString)) {
                 if (true === $this->validateIPv4Address($explodedIPString[0])) {
                     $this->ipv4Address = $explodedIPString[0];
-                    $this->ipv4Port = (int) $explodedIPString[1];
+                    $port = (int) $explodedIPString[1];
+                    if ($port >= 1 && $port <= 65535) {
+                        $this->ipv4Port = $port;
+                    }
                 }
             } else {
                 if (true === $this->validateIPv4Address($IP)) {
@@ -330,7 +337,10 @@ class AnnounceService
                 $IP = substr($IPWithPort, 0, strrpos($IPWithPort, ':'));
                 if (true === $this->validateIPv6Address($IP)) {
                     $this->ipv6Address = $IP;
-                    $this->ipv6Port = (int) substr($IPWithPort, strrpos($IPWithPort, ':') + 1);
+                    $port = (int) substr($IPWithPort, strrpos($IPWithPort, ':') + 1);
+                    if ($port >= 1 && $port <= 65535) {
+                        $this->ipv6Port = $port;
+                    }
                 }
             } else {
                 if (true === $this->validateIPv6Address($IP)) {
@@ -613,8 +623,8 @@ class AnnounceService
 
         $peers = $this->getPeers();
 
-        $response['complete'] = $peers->where('seeder', '=', true)->count();
-        $response['incomplete'] = $peers->where('seeder', '=', false)->count();
+        $response['complete'] = (int) $this->torrent->seeders;
+        $response['incomplete'] = (int) $this->torrent->leechers;
 
         foreach ($peers as $peer) {
             foreach ($peer->IPs as $peerAddress) {
@@ -637,15 +647,27 @@ class AnnounceService
      */
     protected function nonCompactResponse(): string
     {
-        /* IPv6 peers are not separate for non-compact responses
-        response.peers = response.peers.map(function (peer) {
-                return {
-                    'peer id': common.hexToBinary(peer.peerId),
-            ip: peer.ip,
-            port: peer.port
-          }
-        })*/
-        return $this->announceErrorResponse('At the moment the tracker does not support non-compact response.');
+        $response['interval'] = 40 * 60; // 40 minutes
+        $response['min interval'] = 1 * 60; // 1 minute
+        $response['peers'] = [];
+
+        $peers = $this->getPeers();
+
+        $response['complete'] = (int) $this->torrent->seeders;
+        $response['incomplete'] = (int) $this->torrent->leechers;
+
+        foreach ($peers as $peer) {
+            foreach ($peer->IPs as $peerAddress) {
+                // IPv6 peers are not separate for non-compact responses
+                $response['peers'][] = [
+                    'peer id' => hex2bin($peer->peer_id),
+                    'ip'      => $peerAddress->IP,
+                    'port'    => (int) $peerAddress->port,
+                ];
+            }
+        }
+
+        return $this->encoder->encode($response);
     }
 
     /**

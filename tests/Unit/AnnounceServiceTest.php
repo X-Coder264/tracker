@@ -6,6 +6,7 @@ use Tests\TestCase;
 use ReflectionClass;
 use App\Http\Models\Peer;
 use App\Http\Models\PeerIP;
+use App\Http\Models\Torrent;
 use Illuminate\Support\Collection;
 use App\Http\Services\AnnounceService;
 use App\Http\Services\BencodingService;
@@ -93,6 +94,7 @@ class AnnounceServiceTest extends TestCase
 
     public function testCompactResponse()
     {
+        $torrent = factory(Torrent::class)->make(['seeders' => 1, 'leechers' => 0, 'uploader_id' => 1]);
         $peer = factory(Peer::class)->make(['torrent_id' => 1, 'user_id' => 1, 'seeder' => true]);
 
         $IPs = new Collection([
@@ -113,12 +115,12 @@ class AnnounceServiceTest extends TestCase
             ->method('encode')
             ->with($this->equalTo(
                 [
-                    'interval' => 2400,
+                    'interval'     => 2400,
                     'min interval' => 60,
-                    'complete' => 1,
-                    'incomplete' => 0,
-                    'peers' => inet_pton('95.152.44.55') . pack('n*', 55555),
-                    'peers6' => inet_pton('2b63:1478:1ac5:37ef:4e8c:75df:14cd:93f2') . pack('n*', 60000),
+                    'complete'     => 1,
+                    'incomplete'   => 0,
+                    'peers'        => inet_pton('95.152.44.55') . pack('n*', 55555),
+                    'peers6'       => inet_pton('2b63:1478:1ac5:37ef:4e8c:75df:14cd:93f2') . pack('n*', 60000),
                 ]
             ))
             ->willReturn($returnValue);
@@ -134,6 +136,89 @@ class AnnounceServiceTest extends TestCase
         $reflectionClass = new ReflectionClass(AnnounceService::class);
         $reflectionMethod = $reflectionClass->getMethod('compactResponse');
         $reflectionMethod->setAccessible(true);
+        $reflectionProperty = $reflectionClass->getProperty('torrent');
+        $reflectionProperty->setAccessible(true);
+        $reflectionProperty->setValue($announceService, $torrent);
+        $this->assertSame($returnValue, $reflectionMethod->invoke($announceService));
+    }
+
+    public function testNonCompactResponse()
+    {
+        $torrent = factory(Torrent::class)->make(['seeders' => 1, 'leechers' => 0, 'uploader_id' => 1]);
+        $peer = factory(Peer::class)->make(
+            [
+                'torrent_id' => 1,
+                'user_id'    => 1,
+                'seeder'     => true,
+                'peer_id'    => '2d7142333345302d64354e334474384672517776',
+            ]);
+
+        $IPs = new Collection([
+            factory(PeerIP::class)->make(
+                [
+                    'peerID' => $peer,
+                    'IP' => '95.152.44.55',
+                    'isIPv6' => false,
+                    'port' => 55555,
+                ]
+            ),
+            factory(PeerIP::class)->make(
+                [
+                    'peerID' => $peer,
+                    'IP' => '2b63:1478:1ac5:37ef:4e8c:75df:14cd:93f2',
+                    'isIPv6' => true,
+                    'port' => 60000,
+                ]
+            ),
+        ]);
+
+        $peer->setRelation('IPs', $IPs);
+
+        $peers = new EloquentCollection([$peer]);
+
+        $encoder = $this->getMockBuilder(BencodingService::class)
+            ->setMethods(['encode'])
+            ->getMock();
+
+        $returnValue = 'something';
+        $encoder->expects($this->once())
+            ->method('encode')
+            ->with($this->equalTo(
+                [
+                    'interval'     => 2400,
+                    'min interval' => 60,
+                    'complete'     => 1,
+                    'incomplete'   => 0,
+                    'peers'        => [
+                        [
+                            'peer id' => '-qB33E0-d5N3Dt8FrQwv',
+                            'ip'      => '95.152.44.55',
+                            'port'    => 55555,
+                        ],
+                        [
+                            'peer id' => '-qB33E0-d5N3Dt8FrQwv',
+                            'ip'      => '2b63:1478:1ac5:37ef:4e8c:75df:14cd:93f2',
+                            'port'    => 60000,
+                        ],
+                    ],
+                ]
+            ))
+            ->willReturn($returnValue);
+
+        $announceService = $this->getMockBuilder(AnnounceService::class)
+            ->setConstructorArgs([$encoder])
+            ->setMethods(['getPeers'])
+            ->getMock();
+        $announceService->expects($this->once())
+            ->method('getPeers')
+            ->willReturn($peers);
+
+        $reflectionClass = new ReflectionClass(AnnounceService::class);
+        $reflectionMethod = $reflectionClass->getMethod('nonCompactResponse');
+        $reflectionMethod->setAccessible(true);
+        $reflectionProperty = $reflectionClass->getProperty('torrent');
+        $reflectionProperty->setAccessible(true);
+        $reflectionProperty->setValue($announceService, $torrent);
         $this->assertSame($returnValue, $reflectionMethod->invoke($announceService));
     }
 }

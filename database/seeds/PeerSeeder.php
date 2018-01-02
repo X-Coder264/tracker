@@ -22,7 +22,6 @@ class PeerSeeder extends Seeder
                 'IP' => '5.93.165.5',
                 'port' => 60755,
                 'isIPv6' => false,
-                'connectable' => false,
             ]
         );
 
@@ -39,13 +38,11 @@ class PeerSeeder extends Seeder
                     'IP' => '5.93.165.6',
                     'port' => 60756,
                     'isIPv6' => false,
-                    'connectable' => false,
                 ],
                 [
                     'IP' => '2001:db8:a0b:12f0::1',
                     'port' => 60755,
                     'isIPv6' => true,
-                    'connectable' => false,
                 ],
             ]
         );
