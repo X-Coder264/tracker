@@ -1193,7 +1193,7 @@ class AnnounceServiceTest extends TestCase
                     'ip'      => $peerOneIP->IP,
                     'peer id' => hex2bin($peerIdOne),
                     'port'    => $peerOneIP->port,
-                ]
+                ],
             ],
         ];
         $response->assertStatus(Response::HTTP_OK);
