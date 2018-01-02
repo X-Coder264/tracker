@@ -1687,7 +1687,7 @@ class AnnounceServiceTest extends TestCase
             ]))
         );
         $response->assertStatus(Response::HTTP_OK);
-        $expectedResponse = ['failure reason' => __('messages.validation.variable.integer', ['var' => 'xyz'])];
+        $expectedResponse = ['failure reason' => __('messages.validation.variable.integer', ['var' => 'uploaded'])];
         $decoder = new BdecodingService();
         $actualResponse = $decoder->decode($response->getContent());
         $this->assertSame($expectedResponse, $actualResponse);
@@ -1735,7 +1735,7 @@ class AnnounceServiceTest extends TestCase
             ]))
         );
         $response->assertStatus(Response::HTTP_OK);
-        $expectedResponse = ['failure reason' => __('messages.validation.variable.integer', ['var' => 'xyz'])];
+        $expectedResponse = ['failure reason' => __('messages.validation.variable.integer', ['var' => 'downloaded'])];
         $decoder = new BdecodingService();
         $actualResponse = $decoder->decode($response->getContent());
         $this->assertSame($expectedResponse, $actualResponse);
@@ -1783,7 +1783,7 @@ class AnnounceServiceTest extends TestCase
             ]))
         );
         $response->assertStatus(Response::HTTP_OK);
-        $expectedResponse = ['failure reason' => __('messages.validation.variable.integer', ['var' => 'xyz'])];
+        $expectedResponse = ['failure reason' => __('messages.validation.variable.integer', ['var' => 'left'])];
         $decoder = new BdecodingService();
         $actualResponse = $decoder->decode($response->getContent());
         $this->assertSame($expectedResponse, $actualResponse);

@@ -12,6 +12,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Facades\Storage;
 
 class AnnounceService
 {
@@ -196,7 +197,7 @@ class AnnounceService
                                 ->where('user_id', '=', $this->user->id)
                                 ->first();
 
-        if ($this->request->filled('numwant')) {
+        if ($this->request->filled('numwant') && 0 < (int) $this->request->input('numwant')) {
             $this->numberOfWantedPeers = (int) $this->request->input('numwant');
         }
 
@@ -261,7 +262,7 @@ class AnnounceService
                 'uploaded'   => 'required|integer|min:0',
                 'downloaded' => 'required|integer|min:0',
                 'left'       => 'required|integer|min:0',
-                'numwant'    => 'sometimes|integer|min:1',
+                'numwant'    => 'sometimes|integer',
             ],
             [
                 'passkey.required'    => __('messages.validation.variable.required', ['var' => 'passkey']),
@@ -272,16 +273,15 @@ class AnnounceService
                 'port.min'            => __('messages.validation.variable.port', ['port' => $this->request->input('port')]),
                 'port.max'            => __('messages.validation.variable.port', ['port' => $this->request->input('port')]),
                 'uploaded.required'   => __('messages.validation.variable.required', ['var' => 'uploaded']),
-                'uploaded.integer'    => __('messages.validation.variable.integer', ['var' => $this->request->input('uploaded')]),
+                'uploaded.integer'    => __('messages.validation.variable.integer', ['var' => 'uploaded']),
                 'uploaded.min'        => __('messages.validation.variable.uploaded', ['uploaded' => $this->request->input('uploaded')]),
                 'downloaded.required' => __('messages.validation.variable.required', ['var' => 'downloaded']),
-                'downloaded.integer'  => __('messages.validation.variable.integer', ['var' => $this->request->input('downloaded')]),
+                'downloaded.integer'  => __('messages.validation.variable.integer', ['var' => 'downloaded']),
                 'downloaded.min'      => __('messages.validation.variable.downloaded', ['downloaded' => $this->request->input('downloaded')]),
                 'left.required'       => __('messages.validation.variable.required', ['var' => 'left']),
-                'left.integer'        => __('messages.validation.variable.integer', ['var' => $this->request->input('left')]),
+                'left.integer'        => __('messages.validation.variable.integer', ['var' => 'left']),
                 'left.min'            => __('messages.validation.variable.left', ['left' => $this->request->input('left')]),
-                'numwant.integer'     => __('messages.validation.variable.integer', ['var' => $this->request->input('numwant')]),
-                'numwant.min'         => __('messages.validation.variable.integer', ['var' => $this->request->input('numwant')]),
+                'numwant.integer'     => __('messages.validation.variable.integer', ['var' => 'numwant']),
             ]
         );
 
