@@ -157,17 +157,17 @@ class AnnounceServiceTest extends TestCase
             factory(PeerIP::class)->make(
                 [
                     'peerID' => $peer,
-                    'IP' => '95.152.44.55',
+                    'IP'     => '95.152.44.55',
                     'isIPv6' => false,
-                    'port' => 55555,
+                    'port'   => 55555,
                 ]
             ),
             factory(PeerIP::class)->make(
                 [
                     'peerID' => $peer,
-                    'IP' => '2b63:1478:1ac5:37ef:4e8c:75df:14cd:93f2',
+                    'IP'     => '2b63:1478:1ac5:37ef:4e8c:75df:14cd:93f2',
                     'isIPv6' => true,
-                    'port' => 60000,
+                    'port'   => 60000,
                 ]
             ),
         ]);
