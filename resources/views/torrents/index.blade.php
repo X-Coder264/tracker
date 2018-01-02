@@ -16,7 +16,7 @@
                         </div>
                     </div>
                 @else
-                    <div class="table-responsive-sm table-responsive-md table-responsive-lg">
+                    <div class="table-responsive-lg">
                         <table class="table table-hover table-bordered">
                             <thead>
                                 <tr>

@@ -120,7 +120,7 @@ class AnnounceService
         $event = $this->request->input('event');
 
         // info_hash and peer_id are validated separately because the Laravel validator uses
-        // mb_strlen to get the length of the string which returns a wrong number
+        // mb_strlen to get the length of the (sometimes binary) string which returns a wrong number
         // when used on those two properties so strlen must be used
         // mb_strlen returns a "wrong" number because it counts code points instead of characters
         $validationMessage = $this->validateInfoHashAndPeerID();
@@ -128,16 +128,17 @@ class AnnounceService
             return $validationMessage;
         }
 
-        // if we get the stopped event there is no need to validate the entire request,
+        // validate the rest of the request (passkey, uploaded, downloaded, left, port)
+        $validationMessage = $this->validateRequest();
+        if (null !== $validationMessage) {
+            return $validationMessage;
+        }
+
+        // if we get the stopped event there is no need to validate the IP address,
         // since we are just going to delete the peer from the DB
         if ('stopped' !== $event) {
             // in order to support IPv6 peers (BEP 7) a more complex IP validation logic is needed
             $validationMessage = $this->validateAndSetIPAddress();
-            if (null !== $validationMessage) {
-                return $validationMessage;
-            }
-
-            $validationMessage = $this->validateRequest();
             if (null !== $validationMessage) {
                 return $validationMessage;
             }
@@ -170,6 +171,10 @@ class AnnounceService
                 ->where('torrent_id', '=', $this->torrent->id)
                 ->where('user_id', '=', $this->user->id)
                 ->first();
+
+            if (null === $this->peer) {
+                return $this->announceErrorResponse(__('messages.announce.invalid_peer_id'));
+            }
         }
 
         $timeNow = Carbon::now();
@@ -191,7 +196,7 @@ class AnnounceService
                                 ->where('user_id', '=', $this->user->id)
                                 ->first();
 
-        if ($this->request->has('numwant')) {
+        if ($this->request->filled('numwant')) {
             $this->numberOfWantedPeers = (int) $this->request->input('numwant');
         }
 
@@ -213,7 +218,7 @@ class AnnounceService
      */
     protected function validateInfoHashAndPeerID(): ?string
     {
-        if ($this->request->has('info_hash')) {
+        if ($this->request->filled('info_hash')) {
             if (20 !== strlen($this->request->input('info_hash'))) {
                 $errorMessage = __('messages.validation.variable.size', ['var' => 'info_hash']);
 
@@ -225,7 +230,7 @@ class AnnounceService
             return $this->announceErrorResponse($errorMessage);
         }
 
-        if ($this->request->has('peer_id')) {
+        if ($this->request->filled('peer_id')) {
             if (20 !== strlen($this->request->input('peer_id'))) {
                 $errorMessage = __('messages.validation.variable.size', ['var' => 'peer_id']);
 
@@ -253,8 +258,8 @@ class AnnounceService
             [
                 'passkey'    => 'required|string|size:64',
                 'port'       => 'required|integer|min:1|max:65535',
-                'uploaded'   => 'required|integer',
-                'downloaded' => 'required|integer',
+                'uploaded'   => 'required|integer|min:0',
+                'downloaded' => 'required|integer|min:0',
                 'left'       => 'required|integer|min:0',
                 'numwant'    => 'sometimes|integer|min:1',
             ],
@@ -268,11 +273,13 @@ class AnnounceService
                 'port.max'            => __('messages.validation.variable.port', ['port' => $this->request->input('port')]),
                 'uploaded.required'   => __('messages.validation.variable.required', ['var' => 'uploaded']),
                 'uploaded.integer'    => __('messages.validation.variable.integer', ['var' => $this->request->input('uploaded')]),
+                'uploaded.min'        => __('messages.validation.variable.uploaded', ['uploaded' => $this->request->input('uploaded')]),
                 'downloaded.required' => __('messages.validation.variable.required', ['var' => 'downloaded']),
                 'downloaded.integer'  => __('messages.validation.variable.integer', ['var' => $this->request->input('downloaded')]),
+                'downloaded.min'      => __('messages.validation.variable.downloaded', ['downloaded' => $this->request->input('downloaded')]),
                 'left.required'       => __('messages.validation.variable.required', ['var' => 'left']),
                 'left.integer'        => __('messages.validation.variable.integer', ['var' => $this->request->input('left')]),
-                'left.min'            => __('messages.validation.variable.integer', ['var' => $this->request->input('left')]),
+                'left.min'            => __('messages.validation.variable.left', ['left' => $this->request->input('left')]),
                 'numwant.integer'     => __('messages.validation.variable.integer', ['var' => $this->request->input('numwant')]),
                 'numwant.min'         => __('messages.validation.variable.integer', ['var' => $this->request->input('numwant')]),
             ]
@@ -295,7 +302,7 @@ class AnnounceService
         $this->ipv4Port = $this->request->input('port');
         $this->ipv6Port = $this->request->input('port');
 
-        if ($this->request->has('ip')) {
+        if ($this->request->filled('ip')) {
             $IP = $this->request->input('ip');
 
             if (true === $this->validateIPv4Address($IP)) {
@@ -307,7 +314,7 @@ class AnnounceService
             }
         }
 
-        if ($this->request->has('ipv4')) {
+        if ($this->request->filled('ipv4')) {
             $IP = $this->request->input('ipv4');
             $explodedIPString = explode(':', $IP);
             // check if the ipv4 field has the IP address and the port
@@ -327,7 +334,7 @@ class AnnounceService
             }
         }
 
-        if ($this->request->has('ipv6')) {
+        if ($this->request->filled('ipv6')) {
             $IP = $this->request->input('ipv6');
             $explodedIPString = explode(':', $IP);
             // check if the ipv6 field has the IP address and the port
@@ -679,8 +686,15 @@ class AnnounceService
     {
         $response['failure reason'] = '';
         if (is_array($error)) {
+            $i = 0;
+            $numberOfElements = count($error);
             foreach ($error as $message) {
-                $response['failure reason'] .= $message . ' ';
+                if ($numberOfElements - 1 === $i) {
+                    $response['failure reason'] .= $message;
+                } else {
+                    $response['failure reason'] .= $message . ' ';
+                }
+                $i++;
             }
         } else {
             $response['failure reason'] = $error;

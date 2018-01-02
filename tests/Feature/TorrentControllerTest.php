@@ -193,9 +193,9 @@ class TorrentControllerTest extends TestCase
     private function validParams($overrides = []): array
     {
         return array_merge([
-            'name' => 'Test name',
+            'name'        => 'Test name',
             'description' => 'Test description',
-            'torrent' => File::create('file.torrent'),
+            'torrent'     => File::create('file.torrent'),
         ], $overrides);
     }
 }

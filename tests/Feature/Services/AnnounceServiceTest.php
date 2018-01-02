@@ -1436,4 +1436,355 @@ class AnnounceServiceTest extends TestCase
         $this->assertSame(2, (int) $torrent->leechers);
         $this->assertSame(1, (int) $torrent->seeders);
     }
+
+    public function testPasskeyIsRequired()
+    {
+        $response = $this->get(route('announce', $this->validParams([
+            'passkey' => '',
+        ])));
+        $response->assertStatus(Response::HTTP_OK);
+        $expectedResponse = ['failure reason' => __('messages.validation.variable.required', ['var' => 'passkey'])];
+        $decoder = new BdecodingService();
+        $actualResponse = $decoder->decode($response->getContent());
+        $this->assertSame($expectedResponse, $actualResponse);
+        $this->assertSame(0, Peer::count());
+        $this->assertSame(0, Snatch::count());
+    }
+
+    public function testPasskeyMustBe64CharsLong()
+    {
+        $response = $this->get(route('announce', $this->validParams([
+            'passkey' => 'xyz',
+        ])));
+        $response->assertStatus(Response::HTTP_OK);
+        $expectedResponse = ['failure reason' => __('messages.validation.variable.size', ['var' => 'passkey'])];
+        $decoder = new BdecodingService();
+        $actualResponse = $decoder->decode($response->getContent());
+        $this->assertSame($expectedResponse, $actualResponse);
+        $this->assertSame(0, Peer::count());
+        $this->assertSame(0, Snatch::count());
+    }
+
+    public function testPasskeyMustBeValid()
+    {
+        $response = $this->get(route('announce', $this->validParams([
+            'passkey' => bin2hex(random_bytes(32)),
+        ])));
+        $response->assertStatus(Response::HTTP_OK);
+        $expectedResponse = ['failure reason' => __('messages.announce.invalid_passkey')];
+        $decoder = new BdecodingService();
+        $actualResponse = $decoder->decode($response->getContent());
+        $this->assertSame($expectedResponse, $actualResponse);
+        $this->assertSame(0, Peer::count());
+        $this->assertSame(0, Snatch::count());
+    }
+
+    public function testInfoHashIsRequired()
+    {
+        $response = $this->get(route('announce', $this->validParams([
+            'info_hash' => '',
+        ])));
+        $response->assertStatus(Response::HTTP_OK);
+        $expectedResponse = ['failure reason' => __('messages.validation.variable.required', ['var' => 'info_hash'])];
+        $decoder = new BdecodingService();
+        $actualResponse = $decoder->decode($response->getContent());
+        $this->assertSame($expectedResponse, $actualResponse);
+        $this->assertSame(0, Peer::count());
+        $this->assertSame(0, Snatch::count());
+    }
+
+    public function testInfoHashMustBe20CharsLong()
+    {
+        $response = $this->get(route('announce', $this->validParams([
+            'info_hash' => 'xyz',
+        ])));
+        $response->assertStatus(Response::HTTP_OK);
+        $expectedResponse = ['failure reason' => __('messages.validation.variable.size', ['var' => 'info_hash'])];
+        $decoder = new BdecodingService();
+        $actualResponse = $decoder->decode($response->getContent());
+        $this->assertSame($expectedResponse, $actualResponse);
+        $this->assertSame(0, Peer::count());
+        $this->assertSame(0, Snatch::count());
+    }
+
+    public function testInfoHashMustBeValid()
+    {
+        $response = $this->get(route('announce', $this->validParams([
+            'info_hash' => hex2bin('ccd285bd6d7fc749e9ed34d8b1e8a0f1b582d978'),
+        ])));
+        $response->assertStatus(Response::HTTP_OK);
+        $expectedResponse = ['failure reason' => __('messages.announce.invalid_info_hash')];
+        $decoder = new BdecodingService();
+        $actualResponse = $decoder->decode($response->getContent());
+        $this->assertSame($expectedResponse, $actualResponse);
+        $this->assertSame(0, Peer::count());
+        $this->assertSame(0, Snatch::count());
+    }
+
+    public function testPeerIDIsRequired()
+    {
+        $response = $this->get(route('announce', $this->validParams([
+            'peer_id' => '',
+        ])));
+        $response->assertStatus(Response::HTTP_OK);
+        $expectedResponse = ['failure reason' => __('messages.validation.variable.required', ['var' => 'peer_id'])];
+        $decoder = new BdecodingService();
+        $actualResponse = $decoder->decode($response->getContent());
+        $this->assertSame($expectedResponse, $actualResponse);
+        $this->assertSame(0, Peer::count());
+        $this->assertSame(0, Snatch::count());
+    }
+
+    public function testPeerIDMustBe20CharsLong()
+    {
+        $response = $this->get(route('announce', $this->validParams([
+            'peer_id' => 'xyz',
+        ])));
+        $response->assertStatus(Response::HTTP_OK);
+        $expectedResponse = ['failure reason' => __('messages.validation.variable.size', ['var' => 'peer_id'])];
+        $decoder = new BdecodingService();
+        $actualResponse = $decoder->decode($response->getContent());
+        $this->assertSame($expectedResponse, $actualResponse);
+        $this->assertSame(0, Peer::count());
+        $this->assertSame(0, Snatch::count());
+    }
+
+    public function testPeerIDMustBeValid()
+    {
+        $response = $this->get(route('announce', $this->validParams([
+            'peer_id' => hex2bin('2d7142333345302d64354e334474384672517777'),
+            'event'   => '',
+        ])));
+        $response->assertStatus(Response::HTTP_OK);
+        $expectedResponse = ['failure reason' => __('messages.announce.invalid_peer_id')];
+        $decoder = new BdecodingService();
+        $actualResponse = $decoder->decode($response->getContent());
+        $this->assertSame($expectedResponse, $actualResponse);
+        $this->assertSame(0, Peer::count());
+        $this->assertSame(0, Snatch::count());
+    }
+
+    public function testIPIsRequired()
+    {
+        $response = $this->get(route('announce', $this->validParams([
+            'ip' => '',
+        ])),
+            [
+                'REMOTE_ADDR'     => '',
+            ]
+        );
+        $response->assertStatus(Response::HTTP_OK);
+        $expectedResponse = ['failure reason' => __('messages.announce.invalid_ip_or_port')];
+        $decoder = new BdecodingService();
+        $actualResponse = $decoder->decode($response->getContent());
+        $this->assertSame($expectedResponse, $actualResponse);
+        $this->assertSame(0, Peer::count());
+        $this->assertSame(0, Snatch::count());
+    }
+
+    public function testPortIsRequired()
+    {
+        $response = $this->get(route('announce', $this->validParams([
+            'port' => '',
+        ])));
+        $response->assertStatus(Response::HTTP_OK);
+        $expectedResponse = ['failure reason' => __('messages.validation.variable.required', ['var' => 'port'])];
+        $decoder = new BdecodingService();
+        $actualResponse = $decoder->decode($response->getContent());
+        $this->assertSame($expectedResponse, $actualResponse);
+        $this->assertSame(0, Peer::count());
+        $this->assertSame(0, Snatch::count());
+    }
+
+    public function testPortMustBeAnInteger()
+    {
+        $response = $this->get(route('announce', $this->validParams([
+            'port' => 'xyz',
+        ])));
+        $response->assertStatus(Response::HTTP_OK);
+        $expectedResponse = ['failure reason' => __('messages.validation.variable.port', ['port' => 'xyz'])];
+        $decoder = new BdecodingService();
+        $actualResponse = $decoder->decode($response->getContent());
+        $this->assertSame($expectedResponse, $actualResponse);
+        $this->assertSame(0, Peer::count());
+        $this->assertSame(0, Snatch::count());
+    }
+
+    public function testPortMustBeHigherThan0()
+    {
+        $response = $this->get(route('announce', $this->validParams([
+            'port' => 0,
+        ])));
+        $response->assertStatus(Response::HTTP_OK);
+        $expectedResponse = ['failure reason' => __('messages.validation.variable.port', ['port' => 0])];
+        $decoder = new BdecodingService();
+        $actualResponse = $decoder->decode($response->getContent());
+        $this->assertSame($expectedResponse, $actualResponse);
+        $this->assertSame(0, Peer::count());
+        $this->assertSame(0, Snatch::count());
+    }
+
+    public function testPortMustBeLowerThan65536()
+    {
+        $response = $this->get(route('announce', $this->validParams([
+            'port' => 65536,
+        ])));
+        $response->assertStatus(Response::HTTP_OK);
+        $expectedResponse = ['failure reason' => __('messages.validation.variable.port', ['port' => 65536])];
+        $decoder = new BdecodingService();
+        $actualResponse = $decoder->decode($response->getContent());
+        $this->assertSame($expectedResponse, $actualResponse);
+        $this->assertSame(0, Peer::count());
+        $this->assertSame(0, Snatch::count());
+    }
+
+    public function testUploadedIsRequired()
+    {
+        $response = $this->get(route('announce', $this->validParams([
+            'uploaded' => '',
+        ])));
+        $response->assertStatus(Response::HTTP_OK);
+        $expectedResponse = ['failure reason' => __('messages.validation.variable.required', ['var' => 'uploaded'])];
+        $decoder = new BdecodingService();
+        $actualResponse = $decoder->decode($response->getContent());
+        $this->assertSame($expectedResponse, $actualResponse);
+        $this->assertSame(0, Peer::count());
+        $this->assertSame(0, Snatch::count());
+    }
+
+    public function testUploadedMustBeAnInteger()
+    {
+        $response = $this->get(route('announce', $this->validParams([
+            'uploaded' => 'xyz',
+        ])));
+        $response->assertStatus(Response::HTTP_OK);
+        $expectedResponse = ['failure reason' => __('messages.validation.variable.integer', ['var' => 'xyz'])];
+        $decoder = new BdecodingService();
+        $actualResponse = $decoder->decode($response->getContent());
+        $this->assertSame($expectedResponse, $actualResponse);
+        $this->assertSame(0, Peer::count());
+        $this->assertSame(0, Snatch::count());
+    }
+
+    public function testUploadedMustBeEqualToZeroOrGreater()
+    {
+        $response = $this->get(route('announce', $this->validParams([
+            'uploaded' => -1,
+        ])));
+        $response->assertStatus(Response::HTTP_OK);
+        $expectedResponse = ['failure reason' => __('messages.validation.variable.uploaded', ['uploaded' => -1])];
+        $decoder = new BdecodingService();
+        $actualResponse = $decoder->decode($response->getContent());
+        $this->assertSame($expectedResponse, $actualResponse);
+        $this->assertSame(0, Peer::count());
+        $this->assertSame(0, Snatch::count());
+    }
+
+    public function testDownloadedIsRequired()
+    {
+        $response = $this->get(route('announce', $this->validParams([
+            'downloaded' => '',
+        ])));
+        $response->assertStatus(Response::HTTP_OK);
+        $expectedResponse = ['failure reason' => __('messages.validation.variable.required', ['var' => 'downloaded'])];
+        $decoder = new BdecodingService();
+        $actualResponse = $decoder->decode($response->getContent());
+        $this->assertSame($expectedResponse, $actualResponse);
+        $this->assertSame(0, Peer::count());
+        $this->assertSame(0, Snatch::count());
+    }
+
+    public function testDownloadedMustBeAnInteger()
+    {
+        $response = $this->get(route('announce', $this->validParams([
+            'downloaded' => 'xyz',
+        ])));
+        $response->assertStatus(Response::HTTP_OK);
+        $expectedResponse = ['failure reason' => __('messages.validation.variable.integer', ['var' => 'xyz'])];
+        $decoder = new BdecodingService();
+        $actualResponse = $decoder->decode($response->getContent());
+        $this->assertSame($expectedResponse, $actualResponse);
+        $this->assertSame(0, Peer::count());
+        $this->assertSame(0, Snatch::count());
+    }
+
+    public function testDownloadedMustBeEqualToZeroOrGreater()
+    {
+        $response = $this->get(route('announce', $this->validParams([
+            'downloaded' => -1,
+        ])));
+        $response->assertStatus(Response::HTTP_OK);
+        $expectedResponse = ['failure reason' => __('messages.validation.variable.downloaded', ['downloaded' => -1])];
+        $decoder = new BdecodingService();
+        $actualResponse = $decoder->decode($response->getContent());
+        $this->assertSame($expectedResponse, $actualResponse);
+        $this->assertSame(0, Peer::count());
+        $this->assertSame(0, Snatch::count());
+    }
+
+    public function testLeftIsRequired()
+    {
+        $response = $this->get(route('announce', $this->validParams([
+            'left' => '',
+        ])));
+        $response->assertStatus(Response::HTTP_OK);
+        $expectedResponse = ['failure reason' => __('messages.validation.variable.required', ['var' => 'left'])];
+        $decoder = new BdecodingService();
+        $actualResponse = $decoder->decode($response->getContent());
+        $this->assertSame($expectedResponse, $actualResponse);
+        $this->assertSame(0, Peer::count());
+        $this->assertSame(0, Snatch::count());
+    }
+
+    public function testLeftMustBeAnInteger()
+    {
+        $response = $this->get(route('announce', $this->validParams([
+            'left' => 'xyz',
+        ])));
+        $response->assertStatus(Response::HTTP_OK);
+        $expectedResponse = ['failure reason' => __('messages.validation.variable.integer', ['var' => 'xyz'])];
+        $decoder = new BdecodingService();
+        $actualResponse = $decoder->decode($response->getContent());
+        $this->assertSame($expectedResponse, $actualResponse);
+        $this->assertSame(0, Peer::count());
+        $this->assertSame(0, Snatch::count());
+    }
+
+    public function testLeftMustBeEqualToZeroOrGreater()
+    {
+        $response = $this->get(route('announce', $this->validParams([
+            'left' => -1,
+        ])));
+        $response->assertStatus(Response::HTTP_OK);
+        $expectedResponse = ['failure reason' => __('messages.validation.variable.left', ['left' => -1])];
+        $decoder = new BdecodingService();
+        $actualResponse = $decoder->decode($response->getContent());
+        $this->assertSame($expectedResponse, $actualResponse);
+        $this->assertSame(0, Peer::count());
+        $this->assertSame(0, Snatch::count());
+    }
+
+    /**
+     * @param array $overrides
+     *
+     * @return array
+     */
+    private function validParams($overrides = []): array
+    {
+        $infoHash = 'ccd285bd6d7fc749e9ed34d8b1e8a0f1b582d977';
+        $peerId = '2d7142333345302d64354e334474384672517776';
+        $user = factory(User::class)->create();
+        $torrent = factory(Torrent::class)->create(['uploader_id' => $user->id, 'infoHash' => $infoHash]);
+        return array_merge([
+            'info_hash'  => hex2bin($infoHash),
+            'passkey'    => $user->passkey,
+            'peer_id'    => hex2bin($peerId),
+            'ip'         => '98.165.38.50',
+            'port'       => 65535,
+            'downloaded' => 0,
+            'uploaded'   => 0,
+            'left'       => $torrent->getOriginal('size'),
+            'event'      => 'started',
+        ], $overrides);
+    }
 }

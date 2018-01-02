@@ -74,10 +74,7 @@ class AnnounceServiceTest extends TestCase
             ->setMethods(['encode'])
             ->getMock();
         $error = ['Error X.', 'Error Y.'];
-        $errorMessage = '';
-        foreach ($error as $message) {
-            $errorMessage .= $message . ' ';
-        }
+        $errorMessage = 'Error X. Error Y.';
         $returnValue = 'something';
         $encoder->expects($this->once())
             ->method('encode')

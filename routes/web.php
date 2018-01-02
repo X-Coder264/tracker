@@ -19,9 +19,9 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('torrents', 'TorrentController@index')->name('torrents.index');
     Route::get('torrents/create', 'TorrentController@create')->name('torrents.create');
-    Route::get('torrents/{torrent}', 'TorrentController@show')->name('torrents.show');
-    Route::post('torrents/upload', 'TorrentController@store')->name('torrents.store');
     Route::get('torrents/download/{torrent}', 'TorrentController@download')->name('torrents.download');
+    Route::get('torrents/{torrent}', 'TorrentController@show')->name('torrents.show');
+    Route::post('torrents', 'TorrentController@store')->name('torrents.store');
 
     Route::get('torrent-comments/{torrent}/create', 'TorrentCommentController@create')->name('torrent-comments.create');
     Route::post('torrent-comments/{torrent}', 'TorrentCommentController@store')->name('torrent-comments.store');

@@ -32,8 +32,9 @@
                                     {{ __('messages.torrents.show.no_peers') }}
                                 </div>
                             @else
-                                <table class="table table-hover table-bordered table-responsive-sm table-responsive-md table-responsive-lg">
-                                    <thead>
+                                <div class="table-responsive-lg">
+                                    <table class="table table-hover table-bordered">
+                                        <thead>
                                         <tr>
                                             <th>{{ __('messages.common.torrent_table_username') }}</th>
                                             <th>{{ __('messages.common.torrent_table_uploaded') }}</th>
@@ -42,14 +43,14 @@
                                             <th>{{ __('messages.common.torrent_table_last_announce') }}</th>
                                             <th>{{ __('messages.common.torrent_table_torrent_client') }}</th>
                                         </tr>
-                                    </thead>
-                                    <tbody>
+                                        </thead>
+                                        <tbody>
                                         @foreach ($torrent->peers as $peer)
                                             <tr>
                                                 <td>{{ $peer->user->name }}</td>
                                                 <td>{{ $peer->uploaded }}</td>
                                                 <td>{{ $peer->downloaded }}</td>
-                                                @if ($peer->downloaded == 0)
+                                                @if (0 === (int) $peer->downloaded)
                                                     <td>Inf.</td>
                                                 @else
                                                     <td>{{ number_format((int) $peer->uploaded / (int) $peer->downloaded, 2) }}</td>
@@ -58,8 +59,9 @@
                                                 <td>{{ $peer->userAgent }}</td>
                                             </tr>
                                         @endforeach
-                                    </tbody>
-                                </table>
+                                        </tbody>
+                                    </table>
+                                </div>
                             @endif
                         </div>
                     </div>
@@ -125,7 +127,7 @@
                         <br>
                         <div class="card">
                             <div class="card-header">
-                                {{ $torrentComment->user->name }} - {{ $torrentComment->created_at }} ({{ $torrentComment->created_at->diffForHumans() }})
+                                {{ $torrentComment->user->name }} - {{ $torrentComment->created_at->timezone($timezone) }} ({{ $torrentComment->created_at->diffForHumans() }})
                             </div>
                             <div class="card-body">
                                 <div class="row">
