@@ -64,7 +64,9 @@
         </nav>
         <br>
 
-        @yield('content')
+        <main>
+            @yield('content')
+        </main>
     </div>
 
     <!-- Scripts -->
