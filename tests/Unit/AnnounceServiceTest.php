@@ -151,7 +151,8 @@ class AnnounceServiceTest extends TestCase
                 'user_id'    => 1,
                 'seeder'     => true,
                 'peer_id'    => '2d7142333345302d64354e334474384672517776',
-            ]);
+            ]
+        );
 
         $IPs = new Collection([
             factory(PeerIP::class)->make(
