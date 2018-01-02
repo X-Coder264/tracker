@@ -1775,6 +1775,7 @@ class AnnounceServiceTest extends TestCase
         $peerId = '2d7142333345302d64354e334474384672517776';
         $user = factory(User::class)->create();
         $torrent = factory(Torrent::class)->create(['uploader_id' => $user->id, 'infoHash' => $infoHash]);
+
         return array_merge([
             'info_hash'  => hex2bin($infoHash),
             'passkey'    => $user->passkey,
