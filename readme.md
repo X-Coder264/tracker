@@ -8,6 +8,9 @@
 <a href="https://styleci.io/repos/103667786">
 <img src="https://styleci.io/repos/103667786/shield?branch=master" alt="StyleCI">
 </a>
+<a href="https://github.com/X-Coder264/tracker">
+<img src="https://img.shields.io/badge/License-MIT-green.svg" alt="MIT">
+</a>
 </p>
 
 ## About LaraTracker
