@@ -1181,8 +1181,7 @@ class AnnounceServiceTest extends TestCase
             ]
         );
 
-        // Note 1: because we use the "inRandomOrder" method in the getPeers method there can be two possible responses
-        // Note 2: PHPUnit has some problems when asserting binary strings
+        // Note: PHPUnit has some problems when asserting binary strings
         // so we use bin2hex on the expected and actual responses as a workaround
         $expectedResponse = [
             'complete' => 1,
@@ -1191,9 +1190,9 @@ class AnnounceServiceTest extends TestCase
             'min interval' => 60,
             'peers' => [
                 [
-                    'ip' => $peerOneIP->IP,
+                    'ip'      => $peerOneIP->IP,
                     'peer id' => hex2bin($peerIdOne),
-                    'port' => $peerOneIP->port,
+                    'port'    => $peerOneIP->port,
                 ]
             ],
         ];
@@ -1278,20 +1277,20 @@ class AnnounceServiceTest extends TestCase
         // Note 2: PHPUnit has some problems when asserting binary strings
         // so we use bin2hex on the expected and actual responses as a workaround
         $expectedResponseOne = [
-            'complete' => 1,
-            'incomplete' => 2,
-            'interval' => 2400,
+            'complete'     => 1,
+            'incomplete'   => 2,
+            'interval'     => 2400,
             'min interval' => 60,
-            'peers' => bin2hex(inet_pton($peerOneIP->IP) . pack('n*', $peerOneIP->port)),
-            'peers6' => '',
+            'peers'        => bin2hex(inet_pton($peerOneIP->IP) . pack('n*', $peerOneIP->port)),
+            'peers6'       => '',
         ];
         $expectedResponseTwo = [
-            'complete' => 1,
-            'incomplete' => 2,
-            'interval' => 2400,
+            'complete'     => 1,
+            'incomplete'   => 2,
+            'interval'     => 2400,
             'min interval' => 60,
-            'peers' => bin2hex(inet_pton($peerTwoIP->IP) . pack('n*', $peerTwoIP->port)),
-            'peers6' => '',
+            'peers'        => bin2hex(inet_pton($peerTwoIP->IP) . pack('n*', $peerTwoIP->port)),
+            'peers6'       => '',
         ];
         $response->assertStatus(Response::HTTP_OK);
         $response->assertHeader('Content-Type', 'text/plain; charset=UTF-8');
