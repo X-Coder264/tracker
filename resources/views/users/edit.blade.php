@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-    <div class="col-10 mx-auto">
+    <div class="col-12 col-lg-10 col-xl-10 mx-auto">
         <div class="card">
             <div class="card-header">
                 {{ __('messages.users.edit.page_title') }}

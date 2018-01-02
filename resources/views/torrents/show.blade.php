@@ -77,22 +77,24 @@
                             @if (count($torrentFileNamesAndSizes) === 0)
                                 {{ __('messages.common.error') }}
                             @else
-                                <table class="table table-hover table-bordered table-responsive-sm table-responsive-md table-responsive-lg">
-                                    <thead>
+                                <div class="table-responsive-lg">
+                                    <table class="table table-hover table-bordered">
+                                        <thead>
                                         <tr>
                                             <th>{{ __('messages.torrents.show.file_name') }}</th>
                                             <th>{{ __('messages.common.size') }}</th>
                                         </tr>
-                                    </thead>
-                                    <tbody>
-                                    @foreach ($torrentFileNamesAndSizes as $file)
-                                        <tr>
-                                            <td>{{ $file[0] }}</td>
-                                            <td>{{ $file[1] }}</td>
-                                        </tr>
-                                    @endforeach
-                                    </tbody>
-                                </table>
+                                        </thead>
+                                        <tbody>
+                                        @foreach ($torrentFileNamesAndSizes as $file)
+                                            <tr>
+                                                <td>{{ $file[0] }}</td>
+                                                <td>{{ $file[1] }}</td>
+                                            </tr>
+                                        @endforeach
+                                        </tbody>
+                                    </table>
+                                </div>
                             @endif
                         </div>
                     </div>
@@ -141,6 +143,7 @@
                             </div>
                         </div>
                     @endforeach
+                    <br>
                     {{ $torrentComments->render() }}
                 @endif
             </div>

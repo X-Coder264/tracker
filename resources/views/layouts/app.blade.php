@@ -15,8 +15,8 @@
     @yield('stylesheets')
 
 </head>
-<body>
-    <div class="container-fluid">
+<body style="height: 100vh;" class="d-flex flex-column">
+    <div class="container-fluid" style="flex: 1 0 auto;">
         <nav class="navbar navbar-expand-sm navbar-light bg-light">
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#nav-content" aria-controls="nav-content" aria-expanded="false">
                 <span class="navbar-toggler-icon"></span>
@@ -64,10 +64,22 @@
         </nav>
         <br>
 
-        <main>
+        <main role="main">
             @yield('content')
         </main>
     </div>
+
+    <footer class="footer" style="flex-shrink: 0;">
+        <div class="container-fluid">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body">
+                        <p class="text-muted text-center">LaraTracker {{ date('Y') }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
 
     <!-- Scripts -->
     <script src="{{ asset('js/jquery.min.js') }}"></script>
