@@ -1442,7 +1442,8 @@ class AnnounceServiceTest extends TestCase
         $response = $this->get(
             route('announce', $this->validParams([
                 'passkey' => '',
-        ])));
+            ]))
+        );
         $response->assertStatus(Response::HTTP_OK);
         $expectedResponse = ['failure reason' => __('messages.validation.variable.required', ['var' => 'passkey'])];
         $decoder = new BdecodingService();
@@ -1457,7 +1458,8 @@ class AnnounceServiceTest extends TestCase
         $response = $this->get(
             route('announce', $this->validParams([
                 'passkey' => 'xyz',
-        ])));
+            ]))
+        );
         $response->assertStatus(Response::HTTP_OK);
         $expectedResponse = ['failure reason' => __('messages.validation.variable.size', ['var' => 'passkey'])];
         $decoder = new BdecodingService();
@@ -1472,7 +1474,8 @@ class AnnounceServiceTest extends TestCase
         $response = $this->get(
             route('announce', $this->validParams([
                 'passkey' => bin2hex(random_bytes(32)),
-        ])));
+            ]))
+        );
         $response->assertStatus(Response::HTTP_OK);
         $expectedResponse = ['failure reason' => __('messages.announce.invalid_passkey')];
         $decoder = new BdecodingService();
@@ -1487,7 +1490,8 @@ class AnnounceServiceTest extends TestCase
         $response = $this->get(
             route('announce', $this->validParams([
                 'info_hash' => '',
-        ])));
+            ]))
+        );
         $response->assertStatus(Response::HTTP_OK);
         $expectedResponse = ['failure reason' => __('messages.validation.variable.required', ['var' => 'info_hash'])];
         $decoder = new BdecodingService();
@@ -1502,7 +1506,8 @@ class AnnounceServiceTest extends TestCase
         $response = $this->get(
             route('announce', $this->validParams([
                 'info_hash' => 'xyz',
-        ])));
+            ]))
+        );
         $response->assertStatus(Response::HTTP_OK);
         $expectedResponse = ['failure reason' => __('messages.validation.variable.size', ['var' => 'info_hash'])];
         $decoder = new BdecodingService();
@@ -1517,7 +1522,8 @@ class AnnounceServiceTest extends TestCase
         $response = $this->get(
             route('announce', $this->validParams([
                 'info_hash' => hex2bin('ccd285bd6d7fc749e9ed34d8b1e8a0f1b582d978'),
-        ])));
+            ]))
+        );
         $response->assertStatus(Response::HTTP_OK);
         $expectedResponse = ['failure reason' => __('messages.announce.invalid_info_hash')];
         $decoder = new BdecodingService();
@@ -1532,7 +1538,8 @@ class AnnounceServiceTest extends TestCase
         $response = $this->get(
             route('announce', $this->validParams([
                 'peer_id' => '',
-        ])));
+            ]))
+        );
         $response->assertStatus(Response::HTTP_OK);
         $expectedResponse = ['failure reason' => __('messages.validation.variable.required', ['var' => 'peer_id'])];
         $decoder = new BdecodingService();
@@ -1547,7 +1554,8 @@ class AnnounceServiceTest extends TestCase
         $response = $this->get(
             route('announce', $this->validParams([
                 'peer_id' => 'xyz',
-        ])));
+            ]))
+        );
         $response->assertStatus(Response::HTTP_OK);
         $expectedResponse = ['failure reason' => __('messages.validation.variable.size', ['var' => 'peer_id'])];
         $decoder = new BdecodingService();
@@ -1563,7 +1571,8 @@ class AnnounceServiceTest extends TestCase
             route('announce', $this->validParams([
                 'peer_id' => hex2bin('2d7142333345302d64354e334474384672517777'),
                 'event'   => '',
-        ])));
+            ]))
+        );
         $response->assertStatus(Response::HTTP_OK);
         $expectedResponse = ['failure reason' => __('messages.announce.invalid_peer_id')];
         $decoder = new BdecodingService();
@@ -1595,7 +1604,8 @@ class AnnounceServiceTest extends TestCase
         $response = $this->get(
             route('announce', $this->validParams([
                 'port' => '',
-        ])));
+            ]))
+        );
         $response->assertStatus(Response::HTTP_OK);
         $expectedResponse = ['failure reason' => __('messages.validation.variable.required', ['var' => 'port'])];
         $decoder = new BdecodingService();
@@ -1610,7 +1620,8 @@ class AnnounceServiceTest extends TestCase
         $response = $this->get(
             route('announce', $this->validParams([
                 'port' => 'xyz',
-        ])));
+            ]))
+        );
         $response->assertStatus(Response::HTTP_OK);
         $expectedResponse = ['failure reason' => __('messages.validation.variable.port', ['port' => 'xyz'])];
         $decoder = new BdecodingService();
@@ -1625,7 +1636,8 @@ class AnnounceServiceTest extends TestCase
         $response = $this->get(
             route('announce', $this->validParams([
                 'port' => 0,
-        ])));
+            ]))
+        );
         $response->assertStatus(Response::HTTP_OK);
         $expectedResponse = ['failure reason' => __('messages.validation.variable.port', ['port' => 0])];
         $decoder = new BdecodingService();
@@ -1640,7 +1652,8 @@ class AnnounceServiceTest extends TestCase
         $response = $this->get(
             route('announce', $this->validParams([
                 'port' => 65536,
-        ])));
+            ]))
+        );
         $response->assertStatus(Response::HTTP_OK);
         $expectedResponse = ['failure reason' => __('messages.validation.variable.port', ['port' => 65536])];
         $decoder = new BdecodingService();
@@ -1655,7 +1668,8 @@ class AnnounceServiceTest extends TestCase
         $response = $this->get(
             route('announce', $this->validParams([
                 'uploaded' => '',
-        ])));
+            ]))
+        );
         $response->assertStatus(Response::HTTP_OK);
         $expectedResponse = ['failure reason' => __('messages.validation.variable.required', ['var' => 'uploaded'])];
         $decoder = new BdecodingService();
@@ -1670,7 +1684,8 @@ class AnnounceServiceTest extends TestCase
         $response = $this->get(
             route('announce', $this->validParams([
                 'uploaded' => 'xyz',
-        ])));
+            ]))
+        );
         $response->assertStatus(Response::HTTP_OK);
         $expectedResponse = ['failure reason' => __('messages.validation.variable.integer', ['var' => 'xyz'])];
         $decoder = new BdecodingService();
@@ -1685,7 +1700,8 @@ class AnnounceServiceTest extends TestCase
         $response = $this->get(
             route('announce', $this->validParams([
                 'uploaded' => -1,
-        ])));
+            ]))
+        );
         $response->assertStatus(Response::HTTP_OK);
         $expectedResponse = ['failure reason' => __('messages.validation.variable.uploaded', ['uploaded' => -1])];
         $decoder = new BdecodingService();
@@ -1700,7 +1716,8 @@ class AnnounceServiceTest extends TestCase
         $response = $this->get(
             route('announce', $this->validParams([
                 'downloaded' => '',
-        ])));
+            ]))
+        );
         $response->assertStatus(Response::HTTP_OK);
         $expectedResponse = ['failure reason' => __('messages.validation.variable.required', ['var' => 'downloaded'])];
         $decoder = new BdecodingService();
@@ -1715,7 +1732,8 @@ class AnnounceServiceTest extends TestCase
         $response = $this->get(
             route('announce', $this->validParams([
                 'downloaded' => 'xyz',
-        ])));
+            ]))
+        );
         $response->assertStatus(Response::HTTP_OK);
         $expectedResponse = ['failure reason' => __('messages.validation.variable.integer', ['var' => 'xyz'])];
         $decoder = new BdecodingService();
@@ -1730,7 +1748,8 @@ class AnnounceServiceTest extends TestCase
         $response = $this->get(
             route('announce', $this->validParams([
                 'downloaded' => -1,
-        ])));
+            ]))
+        );
         $response->assertStatus(Response::HTTP_OK);
         $expectedResponse = ['failure reason' => __('messages.validation.variable.downloaded', ['downloaded' => -1])];
         $decoder = new BdecodingService();
@@ -1745,7 +1764,8 @@ class AnnounceServiceTest extends TestCase
         $response = $this->get(
             route('announce', $this->validParams([
                 'left' => '',
-        ])));
+            ]))
+        );
         $response->assertStatus(Response::HTTP_OK);
         $expectedResponse = ['failure reason' => __('messages.validation.variable.required', ['var' => 'left'])];
         $decoder = new BdecodingService();
@@ -1760,7 +1780,8 @@ class AnnounceServiceTest extends TestCase
         $response = $this->get(
             route('announce', $this->validParams([
                 'left' => 'xyz',
-        ])));
+            ]))
+        );
         $response->assertStatus(Response::HTTP_OK);
         $expectedResponse = ['failure reason' => __('messages.validation.variable.integer', ['var' => 'xyz'])];
         $decoder = new BdecodingService();
@@ -1775,7 +1796,8 @@ class AnnounceServiceTest extends TestCase
         $response = $this->get(
             route('announce', $this->validParams([
                 'left' => -1,
-        ])));
+            ]))
+        );
         $response->assertStatus(Response::HTTP_OK);
         $expectedResponse = ['failure reason' => __('messages.validation.variable.left', ['left' => -1])];
         $decoder = new BdecodingService();
