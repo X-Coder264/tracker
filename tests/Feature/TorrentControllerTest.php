@@ -78,7 +78,7 @@ class TorrentControllerTest extends TestCase
         $torrentInfo = $this->createMock(TorrentInfoService::class);
         $this->app->instance(TorrentInfoService::class, $torrentInfo);
 
-        $torrentInfo->method('getTorrentFileNamesAndSizes')->will($this->throwException(new FileNotFoundException));
+        $torrentInfo->method('getTorrentFileNamesAndSizes')->will($this->throwException(new FileNotFoundException()));
 
         $response = $this->get(route('torrents.show', $torrent));
         $response->assertStatus(Response::HTTP_NOT_FOUND);
