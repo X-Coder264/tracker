@@ -3,10 +3,10 @@
 namespace App\JsonApi\Torrents;
 
 use App\Http\Models\Torrent;
+use App\JsonApi\OffsetStrategy;
 use Illuminate\Support\Collection;
 use Illuminate\Database\Eloquent\Builder;
 use CloudCreativity\LaravelJsonApi\Store\EloquentAdapter;
-use CloudCreativity\LaravelJsonApi\Pagination\StandardStrategy;
 
 class Adapter extends EloquentAdapter
 {
@@ -14,15 +14,15 @@ class Adapter extends EloquentAdapter
      * @var array
      */
     protected $defaultPagination = [
-        'number' => 1,
+        'offset' => 0,
     ];
 
     /**
      * Adapter constructor.
      *
-     * @param StandardStrategy $paging
+     * @param OffsetStrategy $paging
      */
-    public function __construct(StandardStrategy $paging)
+    public function __construct(OffsetStrategy $paging)
     {
         $paging->withMetaKey(null);
         parent::__construct(new Torrent(), $paging);
@@ -37,8 +37,16 @@ class Adapter extends EloquentAdapter
             $builder->where('torrents.name', '=', $filters->get('name'));
         }
 
+        if ($filters->has('minimumSize')) {
+            $builder->where('torrents.size', '>', (int) $filters->get('minimumSize') * 1024 * 1024);
+        }
+
+        if ($filters->has('maximumSize')) {
+            $builder->where('torrents.size', '<', (int) $filters->get('maximumSize') * 1024 * 1024);
+        }
+
         if ($filters->has('slug')) {
-            $builder->where('torrents.slug', $filters->get('slug'));
+            $builder->where('torrents.slug', '=', $filters->get('slug'));
         }
     }
 

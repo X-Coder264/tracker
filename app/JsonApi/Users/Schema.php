@@ -20,6 +20,7 @@ class Schema extends EloquentSchema
         'name',
         'slug',
         'email',
+        'timezone',
     ];
 
     /**

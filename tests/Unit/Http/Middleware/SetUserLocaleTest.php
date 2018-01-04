@@ -91,7 +91,7 @@ class SetUserLocaleTest extends TestCase
         $allRoutes = Route::getRoutes()->getRoutesByName();
 
         foreach ($allRoutes as $route) {
-            if (! Str::startsWith($route->uri, ['_', 'api'])) {
+            if (! Str::startsWith($route->uri, ['_', 'api', 'cms/api'])) {
                 $this->assertContains(
                     SetUserLocale::class,
                     Route::gatherRouteMiddleware($route)

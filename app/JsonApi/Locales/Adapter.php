@@ -3,10 +3,10 @@
 namespace App\JsonApi\Locales;
 
 use App\Http\Models\Locale;
+use App\JsonApi\OffsetStrategy;
 use Illuminate\Support\Collection;
 use Illuminate\Database\Eloquent\Builder;
 use CloudCreativity\LaravelJsonApi\Store\EloquentAdapter;
-use CloudCreativity\LaravelJsonApi\Pagination\StandardStrategy;
 
 class Adapter extends EloquentAdapter
 {
@@ -14,15 +14,15 @@ class Adapter extends EloquentAdapter
      * @var array
      */
     protected $defaultPagination = [
-        'number' => 1,
+        'offset' => 0,
     ];
 
     /**
      * Adapter constructor.
      *
-     * @param StandardStrategy $paging
+     * @param OffsetStrategy $paging
      */
-    public function __construct(StandardStrategy $paging)
+    public function __construct(OffsetStrategy $paging)
     {
         $paging->withMetaKey(null);
         parent::__construct(new Locale(), $paging);

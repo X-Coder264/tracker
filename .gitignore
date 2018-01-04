@@ -1,5 +1,6 @@
-/node_modules
+node_modules/
 /public/hot
+/public/src
 /public/storage
 /storage/*.key
 /vendor
@@ -13,3 +14,4 @@ yarn-error.log
 .env
 _ide_helper.php
 .php_cs.cache
+/public/admin
