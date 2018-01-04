@@ -3,10 +3,10 @@
 namespace App\JsonApi\Users;
 
 use App\Http\Models\User;
+use App\JsonApi\OffsetStrategy;
 use Illuminate\Support\Collection;
 use Illuminate\Database\Eloquent\Builder;
 use CloudCreativity\LaravelJsonApi\Store\EloquentAdapter;
-use CloudCreativity\LaravelJsonApi\Pagination\StandardStrategy;
 
 class Adapter extends EloquentAdapter
 {
@@ -14,15 +14,15 @@ class Adapter extends EloquentAdapter
      * @var array
      */
     protected $defaultPagination = [
-        'number' => 1,
+        'offset' => 0,
     ];
 
     /**
      * Adapter constructor.
      *
-     * @param StandardStrategy $paging
+     * @param OffsetStrategy $paging
      */
-    public function __construct(StandardStrategy $paging)
+    public function __construct(OffsetStrategy $paging)
     {
         $paging->withMetaKey(null);
         parent::__construct(new User(), $paging);
@@ -37,8 +37,16 @@ class Adapter extends EloquentAdapter
             $builder->where('users.name', '=', $filters->get('name'));
         }
 
+        if ($filters->has('email')) {
+            $builder->where('users.email', '=', $filters->get('email'));
+        }
+
+        if ($filters->has('timezone')) {
+            $builder->where('users.timezone', '=', $filters->get('timezone'));
+        }
+
         if ($filters->has('slug')) {
-            $builder->where('users.slug', $filters->get('slug'));
+            $builder->where('users.slug', '=', $filters->get('slug'));
         }
     }
 

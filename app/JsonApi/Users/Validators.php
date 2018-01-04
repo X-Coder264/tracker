@@ -18,20 +18,17 @@ class Validators extends AbstractValidatorProvider
      * @var array
      */
     protected $queryRules = [
-        'filter.name' => 'string|min:1',
-        'filter.slug' => 'sometimes|required|alpha_dash',
-        'page.number' => 'integer|min:1',
-        'page.size' => 'integer|between:1,50',
+        'page.offset' => 'integer|min:0',
+        'page.limit' => 'integer|between:1,60',
     ];
 
     /**
      * @var array
      */
     protected $allowedSortParameters = [
+        'id',
         'created-at',
         'updated-at',
-        'title',
-        'slug',
     ];
 
     /**
@@ -40,6 +37,7 @@ class Validators extends AbstractValidatorProvider
     protected $allowedFilteringParameters = [
         'id',
         'name',
+        'timezone',
         'slug',
         'email',
     ];
@@ -57,7 +55,7 @@ class Validators extends AbstractValidatorProvider
 
         return [
             'name' => "$required|string|between:1,255",
-            'password' => "$required|string|between:1,255",
+            'password' => "$required|string|between:8,255",
             'email' => "$required|string|email",
             'timezone' => "$required|string|timezone",
         ];
@@ -68,6 +66,6 @@ class Validators extends AbstractValidatorProvider
      */
     protected function relationshipRules(RelationshipsValidatorInterface $relationships, $record = null)
     {
-        //$relationships->hasOne('author', 'people', is_null($record), false);
+        $relationships->hasOne('locale', 'locales', is_null($record), false);
     }
 }

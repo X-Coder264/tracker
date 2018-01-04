@@ -14,6 +14,8 @@ class LocalesControllerTest extends AdminApiTestCase
 
     public function testIndex()
     {
+        $this->withoutExceptionHandling();
+
         $locale = factory(Locale::class)->create();
         $user = factory(User::class)->create();
         $this->actingAs($user);

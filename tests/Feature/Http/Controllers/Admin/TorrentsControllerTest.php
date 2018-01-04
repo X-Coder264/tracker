@@ -14,6 +14,8 @@ class TorrentsControllerTest extends AdminApiTestCase
 
     public function testIndex()
     {
+        $this->withExceptionHandling();
+
         $user = factory(User::class)->create();
         $torrents = factory(Torrent::class, 2)->create();
         $this->actingAs($user);
@@ -55,6 +57,8 @@ class TorrentsControllerTest extends AdminApiTestCase
 
     public function testNameFilter()
     {
+        $this->withExceptionHandling();
+
         $user = factory(User::class)->create();
         $torrents = factory(Torrent::class, 2)->create();
         $this->actingAs($user);
@@ -85,6 +89,7 @@ class TorrentsControllerTest extends AdminApiTestCase
     public function testSlugFilter()
     {
         $this->withExceptionHandling();
+
         $user = factory(User::class)->create();
         $torrents = factory(Torrent::class, 2)->create();
         $this->actingAs($user);
@@ -109,6 +114,70 @@ class TorrentsControllerTest extends AdminApiTestCase
             $jsonResponse['data'][0]['attributes']['updated-at']
         );
         $this->assertSame(route('admin.torrents.read', $torrents[1]->id), $jsonResponse['data'][0]['links']['self']);
+        $this->assertCount(1, $jsonResponse['data']);
+    }
+
+    public function testMinimumSizeFilter()
+    {
+        $this->withExceptionHandling();
+
+        $user = factory(User::class)->create();
+        $firstTorrent = factory(Torrent::class)->create(['size' => 4194303]);
+        $secondTorrent = factory(Torrent::class)->create(['size' => 4194305]);
+        $this->actingAs($user);
+        $response = $this->makeRequest('GET', route('admin.torrents.index', ['filter[minimumSize]' => 4]));
+        $jsonResponse = $response->getJsonResponse();
+
+        $this->assertSame(1, $jsonResponse['meta']['total']);
+        $this->assertSame($secondTorrent->name, $jsonResponse['data'][0]['attributes']['name']);
+        $this->assertSame($secondTorrent->size, $jsonResponse['data'][0]['attributes']['size']);
+        $this->assertSame($secondTorrent->description, $jsonResponse['data'][0]['attributes']['description']);
+        $this->assertSame($secondTorrent->slug, $jsonResponse['data'][0]['attributes']['slug']);
+        $this->assertSame(
+            $secondTorrent->uploader->id,
+            (int) $jsonResponse['data'][0]['relationships']['uploader']['data']['id']
+        );
+        $this->assertSame(
+            $secondTorrent->created_at->format(Carbon::W3C),
+            $jsonResponse['data'][0]['attributes']['created-at']
+        );
+        $this->assertSame(
+            $secondTorrent->updated_at->format(Carbon::W3C),
+            $jsonResponse['data'][0]['attributes']['updated-at']
+        );
+        $this->assertSame(route('admin.torrents.read', $secondTorrent->id), $jsonResponse['data'][0]['links']['self']);
+        $this->assertCount(1, $jsonResponse['data']);
+    }
+
+    public function testMaximumSizeFilter()
+    {
+        $this->withExceptionHandling();
+
+        $user = factory(User::class)->create();
+        $firstTorrent = factory(Torrent::class)->create(['size' => 4194303]);
+        $secondTorrent = factory(Torrent::class)->create(['size' => 4194305]);
+        $this->actingAs($user);
+        $response = $this->makeRequest('GET', route('admin.torrents.index', ['filter[maximumSize]' => 4]));
+        $jsonResponse = $response->getJsonResponse();
+
+        $this->assertSame(1, $jsonResponse['meta']['total']);
+        $this->assertSame($firstTorrent->name, $jsonResponse['data'][0]['attributes']['name']);
+        $this->assertSame($firstTorrent->size, $jsonResponse['data'][0]['attributes']['size']);
+        $this->assertSame($firstTorrent->description, $jsonResponse['data'][0]['attributes']['description']);
+        $this->assertSame($firstTorrent->slug, $jsonResponse['data'][0]['attributes']['slug']);
+        $this->assertSame(
+            $firstTorrent->uploader->id,
+            (int) $jsonResponse['data'][0]['relationships']['uploader']['data']['id']
+        );
+        $this->assertSame(
+            $firstTorrent->created_at->format(Carbon::W3C),
+            $jsonResponse['data'][0]['attributes']['created-at']
+        );
+        $this->assertSame(
+            $firstTorrent->updated_at->format(Carbon::W3C),
+            $jsonResponse['data'][0]['attributes']['updated-at']
+        );
+        $this->assertSame(route('admin.torrents.read', $firstTorrent->id), $jsonResponse['data'][0]['links']['self']);
         $this->assertCount(1, $jsonResponse['data']);
     }
 }

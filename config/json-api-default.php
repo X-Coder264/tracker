@@ -77,7 +77,7 @@ return [
     */
     'url' => [
         'host' => null,
-        'namespace' => '/api/admin',
+        'namespace' => '/cms/api',
         'name' => 'admin.',
     ],
 
