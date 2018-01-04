@@ -85,6 +85,7 @@ class TorrentInfoService
 
     /**
      * @param Torrent $torrent
+     *
      * @throws FileNotFoundException
      *
      * @return array
