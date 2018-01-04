@@ -251,4 +251,44 @@ class TorrentUploadServiceTest extends TestCase
         $decodedTorrent = $decoder->decode(Storage::disk('public')->get('torrents/1.torrent'));
         $this->assertSame(route('announce'), $decodedTorrent['announce']);
     }
+
+    public function testTorrentGetsDeletedIfTheFileWasNotSuccessfullyWrittenToTheDisk()
+    {
+        $user = factory(User::class)->create();
+        $this->actingAs($user);
+
+        Storage::shouldReceive('disk->put')->once()->andReturn(false);
+
+        $decoder = $this->createMock(BdecodingService::class);
+        $this->app->instance(BdecodingService::class, $decoder);
+
+        $decoder->method('decode')->willReturn(['test' => 'test']);
+
+        $encoder = $this->createMock(BencodingService::class);
+        $this->app->instance(BencodingService::class, $encoder);
+
+        $infoService = $this->createMock(TorrentInfoService::class);
+        $torrentSize = 5000;
+        $infoService->method('getTorrentSize')->willReturn($torrentSize);
+        $this->app->instance(TorrentInfoService::class, $infoService);
+
+        $torrentValue = '123456';
+        $encoder->method('encode')->willReturn($torrentValue);
+
+        $torrentName = 'Test name';
+        $torrentDescription = 'Test description';
+
+        $response = $this->from(route('torrents.create'))->post(route('torrents.store'), [
+            'torrent'     => File::create('file.torrent'),
+            'name'        => $torrentName,
+            'description' => $torrentDescription,
+        ]);
+
+        $this->assertSame(0, Torrent::count());
+
+        $response->assertStatus(Response::HTTP_FOUND);
+        $response->assertRedirect(route('torrents.create'));
+        $response->assertSessionHas('error', __('messages.file-not-writable-exception.error-message'));
+        $response->assertSessionHas('_old_input');
+    }
 }

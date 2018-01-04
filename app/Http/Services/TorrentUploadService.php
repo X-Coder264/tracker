@@ -4,13 +4,12 @@ declare(strict_types=1);
 
 namespace App\Http\Services;
 
-use Exception;
 use App\Http\Models\Torrent;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Contracts\Filesystem\FileNotFoundException;
+use App\Exceptions\FileNotWritableException;
 
 class TorrentUploadService
 {
@@ -47,7 +46,7 @@ class TorrentUploadService
     /**
      * @param Request $request
      *
-     * @throws Exception
+     * @throws FileNotWritableException
      *
      * @return Torrent
      */
@@ -56,12 +55,7 @@ class TorrentUploadService
         $torrentFile = $request->file('torrent');
         $torrentFilePath = $torrentFile->getRealPath();
 
-        try {
-            $torrentContent = File::get($torrentFilePath);
-        } catch (FileNotFoundException $e) {
-            throw new Exception('The file could not be read.');
-        }
-
+        $torrentContent = File::get($torrentFilePath);
         $decodedTorrent = $this->decoder->decode($torrentContent);
 
         // the torrent must be private
@@ -89,20 +83,17 @@ class TorrentUploadService
         $torrent->description = $request->input('description');
         $torrent->uploader_id = Auth::id();
         $torrent->infoHash = $infoHash;
-        if (true === $torrent->save()) {
-            $stored = Storage::disk('public')->put(
-                "/torrents/{$torrent->id}.torrent",
-                $this->encoder->encode($decodedTorrent)
-            );
-            if (false !== $stored) {
-                return $torrent;
-            } else {
-                $torrent->delete();
+        $torrent->save();
 
-                throw new Exception();
-            }
+        $stored = Storage::disk('public')->put(
+            "/torrents/{$torrent->id}.torrent",
+            $this->encoder->encode($decodedTorrent)
+        );
+        if (false !== $stored) {
+            return $torrent;
         } else {
-            throw new Exception();
+            $torrent->delete();
+            throw new FileNotWritableException(__('messages.file-not-writable-exception.error-message'));
         }
     }
 

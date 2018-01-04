@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
-use Exception;
 use App\Http\Models\Torrent;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -76,27 +75,23 @@ class TorrentController extends Controller
         $this->validate(
             $request,
             [
-                'torrent' => 'required|file|mimetypes:application/x-bittorrent',
-                'name' => 'required|string|min:5|max:255|unique:torrents',
+                'torrent'     => 'required|file|mimetypes:application/x-bittorrent',
+                'name'        => 'required|string|min:5|max:255|unique:torrents',
                 'description' => 'required|string',
             ],
             [
-                'torrent.required' => 'Test',
-                'torrent.file' => 'Test',
-                'torrent.mimetypes' => 'Test',
-                'name.required' => 'Test',
-                'name.min' => 'Test',
-                'name.max' => 'Test',
-                'name.unique' => 'Test',
+                'torrent.required'     => 'Test',
+                'torrent.file'         => 'Test',
+                'torrent.mimetypes'    => 'Test',
+                'name.required'        => 'Test',
+                'name.min'             => 'Test',
+                'name.max'             => 'Test',
+                'name.unique'          => 'Test',
                 'description.required' => 'Test',
             ]
         );
 
-        try {
-            $torrent = $torrentUploadService->upload($request);
-        } catch (Exception $e) {
-            return back()->with('error', $e->getMessage());
-        }
+        $torrent = $torrentUploadService->upload($request);
 
         return redirect()->route('torrents.show', $torrent)->with('success', 'Bla');
     }

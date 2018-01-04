@@ -78,4 +78,6 @@ return [
     'common.torrent_table_torrent_client' => 'Torrent klijent',
     'common.submit' => 'Pošalji',
     'torrent-comments.show.header' => 'Napiši komentar za :torrent',
+    'file-not-writable-exception.error-message' => 'Datoteka se nije uspjela zapisati na disk. Molimo pokušajte kasnije.',
+    'file-not-readable.error-message' => 'Greška, datoteku nije bilo moguće pročitati.',
 ];
