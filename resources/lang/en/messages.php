@@ -80,4 +80,5 @@ return [
     'torrent-comments.show.header' => 'Write a comment for :torrent',
     'file-not-writable-exception.error-message' => 'Failed to write the file to the disk. Please try again later.',
     'file-not-readable.error-message' => 'Error, the file could not be read.',
+    'torrent-file-missing.error-message' => 'The .torrent file for this torrent is missing.',
 ];

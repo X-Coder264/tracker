@@ -85,25 +85,20 @@ class TorrentInfoService
 
     /**
      * @param Torrent $torrent
+     * @throws FileNotFoundException
      *
      * @return array
      */
     public function getTorrentFileNamesAndSizes(Torrent $torrent): array
     {
-        $torrentFileNamesAndSizes = Cache::rememberForever(
-            'torrent' . $torrent->id . 'files',
+        return Cache::rememberForever(
+            'torrent.' . $torrent->id . '.files',
             function () use ($torrent) {
-                try {
-                    $torrentFile = Storage::disk('public')->get("torrents/{$torrent->id}.torrent");
-                } catch (FileNotFoundException $e) {
-                    abort(404, 'You requested an unavailable .torrent file.');
-                }
+                $torrentFile = Storage::disk('public')->get("torrents/{$torrent->id}.torrent");
                 $decodedTorrent = $this->bdecodingService->decode($torrentFile);
 
                 return $this->getTorrentFileNamesAndSizesFromTorrentInfoDict($decodedTorrent['info']);
             }
         );
-
-        return $torrentFileNamesAndSizes;
     }
 }

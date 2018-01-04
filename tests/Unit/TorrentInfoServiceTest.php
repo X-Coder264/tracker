@@ -3,7 +3,10 @@
 namespace Tests\Unit;
 
 use Tests\TestCase;
+use App\Http\Models\Torrent;
+use Illuminate\Support\Facades\Cache;
 use App\Http\Services\BdecodingService;
+use Illuminate\Support\Facades\Storage;
 use App\Http\Services\TorrentInfoService;
 use App\Http\Services\SizeFormattingService;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -34,7 +37,6 @@ class TorrentInfoServiceTest extends TestCase
     {
         /** @var BdecodingService|MockObject $decoder */
         $decoder = $this->createMock(BdecodingService::class);
-        $this->app->instance(BdecodingService::class, $decoder);
         /** @var SizeFormattingService|MockObject $formatter */
         $formatter = $this->createMock(SizeFormattingService::class);
         $map = [
@@ -77,5 +79,39 @@ class TorrentInfoServiceTest extends TestCase
             $expectedResult2,
             $torrentInfoService->getTorrentFileNamesAndSizesFromTorrentInfoDict($torrentInfoDict2)
         );
+    }
+
+    public function testGetTorrentFileNamesAndSizes()
+    {
+        /** @var BdecodingService|MockObject $decoder */
+        $decoder = $this->createMock(BdecodingService::class);
+        /** @var SizeFormattingService|MockObject $formatter */
+        $formatter = $this->createMock(SizeFormattingService::class);
+
+        $torrent = factory(Torrent::class)->make(['uploader_id' => 1]);
+
+        $storageReturnValue = 'xyz';
+        Storage::shouldReceive('disk->get')->once()->with("torrents/{$torrent->id}.torrent")->andReturn($storageReturnValue);
+
+        $decoderReturnValue = ['info' => ['x' => 'y']];
+        $decoder->expects($this->once())
+            ->method('decode')
+            ->with($this->equalTo($storageReturnValue))
+            ->willReturn($decoderReturnValue);
+
+        $returnValue = ['name' => 'test', 'length' => 500];
+        /** @var TorrentInfoService|MockObject $torrentInfoService */
+        $torrentInfoService = $this->getMockBuilder(TorrentInfoService::class)
+            ->setConstructorArgs([$formatter, $decoder])
+            ->setMethods(['getTorrentFileNamesAndSizesFromTorrentInfoDict'])
+            ->getMock();
+        $torrentInfoService->expects($this->once())
+            ->method('getTorrentFileNamesAndSizesFromTorrentInfoDict')
+            ->with($this->equalTo($decoderReturnValue['info']))
+            ->willReturn($returnValue);
+
+        $torrentInfoService->getTorrentFileNamesAndSizes($torrent);
+
+        $this->assertSame($returnValue, Cache::get('torrent.' . $torrent->id . '.files'));
     }
 }

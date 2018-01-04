@@ -48,15 +48,17 @@ class TorrentController extends Controller
      *
      * @return Response
      */
-    public function show(
-        Torrent $torrent,
-        TorrentInfoService $torrentInfoService
-    ): Response {
+    public function show(Torrent $torrent, TorrentInfoService $torrentInfoService): Response
+    {
+        try {
+            $torrentFileNamesAndSizes = $torrentInfoService->getTorrentFileNamesAndSizes($torrent);
+        } catch (FileNotFoundException $e) {
+            abort(404, __('messages.torrent-file-missing.error-message'));
+        }
+
         $torrent->load(['uploader', 'peers.user']);
         $numberOfPeers = $torrent->peers->count();
         $torrentComments = $torrent->comments()->with('user')->paginate(10);
-
-        $torrentFileNamesAndSizes = $torrentInfoService->getTorrentFileNamesAndSizes($torrent);
 
         return response()->view(
             'torrents.show',

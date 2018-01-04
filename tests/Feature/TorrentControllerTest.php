@@ -11,6 +11,7 @@ use App\Http\Models\TorrentComment;
 use App\Http\Services\TorrentInfoService;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Contracts\Filesystem\FileNotFoundException;
 
 class TorrentControllerTest extends TestCase
 {
@@ -68,6 +69,21 @@ class TorrentControllerTest extends TestCase
         $response->assertViewHas('timezone');
         $this->assertInstanceOf(LengthAwarePaginator::class, $response->original->torrentComments);
         $response->assertSee($torrentComment->comment);
+    }
+
+    public function testShowWhenTorrentInfoServiceThrowsAnException()
+    {
+        $torrent = factory(Torrent::class)->create();
+
+        $torrentInfo = $this->createMock(TorrentInfoService::class);
+        $this->app->instance(TorrentInfoService::class, $torrentInfo);
+
+        $torrentInfo->method('getTorrentFileNamesAndSizes')->will($this->throwException(new FileNotFoundException));
+
+        $response = $this->get(route('torrents.show', $torrent));
+        $response->assertStatus(Response::HTTP_NOT_FOUND);
+        $response->assertSee(__('messages.torrent-file-missing.error-message'));
+        $response->assertDontSee($torrent->name);
     }
 
     public function testGuestsCannotSeeTheTorrentsIndexPage()

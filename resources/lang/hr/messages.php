@@ -80,4 +80,5 @@ return [
     'torrent-comments.show.header' => 'Napiši komentar za :torrent',
     'file-not-writable-exception.error-message' => 'Datoteka se nije uspjela zapisati na disk. Molimo pokušajte kasnije.',
     'file-not-readable.error-message' => 'Greška, datoteku nije bilo moguće pročitati.',
+    'torrent-file-missing.error-message' => 'Ne postoji na disku .torrent datoteka za ovaj torrent.',
 ];
