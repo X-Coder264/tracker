@@ -8,13 +8,10 @@ use Illuminate\Support\ServiceProvider;
 
 class BroadcastServiceProvider extends ServiceProvider
 {
-    /**
-     * Bootstrap any application services.
-     */
-    public function boot()
+    /*public function boot()
     {
-        //Broadcast::routes();
+        Broadcast::routes();
 
-        //require base_path('routes/channels.php');
-    }
+        require base_path('routes/channels.php');
+    }*/
 }
