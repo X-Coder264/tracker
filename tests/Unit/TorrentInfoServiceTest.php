@@ -110,8 +110,7 @@ class TorrentInfoServiceTest extends TestCase
             ->with($this->equalTo($decoderReturnValue['info']))
             ->willReturn($returnValue);
 
-        $torrentInfoService->getTorrentFileNamesAndSizes($torrent);
-
+        $this->assertSame($returnValue, $torrentInfoService->getTorrentFileNamesAndSizes($torrent));
         $this->assertSame($returnValue, Cache::get('torrent.' . $torrent->id . '.files'));
     }
 }
