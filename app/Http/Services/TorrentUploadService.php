@@ -93,6 +93,7 @@ class TorrentUploadService
             return $torrent;
         } else {
             $torrent->delete();
+
             throw new FileNotWritableException(__('messages.file-not-writable-exception.error-message'));
         }
     }
