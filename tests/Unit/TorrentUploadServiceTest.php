@@ -4,8 +4,8 @@ namespace Tests\Unit;
 
 use Tests\TestCase;
 use ReflectionClass;
-use App\Http\Services\BencodingService;
 use App\Http\Services\BdecodingService;
+use App\Http\Services\BencodingService;
 use App\Http\Services\TorrentInfoService;
 use App\Http\Services\TorrentUploadService;
 use PHPUnit\Framework\MockObject\MockObject;
