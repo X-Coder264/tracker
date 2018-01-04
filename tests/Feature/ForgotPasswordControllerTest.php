@@ -15,6 +15,8 @@ class ForgotPasswordControllerTest extends TestCase
 
     public function testIndex()
     {
+        $this->withoutExceptionHandling();
+
         $response = $this->get(route('password.request'));
 
         $response->assertStatus(Response::HTTP_OK);
@@ -23,6 +25,8 @@ class ForgotPasswordControllerTest extends TestCase
 
     public function testNotificationIsSent()
     {
+        $this->withoutExceptionHandling();
+
         Notification::fake();
 
         $user = factory(User::class)->create();

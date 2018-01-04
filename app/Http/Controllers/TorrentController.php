@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
+use App\Http\Models\User;
 use App\Http\Models\Torrent;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
+use App\Http\Services\PasskeyService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Cache;
 use App\Http\Services\BdecodingService;
@@ -15,6 +17,7 @@ use App\Http\Services\BencodingService;
 use Illuminate\Support\Facades\Storage;
 use App\Http\Services\TorrentInfoService;
 use App\Http\Services\TorrentUploadService;
+use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
 
 class TorrentController extends Controller
@@ -53,7 +56,7 @@ class TorrentController extends Controller
         try {
             $torrentFileNamesAndSizes = $torrentInfoService->getTorrentFileNamesAndSizes($torrent);
         } catch (FileNotFoundException $e) {
-            abort(404, __('messages.torrent-file-missing.error-message'));
+            abort(Response::HTTP_NOT_FOUND, __('messages.torrent-file-missing.error-message'));
         }
 
         $torrent->load(['uploader', 'peers.user']);
@@ -102,27 +105,41 @@ class TorrentController extends Controller
      * @param Torrent          $torrent
      * @param BencodingService $encoder
      * @param BdecodingService $decoder
+     * @param PasskeyService   $passkeyService
      *
      * @return Response
      */
-    public function download(Torrent $torrent, BencodingService $encoder, BdecodingService $decoder): Response
-    {
+    public function download(
+        Torrent $torrent,
+        BencodingService $encoder,
+        BdecodingService $decoder,
+        PasskeyService $passkeyService
+    ): Response {
         try {
             $torrentFile = Storage::disk('public')->get("torrents/{$torrent->id}.torrent");
         } catch (FileNotFoundException $e) {
-            abort(404, 'Error, you requested an unavailable .torrent file.');
+            abort(Response::HTTP_NOT_FOUND, __('messages.torrent-file-missing.error-message'));
         }
 
         $decodedTorrent = $decoder->decode($torrentFile);
-        $decodedTorrent['announce'] = route('announce', ['passkey' => Auth::user()->passkey]);
 
-        return response(
-            $encoder->encode($decodedTorrent),
-            200,
-            [
-                'Content-Type'        => 'application/x-bittorrent',
-                'Content-Disposition' => 'attachment; filename="' . $torrent->name . '.torrent"',
-            ]
+        $passkey = Auth::user()->passkey;
+        if (empty($passkey)) {
+            $passkey = $passkeyService->generateUniquePasskey();
+            User::where('id', '=', Auth::id())->update(['passkey' => $passkey]);
+        }
+
+        $decodedTorrent['announce'] = route('announce', ['passkey' => $passkey]);
+
+        $response = new Response($encoder->encode($decodedTorrent));
+        $response->headers->set('Content-Type', 'application/x-bittorrent');
+        $disposition = $response->headers->makeDisposition(
+            ResponseHeaderBag::DISPOSITION_ATTACHMENT,
+            $torrent->name . '.torrent'
         );
+
+        $response->headers->set('Content-Disposition', $disposition);
+
+        return $response;
     }
 }

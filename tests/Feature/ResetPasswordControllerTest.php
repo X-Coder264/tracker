@@ -19,6 +19,8 @@ class ResetPasswordControllerTest extends TestCase
 
     public function testPasswordReset()
     {
+        $this->withoutExceptionHandling();
+
         Event::fake();
 
         $user = factory(User::class)->create();
@@ -27,7 +29,11 @@ class ResetPasswordControllerTest extends TestCase
         $newPassword = '1234567899';
 
         DB::table('password_resets')->insert(
-            ['email' => $user->email, 'token' => $token, 'created_at' => Carbon::now()]
+            [
+                'email'      => $user->email,
+                'token'      => $token,
+                'created_at' => Carbon::now(),
+            ]
         );
 
         $response = $this->post(route('password.request'), [

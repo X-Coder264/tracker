@@ -15,6 +15,8 @@ class RegisterControllerTest extends TestCase
 
     public function testIndex()
     {
+        $this->withoutExceptionHandling();
+
         factory(Locale::class)->create();
         $response = $this->get(route('register'));
 
@@ -25,6 +27,8 @@ class RegisterControllerTest extends TestCase
 
     public function testRegister()
     {
+        $this->withoutExceptionHandling();
+
         $name = 'test name';
         $email = 'test@gmail.com';
         $password = 'test password';

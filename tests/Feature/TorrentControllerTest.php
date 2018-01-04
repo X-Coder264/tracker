@@ -8,7 +8,12 @@ use App\Http\Models\Torrent;
 use Illuminate\Http\Response;
 use Illuminate\Http\Testing\File;
 use App\Http\Models\TorrentComment;
+use App\Http\Services\PasskeyService;
+use App\Http\Services\BdecodingService;
+use App\Http\Services\BencodingService;
+use Illuminate\Support\Facades\Storage;
 use App\Http\Services\TorrentInfoService;
+use PHPUnit\Framework\MockObject\MockObject;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
@@ -17,16 +22,23 @@ class TorrentControllerTest extends TestCase
 {
     use RefreshDatabase;
 
+    /**
+     * @var User
+     */
+    private $user;
+
     protected function setUp()
     {
         parent::setUp();
-        $user = factory(User::class)->create();
-        $this->actingAs($user);
+        $this->user = factory(User::class)->create();
+        $this->actingAs($this->user);
     }
 
     public function testIndex()
     {
-        $torrent = factory(Torrent::class)->create();
+        $this->withoutExceptionHandling();
+
+        $torrent = factory(Torrent::class)->create(['uploader_id' => $this->user->id]);
 
         $response = $this->get(route('torrents.index'));
 
@@ -40,6 +52,8 @@ class TorrentControllerTest extends TestCase
 
     public function testCreate()
     {
+        $this->withoutExceptionHandling();
+
         $response = $this->get(route('torrents.create'));
 
         $response->assertStatus(Response::HTTP_OK);
@@ -48,7 +62,9 @@ class TorrentControllerTest extends TestCase
 
     public function testShow()
     {
-        $torrent = factory(Torrent::class)->create();
+        $this->withoutExceptionHandling();
+
+        $torrent = factory(Torrent::class)->create(['uploader_id' => $this->user->id]);
         $torrentComment = factory(TorrentComment::class)->create(
             ['torrent_id' => $torrent->id, 'user_id' => $torrent->uploader_id]
         );
@@ -73,7 +89,7 @@ class TorrentControllerTest extends TestCase
 
     public function testShowWhenTorrentInfoServiceThrowsAnException()
     {
-        $torrent = factory(Torrent::class)->create();
+        $torrent = factory(Torrent::class)->create(['uploader_id' => $this->user->id]);
 
         $torrentInfo = $this->createMock(TorrentInfoService::class);
         $this->app->instance(TorrentInfoService::class, $torrentInfo);
@@ -81,6 +97,100 @@ class TorrentControllerTest extends TestCase
         $torrentInfo->method('getTorrentFileNamesAndSizes')->will($this->throwException(new FileNotFoundException()));
 
         $response = $this->get(route('torrents.show', $torrent));
+        $response->assertStatus(Response::HTTP_NOT_FOUND);
+        $response->assertSee(__('messages.torrent-file-missing.error-message'));
+        $response->assertDontSee($torrent->name);
+    }
+
+    public function testDownload()
+    {
+        $this->withoutExceptionHandling();
+
+        /* @var BdecodingService|MockObject $decoder */
+        $decoder = $this->createMock(BdecodingService::class);
+        /* @var BencodingService|MockObject $encoder */
+        $encoder = $this->createMock(BencodingService::class);
+
+        $torrent = factory(Torrent::class)->create(['uploader_id' => $this->user->id]);
+
+        $storageReturnValue = 'something x264';
+        Storage::shouldReceive('disk->get')->once()->with("torrents/{$torrent->id}.torrent")->andReturn($storageReturnValue);
+
+        $decoderReturnValue = ['info' => ['x' => 'y']];
+        $decoder->expects($this->once())
+            ->method('decode')
+            ->with($this->equalTo($storageReturnValue))
+            ->willReturn($decoderReturnValue);
+
+        $this->app->instance(BdecodingService::class, $decoder);
+
+        $encoderReturnValue = 'something xyz';
+        $encoder->expects($this->once())
+            ->method('encode')
+            ->with($this->equalTo(array_merge($decoderReturnValue, ['announce' => route('announce', ['passkey' => $this->user->passkey])])))
+            ->willReturn($encoderReturnValue);
+
+        $this->app->instance(BencodingService::class, $encoder);
+
+        $response = $this->get(route('torrents.download', $torrent));
+        $response->assertStatus(Response::HTTP_OK);
+        $this->assertSame($encoderReturnValue, $response->getContent());
+        $response->assertHeader('Content-Type', 'application/x-bittorrent');
+        $response->assertHeader('Content-Disposition', 'attachment; filename="' . $torrent->name . '.torrent"');
+    }
+
+    public function testUserGetsAPasskeyIfHeDidNotHaveItBefore()
+    {
+        $this->withoutExceptionHandling();
+
+        $this->user->forceFill(['passkey' => null])->save();
+
+        /* @var BdecodingService|MockObject $decoder */
+        $decoder = $this->createMock(BdecodingService::class);
+        /* @var BencodingService|MockObject $encoder */
+        $encoder = $this->createMock(BencodingService::class);
+        /* @var PasskeyService|MockObject $passkeyService */
+        $passkeyService = $this->createMock(PasskeyService::class);
+
+        $torrent = factory(Torrent::class)->create(['uploader_id' => $this->user->id]);
+
+        $storageReturnValue = 'something x264';
+        Storage::shouldReceive('disk->get')->once()->with("torrents/{$torrent->id}.torrent")->andReturn($storageReturnValue);
+
+        $decoderReturnValue = ['info' => ['x' => 'y']];
+        $decoder->expects($this->once())
+            ->method('decode')
+            ->with($this->equalTo($storageReturnValue))
+            ->willReturn($decoderReturnValue);
+
+        $this->app->instance(BdecodingService::class, $decoder);
+
+        $passkey = 'test passkey';
+        $passkeyService->expects($this->once())->method('generateUniquePasskey')->willReturn($passkey);
+        $this->app->instance(PasskeyService::class, $passkeyService);
+
+        $encoderReturnValue = 'something xyz';
+        $encoder->expects($this->once())
+            ->method('encode')
+            ->with($this->equalTo(array_merge($decoderReturnValue, ['announce' => route('announce', ['passkey' => $passkey])])))
+            ->willReturn($encoderReturnValue);
+
+        $this->app->instance(BencodingService::class, $encoder);
+
+        $response = $this->get(route('torrents.download', $torrent));
+        $response->assertStatus(Response::HTTP_OK);
+        $this->assertSame($encoderReturnValue, $response->getContent());
+        $response->assertHeader('Content-Type', 'application/x-bittorrent');
+        $response->assertHeader('Content-Disposition', 'attachment; filename="' . $torrent->name . '.torrent"');
+        $user = $this->user->fresh();
+        $this->assertSame($passkey, $user->passkey);
+    }
+
+    public function testDownloadWhenStorageThrowsAnException()
+    {
+        $torrent = factory(Torrent::class)->create(['uploader_id' => $this->user->id]);
+        Storage::shouldReceive('disk->get')->once()->with("torrents/{$torrent->id}.torrent")->andThrow(new FileNotFoundException());
+        $response = $this->get(route('torrents.download', $torrent));
         $response->assertStatus(Response::HTTP_NOT_FOUND);
         $response->assertSee(__('messages.torrent-file-missing.error-message'));
         $response->assertDontSee($torrent->name);
@@ -97,8 +207,17 @@ class TorrentControllerTest extends TestCase
     public function testGuestsCannotSeeTheTorrentPage()
     {
         $this->app->make('auth')->guard()->logout();
-        $torrent = factory(Torrent::class)->create();
+        $torrent = factory(Torrent::class)->create(['uploader_id' => $this->user->id]);
         $response = $this->get(route('torrents.show', $torrent));
+        $response->assertStatus(Response::HTTP_FOUND);
+        $response->assertRedirect(route('login'));
+    }
+
+    public function testGuestsCannotDownloadTorrents()
+    {
+        $this->app->make('auth')->guard()->logout();
+        $torrent = factory(Torrent::class)->create(['uploader_id' => $this->user->id]);
+        $response = $this->get(route('torrents.download', $torrent));
         $response->assertStatus(Response::HTTP_FOUND);
         $response->assertRedirect(route('login'));
     }
@@ -180,7 +299,7 @@ class TorrentControllerTest extends TestCase
 
     public function testNameMustBeUnique()
     {
-        $torrent = factory(Torrent::class)->create();
+        $torrent = factory(Torrent::class)->create(['uploader_id' => $this->user->id]);
         $response = $this->from(route('torrents.create'))->post(route('torrents.store'), $this->validParams([
             'name' => $torrent->name,
         ]));

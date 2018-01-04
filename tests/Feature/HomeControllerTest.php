@@ -13,6 +13,8 @@ class HomeControllerTest extends TestCase
 
     public function testIndex()
     {
+        $this->withoutExceptionHandling();
+
         $user = factory(User::class)->create();
         $this->actingAs($user);
         $response = $this->get(route('home.index'));

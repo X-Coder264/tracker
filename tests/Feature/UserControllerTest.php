@@ -16,6 +16,8 @@ class UserControllerTest extends TestCase
 
     public function testEdit()
     {
+        $this->withoutExceptionHandling();
+
         $user = factory(User::class)->create();
         $this->actingAs($user);
         $response = $this->get(route('users.edit', $user));
@@ -28,6 +30,7 @@ class UserControllerTest extends TestCase
     public function testUpdate()
     {
         $this->withoutExceptionHandling();
+
         $this->withoutMiddleware(SetUserLocale::class);
         $user = factory(User::class)->create();
         $locale = factory(Locale::class)->create();

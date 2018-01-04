@@ -15,6 +15,8 @@ class LoginControllerTest extends TestCase
 
     public function testIndex()
     {
+        $this->withoutExceptionHandling();
+
         $response = $this->get(route('login'));
 
         $response->assertStatus(Response::HTTP_OK);
@@ -23,6 +25,8 @@ class LoginControllerTest extends TestCase
 
     public function testLogin()
     {
+        $this->withoutExceptionHandling();
+
         $locale = factory(Locale::class)->create();
         $email = 'test@gmail.com';
         $password = '12345678';

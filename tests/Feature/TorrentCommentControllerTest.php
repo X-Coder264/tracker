@@ -15,6 +15,8 @@ class TorrentCommentControllerTest extends TestCase
 
     public function testCreate()
     {
+        $this->withoutExceptionHandling();
+
         $user = factory(User::class)->create();
         $torrent = factory(Torrent::class)->create(['uploader_id' => $user->id]);
         $this->actingAs($user);
@@ -27,6 +29,8 @@ class TorrentCommentControllerTest extends TestCase
 
     public function testStore()
     {
+        $this->withoutExceptionHandling();
+
         $user = factory(User::class)->create();
         $torrent = factory(Torrent::class)->create(['uploader_id' => $user->id]);
         $this->actingAs($user);
