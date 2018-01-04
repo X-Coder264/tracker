@@ -135,7 +135,8 @@ class TorrentController extends Controller
         $response->headers->set('Content-Type', 'application/x-bittorrent');
         $disposition = $response->headers->makeDisposition(
             ResponseHeaderBag::DISPOSITION_ATTACHMENT,
-            $torrent->name . '.torrent'
+            $torrent->name . '.torrent',
+            mb_convert_encoding($torrent->name . '.torrent', 'ASCII')
         );
 
         $response->headers->set('Content-Disposition', $disposition);

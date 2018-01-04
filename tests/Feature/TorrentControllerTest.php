@@ -16,6 +16,7 @@ use App\Http\Services\TorrentInfoService;
 use PHPUnit\Framework\MockObject\MockObject;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
 
 class TorrentControllerTest extends TestCase
@@ -102,7 +103,7 @@ class TorrentControllerTest extends TestCase
         $response->assertDontSee($torrent->name);
     }
 
-    public function testDownload()
+    public function testDownloadWithASCIITorrentFileName()
     {
         $this->withoutExceptionHandling();
 
@@ -111,7 +112,7 @@ class TorrentControllerTest extends TestCase
         /* @var BencodingService|MockObject $encoder */
         $encoder = $this->createMock(BencodingService::class);
 
-        $torrent = factory(Torrent::class)->create(['uploader_id' => $this->user->id]);
+        $torrent = factory(Torrent::class)->create(['uploader_id' => $this->user->id, 'name' => 'xyz']);
 
         $storageReturnValue = 'something x264';
         Storage::shouldReceive('disk->get')->once()->with("torrents/{$torrent->id}.torrent")->andReturn($storageReturnValue);
@@ -137,6 +138,51 @@ class TorrentControllerTest extends TestCase
         $this->assertSame($encoderReturnValue, $response->getContent());
         $response->assertHeader('Content-Type', 'application/x-bittorrent');
         $response->assertHeader('Content-Disposition', 'attachment; filename="' . $torrent->name . '.torrent"');
+    }
+
+    public function testDownloadWithUTF8TorrentFileName()
+    {
+        $this->withoutExceptionHandling();
+
+        /* @var BdecodingService|MockObject $decoder */
+        $decoder = $this->createMock(BdecodingService::class);
+        /* @var BencodingService|MockObject $encoder */
+        $encoder = $this->createMock(BencodingService::class);
+
+        $torrent = factory(Torrent::class)->create(['uploader_id' => $this->user->id, 'name' => 'čćšđž']);
+
+        $storageReturnValue = 'something x264';
+        Storage::shouldReceive('disk->get')->once()->with("torrents/{$torrent->id}.torrent")->andReturn($storageReturnValue);
+
+        $decoderReturnValue = ['info' => ['x' => 'y']];
+        $decoder->expects($this->once())
+            ->method('decode')
+            ->with($this->equalTo($storageReturnValue))
+            ->willReturn($decoderReturnValue);
+
+        $this->app->instance(BdecodingService::class, $decoder);
+
+        $encoderReturnValue = 'something xyz';
+        $encoder->expects($this->once())
+            ->method('encode')
+            ->with($this->equalTo(array_merge($decoderReturnValue, ['announce' => route('announce', ['passkey' => $this->user->passkey])])))
+            ->willReturn($encoderReturnValue);
+
+        $this->app->instance(BencodingService::class, $encoder);
+
+        $response = $this->get(route('torrents.download', $torrent));
+        $response->assertStatus(Response::HTTP_OK);
+        $this->assertSame($encoderReturnValue, $response->getContent());
+        $response->assertHeader('Content-Type', 'application/x-bittorrent');
+        $fileName = $torrent->name . '.torrent';
+        $filenameFallback = mb_convert_encoding($torrent->name . '.torrent', 'ASCII');
+        $contentDisposition = sprintf(
+            '%s; filename="%s"' . "; filename*=utf-8''%s",
+            ResponseHeaderBag::DISPOSITION_ATTACHMENT,
+            str_replace('"', '\\"', $filenameFallback),
+            rawurlencode($fileName)
+        );
+        $response->assertHeader('Content-Disposition', $contentDisposition);
     }
 
     public function testUserGetsAPasskeyIfHeDidNotHaveItBefore()
