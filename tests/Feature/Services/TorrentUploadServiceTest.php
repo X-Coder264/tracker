@@ -79,7 +79,7 @@ class TorrentUploadServiceTest extends TestCase
         Storage::fake('public');
 
         $torrentFile = new UploadedFile(
-            realpath(__DIR__ . DIRECTORY_SEPARATOR),
+            realpath(__DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'Fixtures' . DIRECTORY_SEPARATOR . 'non private torrent.torrent'),
             'non private torrent',
             'application/x-bittorrent',
             null,
@@ -121,7 +121,7 @@ class TorrentUploadServiceTest extends TestCase
         Storage::fake('public');
 
         $torrentFile = new UploadedFile(
-            realpath(__DIR__ . DIRECTORY_SEPARATOR),
+            realpath(__DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'Fixtures' . DIRECTORY_SEPARATOR . 'test.torrent'),
             'test',
             'application/x-bittorrent',
             null,
@@ -223,7 +223,7 @@ class TorrentUploadServiceTest extends TestCase
         Storage::fake('public');
 
         $torrentFile = new UploadedFile(
-            realpath(__DIR__ . DIRECTORY_SEPARATOR),
+            realpath(__DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'Fixtures' . DIRECTORY_SEPARATOR . 'test.torrent'),
             'test',
             'application/x-bittorrent',
             null,
