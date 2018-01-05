@@ -174,8 +174,8 @@ class TorrentControllerTest extends TestCase
         $response->assertStatus(Response::HTTP_OK);
         $this->assertSame($encoderReturnValue, $response->getContent());
         $response->assertHeader('Content-Type', 'application/x-bittorrent');
-        $fileName = str_replace(['/', '\\'],'',$torrent->name . '.torrent');
-        $filenameFallback = mb_convert_encoding(str_replace('%','', $fileName), 'ASCII');
+        $fileName = str_replace(['/', '\\'], '', $torrent->name . '.torrent');
+        $filenameFallback = mb_convert_encoding(str_replace('%', '', $fileName), 'ASCII');
         $contentDisposition = sprintf(
             '%s; filename="%s"' . "; filename*=utf-8''%s",
             ResponseHeaderBag::DISPOSITION_ATTACHMENT,
