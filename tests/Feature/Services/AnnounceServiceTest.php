@@ -20,6 +20,8 @@ class AnnounceServiceTest extends TestCase
 
     public function testStartLeechingWithNoOtherPeersPresentOnTheTorrent()
     {
+        $this->withoutExceptionHandling();
+
         $infoHash = 'ccd285bd6d7fc749e9ed34d8b1e8a0f1b582d977';
         $peerId = '2d7142333345302d64354e334474384672517776';
         $IP = '98.165.38.50';
@@ -90,6 +92,8 @@ class AnnounceServiceTest extends TestCase
 
     public function testStartLeechingWithOtherPeersPresentOnTheTorrent()
     {
+        $this->withoutExceptionHandling();
+
         $infoHash = 'ccd285bd6d7fc749e9ed34d8b1e8a0f1b582d977';
         $peerId = '2d7142333345302d64354e334474384672517776';
         $peerIdOne = '2d7142333345302d64354e334474384672517777';
@@ -194,6 +198,8 @@ class AnnounceServiceTest extends TestCase
 
     public function testStartSeedingWithNoOtherPeersPresentOnTheTorrent()
     {
+        $this->withoutExceptionHandling();
+
         $infoHash = 'ccd285bd6d7fc749e9ed34d8b1e8a0f1b582d977';
         $peerId = '2d7142333345302d64354e334474384672517776';
         $IP = '98.165.38.50';
@@ -253,6 +259,8 @@ class AnnounceServiceTest extends TestCase
 
     public function testSeederDroppingOutOfTheSwarm()
     {
+        $this->withoutExceptionHandling();
+
         $infoHash = 'ccd285bd6d7fc749e9ed34d8b1e8a0f1b582d977';
         $peerId = '2d7142333345302d64354e334474384672517776';
         $IP = '98.165.38.50';
@@ -335,6 +343,8 @@ class AnnounceServiceTest extends TestCase
 
     public function testLeecherDroppingOutOfTheSwarm()
     {
+        $this->withoutExceptionHandling();
+
         $infoHash = 'ccd285bd6d7fc749e9ed34d8b1e8a0f1b582d977';
         $peerId = '2d7142333345302d64354e334474384672517776';
         $IP = '98.165.38.50';
@@ -423,6 +433,8 @@ class AnnounceServiceTest extends TestCase
 
     public function testLeecherCompletingTheTorrent()
     {
+        $this->withoutExceptionHandling();
+
         $infoHash = 'ccd285bd6d7fc749e9ed34d8b1e8a0f1b582d977';
         $peerId = '2d7142333345302d64354e334474384672517776';
         $peerIdOne = '2d7142333345302d64354e334474384672517777';
@@ -546,6 +558,8 @@ class AnnounceServiceTest extends TestCase
 
     public function testSeederContinuingToSeed()
     {
+        $this->withoutExceptionHandling();
+
         $infoHash = 'ccd285bd6d7fc749e9ed34d8b1e8a0f1b582d977';
         $peerId = '2d7142333345302d64354e334474384672517776';
         $IP = '98.165.38.50';
@@ -649,6 +663,8 @@ class AnnounceServiceTest extends TestCase
 
     public function testLeecherContinuingToLeech()
     {
+        $this->withoutExceptionHandling();
+
         $infoHash = 'ccd285bd6d7fc749e9ed34d8b1e8a0f1b582d977';
         $peerId = '2d7142333345302d64354e334474384672517776';
         $IP = '98.165.38.50';
@@ -750,6 +766,8 @@ class AnnounceServiceTest extends TestCase
 
     public function testPeerWithIPv4AndIPv6Address()
     {
+        $this->withoutExceptionHandling();
+
         $infoHash = 'ccd285bd6d7fc749e9ed34d8b1e8a0f1b582d977';
         $peerId = '2d7142333345302d64354e334474384672517776';
         $IPv4 = '98.165.38.50';
@@ -853,6 +871,8 @@ class AnnounceServiceTest extends TestCase
 
     public function testPeerWithIPv6AddressBEP7()
     {
+        $this->withoutExceptionHandling();
+
         $infoHash = 'ccd285bd6d7fc749e9ed34d8b1e8a0f1b582d977';
         $peerId = '2d7142333345302d64354e334474384672517776';
         $IPv6 = '2001::53aa:64c:0:7f83:bc43:dec9';
@@ -950,6 +970,8 @@ class AnnounceServiceTest extends TestCase
 
     public function testPeerWithIPv6Address()
     {
+        $this->withoutExceptionHandling();
+
         $infoHash = 'ccd285bd6d7fc749e9ed34d8b1e8a0f1b582d977';
         $peerId = '2d7142333345302d64354e334474384672517776';
         $IPv6 = '2001::53aa:64c:0:7f83:bc43:dec9';
@@ -1047,6 +1069,8 @@ class AnnounceServiceTest extends TestCase
 
     public function testPeerWithIPv6Endpoint()
     {
+        $this->withoutExceptionHandling();
+
         $infoHash = 'ccd285bd6d7fc749e9ed34d8b1e8a0f1b582d977';
         $peerId = '2d7142333345302d64354e334474384672517776';
         $IPv6 = '2001::53aa:64c:0:7f83:bc43:dec9';
@@ -1146,6 +1170,8 @@ class AnnounceServiceTest extends TestCase
 
     public function testPeerWithIPv4Endpoint()
     {
+        $this->withoutExceptionHandling();
+
         $infoHash = 'ccd285bd6d7fc749e9ed34d8b1e8a0f1b582d977';
         $peerId = '2d7142333345302d64354e334474384672517776';
         $IPv4 = '98.165.38.50';
@@ -1245,6 +1271,8 @@ class AnnounceServiceTest extends TestCase
 
     public function testNonCompactResponse()
     {
+        $this->withoutExceptionHandling();
+
         $infoHash = 'ccd285bd6d7fc749e9ed34d8b1e8a0f1b582d977';
         $peerId = '2d7142333345302d64354e334474384672517776';
         $peerIdOne = '2d7142333345302d64354e334474384672517777';
@@ -1334,6 +1362,8 @@ class AnnounceServiceTest extends TestCase
 
     public function testNumWantParameterIsRespected()
     {
+        $this->withoutExceptionHandling();
+
         $infoHash = 'ccd285bd6d7fc749e9ed34d8b1e8a0f1b582d977';
         $peerId = '2d7142333345302d64354e334474384672517776';
         $peerIdOne = '2d7142333345302d64354e334474384672517777';
@@ -1565,12 +1595,36 @@ class AnnounceServiceTest extends TestCase
         $this->assertSame(0, Snatch::count());
     }
 
-    public function testPeerIDMustBeValid()
+    public function testPeerWithTheGivenPeerIDMustExistWhenTheEventIsCompleted()
     {
+        $this->withoutExceptionHandling();
+
         $response = $this->get(
             route('announce', $this->validParams([
                 'peer_id' => hex2bin('2d7142333345302d64354e334474384672517777'),
-                'event'   => '',
+                'event'   => 'completed',
+                'downloaded' => 100,
+                'uploaded'   => 200,
+                'left'       => 0,
+            ]))
+        );
+        $response->assertStatus(Response::HTTP_OK);
+        $expectedResponse = ['failure reason' => __('messages.announce.invalid_peer_id')];
+        $decoder = new BdecodingService();
+        $actualResponse = $decoder->decode($response->getContent());
+        $this->assertSame($expectedResponse, $actualResponse);
+        $this->assertSame(0, Peer::count());
+        $this->assertSame(0, Snatch::count());
+    }
+
+    public function testPeerWithTheGivenPeerIDMustExistWhenTheEventIsStopped()
+    {
+        $this->withoutExceptionHandling();
+
+        $response = $this->get(
+            route('announce', $this->validParams([
+                'peer_id' => hex2bin('2d7142333345302d64354e334474384672517777'),
+                'event'   => 'stopped',
             ]))
         );
         $response->assertStatus(Response::HTTP_OK);

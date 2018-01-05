@@ -166,25 +166,27 @@ class AnnounceService
         $left = (int) $this->request->input('left');
         $this->seeder = 0 === $left ? true : false;
 
-        if ('started' !== $event) {
-            $this->peer = Peer::where('peer_id', '=', $this->peerID)
-                ->where('torrent_id', '=', $this->torrent->id)
-                ->where('user_id', '=', $this->user->id)
-                ->first();
+        $this->peer = Peer::where('peer_id', '=', $this->peerID)
+            ->where('torrent_id', '=', $this->torrent->id)
+            ->where('user_id', '=', $this->user->id)
+            ->first();
 
+        if ('completed' === $event || 'stopped' === $event) {
             if (null === $this->peer) {
                 return $this->announceErrorResponse(__('messages.announce.invalid_peer_id'));
             }
         }
 
         $timeNow = Carbon::now();
+        $downloaded = $this->request->input('downloaded');
+        $uploaded = $this->request->input('uploaded');
 
         if (null === $this->peer) {
-            $this->downloadedInThisAnnounceCycle = $this->request->input('downloaded', 0);
-            $this->uploadedInThisAnnounceCycle = $this->request->input('uploaded', 0);
+            $this->downloadedInThisAnnounceCycle = $downloaded;
+            $this->uploadedInThisAnnounceCycle = $uploaded;
         } else {
-            $this->downloadedInThisAnnounceCycle = max(0, $this->request->input('downloaded') - $this->peer->getOriginal('downloaded'));
-            $this->uploadedInThisAnnounceCycle = max(0, $this->request->input('uploaded') - $this->peer->getOriginal('uploaded'));
+            $this->downloadedInThisAnnounceCycle = max(0, $downloaded - $this->peer->getOriginal('downloaded'));
+            $this->uploadedInThisAnnounceCycle = max(0, $uploaded - $this->peer->getOriginal('uploaded'));
             if (false === $this->seeder || (true === $this->seeder && 'completed' === $event)) {
                 $this->leechTime = $timeNow->diffInSeconds($this->peer->updated_at);
             } else {
@@ -436,19 +438,29 @@ class AnnounceService
      */
     protected function startedEventAnnounceResponse(): string
     {
-        $this->peer = Peer::updateOrCreate(
-            [
-                'peer_id'    => $this->peerID,
-                'torrent_id' => $this->torrent->id,
-                'user_id'    => $this->user->id,
-            ],
-            [
-                'uploaded'   => $this->uploadedInThisAnnounceCycle,
-                'downloaded' => $this->downloadedInThisAnnounceCycle,
-                'seeder'     => $this->seeder,
-                'userAgent'  => $this->request->userAgent(),
-            ]
-        );
+        if (null !== $this->peer) {
+            $this->peer->update(
+                [
+                    'uploaded'   => $this->peer->getOriginal('uploaded') + $this->uploadedInThisAnnounceCycle,
+                    'downloaded' => $this->peer->getOriginal('downloaded') + $this->downloadedInThisAnnounceCycle,
+                    'seeder'     => $this->seeder,
+                    'userAgent'  => $this->request->userAgent(),
+                ]
+            );
+        } else {
+            $this->peer = new Peer(
+                [
+                    'peer_id'    => $this->peerID,
+                    'torrent_id' => $this->torrent->id,
+                    'user_id'    => $this->user->id,
+                    'uploaded'   => $this->uploadedInThisAnnounceCycle,
+                    'downloaded' => $this->downloadedInThisAnnounceCycle,
+                    'seeder'     => $this->seeder,
+                    'userAgent'  => $this->request->userAgent(),
+                ]
+            );
+            $this->peer->save();
+        }
 
         $this->insertPeerIPs();
 
@@ -551,19 +563,29 @@ class AnnounceService
      */
     protected function noEventAnnounceResponse(): string
     {
-        $this->peer = Peer::updateOrCreate(
-            [
-                'peer_id'    => $this->peerID,
-                'torrent_id' => $this->torrent->id,
-                'user_id'    => $this->user->id,
-            ],
-            [
-                'uploaded'   => $this->peer->getOriginal('uploaded') + $this->uploadedInThisAnnounceCycle,
-                'downloaded' => $this->peer->getOriginal('downloaded') + $this->downloadedInThisAnnounceCycle,
-                'seeder'     => $this->seeder,
-                'userAgent'  => $this->request->userAgent(),
-            ]
-        );
+        if (null !== $this->peer) {
+            $this->peer->update(
+                [
+                    'uploaded'   => $this->peer->getOriginal('uploaded') + $this->uploadedInThisAnnounceCycle,
+                    'downloaded' => $this->peer->getOriginal('downloaded') + $this->downloadedInThisAnnounceCycle,
+                    'seeder'     => $this->seeder,
+                    'userAgent'  => $this->request->userAgent(),
+                ]
+            );
+        } else {
+            $this->peer = new Peer(
+                [
+                    'peer_id'    => $this->peerID,
+                    'torrent_id' => $this->torrent->id,
+                    'user_id'    => $this->user->id,
+                    'uploaded'   => $this->uploadedInThisAnnounceCycle,
+                    'downloaded' => $this->downloadedInThisAnnounceCycle,
+                    'seeder'     => $this->seeder,
+                    'userAgent'  => $this->request->userAgent(),
+                ]
+            );
+            $this->peer->save();
+        }
 
         $this->insertPeerIPs();
 
