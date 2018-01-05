@@ -140,7 +140,7 @@ class TorrentControllerTest extends TestCase
         $response->assertHeader('Content-Disposition', 'attachment; filename="' . $torrent->name . '.torrent"');
     }
 
-    public function testDownloadWithUTF8TorrentFileName()
+    public function testDownloadWithUTF8TorrentFileNameWhichIncludesSpecialCharacters()
     {
         $this->withoutExceptionHandling();
 
@@ -149,7 +149,7 @@ class TorrentControllerTest extends TestCase
         /* @var BencodingService|MockObject $encoder */
         $encoder = $this->createMock(BencodingService::class);
 
-        $torrent = factory(Torrent::class)->create(['uploader_id' => $this->user->id, 'name' => 'čćšđž']);
+        $torrent = factory(Torrent::class)->create(['uploader_id' => $this->user->id, 'name' => 'čćš/đž%']);
 
         $storageReturnValue = 'something x264';
         Storage::shouldReceive('disk->get')->once()->with("torrents/{$torrent->id}.torrent")->andReturn($storageReturnValue);
@@ -174,8 +174,8 @@ class TorrentControllerTest extends TestCase
         $response->assertStatus(Response::HTTP_OK);
         $this->assertSame($encoderReturnValue, $response->getContent());
         $response->assertHeader('Content-Type', 'application/x-bittorrent');
-        $fileName = $torrent->name . '.torrent';
-        $filenameFallback = mb_convert_encoding($torrent->name . '.torrent', 'ASCII');
+        $fileName = str_replace(['/', '\\'],'',$torrent->name . '.torrent');
+        $filenameFallback = mb_convert_encoding(str_replace('%','', $fileName), 'ASCII');
         $contentDisposition = sprintf(
             '%s; filename="%s"' . "; filename*=utf-8''%s",
             ResponseHeaderBag::DISPOSITION_ATTACHMENT,

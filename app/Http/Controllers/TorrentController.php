@@ -133,10 +133,12 @@ class TorrentController extends Controller
 
         $response = new Response($encoder->encode($decodedTorrent));
         $response->headers->set('Content-Type', 'application/x-bittorrent');
+        // TODO: add support for adding a prefix (or suffix) to the name of the file
+        $fileName = str_replace(['/', '\\'],'',$torrent->name . '.torrent');
         $disposition = $response->headers->makeDisposition(
             ResponseHeaderBag::DISPOSITION_ATTACHMENT,
-            $torrent->name . '.torrent',
-            mb_convert_encoding($torrent->name . '.torrent', 'ASCII')
+            $fileName,
+            mb_convert_encoding(str_replace('%','', $fileName), 'ASCII')
         );
 
         $response->headers->set('Content-Disposition', $disposition);
