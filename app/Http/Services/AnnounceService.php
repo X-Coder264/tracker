@@ -412,8 +412,9 @@ class AnnounceService
      */
     protected function insertPeerIPs(): void
     {
+        $this->peer->IPs()->delete();
         if (false !== isset($this->ipv4Address) && false !== isset($this->ipv4Port)) {
-            $this->peer->IPs()->updateOrCreate(
+            $this->peer->IPs()->create(
                 [
                     'IP'          => $this->ipv4Address,
                     'port'        => $this->ipv4Port,
@@ -423,7 +424,7 @@ class AnnounceService
         }
 
         if (false !== isset($this->ipv6Address) && false !== isset($this->ipv6Port)) {
-            $this->peer->IPs()->updateOrCreate(
+            $this->peer->IPs()->create(
                 [
                     'IP'          => $this->ipv6Address,
                     'port'        => $this->ipv6Port,
