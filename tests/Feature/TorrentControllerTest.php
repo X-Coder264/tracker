@@ -39,16 +39,16 @@ class TorrentControllerTest extends TestCase
     {
         $this->withoutExceptionHandling();
 
-        $torrent = factory(Torrent::class)->create(['uploader_id' => $this->user->id]);
+        $visibleTorrent = factory(Torrent::class)->create(['uploader_id' => $this->user->id, 'seeders' => 1]);
+        $deadTorrent = factory(Torrent::class)->create(['uploader_id' => $this->user->id, 'seeders' => 0]);
 
         $response = $this->get(route('torrents.index'));
-
-        $response->assertSee($torrent->name);
-        $response->assertSee($torrent->uploader->name);
-
         $response->assertStatus(Response::HTTP_OK);
         $response->assertViewIs('torrents.index');
         $response->assertViewHas(['torrents', 'timezone']);
+        $response->assertSee($visibleTorrent->name);
+        $response->assertSee($visibleTorrent->uploader->name);
+        $response->assertDontSee($deadTorrent->name);
     }
 
     public function testCreate()
@@ -85,6 +85,8 @@ class TorrentControllerTest extends TestCase
         $response->assertViewHas('torrentComments');
         $response->assertViewHas('timezone');
         $this->assertInstanceOf(LengthAwarePaginator::class, $response->original->torrentComments);
+        $response->assertSee($torrent->name);
+        $response->assertSee($torrent->description);
         $response->assertSee($torrentComment->comment);
     }
 

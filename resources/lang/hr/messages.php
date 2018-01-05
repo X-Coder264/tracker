@@ -34,6 +34,7 @@ return [
     'torrents.show.no_comments' => 'Ovaj torrent nema komentara.',
     'torrents.show.torrent_comments' => 'Torrent komentari',
     'torrents.show.add_comment' => 'Napiši komentar',
+    'torrents.store-successfully-uploaded-torrent.message' => 'Torrent je uspješno uploadan. Kako bi torrent postao vidljiv na stranici morate skinuti .torrent datoteku te početi seedati torrent.',
     'validation.variable.required' => ':var ne postoji u vašem zahtjevu.',
     'validation.variable.string' => ':var mora biti string.',
     'validation.variable.size' => ':var mora imati 20 znakova.',

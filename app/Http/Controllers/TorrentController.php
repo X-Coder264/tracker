@@ -31,7 +31,9 @@ class TorrentController extends Controller
     {
         Cache::forget('torrents');
         $torrents = Cache::remember('torrents', 10, function () {
-            return Torrent::with(['uploader'])->orderby('id', 'desc')->paginate(3);
+            return Torrent::with(['uploader'])->where('seeders', '>', 0)
+                                              ->orderby('id', 'desc')
+                                              ->paginate(3);
         });
 
         return response()->view('torrents.index', compact('torrents'));
@@ -98,7 +100,8 @@ class TorrentController extends Controller
 
         $torrent = $torrentUploadService->upload($request);
 
-        return redirect()->route('torrents.show', $torrent)->with('success', 'Bla');
+        return redirect()->route('torrents.show', $torrent)
+                         ->with('success', __('messages.torrents.store-successfully-uploaded-torrent.message'));
     }
 
     /**

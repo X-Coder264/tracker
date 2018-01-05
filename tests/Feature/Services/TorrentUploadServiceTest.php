@@ -56,7 +56,7 @@ class TorrentUploadServiceTest extends TestCase
 
         $response->assertStatus(Response::HTTP_FOUND);
         $response->assertRedirect(route('torrents.show', $torrent));
-        $response->assertSessionHas('success');
+        $response->assertSessionHas('success', __('messages.torrents.store-successfully-uploaded-torrent.message'));
 
         Storage::disk('public')->assertExists('torrents/1.torrent');
         $this->assertSame($torrentValue, Storage::disk('public')->get('torrents/1.torrent'));
@@ -104,7 +104,7 @@ class TorrentUploadServiceTest extends TestCase
 
         $response->assertStatus(Response::HTTP_FOUND);
         $response->assertRedirect(route('torrents.show', $torrent));
-        $response->assertSessionHas('success');
+        $response->assertSessionHas('success', __('messages.torrents.store-successfully-uploaded-torrent.message'));
 
         Storage::disk('public')->assertExists('torrents/1.torrent');
         $decodedTorrent = $decoder->decode(Storage::disk('public')->get('torrents/1.torrent'));
@@ -142,7 +142,7 @@ class TorrentUploadServiceTest extends TestCase
 
         $response->assertStatus(Response::HTTP_FOUND);
         $response->assertRedirect(route('torrents.show', $torrent));
-        $response->assertSessionHas('success');
+        $response->assertSessionHas('success', __('messages.torrents.store-successfully-uploaded-torrent.message'));
 
         $decoder = new BdecodingService();
         Storage::disk('public')->assertExists('torrents/1.torrent');
@@ -199,7 +199,7 @@ class TorrentUploadServiceTest extends TestCase
 
         $response->assertStatus(Response::HTTP_FOUND);
         $response->assertRedirect(route('torrents.show', $torrent));
-        $response->assertSessionHas('success');
+        $response->assertSessionHas('success', __('messages.torrents.store-successfully-uploaded-torrent.message'));
 
         Storage::disk('public')->assertExists('torrents/2.torrent');
         $this->assertSame($torrentValue, Storage::disk('public')->get('torrents/2.torrent'));
@@ -244,7 +244,7 @@ class TorrentUploadServiceTest extends TestCase
 
         $response->assertStatus(Response::HTTP_FOUND);
         $response->assertRedirect(route('torrents.show', $torrent));
-        $response->assertSessionHas('success');
+        $response->assertSessionHas('success', __('messages.torrents.store-successfully-uploaded-torrent.message'));
 
         $decoder = new BdecodingService();
         Storage::disk('public')->assertExists('torrents/1.torrent');

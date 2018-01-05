@@ -34,6 +34,7 @@ return [
     'torrents.show.no_comments' => 'There are no comments on this torrent.',
     'torrents.show.torrent_comments' => 'Torrent comments',
     'torrents.show.add_comment' => 'Add comment',
+    'torrents.store-successfully-uploaded-torrent.message' => 'The torrent was successfully uploaded. You need to download the .torrent file and start seeding it and after that the torrent will be visible on the site.',
     'validation.variable.required' => 'The :var is not present in the request.',
     'validation.variable.string' => 'The :var must be a string.',
     'validation.variable.size' => 'The :var must have exactly 20 characters.',

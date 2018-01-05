@@ -2,13 +2,14 @@
 
 @section('content')
     <div class="col-12 mx-auto">
+        @include('partials.flash_messages')
+
         <div class="card">
             <div class="card-header">
                 <a href="{{ route('torrents.download', $torrent) }}">{{ $torrent->name }}</a>
             </div>
 
             <div class="card-body">
-                @include('partials.flash_messages')
                 {!! nl2br($torrent->description, false) !!}
             </div>
         </div>
