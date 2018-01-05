@@ -438,7 +438,6 @@ class AnnounceService
                 'uploaded'       => $this->uploadedInThisAnnounceCycle,
                 'downloaded'     => $this->downloadedInThisAnnounceCycle,
                 'left'           => $this->request->input('left'),
-                'leechTime'      => $this->leechTime,
                 'timesAnnounced' => 1,
                 'userAgent'      => $this->request->userAgent(),
             ]
