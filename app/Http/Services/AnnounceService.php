@@ -408,6 +408,45 @@ class AnnounceService
     }
 
     /**
+     * Insert a new peer into the DB.
+     */
+    protected function insertPeer(): void
+    {
+        $this->peer = new Peer(
+            [
+                'peer_id'    => $this->peerID,
+                'torrent_id' => $this->torrent->id,
+                'user_id'    => $this->user->id,
+                'uploaded'   => $this->uploadedInThisAnnounceCycle,
+                'downloaded' => $this->downloadedInThisAnnounceCycle,
+                'seeder'     => $this->seeder,
+                'userAgent'  => $this->request->userAgent(),
+            ]
+        );
+        $this->peer->save();
+    }
+
+    /**
+     * Insert a new snatch into the DB.
+     */
+    protected function insertSnatch(): void
+    {
+        $this->snatch = new Snatch(
+            [
+                'torrent_id'     => $this->torrent->id,
+                'user_id'        => $this->user->id,
+                'uploaded'       => $this->uploadedInThisAnnounceCycle,
+                'downloaded'     => $this->downloadedInThisAnnounceCycle,
+                'left'           => $this->request->input('left'),
+                'leechTime'      => $this->leechTime,
+                'timesAnnounced' => 1,
+                'userAgent'      => $this->request->userAgent(),
+            ]
+        );
+        $this->snatch->save();
+    }
+
+    /**
      * Insert the peer IP address(es).
      */
     protected function insertPeerIPs(): void
@@ -449,42 +488,32 @@ class AnnounceService
                 ]
             );
         } else {
-            $this->peer = new Peer(
-                [
-                    'peer_id'    => $this->peerID,
-                    'torrent_id' => $this->torrent->id,
-                    'user_id'    => $this->user->id,
-                    'uploaded'   => $this->uploadedInThisAnnounceCycle,
-                    'downloaded' => $this->downloadedInThisAnnounceCycle,
-                    'seeder'     => $this->seeder,
-                    'userAgent'  => $this->request->userAgent(),
-                ]
-            );
-            $this->peer->save();
+            $this->insertPeer();
+
+            if (true === $this->seeder) {
+                $this->torrent->update(['seeders' => $this->torrent->seeders + 1]);
+            } else {
+                $this->torrent->update(['leechers' => $this->torrent->leechers + 1]);
+
+                if (null !== $this->snatch) {
+                    $this->snatch->update(
+                        [
+                            'uploaded'       => $this->snatch->getOriginal('uploaded') + $this->uploadedInThisAnnounceCycle,
+                            'downloaded'     => $this->snatch->getOriginal('downloaded') + $this->downloadedInThisAnnounceCycle,
+                            'left'           => $this->request->input('left'),
+                            'seedTime'       => $this->snatch->seedTime + $this->seedTime,
+                            'leechTime'      => $this->snatch->leechTime + $this->leechTime,
+                            'timesAnnounced' => $this->snatch->timesAnnounced + 1,
+                            'userAgent'      => $this->request->userAgent(),
+                        ]
+                    );
+                } else {
+                    $this->insertSnatch();
+                }
+            }
         }
 
         $this->insertPeerIPs();
-
-        if (true === $this->seeder) {
-            $this->torrent->update(['seeders' => $this->torrent->seeders + 1]);
-        } else {
-            $this->torrent->update(['leechers' => $this->torrent->leechers + 1]);
-
-            $this->snatch = Snatch::updateOrCreate(
-                [
-                    'torrent_id' => $this->torrent->id,
-                    'user_id'    => $this->user->id,
-                ],
-                [
-                    'uploaded'       => ($this->snatch->uploaded ?? 0) + $this->uploadedInThisAnnounceCycle,
-                    'downloaded'     => ($this->snatch->downloaded ?? 0) + $this->downloadedInThisAnnounceCycle,
-                    'left'           => $this->request->input('left'),
-                    'leechTime'      => ($this->snatch->leechTime ?? 0) + $this->leechTime,
-                    'timesAnnounced' => ($this->snatch->timesAnnounced ?? 0) + 1,
-                    'userAgent'      => $this->request->userAgent(),
-                ]
-            );
-        }
 
         return $this->announceSuccessResponse();
     }
@@ -505,8 +534,8 @@ class AnnounceService
         if (null !== $this->snatch) {
             $this->snatch->update(
                 [
-                    'uploaded'       => $this->snatch->uploaded + $this->uploadedInThisAnnounceCycle,
-                    'downloaded'     => $this->snatch->downloaded + $this->downloadedInThisAnnounceCycle,
+                    'uploaded'       => $this->snatch->getOriginal('uploaded') + $this->uploadedInThisAnnounceCycle,
+                    'downloaded'     => $this->snatch->getOriginal('downloaded') + $this->downloadedInThisAnnounceCycle,
                     'left'           => $this->request->input('left'),
                     'seedTime'       => $this->snatch->seedTime + $this->seedTime,
                     'leechTime'      => $this->snatch->leechTime + $this->leechTime,
@@ -547,7 +576,7 @@ class AnnounceService
                 [
                     'uploaded'       => $this->snatch->getOriginal('uploaded') + $this->uploadedInThisAnnounceCycle,
                     'downloaded'     => $this->snatch->getOriginal('downloaded') + $this->downloadedInThisAnnounceCycle,
-                    'left'           => 0,
+                    'left'           => $this->request->input('left'),
                     'leechTime'      => $this->snatch->leechTime + $this->leechTime,
                     'timesAnnounced' => $this->snatch->timesAnnounced + 1,
                     'finished_at'    => Carbon::now(),
@@ -574,18 +603,12 @@ class AnnounceService
                 ]
             );
         } else {
-            $this->peer = new Peer(
-                [
-                    'peer_id'    => $this->peerID,
-                    'torrent_id' => $this->torrent->id,
-                    'user_id'    => $this->user->id,
-                    'uploaded'   => $this->uploadedInThisAnnounceCycle,
-                    'downloaded' => $this->downloadedInThisAnnounceCycle,
-                    'seeder'     => $this->seeder,
-                    'userAgent'  => $this->request->userAgent(),
-                ]
-            );
-            $this->peer->save();
+            $this->insertPeer();
+            if (true === $this->seeder) {
+                $this->torrent->update(['seeders' => $this->torrent->seeders + 1]);
+            } else {
+                $this->torrent->update(['leechers' => $this->torrent->leechers + 1]);
+            }
         }
 
         $this->insertPeerIPs();
@@ -593,8 +616,8 @@ class AnnounceService
         if (null !== $this->snatch) {
             $this->snatch->update(
                 [
-                    'uploaded'       => $this->snatch->uploaded + $this->uploadedInThisAnnounceCycle,
-                    'downloaded'     => $this->snatch->downloaded + $this->downloadedInThisAnnounceCycle,
+                    'uploaded'       => $this->snatch->getOriginal('uploaded') + $this->uploadedInThisAnnounceCycle,
+                    'downloaded'     => $this->snatch->getOriginal('downloaded') + $this->downloadedInThisAnnounceCycle,
                     'left'           => $this->request->input('left'),
                     'seedTime'       => $this->snatch->seedTime + $this->seedTime,
                     'leechTime'      => $this->snatch->leechTime + $this->leechTime,
