@@ -1601,8 +1601,8 @@ class AnnounceServiceTest extends TestCase
 
         $response = $this->get(
             route('announce', $this->validParams([
-                'peer_id' => hex2bin('2d7142333345302d64354e334474384672517777'),
-                'event'   => 'completed',
+                'peer_id'    => hex2bin('2d7142333345302d64354e334474384672517777'),
+                'event'      => 'completed',
                 'downloaded' => 100,
                 'uploaded'   => 200,
                 'left'       => 0,
