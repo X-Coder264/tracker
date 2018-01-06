@@ -89,8 +89,8 @@ class AnnounceServiceTest extends TestCase
         $this->assertSame(1, (int) $torrent->leechers);
         $this->assertSame(0, (int) $torrent->seeders);
         $freshUser = $user->fresh();
-        $this->assertSame($user->getOriginal('uploaded'), (int) (int) $freshUser->getOriginal('uploaded'));
-        $this->assertSame($user->getOriginal('downloaded'), (int) (int) $freshUser->getOriginal('downloaded'));
+        $this->assertSame($user->getOriginal('uploaded'), (int) $freshUser->getOriginal('uploaded'));
+        $this->assertSame($user->getOriginal('downloaded'), (int) $freshUser->getOriginal('downloaded'));
     }
 
     public function testStartLeechingWithOtherPeersPresentOnTheTorrent()
@@ -349,7 +349,7 @@ class AnnounceServiceTest extends TestCase
         $this->assertSame(0, (int) $torrent->leechers);
         $this->assertSame(0, (int) $torrent->seeders);
         $freshUser = $user->fresh();
-        $this->assertSame($user->getOriginal('uploaded') + 1000, (int) (int) $freshUser->getOriginal('uploaded'));
+        $this->assertSame($user->getOriginal('uploaded') + 1000, (int) $freshUser->getOriginal('uploaded'));
         $this->assertSame($user->getOriginal('downloaded'), (int) $freshUser->getOriginal('downloaded'));
     }
 
@@ -443,7 +443,7 @@ class AnnounceServiceTest extends TestCase
         $this->assertSame(0, (int) $torrent->seeders);
         $freshUser = $user->fresh();
         $this->assertSame($user->getOriginal('uploaded') + 1000, (int) $freshUser->getOriginal('uploaded'));
-        $this->assertSame($user->getOriginal('downloaded') + 1200, (int) (int) $freshUser->getOriginal('downloaded'));
+        $this->assertSame($user->getOriginal('downloaded') + 1200, (int) $freshUser->getOriginal('downloaded'));
     }
 
     public function testLeecherCompletingTheTorrent()
@@ -571,7 +571,7 @@ class AnnounceServiceTest extends TestCase
         $this->assertSame(2, (int) $torrent->seeders);
         $freshUser = $user->fresh();
         $this->assertSame($user->getOriginal('uploaded'), (int) $freshUser->getOriginal('uploaded'));
-        $this->assertSame($user->getOriginal('downloaded') + 4000, (int) (int) $freshUser->getOriginal('downloaded'));
+        $this->assertSame($user->getOriginal('downloaded') + 4000, (int) $freshUser->getOriginal('downloaded'));
     }
 
     public function testSeederContinuingToSeed()
@@ -678,7 +678,7 @@ class AnnounceServiceTest extends TestCase
         $this->assertSame(0, (int) $torrent->leechers);
         $this->assertSame(1, (int) $torrent->seeders);
         $freshUser = $user->fresh();
-        $this->assertSame($user->getOriginal('uploaded') + 1000, (int) (int) $freshUser->getOriginal('uploaded'));
+        $this->assertSame($user->getOriginal('uploaded') + 1000, (int) $freshUser->getOriginal('uploaded'));
         $this->assertSame($user->getOriginal('downloaded'), (int) $freshUser->getOriginal('downloaded'));
     }
 
@@ -784,8 +784,8 @@ class AnnounceServiceTest extends TestCase
         $this->assertSame(1, (int) $torrent->leechers);
         $this->assertSame(0, (int) $torrent->seeders);
         $freshUser = $user->fresh();
-        $this->assertSame($user->getOriginal('uploaded') + 500, (int) (int) $freshUser->getOriginal('uploaded'));
-        $this->assertSame($user->getOriginal('downloaded') + 800, (int) (int) $freshUser->getOriginal('downloaded'));
+        $this->assertSame($user->getOriginal('uploaded') + 500, (int) $freshUser->getOriginal('uploaded'));
+        $this->assertSame($user->getOriginal('downloaded') + 800, (int) $freshUser->getOriginal('downloaded'));
     }
 
     public function testEventStartedWithThePeerAlreadyInTheDB()
@@ -868,8 +868,8 @@ class AnnounceServiceTest extends TestCase
         $this->assertSame(1, (int) $torrent->leechers);
         $this->assertSame(0, (int) $torrent->seeders);
         $freshUser = $user->fresh();
-        $this->assertSame($user->getOriginal('uploaded') + 500, (int) (int) $freshUser->getOriginal('uploaded'));
-        $this->assertSame($user->getOriginal('downloaded') + 800, (int) (int) $freshUser->getOriginal('downloaded'));
+        $this->assertSame($user->getOriginal('uploaded') + 500, (int) $freshUser->getOriginal('uploaded'));
+        $this->assertSame($user->getOriginal('downloaded') + 800, (int) $freshUser->getOriginal('downloaded'));
     }
 
     public function testStartingToLeechAPreviouslySnatchedTorrentUpdatesTheExistingSnatch()
@@ -962,8 +962,8 @@ class AnnounceServiceTest extends TestCase
         $this->assertSame(1, (int) $torrent->leechers);
         $this->assertSame(0, (int) $torrent->seeders);
         $freshUser = $user->fresh();
-        $this->assertSame($user->getOriginal('uploaded') + 2500, (int) (int) $freshUser->getOriginal('uploaded'));
-        $this->assertSame($user->getOriginal('downloaded') + 1800, (int) (int) $freshUser->getOriginal('downloaded'));
+        $this->assertSame($user->getOriginal('uploaded') + 2500, (int) $freshUser->getOriginal('uploaded'));
+        $this->assertSame($user->getOriginal('downloaded') + 1800, (int) $freshUser->getOriginal('downloaded'));
     }
 
     public function testNoEventWithTheLeecherNotPresentInTheDB()
@@ -1032,8 +1032,8 @@ class AnnounceServiceTest extends TestCase
         $this->assertSame(1, (int) $torrent->leechers);
         $this->assertSame(0, (int) $torrent->seeders);
         $freshUser = $user->fresh();
-        $this->assertSame($user->getOriginal('uploaded') + 2500, (int) (int) $freshUser->getOriginal('uploaded'));
-        $this->assertSame($user->getOriginal('downloaded') + 1800, (int) (int) $freshUser->getOriginal('downloaded'));
+        $this->assertSame($user->getOriginal('uploaded') + 2500, (int) $freshUser->getOriginal('uploaded'));
+        $this->assertSame($user->getOriginal('downloaded') + 1800, (int) $freshUser->getOriginal('downloaded'));
     }
 
     public function testNoEventWithTheSeederNotPresentInTheDB()
@@ -1102,7 +1102,7 @@ class AnnounceServiceTest extends TestCase
         $this->assertSame(0, (int) $torrent->leechers);
         $this->assertSame(1, (int) $torrent->seeders);
         $freshUser = $user->fresh();
-        $this->assertSame($user->getOriginal('uploaded') + 2500, (int) (int) $freshUser->getOriginal('uploaded'));
+        $this->assertSame($user->getOriginal('uploaded') + 2500, (int) $freshUser->getOriginal('uploaded'));
         $this->assertSame($user->getOriginal('downloaded'), (int) $freshUser->getOriginal('downloaded'));
     }
 
