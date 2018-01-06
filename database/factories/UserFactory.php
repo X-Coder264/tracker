@@ -30,6 +30,8 @@ $factory->define(User::class, function (Faker $faker) {
             return factory(Locale::class)->create()->id;
         },
         'timezone' => 'Europe/Zagreb',
+        'uploaded' => $faker->numberBetween(0, 10000000),
+        'downloaded' => $faker->numberBetween(0, 1000000),
         'slug' => $faker->unique()->text(255),
     ];
 });

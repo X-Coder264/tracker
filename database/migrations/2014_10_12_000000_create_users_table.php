@@ -20,6 +20,8 @@ class CreateUsersTable extends Migration
             $table->string('timezone', 30);
             $table->integer('locale_id')->unsigned()->index();
             $table->foreign('locale_id')->references('id')->on('locales')->onUpdate('cascade')->onDelete('cascade');
+            $table->unsignedBigInteger('uploaded')->default(0);
+            $table->unsignedBigInteger('downloaded')->default(0);
             $table->rememberToken();
             $table->string('slug')->unique();
             $table->timestamps();
