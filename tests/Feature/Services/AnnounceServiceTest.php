@@ -2,7 +2,6 @@
 
 namespace Tests\Feature\Services;
 
-use Illuminate\Support\Facades\Cache;
 use Tests\TestCase;
 use App\Http\Models\Peer;
 use App\Http\Models\User;
@@ -11,6 +10,7 @@ use App\Http\Models\Snatch;
 use App\Http\Models\Torrent;
 use Illuminate\Http\Response;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Cache;
 use App\Http\Services\BdecodingService;
 use Tests\Traits\EnableForeignKeyConstraints;
 use Illuminate\Foundation\Testing\RefreshDatabase;
