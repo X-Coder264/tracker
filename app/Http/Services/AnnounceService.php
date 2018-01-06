@@ -148,9 +148,8 @@ class AnnounceService
         $this->peerID = bin2hex($this->request->input('peer_id'));
 
         $this->user = Cache::remember('user.' . $this->request->input('passkey'), 24 * 60, function () {
-            return User::with('language')
-                ->where('passkey', '=', $this->request->input('passkey'))
-                ->select(['id', 'slug', 'locale_id', 'uploaded', 'downloaded'])
+            return User::where('passkey', '=', $this->request->input('passkey'))
+                ->select(['id', 'slug', 'uploaded', 'downloaded'])
                 ->first();
         });
 
