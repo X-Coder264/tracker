@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Services;
 
+use Illuminate\Support\Facades\Cache;
 use Tests\TestCase;
 use App\Http\Models\Peer;
 use App\Http\Models\User;
@@ -91,6 +92,9 @@ class AnnounceServiceTest extends TestCase
         $freshUser = $user->fresh();
         $this->assertSame($user->getOriginal('uploaded'), (int) $freshUser->getOriginal('uploaded'));
         $this->assertSame($user->getOriginal('downloaded'), (int) $freshUser->getOriginal('downloaded'));
+        $this->assertInstanceOf(User::class, Cache::get('user.' . $freshUser->passkey));
+        $this->assertSame((int) $freshUser->getOriginal('uploaded'), Cache::get('user.' . $freshUser->passkey)->uploaded);
+        $this->assertSame((int) $freshUser->getOriginal('downloaded'), Cache::get('user.' . $freshUser->passkey)->downloaded);
     }
 
     public function testStartLeechingWithOtherPeersPresentOnTheTorrent()
@@ -200,6 +204,9 @@ class AnnounceServiceTest extends TestCase
         $freshUser = $user->fresh();
         $this->assertSame($user->getOriginal('uploaded'), (int) $freshUser->getOriginal('uploaded'));
         $this->assertSame($user->getOriginal('downloaded'), (int) $freshUser->getOriginal('downloaded'));
+        $this->assertInstanceOf(User::class, Cache::get('user.' . $freshUser->passkey));
+        $this->assertSame((int) $freshUser->getOriginal('uploaded'), Cache::get('user.' . $freshUser->passkey)->uploaded);
+        $this->assertSame((int) $freshUser->getOriginal('downloaded'), Cache::get('user.' . $freshUser->passkey)->downloaded);
     }
 
     public function testStartSeedingWithNoOtherPeersPresentOnTheTorrent()
@@ -264,6 +271,9 @@ class AnnounceServiceTest extends TestCase
         $freshUser = $user->fresh();
         $this->assertSame($user->getOriginal('uploaded'), (int) $freshUser->getOriginal('uploaded'));
         $this->assertSame($user->getOriginal('downloaded'), (int) $freshUser->getOriginal('downloaded'));
+        $this->assertInstanceOf(User::class, Cache::get('user.' . $freshUser->passkey));
+        $this->assertSame((int) $freshUser->getOriginal('uploaded'), Cache::get('user.' . $freshUser->passkey)->uploaded);
+        $this->assertSame((int) $freshUser->getOriginal('downloaded'), Cache::get('user.' . $freshUser->passkey)->downloaded);
     }
 
     public function testSeederDroppingOutOfTheSwarm()
@@ -351,6 +361,9 @@ class AnnounceServiceTest extends TestCase
         $freshUser = $user->fresh();
         $this->assertSame($user->getOriginal('uploaded') + 1000, (int) $freshUser->getOriginal('uploaded'));
         $this->assertSame($user->getOriginal('downloaded'), (int) $freshUser->getOriginal('downloaded'));
+        $this->assertInstanceOf(User::class, Cache::get('user.' . $freshUser->passkey));
+        $this->assertSame((int) $freshUser->getOriginal('uploaded'), Cache::get('user.' . $freshUser->passkey)->uploaded);
+        $this->assertSame((int) $freshUser->getOriginal('downloaded'), Cache::get('user.' . $freshUser->passkey)->downloaded);
     }
 
     public function testLeecherDroppingOutOfTheSwarm()
@@ -444,6 +457,9 @@ class AnnounceServiceTest extends TestCase
         $freshUser = $user->fresh();
         $this->assertSame($user->getOriginal('uploaded') + 1000, (int) $freshUser->getOriginal('uploaded'));
         $this->assertSame($user->getOriginal('downloaded') + 1200, (int) $freshUser->getOriginal('downloaded'));
+        $this->assertInstanceOf(User::class, Cache::get('user.' . $freshUser->passkey));
+        $this->assertSame((int) $freshUser->getOriginal('uploaded'), Cache::get('user.' . $freshUser->passkey)->uploaded);
+        $this->assertSame((int) $freshUser->getOriginal('downloaded'), Cache::get('user.' . $freshUser->passkey)->downloaded);
     }
 
     public function testLeecherCompletingTheTorrent()
@@ -572,6 +588,9 @@ class AnnounceServiceTest extends TestCase
         $freshUser = $user->fresh();
         $this->assertSame($user->getOriginal('uploaded'), (int) $freshUser->getOriginal('uploaded'));
         $this->assertSame($user->getOriginal('downloaded') + 4000, (int) $freshUser->getOriginal('downloaded'));
+        $this->assertInstanceOf(User::class, Cache::get('user.' . $freshUser->passkey));
+        $this->assertSame((int) $freshUser->getOriginal('uploaded'), Cache::get('user.' . $freshUser->passkey)->uploaded);
+        $this->assertSame((int) $freshUser->getOriginal('downloaded'), Cache::get('user.' . $freshUser->passkey)->downloaded);
     }
 
     public function testSeederContinuingToSeed()
@@ -680,6 +699,9 @@ class AnnounceServiceTest extends TestCase
         $freshUser = $user->fresh();
         $this->assertSame($user->getOriginal('uploaded') + 1000, (int) $freshUser->getOriginal('uploaded'));
         $this->assertSame($user->getOriginal('downloaded'), (int) $freshUser->getOriginal('downloaded'));
+        $this->assertInstanceOf(User::class, Cache::get('user.' . $freshUser->passkey));
+        $this->assertSame((int) $freshUser->getOriginal('uploaded'), Cache::get('user.' . $freshUser->passkey)->uploaded);
+        $this->assertSame((int) $freshUser->getOriginal('downloaded'), Cache::get('user.' . $freshUser->passkey)->downloaded);
     }
 
     public function testLeecherContinuingToLeech()
@@ -786,6 +808,9 @@ class AnnounceServiceTest extends TestCase
         $freshUser = $user->fresh();
         $this->assertSame($user->getOriginal('uploaded') + 500, (int) $freshUser->getOriginal('uploaded'));
         $this->assertSame($user->getOriginal('downloaded') + 800, (int) $freshUser->getOriginal('downloaded'));
+        $this->assertInstanceOf(User::class, Cache::get('user.' . $freshUser->passkey));
+        $this->assertSame((int) $freshUser->getOriginal('uploaded'), Cache::get('user.' . $freshUser->passkey)->uploaded);
+        $this->assertSame((int) $freshUser->getOriginal('downloaded'), Cache::get('user.' . $freshUser->passkey)->downloaded);
     }
 
     public function testEventStartedWithThePeerAlreadyInTheDB()
@@ -870,6 +895,9 @@ class AnnounceServiceTest extends TestCase
         $freshUser = $user->fresh();
         $this->assertSame($user->getOriginal('uploaded') + 500, (int) $freshUser->getOriginal('uploaded'));
         $this->assertSame($user->getOriginal('downloaded') + 800, (int) $freshUser->getOriginal('downloaded'));
+        $this->assertInstanceOf(User::class, Cache::get('user.' . $freshUser->passkey));
+        $this->assertSame((int) $freshUser->getOriginal('uploaded'), Cache::get('user.' . $freshUser->passkey)->uploaded);
+        $this->assertSame((int) $freshUser->getOriginal('downloaded'), Cache::get('user.' . $freshUser->passkey)->downloaded);
     }
 
     public function testStartingToLeechAPreviouslySnatchedTorrentUpdatesTheExistingSnatch()
@@ -964,6 +992,9 @@ class AnnounceServiceTest extends TestCase
         $freshUser = $user->fresh();
         $this->assertSame($user->getOriginal('uploaded') + 2500, (int) $freshUser->getOriginal('uploaded'));
         $this->assertSame($user->getOriginal('downloaded') + 1800, (int) $freshUser->getOriginal('downloaded'));
+        $this->assertInstanceOf(User::class, Cache::get('user.' . $freshUser->passkey));
+        $this->assertSame((int) $freshUser->getOriginal('uploaded'), Cache::get('user.' . $freshUser->passkey)->uploaded);
+        $this->assertSame((int) $freshUser->getOriginal('downloaded'), Cache::get('user.' . $freshUser->passkey)->downloaded);
     }
 
     public function testNoEventWithTheLeecherNotPresentInTheDB()
@@ -1034,6 +1065,9 @@ class AnnounceServiceTest extends TestCase
         $freshUser = $user->fresh();
         $this->assertSame($user->getOriginal('uploaded') + 2500, (int) $freshUser->getOriginal('uploaded'));
         $this->assertSame($user->getOriginal('downloaded') + 1800, (int) $freshUser->getOriginal('downloaded'));
+        $this->assertInstanceOf(User::class, Cache::get('user.' . $freshUser->passkey));
+        $this->assertSame((int) $freshUser->getOriginal('uploaded'), Cache::get('user.' . $freshUser->passkey)->uploaded);
+        $this->assertSame((int) $freshUser->getOriginal('downloaded'), Cache::get('user.' . $freshUser->passkey)->downloaded);
     }
 
     public function testNoEventWithTheSeederNotPresentInTheDB()
@@ -1104,6 +1138,9 @@ class AnnounceServiceTest extends TestCase
         $freshUser = $user->fresh();
         $this->assertSame($user->getOriginal('uploaded') + 2500, (int) $freshUser->getOriginal('uploaded'));
         $this->assertSame($user->getOriginal('downloaded'), (int) $freshUser->getOriginal('downloaded'));
+        $this->assertInstanceOf(User::class, Cache::get('user.' . $freshUser->passkey));
+        $this->assertSame((int) $freshUser->getOriginal('uploaded'), Cache::get('user.' . $freshUser->passkey)->uploaded);
+        $this->assertSame((int) $freshUser->getOriginal('downloaded'), Cache::get('user.' . $freshUser->passkey)->downloaded);
     }
 
     public function testPeerWithIPv4AndIPv6Address()
@@ -1212,6 +1249,9 @@ class AnnounceServiceTest extends TestCase
         $freshUser = $user->fresh();
         $this->assertSame($user->getOriginal('uploaded'), (int) $freshUser->getOriginal('uploaded'));
         $this->assertSame($user->getOriginal('downloaded'), (int) $freshUser->getOriginal('downloaded'));
+        $this->assertInstanceOf(User::class, Cache::get('user.' . $freshUser->passkey));
+        $this->assertSame((int) $freshUser->getOriginal('uploaded'), Cache::get('user.' . $freshUser->passkey)->uploaded);
+        $this->assertSame((int) $freshUser->getOriginal('downloaded'), Cache::get('user.' . $freshUser->passkey)->downloaded);
     }
 
     public function testPeerWithIPv6AddressBEP7()
@@ -1314,6 +1354,9 @@ class AnnounceServiceTest extends TestCase
         $freshUser = $user->fresh();
         $this->assertSame($user->getOriginal('uploaded'), (int) $freshUser->getOriginal('uploaded'));
         $this->assertSame($user->getOriginal('downloaded'), (int) $freshUser->getOriginal('downloaded'));
+        $this->assertInstanceOf(User::class, Cache::get('user.' . $freshUser->passkey));
+        $this->assertSame((int) $freshUser->getOriginal('uploaded'), Cache::get('user.' . $freshUser->passkey)->uploaded);
+        $this->assertSame((int) $freshUser->getOriginal('downloaded'), Cache::get('user.' . $freshUser->passkey)->downloaded);
     }
 
     public function testPeerWithIPv6Address()
@@ -1416,6 +1459,9 @@ class AnnounceServiceTest extends TestCase
         $freshUser = $user->fresh();
         $this->assertSame($user->getOriginal('uploaded'), (int) $freshUser->getOriginal('uploaded'));
         $this->assertSame($user->getOriginal('downloaded'), (int) $freshUser->getOriginal('downloaded'));
+        $this->assertInstanceOf(User::class, Cache::get('user.' . $freshUser->passkey));
+        $this->assertSame((int) $freshUser->getOriginal('uploaded'), Cache::get('user.' . $freshUser->passkey)->uploaded);
+        $this->assertSame((int) $freshUser->getOriginal('downloaded'), Cache::get('user.' . $freshUser->passkey)->downloaded);
     }
 
     public function testPeerWithIPv6Endpoint()
@@ -1520,6 +1566,9 @@ class AnnounceServiceTest extends TestCase
         $freshUser = $user->fresh();
         $this->assertSame($user->getOriginal('uploaded'), (int) $freshUser->getOriginal('uploaded'));
         $this->assertSame($user->getOriginal('downloaded'), (int) $freshUser->getOriginal('downloaded'));
+        $this->assertInstanceOf(User::class, Cache::get('user.' . $freshUser->passkey));
+        $this->assertSame((int) $freshUser->getOriginal('uploaded'), Cache::get('user.' . $freshUser->passkey)->uploaded);
+        $this->assertSame((int) $freshUser->getOriginal('downloaded'), Cache::get('user.' . $freshUser->passkey)->downloaded);
     }
 
     public function testPeerWithIPv4Endpoint()
@@ -1624,6 +1673,9 @@ class AnnounceServiceTest extends TestCase
         $freshUser = $user->fresh();
         $this->assertSame($user->getOriginal('uploaded'), (int) $freshUser->getOriginal('uploaded'));
         $this->assertSame($user->getOriginal('downloaded'), (int) $freshUser->getOriginal('downloaded'));
+        $this->assertInstanceOf(User::class, Cache::get('user.' . $freshUser->passkey));
+        $this->assertSame((int) $freshUser->getOriginal('uploaded'), Cache::get('user.' . $freshUser->passkey)->uploaded);
+        $this->assertSame((int) $freshUser->getOriginal('downloaded'), Cache::get('user.' . $freshUser->passkey)->downloaded);
     }
 
     public function testNonCompactResponse()
@@ -1718,6 +1770,9 @@ class AnnounceServiceTest extends TestCase
         $freshUser = $user->fresh();
         $this->assertSame($user->getOriginal('uploaded'), (int) $freshUser->getOriginal('uploaded'));
         $this->assertSame($user->getOriginal('downloaded'), (int) $freshUser->getOriginal('downloaded'));
+        $this->assertInstanceOf(User::class, Cache::get('user.' . $freshUser->passkey));
+        $this->assertSame((int) $freshUser->getOriginal('uploaded'), Cache::get('user.' . $freshUser->passkey)->uploaded);
+        $this->assertSame((int) $freshUser->getOriginal('downloaded'), Cache::get('user.' . $freshUser->passkey)->downloaded);
     }
 
     public function testNumWantParameterIsRespected()
@@ -1828,6 +1883,9 @@ class AnnounceServiceTest extends TestCase
         $freshUser = $user->fresh();
         $this->assertSame($user->getOriginal('uploaded'), (int) $freshUser->getOriginal('uploaded'));
         $this->assertSame($user->getOriginal('downloaded'), (int) $freshUser->getOriginal('downloaded'));
+        $this->assertInstanceOf(User::class, Cache::get('user.' . $freshUser->passkey));
+        $this->assertSame((int) $freshUser->getOriginal('uploaded'), Cache::get('user.' . $freshUser->passkey)->uploaded);
+        $this->assertSame((int) $freshUser->getOriginal('downloaded'), Cache::get('user.' . $freshUser->passkey)->downloaded);
     }
 
     public function testPasskeyIsRequired()

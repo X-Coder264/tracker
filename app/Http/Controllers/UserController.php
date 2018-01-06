@@ -73,6 +73,7 @@ class UserController extends Controller
 
         Cache::forget('user.' . $user->id);
         Cache::forget('user.' . $user->slug . '.locale');
+        Cache::forget('user.' . $user->passkey);
 
         return back()->with('success', __('messages.common.save_changes_successful'));
     }

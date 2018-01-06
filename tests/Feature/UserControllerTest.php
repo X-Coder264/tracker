@@ -39,6 +39,7 @@ class UserControllerTest extends TestCase
         $timezone = 'Europe/Paris';
         Cache::shouldReceive('forget')->once()->with('user.' . $user->id);
         Cache::shouldReceive('forget')->once()->with('user.' . $user->slug . '.locale');
+        Cache::shouldReceive('forget')->once()->with('user.' . $user->passkey);
         $response = $this->from(route('users.edit', $user))->put(
             route('users.update', $user),
             [

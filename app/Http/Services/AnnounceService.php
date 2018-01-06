@@ -10,6 +10,7 @@ use App\Http\Models\Snatch;
 use App\Http\Models\Torrent;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Database\Eloquent\Collection;
 
@@ -146,10 +147,12 @@ class AnnounceService
 
         $this->peerID = bin2hex($this->request->input('peer_id'));
 
-        $this->user = User::with('language')
-                            ->where('passkey', '=', $this->request->input('passkey'))
-                            ->select(['id', 'slug', 'uploaded', 'downloaded'])
-                            ->first();
+        $this->user = Cache::remember('user.' . $this->request->input('passkey'), 24 * 60, function () {
+            return User::with('language')
+                ->where('passkey', '=', $this->request->input('passkey'))
+                ->select(['id', 'slug', 'locale_id', 'uploaded', 'downloaded'])
+                ->first();
+        });
 
         if (null === $this->user) {
             return $this->announceErrorResponse(__('messages.announce.invalid_passkey'));
@@ -499,6 +502,7 @@ class AnnounceService
                 'downloaded'     => $this->user->getOriginal('downloaded') + $this->downloadedInThisAnnounceCycle,
             ]
         )->save();
+        Cache::put('user.' . $this->request->input('passkey'), $this->user, 24 * 60);
     }
 
     /**
