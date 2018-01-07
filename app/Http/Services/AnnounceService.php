@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace App\Http\Services;
 
+use stdClass;
 use App\Http\Models\Peer;
-use App\Http\Models\User;
 use App\Http\Models\Snatch;
-use App\Http\Models\Torrent;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Database\Eloquent\Collection;
@@ -27,7 +27,7 @@ class AnnounceService
     protected $encoder;
 
     /**
-     * @var User
+     * @var stdClass
      */
     protected $user;
 
@@ -42,7 +42,7 @@ class AnnounceService
     protected $peerID;
 
     /**
-     * @var Torrent
+     * @var stdClass
      */
     protected $torrent;
 
@@ -148,7 +148,7 @@ class AnnounceService
         $this->peerID = bin2hex($this->request->input('peer_id'));
 
         $this->user = Cache::remember('user.' . $this->request->input('passkey'), 24 * 60, function () {
-            return User::where('passkey', '=', $this->request->input('passkey'))
+            return DB::table('users')->where('passkey', '=', $this->request->input('passkey'))
                 ->select(['id', 'slug', 'uploaded', 'downloaded'])
                 ->first();
         });
@@ -157,9 +157,9 @@ class AnnounceService
             return $this->announceErrorResponse(__('messages.announce.invalid_passkey'));
         }
 
-        $this->torrent = Torrent::where('infoHash', bin2hex($this->request->input('info_hash')))
-                                ->select(['id', 'seeders', 'leechers', 'slug'])
-                                ->first();
+        $this->torrent = DB::table('torrents')->where('infoHash', bin2hex($this->request->input('info_hash')))
+                                              ->select(['id', 'seeders', 'leechers', 'slug'])
+                                              ->first();
 
         if (null === $this->torrent) {
             return $this->announceErrorResponse(__('messages.announce.invalid_info_hash'));
@@ -410,6 +410,23 @@ class AnnounceService
     }
 
     /**
+     * @param int $seeder
+     * @param int $leecher
+     */
+    protected function adjustTorrentPeers(int $seeder, int $leecher): void
+    {
+        $this->torrent->seeders = $this->torrent->seeders + $seeder;
+        $this->torrent->leechers = $this->torrent->leechers + $leecher;
+        DB::table('torrents')->where('id', $this->torrent->id)
+            ->update(
+                [
+                    'seeders'  => $this->torrent->seeders,
+                    'leechers' => $this->torrent->leechers,
+                ]
+            );
+    }
+
+    /**
      * Insert a new peer into the DB.
      */
     protected function insertPeer(): void
@@ -495,12 +512,17 @@ class AnnounceService
      */
     protected function updateUser(): void
     {
-        $this->user->forceFill(
-            [
-                'uploaded'       => $this->user->getOriginal('uploaded') + $this->uploadedInThisAnnounceCycle,
-                'downloaded'     => $this->user->getOriginal('downloaded') + $this->downloadedInThisAnnounceCycle,
-            ]
-        )->save();
+        $this->user->uploaded = $this->user->uploaded + $this->uploadedInThisAnnounceCycle;
+        $this->user->downloaded = $this->user->downloaded + $this->downloadedInThisAnnounceCycle;
+
+        DB::table('users')
+            ->where('id', $this->user->id)
+            ->update(
+                [
+                    'uploaded'   => $this->user->uploaded,
+                    'downloaded' => $this->user->downloaded,
+                ]
+            );
         Cache::put('user.' . $this->request->input('passkey'), $this->user, 24 * 60);
     }
 
@@ -544,9 +566,9 @@ class AnnounceService
             $this->insertPeer();
 
             if (true === $this->seeder) {
-                $this->torrent->update(['seeders' => $this->torrent->seeders + 1]);
+                $this->adjustTorrentPeers(1, 0);
             } else {
-                $this->torrent->update(['leechers' => $this->torrent->leechers + 1]);
+                $this->adjustTorrentPeers(0, 1);
 
                 if (null !== $this->snatch) {
                     $this->updateSnatchIfItExists();
@@ -569,9 +591,9 @@ class AnnounceService
         $this->peer->delete();
 
         if (true === $this->seeder) {
-            $this->torrent->update(['seeders' => $this->torrent->seeders - 1]);
+            $this->adjustTorrentPeers(-1, 0);
         } else {
-            $this->torrent->update(['leechers' => $this->torrent->leechers - 1]);
+            $this->adjustTorrentPeers(0, -1);
         }
 
         $this->updateSnatchIfItExists();
@@ -586,14 +608,7 @@ class AnnounceService
     {
         $this->updatePeerIfItExists();
         $this->insertPeerIPs();
-
-        $this->torrent->update(
-            [
-                'seeders'  => $this->torrent->seeders + 1,
-                'leechers' => $this->torrent->leechers - 1,
-            ]
-        );
-
+        $this->adjustTorrentPeers(1, -1);
         $this->updateSnatchIfItExists();
 
         return $this->announceSuccessResponse();
@@ -609,9 +624,9 @@ class AnnounceService
         } else {
             $this->insertPeer();
             if (true === $this->seeder) {
-                $this->torrent->update(['seeders' => $this->torrent->seeders + 1]);
+                $this->adjustTorrentPeers(1, 0);
             } else {
-                $this->torrent->update(['leechers' => $this->torrent->leechers + 1]);
+                $this->adjustTorrentPeers(0, 1);
             }
         }
 
