@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Services;
 
+use stdClass;
 use Tests\TestCase;
 use App\Http\Models\Peer;
 use App\Http\Models\User;
@@ -92,7 +93,7 @@ class AnnounceServiceTest extends TestCase
         $freshUser = $user->fresh();
         $this->assertSame($user->getOriginal('uploaded'), (int) $freshUser->getOriginal('uploaded'));
         $this->assertSame($user->getOriginal('downloaded'), (int) $freshUser->getOriginal('downloaded'));
-        $this->assertInstanceOf(User::class, Cache::get('user.' . $freshUser->passkey));
+        $this->assertInstanceOf(stdClass::class, Cache::get('user.' . $freshUser->passkey));
         $this->assertSame((int) $freshUser->getOriginal('uploaded'), Cache::get('user.' . $freshUser->passkey)->uploaded);
         $this->assertSame((int) $freshUser->getOriginal('downloaded'), Cache::get('user.' . $freshUser->passkey)->downloaded);
     }
@@ -204,7 +205,7 @@ class AnnounceServiceTest extends TestCase
         $freshUser = $user->fresh();
         $this->assertSame($user->getOriginal('uploaded'), (int) $freshUser->getOriginal('uploaded'));
         $this->assertSame($user->getOriginal('downloaded'), (int) $freshUser->getOriginal('downloaded'));
-        $this->assertInstanceOf(User::class, Cache::get('user.' . $freshUser->passkey));
+        $this->assertInstanceOf(stdClass::class, Cache::get('user.' . $freshUser->passkey));
         $this->assertSame((int) $freshUser->getOriginal('uploaded'), Cache::get('user.' . $freshUser->passkey)->uploaded);
         $this->assertSame((int) $freshUser->getOriginal('downloaded'), Cache::get('user.' . $freshUser->passkey)->downloaded);
     }
@@ -271,7 +272,7 @@ class AnnounceServiceTest extends TestCase
         $freshUser = $user->fresh();
         $this->assertSame($user->getOriginal('uploaded'), (int) $freshUser->getOriginal('uploaded'));
         $this->assertSame($user->getOriginal('downloaded'), (int) $freshUser->getOriginal('downloaded'));
-        $this->assertInstanceOf(User::class, Cache::get('user.' . $freshUser->passkey));
+        $this->assertInstanceOf(stdClass::class, Cache::get('user.' . $freshUser->passkey));
         $this->assertSame((int) $freshUser->getOriginal('uploaded'), Cache::get('user.' . $freshUser->passkey)->uploaded);
         $this->assertSame((int) $freshUser->getOriginal('downloaded'), Cache::get('user.' . $freshUser->passkey)->downloaded);
     }
@@ -361,7 +362,7 @@ class AnnounceServiceTest extends TestCase
         $freshUser = $user->fresh();
         $this->assertSame($user->getOriginal('uploaded') + 1000, (int) $freshUser->getOriginal('uploaded'));
         $this->assertSame($user->getOriginal('downloaded'), (int) $freshUser->getOriginal('downloaded'));
-        $this->assertInstanceOf(User::class, Cache::get('user.' . $freshUser->passkey));
+        $this->assertInstanceOf(stdClass::class, Cache::get('user.' . $freshUser->passkey));
         $this->assertSame((int) $freshUser->getOriginal('uploaded'), Cache::get('user.' . $freshUser->passkey)->uploaded);
         $this->assertSame((int) $freshUser->getOriginal('downloaded'), Cache::get('user.' . $freshUser->passkey)->downloaded);
     }
@@ -457,7 +458,7 @@ class AnnounceServiceTest extends TestCase
         $freshUser = $user->fresh();
         $this->assertSame($user->getOriginal('uploaded') + 1000, (int) $freshUser->getOriginal('uploaded'));
         $this->assertSame($user->getOriginal('downloaded') + 1200, (int) $freshUser->getOriginal('downloaded'));
-        $this->assertInstanceOf(User::class, Cache::get('user.' . $freshUser->passkey));
+        $this->assertInstanceOf(stdClass::class, Cache::get('user.' . $freshUser->passkey));
         $this->assertSame((int) $freshUser->getOriginal('uploaded'), Cache::get('user.' . $freshUser->passkey)->uploaded);
         $this->assertSame((int) $freshUser->getOriginal('downloaded'), Cache::get('user.' . $freshUser->passkey)->downloaded);
     }
@@ -588,7 +589,7 @@ class AnnounceServiceTest extends TestCase
         $freshUser = $user->fresh();
         $this->assertSame($user->getOriginal('uploaded'), (int) $freshUser->getOriginal('uploaded'));
         $this->assertSame($user->getOriginal('downloaded') + 4000, (int) $freshUser->getOriginal('downloaded'));
-        $this->assertInstanceOf(User::class, Cache::get('user.' . $freshUser->passkey));
+        $this->assertInstanceOf(stdClass::class, Cache::get('user.' . $freshUser->passkey));
         $this->assertSame((int) $freshUser->getOriginal('uploaded'), Cache::get('user.' . $freshUser->passkey)->uploaded);
         $this->assertSame((int) $freshUser->getOriginal('downloaded'), Cache::get('user.' . $freshUser->passkey)->downloaded);
     }
@@ -699,7 +700,7 @@ class AnnounceServiceTest extends TestCase
         $freshUser = $user->fresh();
         $this->assertSame($user->getOriginal('uploaded') + 1000, (int) $freshUser->getOriginal('uploaded'));
         $this->assertSame($user->getOriginal('downloaded'), (int) $freshUser->getOriginal('downloaded'));
-        $this->assertInstanceOf(User::class, Cache::get('user.' . $freshUser->passkey));
+        $this->assertInstanceOf(stdClass::class, Cache::get('user.' . $freshUser->passkey));
         $this->assertSame((int) $freshUser->getOriginal('uploaded'), Cache::get('user.' . $freshUser->passkey)->uploaded);
         $this->assertSame((int) $freshUser->getOriginal('downloaded'), Cache::get('user.' . $freshUser->passkey)->downloaded);
     }
@@ -808,7 +809,7 @@ class AnnounceServiceTest extends TestCase
         $freshUser = $user->fresh();
         $this->assertSame($user->getOriginal('uploaded') + 500, (int) $freshUser->getOriginal('uploaded'));
         $this->assertSame($user->getOriginal('downloaded') + 800, (int) $freshUser->getOriginal('downloaded'));
-        $this->assertInstanceOf(User::class, Cache::get('user.' . $freshUser->passkey));
+        $this->assertInstanceOf(stdClass::class, Cache::get('user.' . $freshUser->passkey));
         $this->assertSame((int) $freshUser->getOriginal('uploaded'), Cache::get('user.' . $freshUser->passkey)->uploaded);
         $this->assertSame((int) $freshUser->getOriginal('downloaded'), Cache::get('user.' . $freshUser->passkey)->downloaded);
     }
@@ -895,7 +896,7 @@ class AnnounceServiceTest extends TestCase
         $freshUser = $user->fresh();
         $this->assertSame($user->getOriginal('uploaded') + 500, (int) $freshUser->getOriginal('uploaded'));
         $this->assertSame($user->getOriginal('downloaded') + 800, (int) $freshUser->getOriginal('downloaded'));
-        $this->assertInstanceOf(User::class, Cache::get('user.' . $freshUser->passkey));
+        $this->assertInstanceOf(stdClass::class, Cache::get('user.' . $freshUser->passkey));
         $this->assertSame((int) $freshUser->getOriginal('uploaded'), Cache::get('user.' . $freshUser->passkey)->uploaded);
         $this->assertSame((int) $freshUser->getOriginal('downloaded'), Cache::get('user.' . $freshUser->passkey)->downloaded);
     }
@@ -992,7 +993,7 @@ class AnnounceServiceTest extends TestCase
         $freshUser = $user->fresh();
         $this->assertSame($user->getOriginal('uploaded') + 2500, (int) $freshUser->getOriginal('uploaded'));
         $this->assertSame($user->getOriginal('downloaded') + 1800, (int) $freshUser->getOriginal('downloaded'));
-        $this->assertInstanceOf(User::class, Cache::get('user.' . $freshUser->passkey));
+        $this->assertInstanceOf(stdClass::class, Cache::get('user.' . $freshUser->passkey));
         $this->assertSame((int) $freshUser->getOriginal('uploaded'), Cache::get('user.' . $freshUser->passkey)->uploaded);
         $this->assertSame((int) $freshUser->getOriginal('downloaded'), Cache::get('user.' . $freshUser->passkey)->downloaded);
     }
@@ -1065,7 +1066,7 @@ class AnnounceServiceTest extends TestCase
         $freshUser = $user->fresh();
         $this->assertSame($user->getOriginal('uploaded') + 2500, (int) $freshUser->getOriginal('uploaded'));
         $this->assertSame($user->getOriginal('downloaded') + 1800, (int) $freshUser->getOriginal('downloaded'));
-        $this->assertInstanceOf(User::class, Cache::get('user.' . $freshUser->passkey));
+        $this->assertInstanceOf(stdClass::class, Cache::get('user.' . $freshUser->passkey));
         $this->assertSame((int) $freshUser->getOriginal('uploaded'), Cache::get('user.' . $freshUser->passkey)->uploaded);
         $this->assertSame((int) $freshUser->getOriginal('downloaded'), Cache::get('user.' . $freshUser->passkey)->downloaded);
     }
@@ -1138,7 +1139,7 @@ class AnnounceServiceTest extends TestCase
         $freshUser = $user->fresh();
         $this->assertSame($user->getOriginal('uploaded') + 2500, (int) $freshUser->getOriginal('uploaded'));
         $this->assertSame($user->getOriginal('downloaded'), (int) $freshUser->getOriginal('downloaded'));
-        $this->assertInstanceOf(User::class, Cache::get('user.' . $freshUser->passkey));
+        $this->assertInstanceOf(stdClass::class, Cache::get('user.' . $freshUser->passkey));
         $this->assertSame((int) $freshUser->getOriginal('uploaded'), Cache::get('user.' . $freshUser->passkey)->uploaded);
         $this->assertSame((int) $freshUser->getOriginal('downloaded'), Cache::get('user.' . $freshUser->passkey)->downloaded);
     }
@@ -1249,7 +1250,7 @@ class AnnounceServiceTest extends TestCase
         $freshUser = $user->fresh();
         $this->assertSame($user->getOriginal('uploaded'), (int) $freshUser->getOriginal('uploaded'));
         $this->assertSame($user->getOriginal('downloaded'), (int) $freshUser->getOriginal('downloaded'));
-        $this->assertInstanceOf(User::class, Cache::get('user.' . $freshUser->passkey));
+        $this->assertInstanceOf(stdClass::class, Cache::get('user.' . $freshUser->passkey));
         $this->assertSame((int) $freshUser->getOriginal('uploaded'), Cache::get('user.' . $freshUser->passkey)->uploaded);
         $this->assertSame((int) $freshUser->getOriginal('downloaded'), Cache::get('user.' . $freshUser->passkey)->downloaded);
     }
@@ -1354,7 +1355,7 @@ class AnnounceServiceTest extends TestCase
         $freshUser = $user->fresh();
         $this->assertSame($user->getOriginal('uploaded'), (int) $freshUser->getOriginal('uploaded'));
         $this->assertSame($user->getOriginal('downloaded'), (int) $freshUser->getOriginal('downloaded'));
-        $this->assertInstanceOf(User::class, Cache::get('user.' . $freshUser->passkey));
+        $this->assertInstanceOf(stdClass::class, Cache::get('user.' . $freshUser->passkey));
         $this->assertSame((int) $freshUser->getOriginal('uploaded'), Cache::get('user.' . $freshUser->passkey)->uploaded);
         $this->assertSame((int) $freshUser->getOriginal('downloaded'), Cache::get('user.' . $freshUser->passkey)->downloaded);
     }
@@ -1459,7 +1460,7 @@ class AnnounceServiceTest extends TestCase
         $freshUser = $user->fresh();
         $this->assertSame($user->getOriginal('uploaded'), (int) $freshUser->getOriginal('uploaded'));
         $this->assertSame($user->getOriginal('downloaded'), (int) $freshUser->getOriginal('downloaded'));
-        $this->assertInstanceOf(User::class, Cache::get('user.' . $freshUser->passkey));
+        $this->assertInstanceOf(stdClass::class, Cache::get('user.' . $freshUser->passkey));
         $this->assertSame((int) $freshUser->getOriginal('uploaded'), Cache::get('user.' . $freshUser->passkey)->uploaded);
         $this->assertSame((int) $freshUser->getOriginal('downloaded'), Cache::get('user.' . $freshUser->passkey)->downloaded);
     }
@@ -1566,7 +1567,7 @@ class AnnounceServiceTest extends TestCase
         $freshUser = $user->fresh();
         $this->assertSame($user->getOriginal('uploaded'), (int) $freshUser->getOriginal('uploaded'));
         $this->assertSame($user->getOriginal('downloaded'), (int) $freshUser->getOriginal('downloaded'));
-        $this->assertInstanceOf(User::class, Cache::get('user.' . $freshUser->passkey));
+        $this->assertInstanceOf(stdClass::class, Cache::get('user.' . $freshUser->passkey));
         $this->assertSame((int) $freshUser->getOriginal('uploaded'), Cache::get('user.' . $freshUser->passkey)->uploaded);
         $this->assertSame((int) $freshUser->getOriginal('downloaded'), Cache::get('user.' . $freshUser->passkey)->downloaded);
     }
@@ -1673,7 +1674,7 @@ class AnnounceServiceTest extends TestCase
         $freshUser = $user->fresh();
         $this->assertSame($user->getOriginal('uploaded'), (int) $freshUser->getOriginal('uploaded'));
         $this->assertSame($user->getOriginal('downloaded'), (int) $freshUser->getOriginal('downloaded'));
-        $this->assertInstanceOf(User::class, Cache::get('user.' . $freshUser->passkey));
+        $this->assertInstanceOf(stdClass::class, Cache::get('user.' . $freshUser->passkey));
         $this->assertSame((int) $freshUser->getOriginal('uploaded'), Cache::get('user.' . $freshUser->passkey)->uploaded);
         $this->assertSame((int) $freshUser->getOriginal('downloaded'), Cache::get('user.' . $freshUser->passkey)->downloaded);
     }
@@ -1770,7 +1771,7 @@ class AnnounceServiceTest extends TestCase
         $freshUser = $user->fresh();
         $this->assertSame($user->getOriginal('uploaded'), (int) $freshUser->getOriginal('uploaded'));
         $this->assertSame($user->getOriginal('downloaded'), (int) $freshUser->getOriginal('downloaded'));
-        $this->assertInstanceOf(User::class, Cache::get('user.' . $freshUser->passkey));
+        $this->assertInstanceOf(stdClass::class, Cache::get('user.' . $freshUser->passkey));
         $this->assertSame((int) $freshUser->getOriginal('uploaded'), Cache::get('user.' . $freshUser->passkey)->uploaded);
         $this->assertSame((int) $freshUser->getOriginal('downloaded'), Cache::get('user.' . $freshUser->passkey)->downloaded);
     }
@@ -1883,7 +1884,7 @@ class AnnounceServiceTest extends TestCase
         $freshUser = $user->fresh();
         $this->assertSame($user->getOriginal('uploaded'), (int) $freshUser->getOriginal('uploaded'));
         $this->assertSame($user->getOriginal('downloaded'), (int) $freshUser->getOriginal('downloaded'));
-        $this->assertInstanceOf(User::class, Cache::get('user.' . $freshUser->passkey));
+        $this->assertInstanceOf(stdClass::class, Cache::get('user.' . $freshUser->passkey));
         $this->assertSame((int) $freshUser->getOriginal('uploaded'), Cache::get('user.' . $freshUser->passkey)->uploaded);
         $this->assertSame((int) $freshUser->getOriginal('downloaded'), Cache::get('user.' . $freshUser->passkey)->downloaded);
     }
