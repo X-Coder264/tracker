@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Controllers;
 
 use App\Http\Models\User;
+use Illuminate\Support\Str;
 use App\Http\Models\Torrent;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -141,7 +142,7 @@ class TorrentController extends Controller
         $disposition = $response->headers->makeDisposition(
             ResponseHeaderBag::DISPOSITION_ATTACHMENT,
             $fileName,
-            mb_convert_encoding(str_replace('%', '', $fileName), 'ASCII')
+            str_replace('%', '', Str::ascii($fileName))
         );
 
         $response->headers->set('Content-Disposition', $disposition);

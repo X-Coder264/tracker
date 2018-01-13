@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use Tests\TestCase;
 use App\Http\Models\User;
+use Illuminate\Support\Str;
 use App\Http\Models\Torrent;
 use Illuminate\Http\Response;
 use Illuminate\Http\Testing\File;
@@ -177,11 +178,11 @@ class TorrentControllerTest extends TestCase
         $this->assertSame($encoderReturnValue, $response->getContent());
         $response->assertHeader('Content-Type', 'application/x-bittorrent');
         $fileName = str_replace(['/', '\\'], '', $torrent->name . '.torrent');
-        $filenameFallback = mb_convert_encoding(str_replace('%', '', $fileName), 'ASCII');
+        $filenameFallback = str_replace('%', '', Str::ascii($fileName));
         $contentDisposition = sprintf(
             '%s; filename="%s"' . "; filename*=utf-8''%s",
             ResponseHeaderBag::DISPOSITION_ATTACHMENT,
-            str_replace('"', '\\"', $filenameFallback),
+            $filenameFallback,
             rawurlencode($fileName)
         );
         $response->assertHeader('Content-Disposition', $contentDisposition);
