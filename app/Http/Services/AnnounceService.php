@@ -32,7 +32,7 @@ class AnnounceService
     protected $user;
 
     /**
-     * @var null|Peer
+     * @var null|Peer|stdClass
      */
     protected $peer = null;
 
@@ -57,7 +57,7 @@ class AnnounceService
     protected $event;
 
     /**
-     * @var null|Snatch
+     * @var null|Snatch|stdClass
      */
     protected $snatch;
 
