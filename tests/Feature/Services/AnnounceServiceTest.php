@@ -56,7 +56,7 @@ class AnnounceServiceTest extends TestCase
         $response->assertStatus(Response::HTTP_OK);
         $response->assertHeader('Content-Type', 'text/plain; charset=UTF-8');
         $this->assertSame(
-            'd8:completei0e10:incompletei1e8:intervali2400e12:min intervali60e5:peers0:6:peers60:e',
+            'd8:completei0e10:incompletei0e8:intervali2400e12:min intervali60e5:peers0:6:peers60:e',
             $response->getContent()
         );
         $this->assertSame(1, Peer::count());
@@ -142,7 +142,7 @@ class AnnounceServiceTest extends TestCase
         // so we use bin2hex on the expected and actual responses as a workaround
         $expectedResponseOne = [
             'complete' => 1,
-            'incomplete' => 2,
+            'incomplete' => 1,
             'interval' => 2400,
             'min interval' => 60,
             'peers' => bin2hex(inet_pton($peerOneIP->IP) . pack('n*', $peerOneIP->port) . inet_pton($peerTwoIP->IP) . pack('n*', $peerTwoIP->port)),
@@ -150,7 +150,7 @@ class AnnounceServiceTest extends TestCase
         ];
         $expectedResponseTwo = [
             'complete' => 1,
-            'incomplete' => 2,
+            'incomplete' => 1,
             'interval' => 2400,
             'min interval' => 60,
             'peers' => bin2hex(inet_pton($peerTwoIP->IP) . pack('n*', $peerTwoIP->port) . inet_pton($peerOneIP->IP) . pack('n*', $peerOneIP->port)),
@@ -246,7 +246,7 @@ class AnnounceServiceTest extends TestCase
         $response->assertStatus(Response::HTTP_OK);
         $response->assertHeader('Content-Type', 'text/plain; charset=UTF-8');
         $this->assertSame(
-            'd8:completei1e10:incompletei0e8:intervali2400e12:min intervali60e5:peers0:6:peers60:e',
+            'd8:completei0e10:incompletei0e8:intervali2400e12:min intervali60e5:peers0:6:peers60:e',
             $response->getContent()
         );
         $this->assertSame(1, Peer::count());
@@ -538,7 +538,7 @@ class AnnounceServiceTest extends TestCase
         // Note: PHPUnit has some problems when asserting binary strings
         // so we use bin2hex on the expected and actual responses as a workaround
         $expectedResponse = [
-            'complete'     => 2,
+            'complete'     => 1,
             'incomplete'   => 1,
             'interval'     => 2400,
             'min interval' => 60,
@@ -662,7 +662,7 @@ class AnnounceServiceTest extends TestCase
         $response->assertStatus(Response::HTTP_OK);
         $response->assertHeader('Content-Type', 'text/plain; charset=UTF-8');
         $this->assertSame(
-            'd8:completei1e10:incompletei0e8:intervali2400e12:min intervali60e5:peers0:6:peers60:e',
+            'd8:completei0e10:incompletei0e8:intervali2400e12:min intervali60e5:peers0:6:peers60:e',
             $response->getContent()
         );
         $this->assertSame(1, Peer::count());
@@ -772,7 +772,7 @@ class AnnounceServiceTest extends TestCase
         $response->assertStatus(Response::HTTP_OK);
         $response->assertHeader('Content-Type', 'text/plain; charset=UTF-8');
         $this->assertSame(
-            'd8:completei0e10:incompletei1e8:intervali2400e12:min intervali60e5:peers0:6:peers60:e',
+            'd8:completei0e10:incompletei0e8:intervali2400e12:min intervali60e5:peers0:6:peers60:e',
             $response->getContent()
         );
         $this->assertSame(1, Peer::count());
@@ -870,7 +870,7 @@ class AnnounceServiceTest extends TestCase
         $response->assertStatus(Response::HTTP_OK);
         $response->assertHeader('Content-Type', 'text/plain; charset=UTF-8');
         $this->assertSame(
-            'd8:completei0e10:incompletei1e8:intervali2400e12:min intervali60e5:peers0:6:peers60:e',
+            'd8:completei0e10:incompletei0e8:intervali2400e12:min intervali60e5:peers0:6:peers60:e',
             $response->getContent()
         );
         $this->assertSame(1, Peer::count());
@@ -956,7 +956,7 @@ class AnnounceServiceTest extends TestCase
         $response->assertStatus(Response::HTTP_OK);
         $response->assertHeader('Content-Type', 'text/plain; charset=UTF-8');
         $this->assertSame(
-            'd8:completei0e10:incompletei1e8:intervali2400e12:min intervali60e5:peers0:6:peers60:e',
+            'd8:completei0e10:incompletei0e8:intervali2400e12:min intervali60e5:peers0:6:peers60:e',
             $response->getContent()
         );
         $this->assertSame(1, Peer::count());
@@ -1040,7 +1040,7 @@ class AnnounceServiceTest extends TestCase
         $response->assertStatus(Response::HTTP_OK);
         $response->assertHeader('Content-Type', 'text/plain; charset=UTF-8');
         $this->assertSame(
-            'd8:completei0e10:incompletei1e8:intervali2400e12:min intervali60e5:peers0:6:peers60:e',
+            'd8:completei0e10:incompletei0e8:intervali2400e12:min intervali60e5:peers0:6:peers60:e',
             $response->getContent()
         );
         $this->assertSame(1, Peer::count());
@@ -1113,7 +1113,7 @@ class AnnounceServiceTest extends TestCase
         $response->assertStatus(Response::HTTP_OK);
         $response->assertHeader('Content-Type', 'text/plain; charset=UTF-8');
         $this->assertSame(
-            'd8:completei1e10:incompletei0e8:intervali2400e12:min intervali60e5:peers0:6:peers60:e',
+            'd8:completei0e10:incompletei0e8:intervali2400e12:min intervali60e5:peers0:6:peers60:e',
             $response->getContent()
         );
         $this->assertSame(1, Peer::count());
@@ -1194,7 +1194,7 @@ class AnnounceServiceTest extends TestCase
         // so we use bin2hex on the expected and actual responses as a workaround
         $expectedResponse = [
             'complete'     => 2,
-            'incomplete'   => 1,
+            'incomplete'   => 0,
             'interval'     => 2400,
             'min interval' => 60,
             'peers'        => bin2hex(inet_pton($peerOneIP->IP) . pack('n*', $peerOneIP->port)),
@@ -1303,7 +1303,7 @@ class AnnounceServiceTest extends TestCase
         // so we use bin2hex on the expected and actual responses as a workaround
         $expectedResponse = [
             'complete'     => 2,
-            'incomplete'   => 1,
+            'incomplete'   => 0,
             'interval'     => 2400,
             'min interval' => 60,
             'peers'        => bin2hex(inet_pton($peerOneIP->IP) . pack('n*', $peerOneIP->port)),
@@ -1408,7 +1408,7 @@ class AnnounceServiceTest extends TestCase
         // so we use bin2hex on the expected and actual responses as a workaround
         $expectedResponse = [
             'complete'     => 2,
-            'incomplete'   => 1,
+            'incomplete'   => 0,
             'interval'     => 2400,
             'min interval' => 60,
             'peers'        => bin2hex(inet_pton($peerOneIP->IP) . pack('n*', $peerOneIP->port)),
@@ -1515,7 +1515,7 @@ class AnnounceServiceTest extends TestCase
         // so we use bin2hex on the expected and actual responses as a workaround
         $expectedResponse = [
             'complete'     => 2,
-            'incomplete'   => 1,
+            'incomplete'   => 0,
             'interval'     => 2400,
             'min interval' => 60,
             'peers'        => bin2hex(inet_pton($peerOneIP->IP) . pack('n*', $peerOneIP->port)),
@@ -1622,7 +1622,7 @@ class AnnounceServiceTest extends TestCase
         // so we use bin2hex on the expected and actual responses as a workaround
         $expectedResponse = [
             'complete'     => 2,
-            'incomplete'   => 1,
+            'incomplete'   => 0,
             'interval'     => 2400,
             'min interval' => 60,
             'peers'        => bin2hex(inet_pton($peerOneIP->IP) . pack('n*', $peerOneIP->port)),
@@ -1720,7 +1720,7 @@ class AnnounceServiceTest extends TestCase
         // so we use bin2hex on the expected and actual responses as a workaround
         $expectedResponse = [
             'complete'     => 1,
-            'incomplete'   => 2,
+            'incomplete'   => 1,
             'interval'     => 2400,
             'min interval' => 60,
             'peers'        => [
@@ -1821,7 +1821,7 @@ class AnnounceServiceTest extends TestCase
         // so we use bin2hex on the expected and actual responses as a workaround
         $expectedResponseOne = [
             'complete'     => 1,
-            'incomplete'   => 2,
+            'incomplete'   => 1,
             'interval'     => 2400,
             'min interval' => 60,
             'peers'        => bin2hex(inet_pton($peerOneIP->IP) . pack('n*', $peerOneIP->port)),
@@ -1829,7 +1829,7 @@ class AnnounceServiceTest extends TestCase
         ];
         $expectedResponseTwo = [
             'complete'     => 1,
-            'incomplete'   => 2,
+            'incomplete'   => 1,
             'interval'     => 2400,
             'min interval' => 60,
             'peers'        => bin2hex(inet_pton($peerTwoIP->IP) . pack('n*', $peerTwoIP->port)),

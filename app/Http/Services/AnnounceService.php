@@ -52,6 +52,11 @@ class AnnounceService
     protected $seeder;
 
     /**
+     * @var string|null
+     */
+    protected $event;
+
+    /**
      * @var null|Snatch
      */
     protected $snatch;
@@ -118,7 +123,7 @@ class AnnounceService
     {
         $this->request = $request;
 
-        $event = $this->request->input('event');
+        $this->event = $this->request->input('event');
 
         // info_hash and peer_id are validated separately because the Laravel validator uses
         // mb_strlen to get the length of the (sometimes binary) string which returns a wrong number
@@ -137,7 +142,7 @@ class AnnounceService
 
         // if we get the stopped event there is no need to validate the IP address,
         // since we are just going to delete the peer from the DB
-        if ('stopped' !== $event) {
+        if ('stopped' !== $this->event) {
             // in order to support IPv6 peers (BEP 7) a more complex IP validation logic is needed
             $validationMessage = $this->validateAndSetIPAddress();
             if (null !== $validationMessage) {
@@ -173,7 +178,7 @@ class AnnounceService
             ->where('user_id', '=', $this->user->id)
             ->first();
 
-        if ('completed' === $event || 'stopped' === $event) {
+        if ('completed' === $this->event || 'stopped' === $this->event) {
             if (null === $this->peer) {
                 return $this->announceErrorResponse(__('messages.announce.invalid_peer_id'));
             }
@@ -189,7 +194,7 @@ class AnnounceService
         } else {
             $this->downloadedInThisAnnounceCycle = max(0, $downloaded - $this->peer->getOriginal('downloaded'));
             $this->uploadedInThisAnnounceCycle = max(0, $uploaded - $this->peer->getOriginal('uploaded'));
-            if (false === $this->seeder || (true === $this->seeder && 'completed' === $event)) {
+            if (false === $this->seeder || (true === $this->seeder && 'completed' === $this->event)) {
                 $this->leechTime = $timeNow->diffInSeconds($this->peer->updated_at);
             } else {
                 $this->seedTime = $timeNow->diffInSeconds($this->peer->updated_at);
@@ -200,15 +205,15 @@ class AnnounceService
                                 ->where('user_id', '=', $this->user->id)
                                 ->first();
 
-        if ($this->request->filled('numwant') && 0 < (int) $this->request->input('numwant')) {
+        if ($this->request->filled('numwant') && (int) $this->request->input('numwant') > 0) {
             $this->numberOfWantedPeers = (int) $this->request->input('numwant');
         }
 
-        if ('started' === $event) {
+        if ('started' === $this->event) {
             return $this->startedEventAnnounceResponse();
-        } elseif ('stopped' === $event) {
+        } elseif ('stopped' === $this->event) {
             return $this->stoppedEventAnnounceResponse();
-        } elseif ('completed' === $event && 0 === $left) {
+        } elseif ('completed' === $this->event && 0 === $left) {
             return $this->completedEventAnnounceResponse();
         }
 
@@ -671,20 +676,52 @@ class AnnounceService
     }
 
     /**
+     * @return array
+     */
+    protected function getSeedersAndLeechersCount(): array
+    {
+        $seedersCount = (int) $this->torrent->seeders;
+        $leechersCount = (int) $this->torrent->leechers;
+        // We don't want to include the current user/peer in the returned seeder/leecher count.
+        if ('stopped' !== $this->event) {
+            if (true === $this->seeder) {
+                $seedersCount--;
+            } else {
+                $leechersCount--;
+            }
+        }
+
+        return [$seedersCount, $leechersCount];
+    }
+
+    /**
+     * @return array
+     */
+    protected function getCommonResponsePart(): array
+    {
+        $response['interval'] = 40 * 60; // 40 minutes
+        $response['min interval'] = 1 * 60; // 1 minute
+
+        $peersCount = $this->getSeedersAndLeechersCount();
+        $response['complete'] = $peersCount[0];
+        $response['incomplete'] = $peersCount[1];
+
+        return $response;
+    }
+
+    /**
      * @return string
      */
     protected function compactResponse(): string
     {
-        $response['interval'] = 40 * 60; // 40 minutes
-        $response['min interval'] = 1 * 60; // 1 minute
+        $response = $this->getCommonResponsePart();
+
         $response['peers'] = '';
+
         // BEP 7 -> IPv6 peers support
         $response['peers6'] = '';
 
         $peers = $this->getPeers();
-
-        $response['complete'] = (int) $this->torrent->seeders;
-        $response['incomplete'] = (int) $this->torrent->leechers;
 
         foreach ($peers as $peer) {
             foreach ($peer->IPs as $peerAddress) {
@@ -707,14 +744,10 @@ class AnnounceService
      */
     protected function nonCompactResponse(): string
     {
-        $response['interval'] = 40 * 60; // 40 minutes
-        $response['min interval'] = 1 * 60; // 1 minute
+        $response = $this->getCommonResponsePart();
         $response['peers'] = [];
 
         $peers = $this->getPeers();
-
-        $response['complete'] = (int) $this->torrent->seeders;
-        $response['incomplete'] = (int) $this->torrent->leechers;
 
         foreach ($peers as $peer) {
             foreach ($peer->IPs as $peerAddress) {

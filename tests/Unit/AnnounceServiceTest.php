@@ -114,7 +114,7 @@ class AnnounceServiceTest extends TestCase
                 [
                     'interval'     => 2400,
                     'min interval' => 60,
-                    'complete'     => 1,
+                    'complete'     => 0,
                     'incomplete'   => 0,
                     'peers'        => inet_pton('95.152.44.55') . pack('n*', 55555),
                     'peers6'       => inet_pton('2b63:1478:1ac5:37ef:4e8c:75df:14cd:93f2') . pack('n*', 60000),
@@ -136,6 +136,9 @@ class AnnounceServiceTest extends TestCase
         $reflectionProperty = $reflectionClass->getProperty('torrent');
         $reflectionProperty->setAccessible(true);
         $reflectionProperty->setValue($announceService, $torrent);
+        $reflectionProperty = $reflectionClass->getProperty('seeder');
+        $reflectionProperty->setAccessible(true);
+        $reflectionProperty->setValue($announceService, true);
         $this->assertSame($returnValue, $reflectionMethod->invoke($announceService));
     }
 
@@ -185,7 +188,7 @@ class AnnounceServiceTest extends TestCase
                 [
                     'interval'     => 2400,
                     'min interval' => 60,
-                    'complete'     => 1,
+                    'complete'     => 0,
                     'incomplete'   => 0,
                     'peers'        => [
                         [
@@ -217,6 +220,9 @@ class AnnounceServiceTest extends TestCase
         $reflectionProperty = $reflectionClass->getProperty('torrent');
         $reflectionProperty->setAccessible(true);
         $reflectionProperty->setValue($announceService, $torrent);
+        $reflectionProperty = $reflectionClass->getProperty('seeder');
+        $reflectionProperty->setAccessible(true);
+        $reflectionProperty->setValue($announceService, true);
         $this->assertSame($returnValue, $reflectionMethod->invoke($announceService));
     }
 }
