@@ -173,7 +173,7 @@ class AnnounceService
         $left = (int) $this->request->input('left');
         $this->seeder = 0 === $left ? true : false;
 
-        $this->peer = Peer::where('peer_id', '=', $this->peerID)
+        $this->peer = DB::table('peers')->where('peer_id', '=', $this->peerID)
             ->where('torrent_id', '=', $this->torrent->id)
             ->where('user_id', '=', $this->user->id)
             ->first();
@@ -192,16 +192,16 @@ class AnnounceService
             $this->downloadedInThisAnnounceCycle = $downloaded;
             $this->uploadedInThisAnnounceCycle = $uploaded;
         } else {
-            $this->downloadedInThisAnnounceCycle = max(0, $downloaded - $this->peer->getOriginal('downloaded'));
-            $this->uploadedInThisAnnounceCycle = max(0, $uploaded - $this->peer->getOriginal('uploaded'));
+            $this->downloadedInThisAnnounceCycle = max(0, $downloaded - $this->peer->downloaded);
+            $this->uploadedInThisAnnounceCycle = max(0, $uploaded - $this->peer->uploaded);
             if (false === $this->seeder || (true === $this->seeder && 'completed' === $this->event)) {
-                $this->leechTime = $timeNow->diffInSeconds($this->peer->updated_at);
+                $this->leechTime = $timeNow->diffInSeconds(new Carbon($this->peer->updated_at));
             } else {
-                $this->seedTime = $timeNow->diffInSeconds($this->peer->updated_at);
+                $this->seedTime = $timeNow->diffInSeconds(new Carbon($this->peer->updated_at));
             }
         }
 
-        $this->snatch = Snatch::where('torrent_id', '=', $this->torrent->id)
+        $this->snatch = DB::table('snatches')->where('torrent_id', '=', $this->torrent->id)
                                 ->where('user_id', '=', $this->user->id)
                                 ->first();
 
@@ -415,6 +415,16 @@ class AnnounceService
     }
 
     /**
+     * Get the format for database stored dates.
+     *
+     * @return string
+     */
+    protected function getDateFormat(): string
+    {
+        return DB::getQueryGrammar()->getDateFormat();
+    }
+
+    /**
      * @param int $seeder
      * @param int $leecher
      */
@@ -422,7 +432,7 @@ class AnnounceService
     {
         $this->torrent->seeders = $this->torrent->seeders + $seeder;
         $this->torrent->leechers = $this->torrent->leechers + $leecher;
-        DB::table('torrents')->where('id', $this->torrent->id)
+        DB::table('torrents')->where('id', '=', $this->torrent->id)
             ->update(
                 [
                     'seeders'  => $this->torrent->seeders,
@@ -456,14 +466,17 @@ class AnnounceService
     protected function updatePeerIfItExists(): void
     {
         if (null !== $this->peer) {
-            $this->peer->update(
-                [
-                    'uploaded'   => $this->peer->getOriginal('uploaded') + $this->uploadedInThisAnnounceCycle,
-                    'downloaded' => $this->peer->getOriginal('downloaded') + $this->downloadedInThisAnnounceCycle,
-                    'seeder'     => $this->seeder,
-                    'userAgent'  => $this->request->userAgent(),
-                ]
-            );
+            DB::table('peers')
+                ->where('id', '=', $this->peer->id)
+                ->update(
+                    [
+                        'uploaded'   => $this->peer->uploaded + $this->uploadedInThisAnnounceCycle,
+                        'downloaded' => $this->peer->downloaded + $this->downloadedInThisAnnounceCycle,
+                        'seeder'     => $this->seeder,
+                        'userAgent'  => $this->request->userAgent(),
+                        'updated_at' => Carbon::now()->format($this->getDateFormat()),
+                    ]
+                );
         }
     }
 
@@ -493,22 +506,25 @@ class AnnounceService
     {
         if (null !== $this->snatch) {
             if (0 === (int) $this->request->input('left') && null === $this->snatch->finished_at) {
-                $finishedAt = Carbon::now();
+                $finishedAt = Carbon::now()->format($this->getDateFormat());
             } else {
                 $finishedAt = $this->snatch->finished_at;
             }
-            $this->snatch->update(
-                [
-                    'uploaded'       => $this->snatch->getOriginal('uploaded') + $this->uploadedInThisAnnounceCycle,
-                    'downloaded'     => $this->snatch->getOriginal('downloaded') + $this->downloadedInThisAnnounceCycle,
-                    'left'           => $this->request->input('left'),
-                    'seedTime'       => $this->snatch->seedTime + $this->seedTime,
-                    'leechTime'      => $this->snatch->leechTime + $this->leechTime,
-                    'timesAnnounced' => $this->snatch->timesAnnounced + 1,
-                    'finished_at'    => $finishedAt,
-                    'userAgent'      => $this->request->userAgent(),
-                ]
-            );
+            DB::table('snatches')
+                ->where('id', '=', $this->snatch->id)
+                ->update(
+                    [
+                        'uploaded'       => $this->snatch->uploaded + $this->uploadedInThisAnnounceCycle,
+                        'downloaded'     => $this->snatch->downloaded + $this->downloadedInThisAnnounceCycle,
+                        'left'           => $this->request->input('left'),
+                        'seedTime'       => $this->snatch->seedTime + $this->seedTime,
+                        'leechTime'      => $this->snatch->leechTime + $this->leechTime,
+                        'timesAnnounced' => $this->snatch->timesAnnounced + 1,
+                        'finished_at'    => $finishedAt,
+                        'userAgent'      => $this->request->userAgent(),
+                        'updated_at'     => Carbon::now()->format($this->getDateFormat()),
+                    ]
+                );
         }
     }
 
@@ -521,7 +537,7 @@ class AnnounceService
         $this->user->downloaded = $this->user->downloaded + $this->downloadedInThisAnnounceCycle;
 
         DB::table('users')
-            ->where('id', $this->user->id)
+            ->where('id', '=', $this->user->id)
             ->update(
                 [
                     'uploaded'   => $this->user->uploaded,
@@ -536,24 +552,26 @@ class AnnounceService
      */
     protected function insertPeerIPs(): void
     {
-        $this->peer->IPs()->delete();
+        DB::table('peers_ip')->where('peerID', '=', $this->peer->id)->delete();
 
         if (false !== isset($this->ipv4Address) && false !== isset($this->ipv4Port)) {
-            $this->peer->IPs()->create(
+            DB::table('peers_ip')->insert(
                 [
-                    'IP'          => $this->ipv4Address,
-                    'port'        => $this->ipv4Port,
-                    'isIPv6'      => false,
+                    'peerID' => $this->peer->id,
+                    'IP'     => $this->ipv4Address,
+                    'port'   => $this->ipv4Port,
+                    'isIPv6' => false,
                 ]
             );
         }
 
         if (false !== isset($this->ipv6Address) && false !== isset($this->ipv6Port)) {
-            $this->peer->IPs()->create(
+            DB::table('peers_ip')->insert(
                 [
-                    'IP'          => $this->ipv6Address,
-                    'port'        => $this->ipv6Port,
-                    'isIPv6'      => true,
+                    'peerID' => $this->peer->id,
+                    'IP'     => $this->ipv6Address,
+                    'port'   => $this->ipv6Port,
+                    'isIPv6' => true,
                 ]
             );
         }
@@ -593,7 +611,7 @@ class AnnounceService
      */
     protected function stoppedEventAnnounceResponse(): string
     {
-        $this->peer->delete();
+        DB::table('peers')->where('id', '=', $this->peer->id)->delete();
 
         if (true === $this->seeder) {
             $this->adjustTorrentPeers(-1, 0);
