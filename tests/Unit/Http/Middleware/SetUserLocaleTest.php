@@ -18,13 +18,13 @@ class SetUserLocaleTest extends TestCase
     {
         Auth::shouldReceive('check')->andReturn(true);
 
-        $user = new class {
+        $user = new class() {
             public $language;
             public $slug = 'test_slug';
 
             public function __construct()
             {
-                $this->language = new class {
+                $this->language = new class() {
                     public $localeShort = 'hr';
                 };
             }
@@ -35,7 +35,7 @@ class SetUserLocaleTest extends TestCase
         $middleware = new SetUserLocale();
 
         $request = new Request();
-        $next = new class {
+        $next = new class() {
             public $called = false;
 
             public function __invoke($request)
@@ -59,12 +59,14 @@ class SetUserLocaleTest extends TestCase
     {
         Auth::shouldReceive('check')->andReturn(false);
 
-        $localeBefore = $this->app->getLocale();
+        $localeBefore = 'en';
+        $this->app->setLocale($localeBefore);
+        Carbon::setLocale($localeBefore);
 
         $middleware = new SetUserLocale();
 
         $request = new Request();
-        $next = new class {
+        $next = new class() {
             public $called = false;
 
             public function __invoke($request)

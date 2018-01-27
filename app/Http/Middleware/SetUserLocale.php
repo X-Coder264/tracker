@@ -22,22 +22,13 @@ class SetUserLocale
     public function handle($request, $next)
     {
         if (true === Auth::check()) {
-            $locale = Cache::rememberForever(
-                'user.' . Auth::user()->slug . '.locale',
-                Closure::fromCallable([$this, 'getAuthenticatedUserLocale'])
-            );
+            $locale = Cache::rememberForever('user.' . Auth::user()->slug . '.locale', function () {
+                return Auth::user()->language->localeShort;
+            });
             App::setLocale($locale);
             Carbon::setLocale($locale);
         }
 
         return $next($request);
-    }
-
-    /**
-     * @return string
-     */
-    private function getAuthenticatedUserLocale(): string
-    {
-        return Auth::user()->language->localeShort;
     }
 }
