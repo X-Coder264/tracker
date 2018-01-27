@@ -70,16 +70,16 @@
         },
         {
             "name": "cloudcreativity/laravel-json-api",
-            "version": "v0.11.3",
+            "version": "v0.11.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/cloudcreativity/laravel-json-api.git",
-                "reference": "145fcb2511dc820c13b28e9024b4f1814632693c"
+                "reference": "2d6167f010912ac6e1875c1b5cdd14736dbbeee9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/cloudcreativity/laravel-json-api/zipball/145fcb2511dc820c13b28e9024b4f1814632693c",
-                "reference": "145fcb2511dc820c13b28e9024b4f1814632693c",
+                "url": "https://api.github.com/repos/cloudcreativity/laravel-json-api/zipball/2d6167f010912ac6e1875c1b5cdd14736dbbeee9",
+                "reference": "2d6167f010912ac6e1875c1b5cdd14736dbbeee9",
                 "shasum": ""
             },
             "require": {
@@ -147,7 +147,7 @@
                 "jsonapi.org",
                 "laravel"
             ],
-            "time": "2017-12-01T10:04:06+00:00"
+            "time": "2018-01-25T06:40:10+00:00"
         },
         {
             "name": "cloudcreativity/utils-object",
@@ -200,16 +200,16 @@
         },
         {
             "name": "cocur/slugify",
-            "version": "v3.0.1",
+            "version": "v3.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/cocur/slugify.git",
-                "reference": "1fdf2b1219a199301db3d7c60c16d895bba6ccde"
+                "reference": "b2ccf7b735f4f3df3979aef2e1ebf8e19ca772f7"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/cocur/slugify/zipball/1fdf2b1219a199301db3d7c60c16d895bba6ccde",
-                "reference": "1fdf2b1219a199301db3d7c60c16d895bba6ccde",
+                "url": "https://api.github.com/repos/cocur/slugify/zipball/b2ccf7b735f4f3df3979aef2e1ebf8e19ca772f7",
+                "reference": "b2ccf7b735f4f3df3979aef2e1ebf8e19ca772f7",
                 "shasum": ""
             },
             "require": {
@@ -261,7 +261,7 @@
                 "slug",
                 "slugify"
             ],
-            "time": "2017-09-24T10:29:04+00:00"
+            "time": "2018-01-22T09:00:48+00:00"
         },
         {
             "name": "cviebrock/eloquent-sluggable",
@@ -1238,16 +1238,16 @@
         },
         {
             "name": "nikic/php-parser",
-            "version": "v3.1.3",
+            "version": "v3.1.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nikic/PHP-Parser.git",
-                "reference": "579f4ce846734a1cf55d6a531d00ca07a43e3cda"
+                "reference": "e57b3a09784f846411aa7ed664eedb73e3399078"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nikic/PHP-Parser/zipball/579f4ce846734a1cf55d6a531d00ca07a43e3cda",
-                "reference": "579f4ce846734a1cf55d6a531d00ca07a43e3cda",
+                "url": "https://api.github.com/repos/nikic/PHP-Parser/zipball/e57b3a09784f846411aa7ed664eedb73e3399078",
+                "reference": "e57b3a09784f846411aa7ed664eedb73e3399078",
                 "shasum": ""
             },
             "require": {
@@ -1285,7 +1285,7 @@
                 "parser",
                 "php"
             ],
-            "time": "2017-12-26T14:43:21+00:00"
+            "time": "2018-01-25T21:31:33+00:00"
         },
         {
             "name": "paragonie/random_compat",
@@ -1733,16 +1733,16 @@
         },
         {
             "name": "spatie/laravel-permission",
-            "version": "2.7.8",
+            "version": "2.8.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/spatie/laravel-permission.git",
-                "reference": "e63427e4c364061f05f03fc893727198669c43c7"
+                "reference": "94940d81c2436b4f211990236c8f0ab1b7de9f37"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/spatie/laravel-permission/zipball/e63427e4c364061f05f03fc893727198669c43c7",
-                "reference": "e63427e4c364061f05f03fc893727198669c43c7",
+                "url": "https://api.github.com/repos/spatie/laravel-permission/zipball/94940d81c2436b4f211990236c8f0ab1b7de9f37",
+                "reference": "94940d81c2436b4f211990236c8f0ab1b7de9f37",
                 "shasum": ""
             },
             "require": {
@@ -1794,7 +1794,7 @@
                 "security",
                 "spatie"
             ],
-            "time": "2018-01-02T16:39:56+00:00"
+            "time": "2018-01-25T15:17:15+00:00"
         },
         {
             "name": "swiftmailer/swiftmailer",
@@ -3452,20 +3452,23 @@
         },
         {
             "name": "gecko-packages/gecko-php-unit",
-            "version": "v3.0",
+            "version": "v3.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/GeckoPackages/GeckoPHPUnit.git",
-                "reference": "6a866551dffc2154c1b091bae3a7877d39c25ca3"
+                "reference": "dbb18b292cfa14444d2e6d15202b9dcf5ab8365e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/GeckoPackages/GeckoPHPUnit/zipball/6a866551dffc2154c1b091bae3a7877d39c25ca3",
-                "reference": "6a866551dffc2154c1b091bae3a7877d39c25ca3",
+                "url": "https://api.github.com/repos/GeckoPackages/GeckoPHPUnit/zipball/dbb18b292cfa14444d2e6d15202b9dcf5ab8365e",
+                "reference": "dbb18b292cfa14444d2e6d15202b9dcf5ab8365e",
                 "shasum": ""
             },
             "require": {
                 "php": "^7.0"
+            },
+            "conflict": {
+                "phpunit/phpunit": "<6.0"
             },
             "require-dev": {
                 "phpunit/phpunit": "^6.0"
@@ -3473,7 +3476,7 @@
             "suggest": {
                 "ext-dom": "When testing with xml.",
                 "ext-libxml": "When testing with xml.",
-                "phpunit/phpunit": "This is an extension for it so make sure you have it some way."
+                "phpunit/phpunit": "This is an extension for PHPUnit so make sure you have that in some way."
             },
             "type": "library",
             "extra": {
@@ -3497,7 +3500,7 @@
                 "filesystem",
                 "phpunit"
             ],
-            "time": "2017-08-23T07:46:41+00:00"
+            "time": "2018-01-24T18:03:59+00:00"
         },
         {
             "name": "hamcrest/hamcrest-php",
@@ -3924,16 +3927,16 @@
         },
         {
             "name": "phpdocumentor/reflection-docblock",
-            "version": "4.2.0",
+            "version": "4.3.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phpDocumentor/ReflectionDocBlock.git",
-                "reference": "66465776cfc249844bde6d117abff1d22e06c2da"
+                "reference": "94fd0001232e47129dd3504189fa1c7225010d08"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpDocumentor/ReflectionDocBlock/zipball/66465776cfc249844bde6d117abff1d22e06c2da",
-                "reference": "66465776cfc249844bde6d117abff1d22e06c2da",
+                "url": "https://api.github.com/repos/phpDocumentor/ReflectionDocBlock/zipball/94fd0001232e47129dd3504189fa1c7225010d08",
+                "reference": "94fd0001232e47129dd3504189fa1c7225010d08",
                 "shasum": ""
             },
             "require": {
@@ -3971,7 +3974,7 @@
                 }
             ],
             "description": "With this component, a library can provide support for annotations via DocBlocks or otherwise retrieve information that is embedded in a DocBlock.",
-            "time": "2017-11-27T17:38:31+00:00"
+            "time": "2017-11-30T07:14:17+00:00"
         },
         {
             "name": "phpdocumentor/type-resolver",
