@@ -19,7 +19,6 @@ class SetUserLocaleTest extends TestCase
         Auth::shouldReceive('check')->andReturn(true);
 
         $user = new class {
-
             public $language;
             public $slug = 'test_slug';
 
@@ -37,12 +36,12 @@ class SetUserLocaleTest extends TestCase
 
         $request = new Request();
         $next = new class {
-
             public $called = false;
 
             public function __invoke($request)
             {
                 $this->called = true;
+
                 return $request;
             }
         };
@@ -66,12 +65,12 @@ class SetUserLocaleTest extends TestCase
 
         $request = new Request();
         $next = new class {
-
             public $called = false;
 
             public function __invoke($request)
             {
                 $this->called = true;
+
                 return $request;
             }
         };
