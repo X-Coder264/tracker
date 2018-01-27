@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Validator;
 
 /**
- * Note: For performance reasons the announce uses the query builder instead of Eloquent
+ * Note: For performance reasons the announce uses the query builder instead of Eloquent.
  */
 class AnnounceService
 {
