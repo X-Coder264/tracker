@@ -2,6 +2,7 @@
 
 namespace Tests\Unit\Http\Services;
 
+use stdClass;
 use Tests\TestCase;
 use ReflectionClass;
 use App\Http\Models\Peer;
@@ -11,7 +12,6 @@ use Illuminate\Support\Collection;
 use App\Http\Services\AnnounceService;
 use App\Http\Services\BencodingService;
 use PHPUnit\Framework\MockObject\MockObject;
-use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 
 class AnnounceServiceTest extends TestCase
 {
@@ -99,9 +99,21 @@ class AnnounceServiceTest extends TestCase
             factory(PeerIP::class)->make(['peerID' => $peer, 'IP' => '2b63:1478:1ac5:37ef:4e8c:75df:14cd:93f2', 'isIPv6' => true, 'port' => 60000]),
         ]);
 
-        $peer->setRelation('IPs', $IPs);
+        $peerOne = new stdClass();
+        $peerOne->peer_id = $peer->peer_id;
+        $peerOne->seeder = $peer->seeder;
+        $peerOne->IP = $IPs[0]->IP;
+        $peerOne->port = $IPs[0]->port;
+        $peerOne->isIPv6 = $IPs[0]->isIPv6;
 
-        $peers = new EloquentCollection([$peer]);
+        $peerTwo = new stdClass();
+        $peerTwo->peer_id = $peer->peer_id;
+        $peerTwo->seeder = $peer->seeder;
+        $peerTwo->IP = $IPs[1]->IP;
+        $peerTwo->port = $IPs[1]->port;
+        $peerTwo->isIPv6 = $IPs[1]->isIPv6;
+
+        $peers = Collection::make([$peerOne, $peerTwo]);
 
         $encoder = $this->getMockBuilder(BencodingService::class)
             ->setMethods(['encode'])
@@ -173,9 +185,21 @@ class AnnounceServiceTest extends TestCase
             ),
         ]);
 
-        $peer->setRelation('IPs', $IPs);
+        $peerOne = new stdClass();
+        $peerOne->peer_id = $peer->peer_id;
+        $peerOne->seeder = $peer->seeder;
+        $peerOne->IP = $IPs[0]->IP;
+        $peerOne->port = $IPs[0]->port;
+        $peerOne->isIPv6 = $IPs[0]->isIPv6;
 
-        $peers = new EloquentCollection([$peer]);
+        $peerTwo = new stdClass();
+        $peerTwo->peer_id = $peer->peer_id;
+        $peerTwo->seeder = $peer->seeder;
+        $peerTwo->IP = $IPs[1]->IP;
+        $peerTwo->port = $IPs[1]->port;
+        $peerTwo->isIPv6 = $IPs[1]->isIPv6;
+
+        $peers = Collection::make([$peerOne, $peerTwo]);
 
         $encoder = $this->getMockBuilder(BencodingService::class)
             ->setMethods(['encode'])

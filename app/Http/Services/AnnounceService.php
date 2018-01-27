@@ -5,15 +5,16 @@ declare(strict_types=1);
 namespace App\Http\Services;
 
 use stdClass;
-use App\Http\Models\Peer;
-use App\Http\Models\Snatch;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Database\Eloquent\Collection;
 
+/**
+ * Note: For performance reasons the announce uses the query builder instead of Eloquent
+ */
 class AnnounceService
 {
     /**
@@ -32,7 +33,7 @@ class AnnounceService
     protected $user;
 
     /**
-     * @var null|Peer|stdClass
+     * @var null|stdClass
      */
     protected $peer = null;
 
@@ -57,7 +58,7 @@ class AnnounceService
     protected $event;
 
     /**
-     * @var null|Snatch|stdClass
+     * @var null|stdClass
      */
     protected $snatch;
 
@@ -446,7 +447,8 @@ class AnnounceService
      */
     protected function insertPeer(): void
     {
-        $this->peer = new Peer(
+        $this->peer = new stdClass();
+        $this->peer->id = DB::table('peers')->insertGetId(
             [
                 'peer_id'    => $this->peerID,
                 'torrent_id' => $this->torrent->id,
@@ -455,9 +457,10 @@ class AnnounceService
                 'downloaded' => $this->downloadedInThisAnnounceCycle,
                 'seeder'     => $this->seeder,
                 'userAgent'  => $this->request->userAgent(),
+                'created_at' => Carbon::now()->format($this->getDateFormat()),
+                'updated_at' => Carbon::now()->format($this->getDateFormat()),
             ]
         );
-        $this->peer->save();
     }
 
     /**
@@ -485,7 +488,8 @@ class AnnounceService
      */
     protected function insertSnatch(): void
     {
-        $this->snatch = new Snatch(
+        $this->snatch = new stdClass();
+        $this->snatch->id = DB::table('snatches')->insertGetId(
             [
                 'torrent_id'     => $this->torrent->id,
                 'user_id'        => $this->user->id,
@@ -494,9 +498,10 @@ class AnnounceService
                 'left'           => $this->request->input('left'),
                 'timesAnnounced' => 1,
                 'userAgent'      => $this->request->userAgent(),
+                'created_at'     => Carbon::now()->format($this->getDateFormat()),
+                'updated_at'     => Carbon::now()->format($this->getDateFormat()),
             ]
         );
-        $this->snatch->save();
     }
 
     /**
@@ -664,7 +669,8 @@ class AnnounceService
      */
     protected function getPeers(): Collection
     {
-        return Peer::with('IPs')
+        return DB::table('peers')
+            ->join('peers_ip', 'peers.id', '=', 'peers_ip.peerID')
             ->when($this->seeder, function ($query) {
                 return $query->where('seeder', '!=', true);
             })
@@ -672,7 +678,7 @@ class AnnounceService
             ->where('torrent_id', '=', $this->torrent->id)
             ->limit($this->numberOfWantedPeers)
             ->inRandomOrder()
-            ->select(['id', 'peer_id', 'seeder'])
+            ->select('peer_id', 'seeder', 'peers_ip.*')
             ->get();
     }
 
@@ -742,15 +748,13 @@ class AnnounceService
         $peers = $this->getPeers();
 
         foreach ($peers as $peer) {
-            foreach ($peer->IPs as $peerAddress) {
-                $peerIPAddress = inet_pton($peerAddress->IP);
-                $peerPort = pack('n*', $peerAddress->port);
+            $peerIPAddress = inet_pton($peer->IP);
+            $peerPort = pack('n*', $peer->port);
 
-                if (true === (bool) $peerAddress->isIPv6) {
-                    $response['peers6'] .= $peerIPAddress . $peerPort;
-                } else {
-                    $response['peers'] .= $peerIPAddress . $peerPort;
-                }
+            if (true === (bool) $peer->isIPv6) {
+                $response['peers6'] .= $peerIPAddress . $peerPort;
+            } else {
+                $response['peers'] .= $peerIPAddress . $peerPort;
             }
         }
 
@@ -768,14 +772,12 @@ class AnnounceService
         $peers = $this->getPeers();
 
         foreach ($peers as $peer) {
-            foreach ($peer->IPs as $peerAddress) {
-                // IPv6 peers are not separated for non-compact responses
-                $response['peers'][] = [
-                    'peer id' => hex2bin($peer->peer_id),
-                    'ip'      => $peerAddress->IP,
-                    'port'    => (int) $peerAddress->port,
-                ];
-            }
+            // IPv6 peers are not separated for non-compact responses
+            $response['peers'][] = [
+                'peer id' => hex2bin($peer->peer_id),
+                'ip'      => $peer->IP,
+                'port'    => (int) $peer->port,
+            ];
         }
 
         return $this->encoder->encode($response);
