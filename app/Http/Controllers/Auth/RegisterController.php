@@ -71,7 +71,7 @@ class RegisterController extends Controller
             'name'     => 'required|string|max:255|unique:users',
             'email'    => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:8|confirmed',
-            'locale' => [
+            'locale'   => [
                 'required',
                 Rule::in($localeIDs),
             ],
@@ -89,10 +89,10 @@ class RegisterController extends Controller
     protected function create(array $data): User
     {
         return User::create([
-            'name' => $data['name'],
-            'email' => $data['email'],
-            'password' => $data['password'],
-            'timezone' => $data['timezone'],
+            'name'      => $data['name'],
+            'email'     => $data['email'],
+            'password'  => $data['password'],
+            'timezone'  => $data['timezone'],
             'locale_id' => $data['locale'],
         ]);
     }
