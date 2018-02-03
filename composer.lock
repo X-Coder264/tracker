@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "c3624040ecef6b6a1c2a786a15d4fe3f",
+    "content-hash": "9abf163324e854542b0b1233a821e39f",
     "packages": [
         {
             "name": "cloudcreativity/json-api",
