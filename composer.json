@@ -11,7 +11,7 @@
         "fideloper/proxy": "~3.3",
         "laravel/framework": "5.5.*",
         "laravel/tinker": "~1.0",
-        "predis/predis": "^1.1",
+        "predis/predis": "^1.1.1",
         "spatie/laravel-permission": "^2.7"
     },
     "require-dev": {
@@ -21,7 +21,7 @@
         "friendsofphp/php-cs-fixer": "^2.10",
         "fzaninotto/faker": "~1.4",
         "mockery/mockery": "~1.0",
-        "phpunit/phpunit": "~6.0"
+        "phpunit/phpunit": "~7.0"
     },
     "autoload": {
         "classmap": [
