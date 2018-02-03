@@ -23,9 +23,9 @@ class Schema extends EloquentSchema
     ];
 
     /**
-     * @param User   $resource
-     * @param bool   $isPrimary
-     * @param array  $includeRelationships
+     * @param User  $resource
+     * @param bool  $isPrimary
+     * @param array $includeRelationships
      *
      * @return array
      */
