@@ -52,4 +52,63 @@ class TorrentsControllerTest extends AdminApiTestCase
         );
         $this->assertSame(route('admin.torrents.read', $torrents[1]->id), $jsonResponse['data'][1]['links']['self']);
     }
+
+    public function testNameFilter()
+    {
+        $user = factory(User::class)->create();
+        $torrents = factory(Torrent::class, 2)->create();
+        $this->actingAs($user);
+        $response = $this->makeRequest('GET', route('admin.torrents.index', ['filter[name]' => $torrents[1]->name]));
+        $jsonResponse = $response->getJsonResponse();
+
+        $this->assertSame(1, $jsonResponse['meta']['total']);
+        $this->assertSame($torrents[1]->name, $jsonResponse['data'][0]['attributes']['name']);
+        $this->assertSame($torrents[1]->size, $jsonResponse['data'][0]['attributes']['size']);
+        $this->assertSame($torrents[1]->description, $jsonResponse['data'][0]['attributes']['description']);
+        $this->assertSame($torrents[1]->slug, $jsonResponse['data'][0]['attributes']['slug']);
+        $this->assertSame(
+            $torrents[1]->uploader->id,
+            (int) $jsonResponse['data'][0]['relationships']['uploader']['data']['id']
+        );
+        $this->assertSame(
+            $torrents[0]->created_at->format(Carbon::W3C),
+            $jsonResponse['data'][0]['attributes']['created-at']
+        );
+        $this->assertSame(
+            $torrents[0]->updated_at->format(Carbon::W3C),
+            $jsonResponse['data'][0]['attributes']['updated-at']
+        );
+        $this->assertSame(route('admin.torrents.read', $torrents[1]->id), $jsonResponse['data'][0]['links']['self']);
+        $this->assertCount(1, $jsonResponse['data']);
+    }
+
+    public function testSlugFilter()
+    {
+        $this->withExceptionHandling();
+        $user = factory(User::class)->create();
+        $torrents = factory(Torrent::class, 2)->create();
+        $this->actingAs($user);
+        $response = $this->makeRequest('GET', route('admin.torrents.index', ['filter[slug]' => $torrents[1]->slug]));
+        $jsonResponse = $response->getJsonResponse();
+
+        $this->assertSame(1, $jsonResponse['meta']['total']);
+        $this->assertSame($torrents[1]->name, $jsonResponse['data'][0]['attributes']['name']);
+        $this->assertSame($torrents[1]->size, $jsonResponse['data'][0]['attributes']['size']);
+        $this->assertSame($torrents[1]->description, $jsonResponse['data'][0]['attributes']['description']);
+        $this->assertSame($torrents[1]->slug, $jsonResponse['data'][0]['attributes']['slug']);
+        $this->assertSame(
+            $torrents[1]->uploader->id,
+            (int) $jsonResponse['data'][0]['relationships']['uploader']['data']['id']
+        );
+        $this->assertSame(
+            $torrents[0]->created_at->format(Carbon::W3C),
+            $jsonResponse['data'][0]['attributes']['created-at']
+        );
+        $this->assertSame(
+            $torrents[0]->updated_at->format(Carbon::W3C),
+            $jsonResponse['data'][0]['attributes']['updated-at']
+        );
+        $this->assertSame(route('admin.torrents.read', $torrents[1]->id), $jsonResponse['data'][0]['links']['self']);
+        $this->assertCount(1, $jsonResponse['data']);
+    }
 }

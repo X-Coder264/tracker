@@ -4,7 +4,6 @@ namespace App\JsonApi\Users;
 
 use App\Http\Models\User;
 use App\JsonApi\ResourceTypes;
-use CloudCreativity\JsonApi\Exceptions\RuntimeException;
 use CloudCreativity\LaravelJsonApi\Schema\EloquentSchema;
 
 class Schema extends EloquentSchema
@@ -24,7 +23,7 @@ class Schema extends EloquentSchema
     ];
 
     /**
-     * @param object $resource
+     * @param User   $resource
      * @param bool   $isPrimary
      * @param array  $includeRelationships
      *
@@ -32,10 +31,6 @@ class Schema extends EloquentSchema
      */
     public function getRelationships($resource, $isPrimary, array $includeRelationships)
     {
-        if (! $resource instanceof User) {
-            throw new RuntimeException('Expecting a user model.');
-        }
-
         return [
             'torrents' => [
                 self::DATA => $resource->torrents,

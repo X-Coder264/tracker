@@ -151,4 +151,52 @@ class UsersControllerTest extends AdminApiTestCase
         $this->assertSame($user->passkey, $updatedUser->passkey);
         $this->assertTrue($updatedUser->language->is($locale));
     }
+
+    public function testNameFilter()
+    {
+        $userJohn = factory(User::class)->create(['name' => 'John']);
+        $userDoe = factory(User::class)->create(['name' => 'Doe']);
+        $this->actingAs($userJohn);
+        $response = $this->makeRequest('GET', route('admin.users.index', ['filter[name]' => 'Doe']));
+        $jsonResponse = $response->getJsonResponse();
+
+        $this->assertSame(1, $jsonResponse['meta']['total']);
+        $this->assertSame($userDoe->name, $jsonResponse['data'][0]['attributes']['name']);
+        $this->assertSame($userDoe->email, $jsonResponse['data'][0]['attributes']['email']);
+        $this->assertSame($userDoe->slug, $jsonResponse['data'][0]['attributes']['slug']);
+        $this->assertSame(
+            $userDoe->created_at->format(Carbon::W3C),
+            $jsonResponse['data'][0]['attributes']['created-at']
+        );
+        $this->assertSame(
+            $userDoe->updated_at->format(Carbon::W3C),
+            $jsonResponse['data'][0]['attributes']['updated-at']
+        );
+        $this->assertSame(route('admin.users.read', $userDoe->id), $jsonResponse['data'][0]['links']['self']);
+        $this->assertCount(1, $jsonResponse['data']);
+    }
+
+    public function testSlugFilter()
+    {
+        $userJohn = factory(User::class)->create(['slug' => 'john']);
+        $userDoe = factory(User::class)->create(['slug' => 'doe']);
+        $this->actingAs($userJohn);
+        $response = $this->makeRequest('GET', route('admin.users.index', ['filter[slug]' => 'doe']));
+        $jsonResponse = $response->getJsonResponse();
+
+        $this->assertSame(1, $jsonResponse['meta']['total']);
+        $this->assertSame($userDoe->name, $jsonResponse['data'][0]['attributes']['name']);
+        $this->assertSame($userDoe->email, $jsonResponse['data'][0]['attributes']['email']);
+        $this->assertSame($userDoe->slug, $jsonResponse['data'][0]['attributes']['slug']);
+        $this->assertSame(
+            $userDoe->created_at->format(Carbon::W3C),
+            $jsonResponse['data'][0]['attributes']['created-at']
+        );
+        $this->assertSame(
+            $userDoe->updated_at->format(Carbon::W3C),
+            $jsonResponse['data'][0]['attributes']['updated-at']
+        );
+        $this->assertSame(route('admin.users.read', $userDoe->id), $jsonResponse['data'][0]['links']['self']);
+        $this->assertCount(1, $jsonResponse['data']);
+    }
 }

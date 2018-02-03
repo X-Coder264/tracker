@@ -40,6 +40,6 @@ class Adapter extends EloquentAdapter
      */
     protected function isSearchOne(Collection $filters)
     {
-        return $filters->has('id');
+        return false;
     }
 }

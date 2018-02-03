@@ -2,7 +2,7 @@
 
 namespace App\JsonApi\Torrents;
 
-use App\Http\Models\User;
+use App\Http\Models\Torrent;
 use App\JsonApi\ResourceTypes;
 use CloudCreativity\LaravelJsonApi\Validators\AbstractValidatorProvider;
 use CloudCreativity\JsonApi\Contracts\Validators\RelationshipsValidatorInterface;
@@ -41,7 +41,6 @@ class Validators extends AbstractValidatorProvider
         'id',
         'name',
         'slug',
-        'email',
     ];
 
     /**
@@ -49,7 +48,7 @@ class Validators extends AbstractValidatorProvider
      */
     protected function attributeRules($record = null)
     {
-        /** @var User $record */
+        /** @var Torrent $record */
 
         // The JSON API spec says the client does not have to send all attributes for an update request, so
         // if the record already exists we need to include a 'sometimes' before required.

@@ -4,7 +4,6 @@ namespace App\JsonApi\Torrents;
 
 use App\Http\Models\Torrent;
 use App\JsonApi\ResourceTypes;
-use CloudCreativity\JsonApi\Exceptions\RuntimeException;
 use CloudCreativity\LaravelJsonApi\Schema\EloquentSchema;
 
 class Schema extends EloquentSchema
@@ -25,18 +24,14 @@ class Schema extends EloquentSchema
     ];
 
     /**
-     * @param object $resource
-     * @param bool   $isPrimary
-     * @param array  $includeRelationships
+     * @param Torrent $resource
+     * @param bool    $isPrimary
+     * @param array   $includeRelationships
      *
      * @return array
      */
     public function getRelationships($resource, $isPrimary, array $includeRelationships)
     {
-        if (! $resource instanceof Torrent) {
-            throw new RuntimeException('Expecting a torrent model.');
-        }
-
         return [
             'uploader' => [
                 self::DATA => $resource->uploader,
