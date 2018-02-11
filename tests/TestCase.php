@@ -16,13 +16,13 @@ abstract class TestCase extends BaseTestCase
      */
     protected function setUpTraits()
     {
-        $uses = parent::setUpTraits();
+        $uses = array_flip(class_uses_recursive(static::class));
 
         if (isset($uses[EnableForeignKeyConstraints::class])) {
             /* @var $this TestCase|EnableForeignKeyConstraints */
             $this->enableForeignKeys();
         }
 
-        return $uses;
+        return parent::setUpTraits();
     }
 }

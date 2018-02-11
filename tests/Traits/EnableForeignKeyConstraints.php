@@ -2,6 +2,8 @@
 
 namespace Tests\Traits;
 
+use Illuminate\Database\DatabaseManager;
+
 trait EnableForeignKeyConstraints
 {
     /**
@@ -9,6 +11,7 @@ trait EnableForeignKeyConstraints
      */
     public function enableForeignKeys(): void
     {
+        /* @var DatabaseManager $db */
         $db = app()->make('db');
         $db->getSchemaBuilder()->enableForeignKeyConstraints();
     }
