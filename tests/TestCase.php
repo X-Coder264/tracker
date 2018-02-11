@@ -18,6 +18,7 @@ abstract class TestCase extends BaseTestCase
     {
         $uses = array_flip(class_uses_recursive(static::class));
 
+        // Enabling foreign key constraints should be run before the database migration
         if (isset($uses[EnableForeignKeyConstraints::class])) {
             /* @var $this TestCase|EnableForeignKeyConstraints */
             $this->enableForeignKeys();
