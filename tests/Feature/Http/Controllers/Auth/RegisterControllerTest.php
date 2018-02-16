@@ -50,7 +50,6 @@ class RegisterControllerTest extends TestCase
         $user = User::findOrFail(1);
         $this->assertSame($user->name, $name);
         $this->assertSame($user->email, $email);
-        $this->assertSame(60, strlen($user->password));
         $this->assertTrue(Hash::check($password, $user->password));
         $this->assertSame($user->timezone, $timezone);
         $this->assertTrue($user->language->is($locale));
