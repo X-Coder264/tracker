@@ -10,6 +10,7 @@ class HashFake implements HasherContract
      * Get information about the given hashed value.
      *
      * @param string $hashedValue
+     *
      * @return array
      */
     public function info($hashedValue)
@@ -22,6 +23,7 @@ class HashFake implements HasherContract
      *
      * @param string $value
      * @param array  $options
+     *
      * @return string
      */
     public function make($value, array $options = [])
@@ -35,6 +37,7 @@ class HashFake implements HasherContract
      * @param string $value
      * @param string $hashedValue
      * @param array  $options
+     *
      * @return bool
      */
     public function check($value, $hashedValue, array $options = [])
@@ -47,6 +50,7 @@ class HashFake implements HasherContract
      *
      * @param string $hashedValue
      * @param array  $options
+     *
      * @return bool
      */
     public function needsRehash($hashedValue, array $options = [])
