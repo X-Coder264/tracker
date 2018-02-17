@@ -22,6 +22,7 @@ class DeletePeersTest extends TestCase
         $this->artisan('peers:delete');
 
         $this->assertSame(1, Peer::count());
+
         try {
             Peer::findOrFail($nonObsoletePeer->id);
         } catch (ModelNotFoundException $exception) {
