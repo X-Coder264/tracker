@@ -20,7 +20,7 @@ class Configuration extends Model
      * Scope a query to only include the wanted configuration value.
      *
      * @param Builder $query
-     * @param string $name
+     * @param string  $name
      *
      * @return self
      */
