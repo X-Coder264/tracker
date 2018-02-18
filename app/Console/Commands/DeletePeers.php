@@ -22,17 +22,7 @@ class DeletePeers extends Command
      */
     protected $description = 'Deletes all obsolete peers';
 
-    /**
-     * Create a new console command instance.
-     *
-     * @return void
-     */
-    public function __construct()
-    {
-        parent::__construct();
-    }
-
-    public function handle()
+    public function handle(): void
     {
         $obsoletePeerIds = Peer::select('id')->where('updated_at', '<', Carbon::now()->subMinutes(45))->get()->pluck('id');
         Peer::destroy($obsoletePeerIds);
