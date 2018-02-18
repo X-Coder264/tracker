@@ -33,7 +33,7 @@ class TorrentController extends Controller
         Cache::forget('torrents');
         $torrents = Cache::remember('torrents', 10, function () {
             return Torrent::with(['uploader'])->where('seeders', '>', 0)
-                                              ->orderby('id', 'desc')
+                                              ->orderBy('id', 'desc')
                                               ->paginate(3);
         });
 
