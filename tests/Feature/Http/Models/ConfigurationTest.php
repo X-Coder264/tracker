@@ -2,8 +2,8 @@
 
 namespace Tests\Feature\Http\Models;
 
-use App\Http\Models\Configuration;
 use Tests\TestCase;
+use App\Http\Models\Configuration;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class ConfigurationTest extends TestCase
