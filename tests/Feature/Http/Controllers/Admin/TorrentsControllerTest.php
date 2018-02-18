@@ -71,11 +71,11 @@ class TorrentsControllerTest extends AdminApiTestCase
             (int) $jsonResponse['data'][0]['relationships']['uploader']['data']['id']
         );
         $this->assertSame(
-            $torrents[0]->created_at->format(Carbon::W3C),
+            $torrents[1]->created_at->format(Carbon::W3C),
             $jsonResponse['data'][0]['attributes']['created-at']
         );
         $this->assertSame(
-            $torrents[0]->updated_at->format(Carbon::W3C),
+            $torrents[1]->updated_at->format(Carbon::W3C),
             $jsonResponse['data'][0]['attributes']['updated-at']
         );
         $this->assertSame(route('admin.torrents.read', $torrents[1]->id), $jsonResponse['data'][0]['links']['self']);
@@ -101,11 +101,11 @@ class TorrentsControllerTest extends AdminApiTestCase
             (int) $jsonResponse['data'][0]['relationships']['uploader']['data']['id']
         );
         $this->assertSame(
-            $torrents[0]->created_at->format(Carbon::W3C),
+            $torrents[1]->created_at->format(Carbon::W3C),
             $jsonResponse['data'][0]['attributes']['created-at']
         );
         $this->assertSame(
-            $torrents[0]->updated_at->format(Carbon::W3C),
+            $torrents[1]->updated_at->format(Carbon::W3C),
             $jsonResponse['data'][0]['attributes']['updated-at']
         );
         $this->assertSame(route('admin.torrents.read', $torrents[1]->id), $jsonResponse['data'][0]['links']['self']);
