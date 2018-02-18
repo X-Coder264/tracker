@@ -10,7 +10,7 @@ class ConfigurationTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function testNameScope()
+    public function testGetConfigurationValueScope()
     {
         factory(Configuration::class)->create(['name' => 'test']);
         factory(Configuration::class)->create(['name' => 'test1']);
