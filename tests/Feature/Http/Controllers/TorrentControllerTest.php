@@ -3,8 +3,8 @@
 namespace Tests\Feature\Http\Controllers;
 
 use Tests\TestCase;
+use App\Http\Models\Peer;
 use App\Http\Models\User;
-use Illuminate\Support\Str;
 use App\Http\Models\Torrent;
 use Illuminate\Http\Response;
 use Illuminate\Http\Testing\File;
@@ -47,6 +47,7 @@ class TorrentControllerTest extends TestCase
         $response->assertStatus(Response::HTTP_OK);
         $response->assertViewIs('torrents.index');
         $response->assertViewHas(['torrents', 'timezone']);
+        $this->assertInstanceOf(LengthAwarePaginator::class, $response->original->torrents);
         $response->assertSee($visibleTorrent->name);
         $response->assertSee($visibleTorrent->uploader->name);
         $response->assertDontSee($deadTorrent->name);
@@ -70,25 +71,40 @@ class TorrentControllerTest extends TestCase
         $torrentComment = factory(TorrentComment::class)->create(
             ['torrent_id' => $torrent->id, 'user_id' => $torrent->uploader_id]
         );
+        $peer = factory(Peer::class)->create(
+            [
+                'torrent_id' => $torrent->id,
+                'user_id'    => $this->user->id,
+                'uploaded'   => 6144,
+                'downloaded' => 2048,
+            ]
+        );
 
         $torrentInfo = $this->createMock(TorrentInfoService::class);
-        $this->app->instance(TorrentInfoService::class, $torrentInfo);
-
-        $returnValue = ['55.55 MB', 'Test.txt'];
+        $returnValue = [['Test.txt', '55.55 MiB']];
         $torrentInfo->method('getTorrentFileNamesAndSizes')->willReturn($returnValue);
+        $this->app->instance(TorrentInfoService::class, $torrentInfo);
 
         $response = $this->get(route('torrents.show', $torrent));
         $response->assertStatus(Response::HTTP_OK);
         $response->assertViewIs('torrents.show');
         $response->assertViewHas('torrent');
-        $response->assertViewHas('numberOfPeers');
+        $response->assertViewHas('numberOfPeers', 1);
         $response->assertViewHas('torrentFileNamesAndSizes', $returnValue);
         $response->assertViewHas('torrentComments');
-        $response->assertViewHas('timezone');
+        $response->assertViewHas('timezone', $this->user->timezone);
         $this->assertInstanceOf(LengthAwarePaginator::class, $response->original->torrentComments);
         $response->assertSee($torrent->name);
         $response->assertSee($torrent->description);
         $response->assertSee($torrentComment->comment);
+        $response->assertSee($peer->user->name);
+        $response->assertSee($peer->updated_at->diffForHumans());
+        $response->assertSee('2.00 KiB');
+        $response->assertSee('6.00 KiB');
+        $response->assertSee('3.00');
+        $response->assertSee($peer->userAgent);
+        $response->assertSee('55.55 MiB');
+        $response->assertSee('Test.txt');
     }
 
     public function testShowWhenTorrentInfoServiceThrowsAnException()
@@ -178,11 +194,10 @@ class TorrentControllerTest extends TestCase
         $this->assertSame($encoderReturnValue, $response->getContent());
         $response->assertHeader('Content-Type', 'application/x-bittorrent');
         $fileName = str_replace(['/', '\\'], '', $torrent->name . '.torrent');
-        $filenameFallback = str_replace('%', '', Str::ascii($fileName));
         $contentDisposition = sprintf(
             '%s; filename="%s"' . "; filename*=utf-8''%s",
             ResponseHeaderBag::DISPOSITION_ATTACHMENT,
-            $filenameFallback,
+            'ccsdz.torrent',
             rawurlencode($fileName)
         );
         $response->assertHeader('Content-Disposition', $contentDisposition);

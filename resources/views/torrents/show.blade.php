@@ -51,10 +51,10 @@
                                                 <td>{{ $peer->user->name }}</td>
                                                 <td>{{ $peer->uploaded }}</td>
                                                 <td>{{ $peer->downloaded }}</td>
-                                                @if (0 === (int) $peer->downloaded)
+                                                @if (0 === (int) $peer->getOriginal('downloaded'))
                                                     <td>Inf.</td>
                                                 @else
-                                                    <td>{{ number_format((int) $peer->uploaded / (int) $peer->downloaded, 2) }}</td>
+                                                    <td>{{ number_format((int) $peer->getOriginal('uploaded') / (int) $peer->getOriginal('downloaded'), 2) }}</td>
                                                 @endif
                                                 <td>{{ $peer->updated_at->diffForHumans() }}</td>
                                                 <td>{{ $peer->userAgent }}</td>
