@@ -19,6 +19,6 @@ class IndexControllerTest extends TestCase
 
         $response->assertStatus(Response::HTTP_OK);
         $response->assertViewIs('admin.index');
-        $response->assertViewHasAll([['user' => $user], ['projectName' => config('app.name')]]);
+        $response->assertViewHasAll([['user' => $user], ['projectName' => config('app.name')], 'enumerations']);
     }
 }
