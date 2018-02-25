@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use Carbon\Carbon;
 use App\Http\Models\Peer;
 use Illuminate\Console\Command;
+use Illuminate\Support\Collection;
 
 class DeletePeers extends Command
 {
@@ -24,7 +25,10 @@ class DeletePeers extends Command
 
     public function handle(): void
     {
+        /** @var Collection $obsoletePeerIds */
         $obsoletePeerIds = Peer::select('id')->where('updated_at', '<', Carbon::now()->subMinutes(45))->get()->pluck('id');
-        Peer::destroy($obsoletePeerIds);
+        if ($obsoletePeerIds->isNotEmpty()) {
+            Peer::destroy($obsoletePeerIds->all());
+        }
     }
 }
