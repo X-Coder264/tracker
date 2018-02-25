@@ -262,7 +262,6 @@ class AnnounceService
      */
     protected function validateRequest(): ?string
     {
-        /* @var \Illuminate\Validation\Validator $validator */
         $validator = Validator::make(
             $this->request->all(),
             [

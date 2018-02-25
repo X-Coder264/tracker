@@ -87,7 +87,7 @@ class SetUserLocaleTest extends TestCase
 
     public function testMiddlewareIsAppliedToAllWebRoutes()
     {
-        /* @var RouteCollection $allRoutes */
+        /** @var RouteCollection $allRoutes */
         $allRoutes = Route::getRoutes()->getRoutesByName();
 
         foreach ($allRoutes as $route) {

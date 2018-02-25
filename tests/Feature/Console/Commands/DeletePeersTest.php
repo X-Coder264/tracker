@@ -32,7 +32,7 @@ class DeletePeersTest extends TestCase
 
     public function testTheCommandIsScheduledProperly()
     {
-        /* @var Schedule $schedule */
+        /** @var Schedule $schedule */
         $schedule = $this->app->make(Schedule::class);
 
         $events = collect($schedule->events())->filter(function (Event $event) {

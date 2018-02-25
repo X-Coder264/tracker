@@ -6,7 +6,7 @@ use App\Http\Models\Torrent;
 use Faker\Generator as Faker;
 use Illuminate\Database\Eloquent\Factory;
 
-/* @var Factory $factory */
+/** @var Factory $factory */
 $factory->define(Peer::class, function (Faker $faker) {
     return [
         'peer_id' => bin2hex(random_bytes(20)),

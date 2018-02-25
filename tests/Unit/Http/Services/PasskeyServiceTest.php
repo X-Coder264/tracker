@@ -12,7 +12,7 @@ class PasskeyServiceTest extends TestCase
 {
     public function testGenerateUniquePasskey()
     {
-        /* @var PasskeyService|MockObject $passkeyService */
+        /** @var PasskeyService|MockObject $passkeyService */
         $passkeyService = $this->getMockBuilder(PasskeyService::class)
             ->setMethods(['generatePasskey', 'getUserWithTheSpecifiedPasskey'])
             ->getMock();

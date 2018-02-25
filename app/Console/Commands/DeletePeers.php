@@ -25,7 +25,7 @@ class DeletePeers extends Command
 
     public function handle(): void
     {
-        /* @var Collection $obsoletePeerIds */
+        /** @var Collection $obsoletePeerIds */
         $obsoletePeerIds = Peer::select('id')->where('updated_at', '<', Carbon::now()->subMinutes(45))->get()->pluck('id');
         if ($obsoletePeerIds->isNotEmpty()) {
             Peer::destroy($obsoletePeerIds->all());

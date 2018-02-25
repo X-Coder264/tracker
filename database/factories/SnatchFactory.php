@@ -6,7 +6,7 @@ use App\Http\Models\Torrent;
 use Faker\Generator as Faker;
 use Illuminate\Database\Eloquent\Factory;
 
-/* @var Factory $factory */
+/** @var Factory $factory */
 $factory->define(Snatch::class, function (Faker $faker) {
     return [
         'torrent_id' => function () {

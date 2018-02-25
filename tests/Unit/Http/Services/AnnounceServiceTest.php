@@ -48,7 +48,7 @@ class AnnounceServiceTest extends TestCase
 
     public function testErrorResponseWithStringParameter()
     {
-        /* @var MockObject|BencodingService $encoder */
+        /** @var MockObject|BencodingService $encoder */
         $encoder = $this->getMockBuilder(BencodingService::class)
             ->setMethods(['encode'])
             ->getMock();
@@ -69,7 +69,7 @@ class AnnounceServiceTest extends TestCase
 
     public function testErrorResponseWithArrayParameter()
     {
-        /* @var MockObject|BencodingService $encoder */
+        /** @var MockObject|BencodingService $encoder */
         $encoder = $this->getMockBuilder(BencodingService::class)
             ->setMethods(['encode'])
             ->getMock();

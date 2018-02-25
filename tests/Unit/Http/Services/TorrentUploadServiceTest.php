@@ -14,7 +14,7 @@ class TorrentUploadServiceTest extends TestCase
 {
     public function testGetTorrentInfoHash()
     {
-        /* @var MockObject|BencodingService $encoder */
+        /** @var MockObject|BencodingService $encoder */
         $encoder = $this->getMockBuilder(BencodingService::class)
             ->setMethods(['encode'])
             ->getMock();
@@ -25,9 +25,9 @@ class TorrentUploadServiceTest extends TestCase
             ->with($this->equalTo($array))
             ->willReturn($returnValue);
 
-        /* @var MockObject|BdecodingService $decoder */
+        /** @var MockObject|BdecodingService $decoder */
         $decoder = $this->createMock(BdecodingService::class);
-        /* @var MockObject|TorrentInfoService $torrentInfoService */
+        /** @var MockObject|TorrentInfoService $torrentInfoService */
         $torrentInfoService = $this->createMock(TorrentInfoService::class);
         $torrentUploadService = new TorrentUploadService($encoder, $decoder, $torrentInfoService);
         $reflectionClass = new ReflectionClass(TorrentUploadService::class);

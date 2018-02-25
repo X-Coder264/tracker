@@ -6,7 +6,7 @@ use Faker\Generator as Faker;
 use App\Http\Models\TorrentComment;
 use Illuminate\Database\Eloquent\Factory;
 
-/* @var Factory $factory */
+/** @var Factory $factory */
 $factory->define(TorrentComment::class, function (Faker $faker) {
     return [
         'comment' => $faker->text,

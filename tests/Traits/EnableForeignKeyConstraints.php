@@ -11,7 +11,7 @@ trait EnableForeignKeyConstraints
      */
     public function enableForeignKeys(): void
     {
-        /* @var DatabaseManager $db */
+        /** @var DatabaseManager $db */
         $db = app()->make('db');
         $db->getSchemaBuilder()->enableForeignKeyConstraints();
     }

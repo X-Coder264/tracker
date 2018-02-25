@@ -126,9 +126,9 @@ class TorrentControllerTest extends TestCase
     {
         $this->withoutExceptionHandling();
 
-        /* @var BdecodingService|MockObject $decoder */
+        /** @var BdecodingService|MockObject $decoder */
         $decoder = $this->createMock(BdecodingService::class);
-        /* @var BencodingService|MockObject $encoder */
+        /** @var BencodingService|MockObject $encoder */
         $encoder = $this->createMock(BencodingService::class);
 
         $torrent = factory(Torrent::class)->create(['uploader_id' => $this->user->id, 'name' => 'xyz']);
@@ -163,9 +163,9 @@ class TorrentControllerTest extends TestCase
     {
         $this->withoutExceptionHandling();
 
-        /* @var BdecodingService|MockObject $decoder */
+        /** @var BdecodingService|MockObject $decoder */
         $decoder = $this->createMock(BdecodingService::class);
-        /* @var BencodingService|MockObject $encoder */
+        /** @var BencodingService|MockObject $encoder */
         $encoder = $this->createMock(BencodingService::class);
 
         $torrent = factory(Torrent::class)->create(['uploader_id' => $this->user->id, 'name' => 'čćš/đž%']);
@@ -209,11 +209,11 @@ class TorrentControllerTest extends TestCase
 
         $this->user->forceFill(['passkey' => null])->save();
 
-        /* @var BdecodingService|MockObject $decoder */
+        /** @var BdecodingService|MockObject $decoder */
         $decoder = $this->createMock(BdecodingService::class);
-        /* @var BencodingService|MockObject $encoder */
+        /** @var BencodingService|MockObject $encoder */
         $encoder = $this->createMock(BencodingService::class);
-        /* @var PasskeyService|MockObject $passkeyService */
+        /** @var PasskeyService|MockObject $passkeyService */
         $passkeyService = $this->createMock(PasskeyService::class);
 
         $torrent = factory(Torrent::class)->create(['uploader_id' => $this->user->id]);
