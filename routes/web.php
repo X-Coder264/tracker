@@ -18,8 +18,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/', 'HomeController@index')->name('home.index');
 
     Route::get('/cms', 'Admin\IndexController@index')->name('admin.index');
-    // catch all route for the admin CMS, we are leaving the routing for the CMS to the frontend router
-    Route::get('/cms/{all}', 'Admin\IndexController@index')->where(['all' => '.*']);
+    // catch all route for the admin CMS (except the API ones), we are leaving the routing for the CMS to the frontend router
+    Route::get('/cms/{all}', 'Admin\IndexController@index')->where(['all' => '^(?!api).*$']);
 
     Route::get('torrents', 'TorrentController@index')->name('torrents.index');
     Route::get('torrents/create', 'TorrentController@create')->name('torrents.create');
