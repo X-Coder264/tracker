@@ -16,14 +16,14 @@ abstract class TestCase extends BaseTestCase
      */
     protected function setUpTraits()
     {
-        $uses = array_flip(class_uses_recursive(static::class));
+        $uses = parent::setUpTraits();
 
-        // Enabling foreign key constraints should be run before the database migration
+        // Foreign key constraints are disabled by default for SQLite so we have to change that
         if (isset($uses[EnableForeignKeyConstraints::class])) {
             /** @var $this TestCase|EnableForeignKeyConstraints */
             $this->enableForeignKeys();
         }
 
-        return parent::setUpTraits();
+        return $uses;
     }
 }
