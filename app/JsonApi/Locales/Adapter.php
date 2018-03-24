@@ -18,7 +18,6 @@ class Adapter extends EloquentAdapter
     ];
 
     /**
-     *
      * @param OffsetStrategy $paging
      */
     public function __construct(OffsetStrategy $paging)
@@ -30,10 +29,8 @@ class Adapter extends EloquentAdapter
     /**
      * Apply the supplied filters to the builder instance.
      *
-     * @param Builder $builder
+     * @param Builder    $builder
      * @param Collection $filters
-     *
-     * @return void
      */
     protected function filter(Builder $builder, Collection $filters)
     {

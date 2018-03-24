@@ -46,7 +46,7 @@ class Validators extends AbstractValidatorProvider
      * @var string[]
      */
     protected $allowedIncludePaths = [
-        'torrents', 'locale'
+        'torrents', 'locale',
     ];
 
     /**

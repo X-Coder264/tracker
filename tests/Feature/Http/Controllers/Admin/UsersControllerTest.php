@@ -2,10 +2,10 @@
 
 namespace Tests\Feature\Http\Controllers\Admin;
 
-use App\Http\Models\Torrent;
 use App\Http\Models\User;
 use App\Http\Models\Locale;
 use Tests\AdminApiTestCase;
+use App\Http\Models\Torrent;
 use Illuminate\Http\Response;
 use App\JsonApi\ResourceTypes;
 use Illuminate\Support\Carbon;
