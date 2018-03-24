@@ -395,17 +395,17 @@ class UsersControllerTest extends AdminApiTestCase
         $torrent = factory(Torrent::class)->create(['uploader_id' => $user->id]);
         $this->actingAs($user);
 
-        $response = $this->makeRequest('GET', route('admin.users.read', [$user->id, 'include' => 'torrents']));
+        $response = $this->makeRequest('GET', route('admin.users.index', ['filter[id]' => $user->id, 'include' => 'torrents']));
         $jsonResponse = $response->getJsonResponse();
 
-        $this->assertSame($user->id, (int) $jsonResponse['data']['id']);
-        $this->assertSame($user->name, $jsonResponse['data']['attributes']['name']);
-        $this->assertSame($user->email, $jsonResponse['data']['attributes']['email']);
-        $this->assertSame(route('admin.users.read', $user->id), $jsonResponse['data']['links']['self']);
-        $this->assertSame($user->timezone, $jsonResponse['data']['attributes']['timezone']);
-        $this->assertSame($user->slug, $jsonResponse['data']['attributes']['slug']);
-        $this->assertSame($user->created_at->format(Carbon::W3C), $jsonResponse['data']['attributes']['created-at']);
-        $this->assertArrayNotHasKey('password', $jsonResponse['data']['attributes']);
+        $this->assertSame($user->id, (int) $jsonResponse['data'][0]['id']);
+        $this->assertSame($user->name, $jsonResponse['data'][0]['attributes']['name']);
+        $this->assertSame($user->email, $jsonResponse['data'][0]['attributes']['email']);
+        $this->assertSame(route('admin.users.read', $user->id), $jsonResponse['data'][0]['links']['self']);
+        $this->assertSame($user->timezone, $jsonResponse['data'][0]['attributes']['timezone']);
+        $this->assertSame($user->slug, $jsonResponse['data'][0]['attributes']['slug']);
+        $this->assertSame($user->created_at->format(Carbon::W3C), $jsonResponse['data'][0]['attributes']['created-at']);
+        $this->assertArrayNotHasKey('password', $jsonResponse['data'][0]['attributes']);
         $this->assertSame(ResourceTypes::TORRENT, $jsonResponse['included'][0]['type']);
         $this->assertSame($torrent->id, (int) $jsonResponse['included'][0]['id']);
         $this->assertNotEmpty($jsonResponse['included'][0]['attributes']);
@@ -421,17 +421,17 @@ class UsersControllerTest extends AdminApiTestCase
         $torrent = factory(Torrent::class)->create(['uploader_id' => $user->id]);
         $this->actingAs($user);
 
-        $response = $this->makeRequest('GET', route('admin.users.read', [$user->id, 'include' => 'locale']));
+        $response = $this->makeRequest('GET', route('admin.users.index', ['filter[id]' => $user->id, 'include' => 'locale']));
         $jsonResponse = $response->getJsonResponse();
 
-        $this->assertSame($user->id, (int) $jsonResponse['data']['id']);
-        $this->assertSame($user->name, $jsonResponse['data']['attributes']['name']);
-        $this->assertSame($user->email, $jsonResponse['data']['attributes']['email']);
-        $this->assertSame(route('admin.users.read', $user->id), $jsonResponse['data']['links']['self']);
-        $this->assertSame($user->timezone, $jsonResponse['data']['attributes']['timezone']);
-        $this->assertSame($user->slug, $jsonResponse['data']['attributes']['slug']);
-        $this->assertSame($user->created_at->format(Carbon::W3C), $jsonResponse['data']['attributes']['created-at']);
-        $this->assertArrayNotHasKey('password', $jsonResponse['data']['attributes']);
+        $this->assertSame($user->id, (int) $jsonResponse['data'][0]['id']);
+        $this->assertSame($user->name, $jsonResponse['data'][0]['attributes']['name']);
+        $this->assertSame($user->email, $jsonResponse['data'][0]['attributes']['email']);
+        $this->assertSame(route('admin.users.read', $user->id), $jsonResponse['data'][0]['links']['self']);
+        $this->assertSame($user->timezone, $jsonResponse['data'][0]['attributes']['timezone']);
+        $this->assertSame($user->slug, $jsonResponse['data'][0]['attributes']['slug']);
+        $this->assertSame($user->created_at->format(Carbon::W3C), $jsonResponse['data'][0]['attributes']['created-at']);
+        $this->assertArrayNotHasKey('password', $jsonResponse['data'][0]['attributes']);
         $this->assertSame(ResourceTypes::LOCALE, $jsonResponse['included'][0]['type']);
         $this->assertSame($locale->id, (int) $jsonResponse['included'][0]['id']);
         $this->assertNotEmpty($jsonResponse['included'][0]['attributes']);

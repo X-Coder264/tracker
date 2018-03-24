@@ -32,7 +32,6 @@
     "webpack": "^3.11.0"
   },
   "dependencies": {
-    "trikoder-cmf-ui": "git+https://github.com/trikoder/trim-cmf.git",
-    "trim-cmf": "git+https://github.com/trikoder/trim-cmf.git"
+    "trikoder-cmf-ui": "git+https://github.com/trikoder/trim-cmf.git"
   }
 }
