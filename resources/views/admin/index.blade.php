@@ -15,7 +15,7 @@
 <script>
     window.bootData = {
         baseUrl: '/cms/',
-        baseApiUrl: '/admin/',
+        baseApiUrl: '/cms/api/',
         currentUser: {
             caption: '{{ $user->email }}'
         },

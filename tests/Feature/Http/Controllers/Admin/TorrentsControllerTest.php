@@ -86,6 +86,38 @@ class TorrentsControllerTest extends AdminApiTestCase
         $this->assertCount(1, $jsonResponse['data']);
     }
 
+    public function testUploaderFilter()
+    {
+        $this->withExceptionHandling();
+
+        $user = factory(User::class)->create();
+        factory(Torrent::class, 2)->create();
+        $torrent = factory(Torrent::class)->create(['uploader_id' => $user->id]);
+        $this->actingAs($user);
+        $response = $this->makeRequest('GET', route('admin.torrents.index', ['filter[uploader]' => $user->id]));
+        $jsonResponse = $response->getJsonResponse();
+
+        $this->assertSame(1, $jsonResponse['meta']['total']);
+        $this->assertSame($torrent->name, $jsonResponse['data'][0]['attributes']['name']);
+        $this->assertSame($torrent->size, $jsonResponse['data'][0]['attributes']['size']);
+        $this->assertSame($torrent->description, $jsonResponse['data'][0]['attributes']['description']);
+        $this->assertSame($torrent->slug, $jsonResponse['data'][0]['attributes']['slug']);
+        $this->assertSame(
+            $user->id,
+            (int) $jsonResponse['data'][0]['relationships']['uploader']['data']['id']
+        );
+        $this->assertSame(
+            $torrent->created_at->format(Carbon::W3C),
+            $jsonResponse['data'][0]['attributes']['created-at']
+        );
+        $this->assertSame(
+            $torrent->updated_at->format(Carbon::W3C),
+            $jsonResponse['data'][0]['attributes']['updated-at']
+        );
+        $this->assertSame(route('admin.torrents.read', $torrent->id), $jsonResponse['data'][0]['links']['self']);
+        $this->assertCount(1, $jsonResponse['data']);
+    }
+
     public function testSlugFilter()
     {
         $this->withExceptionHandling();

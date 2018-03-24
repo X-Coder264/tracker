@@ -1,18 +1,23 @@
-import BaseResource from 'trim-cmf/src/js/controllers/baseResource';
-import TextListItem from 'trim-cmf/src/js/listElements/text';
-import LinkListItem from 'trim-cmf/src/js/listElements/link';
-import DateTimeListItem from 'trim-cmf/src/js/listElements/dateTime';
-import ContextMenu from 'trim-cmf/src/js/listElements/contextMenu';
-import TextInput from 'trim-cmf/src/js/formElements/text';
-import ExternalAdmin from 'trim-cmf/src/js/formElements/externalAdmin';
-import SelectInput from 'trim-cmf/src/js/formElements/select';
+import BaseResource from 'trikoder-cmf-ui/src/js/controllers/baseResource';
+import TextListItem from 'trikoder-cmf-ui/src/js/listElements/text';
+import LinkListItem from 'trikoder-cmf-ui/src/js/listElements/link';
+import DateTimeListItem from 'trikoder-cmf-ui/src/js/listElements/dateTime';
+import ContextMenu from 'trikoder-cmf-ui/src/js/listElements/contextMenu';
+import TextInput from 'trikoder-cmf-ui/src/js/formElements/text';
+import ExternalAdmin from 'trikoder-cmf-ui/src/js/formElements/externalAdmin';
+import SelectInput from 'trikoder-cmf-ui/src/js/formElements/select';
 import _ from 'underscore';
-import bootData from 'trim-cmf/src/js/library/bootData';
+import bootData from 'trikoder-cmf-ui/src/js/library/bootData';
 import sortGenerator from '../helpers/sortGenerator';
 
 module.exports = BaseResource.extend({
 
     resourceName: 'users',
+
+    includeApiData: {
+        index: ['locale'],
+        edit: ['locale']
+    },
 
     setupList: function(listHandler) {
 
@@ -131,10 +136,12 @@ module.exports = BaseResource.extend({
             name: 'email'
         });
 
-        editHandler.addField(TextInput, {
-            label: 'Password',
-            name: 'password'
-        });
+        if (method === 'create') {
+            editHandler.addField(TextInput, {
+                label: 'Password',
+                name: 'password'
+            });
+        }
 
         editHandler.addField(SelectInput, {
             label: 'Timezone',

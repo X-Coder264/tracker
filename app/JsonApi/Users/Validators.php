@@ -32,7 +32,7 @@ class Validators extends AbstractValidatorProvider
     ];
 
     /**
-     * @var array
+     * @var string[]
      */
     protected $allowedFilteringParameters = [
         'id',
@@ -40,6 +40,13 @@ class Validators extends AbstractValidatorProvider
         'timezone',
         'slug',
         'email',
+    ];
+
+    /**
+     * @var string[]
+     */
+    protected $allowedIncludePaths = [
+        'torrents', 'locale'
     ];
 
     /**
@@ -66,6 +73,6 @@ class Validators extends AbstractValidatorProvider
      */
     protected function relationshipRules(RelationshipsValidatorInterface $relationships, $record = null)
     {
-        $relationships->hasOne('locale', 'locales', is_null($record), false);
+        $relationships->hasOne('locale', ResourceTypes::LOCALE, is_null($record), false);
     }
 }

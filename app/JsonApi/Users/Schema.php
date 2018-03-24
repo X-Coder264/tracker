@@ -32,18 +32,31 @@ class Schema extends EloquentSchema
      */
     public function getRelationships($resource, $isPrimary, array $includeRelationships)
     {
-        return [
-            'torrents' => [
-                self::DATA => $resource->torrents,
-            ],
-            'locale' => [
-                self::DATA => $resource->language,
-            ],
-        ];
+        $relationships = [];
+
+        if (! empty($includeRelationships) && in_array('torrents', $includeRelationships)) {
+            $relationships['torrents'] = [
+                self::DATA => function () use ($resource) {
+                    return $resource->torrents;
+                },
+            ];
+        }
+
+        if (! empty($includeRelationships) && in_array('locale', $includeRelationships)) {
+            $relationships['locale'] = [
+                self::DATA => function () use ($resource) {
+                    return $resource->language;
+                },
+            ];
+        }
+
+        return $relationships;
     }
 
     /**
-     * {@inheritdoc}
+     * Get schema default include paths.
+     *
+     * @return string[]
      */
     public function getIncludePaths()
     {

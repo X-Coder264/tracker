@@ -13,8 +13,8 @@ module.exports = function(env) {
         dist: path.resolve(__dirname, 'public/admin'),
         public: '/admin/',
         nodeModules: 'node_modules',
-        cmfSrc: 'node_modules/trim-cmf/src/',
-        cmfNodeModules: 'node_modules/trim-cmf/node_modules'
+        cmfSrc: 'node_modules/trikoder-cmf-ui/src/',
+        cmfNodeModules: 'node_modules/trikoder-cmf-ui/node_modules'
     };
 
     var webpackConfig = {

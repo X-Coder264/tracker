@@ -1,5 +1,5 @@
-import BaseMainNavigation from 'trim-cmf/src/js/components/baseMainNavigation';
-import bootData from 'trim-cmf/src/js/library/bootData';
+import BaseMainNavigation from 'trikoder-cmf-ui/src/js/components/baseMainNavigation';
+import bootData from 'trikoder-cmf-ui/src/js/library/bootData';
 
 module.exports = BaseMainNavigation.extend({
 

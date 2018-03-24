@@ -32,15 +32,23 @@ class Schema extends EloquentSchema
      */
     public function getRelationships($resource, $isPrimary, array $includeRelationships)
     {
-        return [
-            'uploader' => [
-                self::DATA => $resource->uploader,
-            ],
-        ];
+        $relationships = [];
+
+        if (! empty($includeRelationships) && in_array('uploader', $includeRelationships)) {
+            $relationships['uploader'] = [
+                self::DATA => function () use ($resource) {
+                    return $resource->uploader;
+                },
+            ];
+        }
+
+        return $relationships;
     }
 
     /**
-     * {@inheritdoc}
+     * Get schema default include paths.
+     *
+     * @return string[]
      */
     public function getIncludePaths()
     {

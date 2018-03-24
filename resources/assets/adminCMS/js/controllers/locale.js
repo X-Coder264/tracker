@@ -1,6 +1,6 @@
-import BaseResource from 'trim-cmf/src/js/controllers/baseResource';
-import TextListItem from 'trim-cmf/src/js/listElements/text';
-import LinkListItem from 'trim-cmf/src/js/listElements/link';
+import BaseResource from 'trikoder-cmf-ui/src/js/controllers/baseResource';
+import TextListItem from 'trikoder-cmf-ui/src/js/listElements/text';
+import LinkListItem from 'trikoder-cmf-ui/src/js/listElements/link';
 
 module.exports = BaseResource.extend({
 

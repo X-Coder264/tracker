@@ -4,8 +4,8 @@ export default function(sortList) {
 
         let [label, field] = item.split('->');
 
-        memo.push({label: label.trim() + ' ↓', field: field.trim()});
-        memo.push({label: label.trim() + ' ↑', field: '-' + field.trim()});
+        memo.push({label: label.trim() + ' - ASC', field: field.trim()});
+        memo.push({label: label.trim() + ' - DESC', field: '-' + field.trim()});
 
         return memo;
 

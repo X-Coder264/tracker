@@ -1,16 +1,21 @@
-import BaseResource from 'trim-cmf/src/js/controllers/baseResource';
-import TextListItem from 'trim-cmf/src/js/listElements/text';
-import LinkListItem from 'trim-cmf/src/js/listElements/link';
-import DateTimeListItem from 'trim-cmf/src/js/listElements/dateTime';
-import ContextMenu from 'trim-cmf/src/js/listElements/contextMenu';
-import TextInput from 'trim-cmf/src/js/formElements/text';
+import BaseResource from 'trikoder-cmf-ui/src/js/controllers/baseResource';
+import TextListItem from 'trikoder-cmf-ui/src/js/listElements/text';
+import LinkListItem from 'trikoder-cmf-ui/src/js/listElements/link';
+import DateTimeListItem from 'trikoder-cmf-ui/src/js/listElements/dateTime';
+import ContextMenu from 'trikoder-cmf-ui/src/js/listElements/contextMenu';
+import TextInput from 'trikoder-cmf-ui/src/js/formElements/text';
 import sortGenerator from '../helpers/sortGenerator';
-import ExternalAdmin from 'trim-cmf/src/js/formElements/externalAdmin';
-import TextareaInput from 'trim-cmf/src/js/formElements/textarea';
+import ExternalAdmin from 'trikoder-cmf-ui/src/js/formElements/externalAdmin';
+import TextareaInput from 'trikoder-cmf-ui/src/js/formElements/textarea';
 
 module.exports = BaseResource.extend({
 
     resourceName: 'torrents',
+
+    includeApiData: {
+        index: ['uploader'],
+        edit: ['uploader']
+    },
 
     setupList: function(listHandler) {
 
@@ -28,6 +33,13 @@ module.exports = BaseResource.extend({
         listHandler.addFilter(TextInput, {
             name: 'name',
             label: 'Name'
+        });
+
+        listHandler.addFilter(ExternalAdmin, {
+            name: 'uploader',
+            label: 'Uploader',
+            mapCaptionTo: 'name',
+            relation: {type: 'hasOne', resourceName: 'users'}
         });
 
         listHandler.addFilter(TextInput, {

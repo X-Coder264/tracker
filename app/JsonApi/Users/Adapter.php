@@ -18,7 +18,6 @@ class Adapter extends EloquentAdapter
     ];
 
     /**
-     * Adapter constructor.
      *
      * @param OffsetStrategy $paging
      */
@@ -29,7 +28,12 @@ class Adapter extends EloquentAdapter
     }
 
     /**
-     * {@inheritdoc}
+     * Apply the supplied filters to the builder instance.
+     *
+     * @param Builder $builder
+     * @param Collection $filters
+     *
+     * @return void
      */
     protected function filter(Builder $builder, Collection $filters)
     {
@@ -51,10 +55,36 @@ class Adapter extends EloquentAdapter
     }
 
     /**
-     * {@inheritdoc}
+     * Is this a search for a singleton resource?
+     *
+     * @param Collection $filters
+     *
+     * @return bool
      */
     protected function isSearchOne(Collection $filters)
     {
         return false;
+    }
+
+    /**
+     * Add eager loading to the query.
+     *
+     * @param Builder $builder
+     * @param Collection $includePaths
+     *
+     * @return void
+     */
+    protected function with(Builder $builder, Collection $includePaths)
+    {
+        if (true === $includePaths->isEmpty()) {
+            $builder->with(['torrents', 'language']);
+        } else {
+            if ($includePaths->contains('torrents')) {
+                $builder->with('torrents');
+            }
+            if ($includePaths->contains('locale')) {
+                $builder->with('language');
+            }
+        }
     }
 }
