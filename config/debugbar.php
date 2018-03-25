@@ -110,8 +110,8 @@ return [
         'session'         => true,  // Display session data
         'symfony_request' => true,  // Only one can be enabled..
         'mail'            => true,  // Catch mail messages
-        'laravel'         => false, // Laravel version and environment
-        'events'          => false, // All events fired
+        'laravel'         => true, // Laravel version and environment
+        'events'          => true, // All events fired
         'default_request' => false, // Regular or special Symfony request logger
         'logs'            => false, // Add the latest log messages
         'files'           => false, // Show the included files
@@ -137,7 +137,7 @@ return [
             'backtrace'         => true,   // Use a backtrace to find the origin of the query in your files.
             'timeline'          => true,  // Add the queries to the timeline
             'explain' => [                 // Show EXPLAIN output on queries
-                'enabled' => false,
+                'enabled' => true,
                 'types' => ['SELECT'],     // ['SELECT', 'INSERT', 'UPDATE', 'DELETE']; for MySQL 5.6.3+
             ],
             'hints'             => true,    // Show hints for common mistakes
