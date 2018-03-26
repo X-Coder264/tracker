@@ -65,7 +65,7 @@ class User extends Authenticatable
      */
     public function setPasswordAttribute(string $password): void
     {
-        $this->attributes['password'] = Hash::make($password, ['rounds' => 15]);
+        $this->attributes['password'] = Hash::make($password);
     }
 
     /**
