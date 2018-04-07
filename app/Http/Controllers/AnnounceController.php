@@ -11,7 +11,7 @@ use App\Services\AnnounceManager;
 class AnnounceController extends Controller
 {
     /**
-     * @param Request          $request
+     * @param Request $request
      * @param $announceManager $announceManager
      *
      * @return Response
