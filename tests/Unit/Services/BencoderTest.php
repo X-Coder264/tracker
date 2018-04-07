@@ -1,14 +1,16 @@
 <?php
 
-namespace Tests\Unit\Http\Services;
+declare(strict_types=1);
+
+namespace Tests\Unit\Services;
 
 use Tests\TestCase;
-use App\Http\Services\BencodingService;
+use App\Services\Bencoder;
 
-class BencodingServiceTest extends TestCase
+class BencoderTest extends TestCase
 {
     /**
-     * @var BencodingService
+     * @var Bencoder
      */
     protected $encoder;
 
@@ -16,7 +18,7 @@ class BencodingServiceTest extends TestCase
     {
         parent::setUp();
 
-        $this->encoder = new BencodingService();
+        $this->encoder = new Bencoder();
     }
 
     public function testStringEncoding()

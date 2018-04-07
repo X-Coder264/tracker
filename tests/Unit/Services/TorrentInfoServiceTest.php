@@ -1,24 +1,26 @@
 <?php
 
-namespace Tests\Unit\Http\Services;
+declare(strict_types=1);
+
+namespace Tests\Unit\Services;
 
 use Tests\TestCase;
+use App\Services\Bdecoder;
 use App\Http\Models\Torrent;
+use App\Services\SizeFormatter;
+use App\Services\TorrentInfoService;
 use Illuminate\Support\Facades\Cache;
-use App\Http\Services\BdecodingService;
 use Illuminate\Support\Facades\Storage;
-use App\Http\Services\TorrentInfoService;
-use App\Http\Services\SizeFormattingService;
 use PHPUnit\Framework\MockObject\MockObject;
 
 class TorrentInfoServiceTest extends TestCase
 {
     public function testGettingTorrentSize()
     {
-        /** @var BdecodingService|MockObject $decoder */
-        $decoder = $this->createMock(BdecodingService::class);
-        /** @var SizeFormattingService|MockObject $formatter */
-        $formatter = $this->createMock(SizeFormattingService::class);
+        /** @var Bdecoder|MockObject $decoder */
+        $decoder = $this->createMock(Bdecoder::class);
+        /** @var SizeFormatter|MockObject $formatter */
+        $formatter = $this->createMock(SizeFormatter::class);
 
         $torrentInfoService = new TorrentInfoService($formatter, $decoder);
         // multiple file mode
@@ -35,10 +37,10 @@ class TorrentInfoServiceTest extends TestCase
 
     public function testGettingTorrentFileNamesAndSizesFromTorrentInfoDict()
     {
-        /** @var BdecodingService|MockObject $decoder */
-        $decoder = $this->createMock(BdecodingService::class);
-        /** @var SizeFormattingService|MockObject $formatter */
-        $formatter = $this->createMock(SizeFormattingService::class);
+        /** @var Bdecoder|MockObject $decoder */
+        $decoder = $this->createMock(Bdecoder::class);
+        /** @var SizeFormatter|MockObject $formatter */
+        $formatter = $this->createMock(SizeFormatter::class);
         $map = [
             [10, '10 B'],
             [25, '25 B'],
@@ -83,10 +85,10 @@ class TorrentInfoServiceTest extends TestCase
 
     public function testGetTorrentFileNamesAndSizes()
     {
-        /** @var BdecodingService|MockObject $decoder */
-        $decoder = $this->createMock(BdecodingService::class);
-        /** @var SizeFormattingService|MockObject $formatter */
-        $formatter = $this->createMock(SizeFormattingService::class);
+        /** @var Bdecoder|MockObject $decoder */
+        $decoder = $this->createMock(Bdecoder::class);
+        /** @var SizeFormatter|MockObject $formatter */
+        $formatter = $this->createMock(SizeFormatter::class);
 
         $torrent = factory(Torrent::class)->make(['uploader_id' => 1]);
 

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Http\Services;
+namespace App\Services;
 
 use App\Http\Models\Torrent;
 use Illuminate\Http\Request;
@@ -14,12 +14,12 @@ use App\Exceptions\FileNotWritableException;
 class TorrentUploadService
 {
     /**
-     * @var BencodingService
+     * @var Bencoder
      */
     protected $encoder;
 
     /**
-     * @var BdecodingService
+     * @var Bdecoder
      */
     protected $decoder;
 
@@ -29,13 +29,13 @@ class TorrentUploadService
     protected $torrentInfoService;
 
     /**
-     * @param BencodingService   $encoder
-     * @param BdecodingService   $decoder
+     * @param Bencoder           $encoder
+     * @param Bdecoder           $decoder
      * @param TorrentInfoService $torrentInfoService
      */
     public function __construct(
-        BencodingService $encoder,
-        BdecodingService $decoder,
+        Bencoder $encoder,
+        Bdecoder $decoder,
         TorrentInfoService $torrentInfoService
     ) {
         $this->encoder = $encoder;
@@ -67,10 +67,9 @@ class TorrentUploadService
         $decodedTorrent['announce'] = route('announce');
 
         do {
-            $bytes = random_bytes(64);
             // add entropy to randomize info_hash in order to prevent peer leaking attacks
             // we are recalculating the entropy until we get an unique info_hash
-            $decodedTorrent['info']['entropy'] = bin2hex($bytes);
+            $decodedTorrent['info']['entropy'] = bin2hex(random_bytes(64));
 
             $infoHash = $this->getTorrentInfoHash($decodedTorrent['info']);
 

@@ -1,19 +1,21 @@
 <?php
 
-namespace Tests\Feature\Http\Services;
+declare(strict_types=1);
+
+namespace Tests\Feature\Services;
 
 use Tests\TestCase;
 use App\Http\Models\User;
+use App\Services\Bdecoder;
+use App\Services\Bencoder;
 use App\Http\Models\Torrent;
 use Illuminate\Http\Response;
+use App\Services\SizeFormatter;
 use Illuminate\Http\Testing\File;
 use Illuminate\Http\UploadedFile;
-use App\Http\Services\BdecodingService;
-use App\Http\Services\BencodingService;
+use App\Services\TorrentInfoService;
+use App\Services\TorrentUploadService;
 use Illuminate\Support\Facades\Storage;
-use App\Http\Services\TorrentInfoService;
-use App\Http\Services\TorrentUploadService;
-use App\Http\Services\SizeFormattingService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class TorrentUploadServiceTest extends TestCase
@@ -27,13 +29,13 @@ class TorrentUploadServiceTest extends TestCase
 
         Storage::fake('public');
 
-        $decoder = $this->createMock(BdecodingService::class);
-        $this->app->instance(BdecodingService::class, $decoder);
+        $decoder = $this->createMock(Bdecoder::class);
+        $this->app->instance(Bdecoder::class, $decoder);
 
         $decoder->method('decode')->willReturn(['test' => 'test']);
 
-        $encoder = $this->createMock(BencodingService::class);
-        $this->app->instance(BencodingService::class, $encoder);
+        $encoder = $this->createMock(Bencoder::class);
+        $this->app->instance(Bencoder::class, $encoder);
 
         $infoService = $this->createMock(TorrentInfoService::class);
         $torrentSize = 5000;
@@ -61,7 +63,7 @@ class TorrentUploadServiceTest extends TestCase
         Storage::disk('public')->assertExists('torrents/1.torrent');
         $this->assertSame($torrentValue, Storage::disk('public')->get('torrents/1.torrent'));
 
-        $formatter = new SizeFormattingService();
+        $formatter = new SizeFormatter();
 
         $this->assertSame($torrentSize, (int) $torrent->getOriginal('size'));
         $this->assertSame($formatter->getFormattedSize($torrentSize), $torrent->size);
@@ -79,7 +81,7 @@ class TorrentUploadServiceTest extends TestCase
         Storage::fake('public');
 
         $torrentFile = new UploadedFile(
-            realpath(__DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'Fixtures' . DIRECTORY_SEPARATOR . 'non private torrent.torrent'),
+            realpath(__DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'Fixtures' . DIRECTORY_SEPARATOR . 'non private torrent.torrent'),
             'non private torrent',
             'application/x-bittorrent',
             null,
@@ -87,7 +89,7 @@ class TorrentUploadServiceTest extends TestCase
             true
         );
 
-        $decoder = new BdecodingService();
+        $decoder = new Bdecoder();
         $decodedTorrent = $decoder->decode(file_get_contents($torrentFile->getRealPath()));
         $this->assertArrayNotHasKey('private', $decodedTorrent['info']);
 
@@ -121,7 +123,7 @@ class TorrentUploadServiceTest extends TestCase
         Storage::fake('public');
 
         $torrentFile = new UploadedFile(
-            realpath(__DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'Fixtures' . DIRECTORY_SEPARATOR . 'test.torrent'),
+            realpath(__DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'Fixtures' . DIRECTORY_SEPARATOR . 'test.torrent'),
             'test',
             'application/x-bittorrent',
             null,
@@ -144,7 +146,7 @@ class TorrentUploadServiceTest extends TestCase
         $response->assertRedirect(route('torrents.show', $torrent));
         $response->assertSessionHas('success', __('messages.torrents.store-successfully-uploaded-torrent.message'));
 
-        $decoder = new BdecodingService();
+        $decoder = new Bdecoder();
         Storage::disk('public')->assertExists('torrents/1.torrent');
         $decodedTorrent = $decoder->decode(Storage::disk('public')->get('torrents/1.torrent'));
         $this->assertSame(128, strlen($decodedTorrent['info']['entropy']));
@@ -159,13 +161,13 @@ class TorrentUploadServiceTest extends TestCase
 
         Storage::fake('public');
 
-        $decoder = $this->createMock(BdecodingService::class);
-        $this->app->instance(BdecodingService::class, $decoder);
+        $decoder = $this->createMock(Bdecoder::class);
+        $this->app->instance(Bdecoder::class, $decoder);
 
         $decoder->method('decode')->willReturn(['test' => 'test']);
 
-        $encoder = $this->createMock(BencodingService::class);
-        $this->app->instance(BencodingService::class, $encoder);
+        $encoder = $this->createMock(Bencoder::class);
+        $this->app->instance(Bencoder::class, $encoder);
 
         $infoService = $this->createMock(TorrentInfoService::class);
         $torrentSize = 5000;
@@ -204,7 +206,7 @@ class TorrentUploadServiceTest extends TestCase
         Storage::disk('public')->assertExists('torrents/2.torrent');
         $this->assertSame($torrentValue, Storage::disk('public')->get('torrents/2.torrent'));
 
-        $formatter = new SizeFormattingService();
+        $formatter = new SizeFormatter();
 
         $this->assertSame($torrentSize, (int) $torrent->getOriginal('size'));
         $this->assertSame($formatter->getFormattedSize($torrentSize), $torrent->size);
@@ -223,7 +225,7 @@ class TorrentUploadServiceTest extends TestCase
         Storage::fake('public');
 
         $torrentFile = new UploadedFile(
-            realpath(__DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'Fixtures' . DIRECTORY_SEPARATOR . 'test.torrent'),
+            realpath(__DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'Fixtures' . DIRECTORY_SEPARATOR . 'test.torrent'),
             'test',
             'application/x-bittorrent',
             null,
@@ -246,7 +248,7 @@ class TorrentUploadServiceTest extends TestCase
         $response->assertRedirect(route('torrents.show', $torrent));
         $response->assertSessionHas('success', __('messages.torrents.store-successfully-uploaded-torrent.message'));
 
-        $decoder = new BdecodingService();
+        $decoder = new Bdecoder();
         Storage::disk('public')->assertExists('torrents/1.torrent');
         $decodedTorrent = $decoder->decode(Storage::disk('public')->get('torrents/1.torrent'));
         $this->assertSame(route('announce'), $decodedTorrent['announce']);
@@ -259,13 +261,13 @@ class TorrentUploadServiceTest extends TestCase
 
         Storage::shouldReceive('disk->put')->once()->andReturn(false);
 
-        $decoder = $this->createMock(BdecodingService::class);
-        $this->app->instance(BdecodingService::class, $decoder);
+        $decoder = $this->createMock(Bdecoder::class);
+        $this->app->instance(Bdecoder::class, $decoder);
 
         $decoder->method('decode')->willReturn(['test' => 'test']);
 
-        $encoder = $this->createMock(BencodingService::class);
-        $this->app->instance(BencodingService::class, $encoder);
+        $encoder = $this->createMock(Bencoder::class);
+        $this->app->instance(Bencoder::class, $encoder);
 
         $infoService = $this->createMock(TorrentInfoService::class);
         $torrentSize = 5000;

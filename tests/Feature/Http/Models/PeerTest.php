@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Tests\Feature\Http\Models;
 
 use Tests\TestCase;
@@ -7,10 +9,10 @@ use App\Http\Models\Peer;
 use App\Http\Models\User;
 use App\Http\Models\PeerIP;
 use App\Http\Models\Torrent;
+use Facades\App\Services\SizeFormatter;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Facades\App\Http\Services\SizeFormattingService;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class PeerTest extends TestCase
@@ -22,7 +24,7 @@ class PeerTest extends TestCase
         factory(Peer::class)->create();
         $peer = Peer::findOrFail(1);
         $returnValue = '500 MB';
-        SizeFormattingService::shouldReceive('getFormattedSize')->once()->with($peer->getOriginal('uploaded'))->andReturn($returnValue);
+        SizeFormatter::shouldReceive('getFormattedSize')->once()->with($peer->getOriginal('uploaded'))->andReturn($returnValue);
         $this->assertSame($returnValue, $peer->uploaded);
     }
 
@@ -31,7 +33,7 @@ class PeerTest extends TestCase
         factory(Peer::class)->create();
         $peer = Peer::findOrFail(1);
         $returnValue = '500 MB';
-        SizeFormattingService::shouldReceive('getFormattedSize')->once()->with($peer->getOriginal('downloaded'))->andReturn($returnValue);
+        SizeFormatter::shouldReceive('getFormattedSize')->once()->with($peer->getOriginal('downloaded'))->andReturn($returnValue);
         $this->assertSame($returnValue, $peer->downloaded);
     }
 

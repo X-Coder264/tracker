@@ -1,24 +1,26 @@
 <?php
 
-namespace Tests\Unit\Http\Services;
+declare(strict_types=1);
+
+namespace Tests\Unit\Services;
 
 use stdClass;
 use Tests\TestCase;
 use ReflectionClass;
 use App\Http\Models\Peer;
+use App\Services\Bencoder;
 use App\Http\Models\PeerIP;
 use App\Http\Models\Torrent;
+use App\Services\AnnounceManager;
 use Illuminate\Support\Collection;
-use App\Http\Services\AnnounceService;
-use App\Http\Services\BencodingService;
 use PHPUnit\Framework\MockObject\MockObject;
 
-class AnnounceServiceTest extends TestCase
+class AnnounceManagerTest extends TestCase
 {
     public function testIPv4AddressValidation()
     {
-        $announceService = new AnnounceService(new BencodingService());
-        $reflectionClass = new ReflectionClass(AnnounceService::class);
+        $announceService = new AnnounceManager(new Bencoder());
+        $reflectionClass = new ReflectionClass(AnnounceManager::class);
         $method = $reflectionClass->getMethod('validateIPv4Address');
         $method->setAccessible(true);
 
@@ -31,8 +33,8 @@ class AnnounceServiceTest extends TestCase
 
     public function testIPv6AddressValidation()
     {
-        $announceService = new AnnounceService(new BencodingService());
-        $reflectionClass = new ReflectionClass(AnnounceService::class);
+        $announceService = new AnnounceManager(new Bencoder());
+        $reflectionClass = new ReflectionClass(AnnounceManager::class);
         $method = $reflectionClass->getMethod('validateIPv6Address');
         $method->setAccessible(true);
 
@@ -48,8 +50,8 @@ class AnnounceServiceTest extends TestCase
 
     public function testErrorResponseWithStringParameter()
     {
-        /** @var MockObject|BencodingService $encoder */
-        $encoder = $this->getMockBuilder(BencodingService::class)
+        /** @var MockObject|Bencoder $encoder */
+        $encoder = $this->getMockBuilder(Bencoder::class)
             ->setMethods(['encode'])
             ->getMock();
         $error = 'Error xyz.';
@@ -59,8 +61,8 @@ class AnnounceServiceTest extends TestCase
             ->with($this->equalTo(['failure reason' => $error]))
             ->willReturn($returnValue);
 
-        $announceService = new AnnounceService($encoder);
-        $reflectionClass = new ReflectionClass(AnnounceService::class);
+        $announceService = new AnnounceManager($encoder);
+        $reflectionClass = new ReflectionClass(AnnounceManager::class);
         $method = $reflectionClass->getMethod('announceErrorResponse');
         $method->setAccessible(true);
 
@@ -69,8 +71,8 @@ class AnnounceServiceTest extends TestCase
 
     public function testErrorResponseWithArrayParameter()
     {
-        /** @var MockObject|BencodingService $encoder */
-        $encoder = $this->getMockBuilder(BencodingService::class)
+        /** @var MockObject|Bencoder $encoder */
+        $encoder = $this->getMockBuilder(Bencoder::class)
             ->setMethods(['encode'])
             ->getMock();
         $error = ['Error X.', 'Error Y.'];
@@ -81,8 +83,8 @@ class AnnounceServiceTest extends TestCase
             ->with($this->equalTo(['failure reason' => $errorMessage]))
             ->willReturn($returnValue);
 
-        $announceService = new AnnounceService($encoder);
-        $reflectionClass = new ReflectionClass(AnnounceService::class);
+        $announceService = new AnnounceManager($encoder);
+        $reflectionClass = new ReflectionClass(AnnounceManager::class);
         $method = $reflectionClass->getMethod('announceErrorResponse');
         $method->setAccessible(true);
 
@@ -115,7 +117,7 @@ class AnnounceServiceTest extends TestCase
 
         $peers = Collection::make([$peerOne, $peerTwo]);
 
-        $encoder = $this->getMockBuilder(BencodingService::class)
+        $encoder = $this->getMockBuilder(Bencoder::class)
             ->setMethods(['encode'])
             ->getMock();
 
@@ -134,7 +136,7 @@ class AnnounceServiceTest extends TestCase
             ))
             ->willReturn($returnValue);
 
-        $announceService = $this->getMockBuilder(AnnounceService::class)
+        $announceService = $this->getMockBuilder(AnnounceManager::class)
             ->setConstructorArgs([$encoder])
             ->setMethods(['getPeers'])
             ->getMock();
@@ -142,7 +144,7 @@ class AnnounceServiceTest extends TestCase
             ->method('getPeers')
             ->willReturn($peers);
 
-        $reflectionClass = new ReflectionClass(AnnounceService::class);
+        $reflectionClass = new ReflectionClass(AnnounceManager::class);
         $reflectionMethod = $reflectionClass->getMethod('compactResponse');
         $reflectionMethod->setAccessible(true);
         $reflectionProperty = $reflectionClass->getProperty('torrent');
@@ -201,7 +203,7 @@ class AnnounceServiceTest extends TestCase
 
         $peers = Collection::make([$peerOne, $peerTwo]);
 
-        $encoder = $this->getMockBuilder(BencodingService::class)
+        $encoder = $this->getMockBuilder(Bencoder::class)
             ->setMethods(['encode'])
             ->getMock();
 
@@ -230,7 +232,7 @@ class AnnounceServiceTest extends TestCase
             ))
             ->willReturn($returnValue);
 
-        $announceService = $this->getMockBuilder(AnnounceService::class)
+        $announceService = $this->getMockBuilder(AnnounceManager::class)
             ->setConstructorArgs([$encoder])
             ->setMethods(['getPeers'])
             ->getMock();
@@ -238,7 +240,7 @@ class AnnounceServiceTest extends TestCase
             ->method('getPeers')
             ->willReturn($peers);
 
-        $reflectionClass = new ReflectionClass(AnnounceService::class);
+        $reflectionClass = new ReflectionClass(AnnounceManager::class);
         $reflectionMethod = $reflectionClass->getMethod('nonCompactResponse');
         $reflectionMethod->setAccessible(true);
         $reflectionProperty = $reflectionClass->getProperty('torrent');

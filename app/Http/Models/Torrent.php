@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace App\Http\Models;
 
+use Facades\App\Services\SizeFormatter;
 use Illuminate\Database\Eloquent\Model;
 use Cviebrock\EloquentSluggable\Sluggable;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Facades\App\Http\Services\SizeFormattingService;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Cviebrock\EloquentSluggable\SluggableScopeHelpers;
 
@@ -54,7 +54,7 @@ class Torrent extends Model
      */
     public function getSizeAttribute($value): string
     {
-        return SizeFormattingService::getFormattedSize((int) $value);
+        return SizeFormatter::getFormattedSize((int) $value);
     }
 
     /**

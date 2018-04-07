@@ -1,19 +1,21 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Tests\Feature\Http\Controllers;
 
 use Tests\TestCase;
 use App\Http\Models\Peer;
 use App\Http\Models\User;
+use App\Services\Bdecoder;
+use App\Services\Bencoder;
 use App\Http\Models\Torrent;
 use Illuminate\Http\Response;
 use Illuminate\Http\Testing\File;
+use App\Services\PasskeyGenerator;
 use App\Http\Models\TorrentComment;
-use App\Http\Services\PasskeyService;
-use App\Http\Services\BdecodingService;
-use App\Http\Services\BencodingService;
+use App\Services\TorrentInfoService;
 use Illuminate\Support\Facades\Storage;
-use App\Http\Services\TorrentInfoService;
 use PHPUnit\Framework\MockObject\MockObject;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -126,10 +128,10 @@ class TorrentControllerTest extends TestCase
     {
         $this->withoutExceptionHandling();
 
-        /** @var BdecodingService|MockObject $decoder */
-        $decoder = $this->createMock(BdecodingService::class);
-        /** @var BencodingService|MockObject $encoder */
-        $encoder = $this->createMock(BencodingService::class);
+        /** @var Bdecoder|MockObject $decoder */
+        $decoder = $this->createMock(Bdecoder::class);
+        /** @var Bencoder|MockObject $encoder */
+        $encoder = $this->createMock(Bencoder::class);
 
         $torrent = factory(Torrent::class)->create(['uploader_id' => $this->user->id, 'name' => 'xyz']);
 
@@ -142,7 +144,7 @@ class TorrentControllerTest extends TestCase
             ->with($this->equalTo($storageReturnValue))
             ->willReturn($decoderReturnValue);
 
-        $this->app->instance(BdecodingService::class, $decoder);
+        $this->app->instance(Bdecoder::class, $decoder);
 
         $encoderReturnValue = 'something xyz';
         $encoder->expects($this->once())
@@ -150,7 +152,7 @@ class TorrentControllerTest extends TestCase
             ->with($this->equalTo(array_merge($decoderReturnValue, ['announce' => route('announce', ['passkey' => $this->user->passkey])])))
             ->willReturn($encoderReturnValue);
 
-        $this->app->instance(BencodingService::class, $encoder);
+        $this->app->instance(Bencoder::class, $encoder);
 
         $response = $this->get(route('torrents.download', $torrent));
         $response->assertStatus(Response::HTTP_OK);
@@ -163,10 +165,10 @@ class TorrentControllerTest extends TestCase
     {
         $this->withoutExceptionHandling();
 
-        /** @var BdecodingService|MockObject $decoder */
-        $decoder = $this->createMock(BdecodingService::class);
-        /** @var BencodingService|MockObject $encoder */
-        $encoder = $this->createMock(BencodingService::class);
+        /** @var Bdecoder|MockObject $decoder */
+        $decoder = $this->createMock(Bdecoder::class);
+        /** @var Bencoder|MockObject $encoder */
+        $encoder = $this->createMock(Bencoder::class);
 
         $torrent = factory(Torrent::class)->create(['uploader_id' => $this->user->id, 'name' => 'čćš/đž%']);
 
@@ -179,7 +181,7 @@ class TorrentControllerTest extends TestCase
             ->with($this->equalTo($storageReturnValue))
             ->willReturn($decoderReturnValue);
 
-        $this->app->instance(BdecodingService::class, $decoder);
+        $this->app->instance(Bdecoder::class, $decoder);
 
         $encoderReturnValue = 'something xyz';
         $encoder->expects($this->once())
@@ -187,7 +189,7 @@ class TorrentControllerTest extends TestCase
             ->with($this->equalTo(array_merge($decoderReturnValue, ['announce' => route('announce', ['passkey' => $this->user->passkey])])))
             ->willReturn($encoderReturnValue);
 
-        $this->app->instance(BencodingService::class, $encoder);
+        $this->app->instance(Bencoder::class, $encoder);
 
         $response = $this->get(route('torrents.download', $torrent));
         $response->assertStatus(Response::HTTP_OK);
@@ -209,12 +211,12 @@ class TorrentControllerTest extends TestCase
 
         $this->user->forceFill(['passkey' => null])->save();
 
-        /** @var BdecodingService|MockObject $decoder */
-        $decoder = $this->createMock(BdecodingService::class);
-        /** @var BencodingService|MockObject $encoder */
-        $encoder = $this->createMock(BencodingService::class);
-        /** @var PasskeyService|MockObject $passkeyService */
-        $passkeyService = $this->createMock(PasskeyService::class);
+        /** @var Bdecoder|MockObject $decoder */
+        $decoder = $this->createMock(Bdecoder::class);
+        /** @var Bencoder|MockObject $encoder */
+        $encoder = $this->createMock(Bencoder::class);
+        /** @var PasskeyGenerator|MockObject $passkeyGenerator */
+        $passkeyGenerator = $this->createMock(PasskeyGenerator::class);
 
         $torrent = factory(Torrent::class)->create(['uploader_id' => $this->user->id]);
 
@@ -227,11 +229,11 @@ class TorrentControllerTest extends TestCase
             ->with($this->equalTo($storageReturnValue))
             ->willReturn($decoderReturnValue);
 
-        $this->app->instance(BdecodingService::class, $decoder);
+        $this->app->instance(Bdecoder::class, $decoder);
 
         $passkey = 'test passkey';
-        $passkeyService->expects($this->once())->method('generateUniquePasskey')->willReturn($passkey);
-        $this->app->instance(PasskeyService::class, $passkeyService);
+        $passkeyGenerator->expects($this->once())->method('generateUniquePasskey')->willReturn($passkey);
+        $this->app->instance(PasskeyGenerator::class, $passkeyGenerator);
 
         $encoderReturnValue = 'something xyz';
         $encoder->expects($this->once())
@@ -239,7 +241,7 @@ class TorrentControllerTest extends TestCase
             ->with($this->equalTo(array_merge($decoderReturnValue, ['announce' => route('announce', ['passkey' => $passkey])])))
             ->willReturn($encoderReturnValue);
 
-        $this->app->instance(BencodingService::class, $encoder);
+        $this->app->instance(Bencoder::class, $encoder);
 
         $response = $this->get(route('torrents.download', $torrent));
         $response->assertStatus(Response::HTTP_OK);

@@ -1,15 +1,17 @@
 <?php
 
-namespace Tests\Unit\Http\Services;
+declare(strict_types=1);
+
+namespace Tests\Unit\Services;
 
 use Tests\TestCase;
-use App\Http\Services\SizeFormattingService;
+use App\Services\SizeFormatter;
 
-class SizeFormattingServiceTest extends TestCase
+class SizeFormatterTest extends TestCase
 {
     public function testFormatting()
     {
-        $formatter = new SizeFormattingService();
+        $formatter = new SizeFormatter();
         $this->assertSame('4.00 B', $formatter->getFormattedSize(4));
         $this->assertSame('1023.00 B', $formatter->getFormattedSize(1023));
         $this->assertSame('1.00 KiB', $formatter->getFormattedSize(1024));

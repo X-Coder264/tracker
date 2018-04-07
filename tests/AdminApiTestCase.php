@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Tests;
 
 use Illuminate\Http\Response;
@@ -43,5 +45,7 @@ class AdminApiTestCase extends TestCase
 
             return $jsonApiResponse;
         }
+
+        return null;
     }
 }

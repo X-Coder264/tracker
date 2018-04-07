@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Tests\Feature\Http\Models;
 
 use Tests\TestCase;
@@ -7,10 +9,10 @@ use App\Http\Models\Peer;
 use App\Http\Models\User;
 use App\Http\Models\Torrent;
 use App\Http\Models\TorrentComment;
+use Facades\App\Services\SizeFormatter;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Facades\App\Http\Services\SizeFormattingService;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class TorrentTest extends TestCase
@@ -22,7 +24,7 @@ class TorrentTest extends TestCase
         factory(Torrent::class)->create();
         $torrent = Torrent::findOrFail(1);
         $returnValue = '500 MB';
-        SizeFormattingService::shouldReceive('getFormattedSize')->once()->with($torrent->getOriginal('size'))->andReturn($returnValue);
+        SizeFormatter::shouldReceive('getFormattedSize')->once()->with($torrent->getOriginal('size'))->andReturn($returnValue);
         $this->assertSame($returnValue, $torrent->size);
     }
 

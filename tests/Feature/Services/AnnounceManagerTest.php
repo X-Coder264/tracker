@@ -1,22 +1,24 @@
 <?php
 
-namespace Tests\Feature\Http\Services;
+declare(strict_types=1);
+
+namespace Tests\Feature\Services;
 
 use stdClass;
 use Tests\TestCase;
 use App\Http\Models\Peer;
 use App\Http\Models\User;
+use App\Services\Bdecoder;
 use App\Http\Models\PeerIP;
 use App\Http\Models\Snatch;
 use App\Http\Models\Torrent;
 use Illuminate\Http\Response;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
-use App\Http\Services\BdecodingService;
 use Tests\Traits\EnableForeignKeyConstraints;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
-class AnnounceServiceTest extends TestCase
+class AnnounceManagerTest extends TestCase
 {
     use RefreshDatabase, EnableForeignKeyConstraints;
 
@@ -159,7 +161,7 @@ class AnnounceServiceTest extends TestCase
         $response->assertStatus(Response::HTTP_OK);
         $response->assertHeader('Content-Type', 'text/plain; charset=UTF-8');
         $responseContent = $response->getContent();
-        $decoder = new BdecodingService();
+        $decoder = new Bdecoder();
         $responseContent = $decoder->decode($responseContent);
         if (! empty($responseContent['peers'])) {
             $responseContent['peers'] = bin2hex($responseContent['peers']);
@@ -548,7 +550,7 @@ class AnnounceServiceTest extends TestCase
         $response->assertStatus(Response::HTTP_OK);
         $response->assertHeader('Content-Type', 'text/plain; charset=UTF-8');
         $responseContent = $response->getContent();
-        $decoder = new BdecodingService();
+        $decoder = new Bdecoder();
         $responseContent = $decoder->decode($responseContent);
         if (! empty($responseContent['peers'])) {
             $responseContent['peers'] = bin2hex($responseContent['peers']);
@@ -1203,7 +1205,7 @@ class AnnounceServiceTest extends TestCase
         $response->assertStatus(Response::HTTP_OK);
         $response->assertHeader('Content-Type', 'text/plain; charset=UTF-8');
         $responseContent = $response->getContent();
-        $decoder = new BdecodingService();
+        $decoder = new Bdecoder();
         $responseContent = $decoder->decode($responseContent);
         if (! empty($responseContent['peers'])) {
             $responseContent['peers'] = bin2hex($responseContent['peers']);
@@ -1312,7 +1314,7 @@ class AnnounceServiceTest extends TestCase
         $response->assertStatus(Response::HTTP_OK);
         $response->assertHeader('Content-Type', 'text/plain; charset=UTF-8');
         $responseContent = $response->getContent();
-        $decoder = new BdecodingService();
+        $decoder = new Bdecoder();
         $responseContent = $decoder->decode($responseContent);
         if (! empty($responseContent['peers'])) {
             $responseContent['peers'] = bin2hex($responseContent['peers']);
@@ -1417,7 +1419,7 @@ class AnnounceServiceTest extends TestCase
         $response->assertStatus(Response::HTTP_OK);
         $response->assertHeader('Content-Type', 'text/plain; charset=UTF-8');
         $responseContent = $response->getContent();
-        $decoder = new BdecodingService();
+        $decoder = new Bdecoder();
         $responseContent = $decoder->decode($responseContent);
         if (! empty($responseContent['peers'])) {
             $responseContent['peers'] = bin2hex($responseContent['peers']);
@@ -1524,7 +1526,7 @@ class AnnounceServiceTest extends TestCase
         $response->assertStatus(Response::HTTP_OK);
         $response->assertHeader('Content-Type', 'text/plain; charset=UTF-8');
         $responseContent = $response->getContent();
-        $decoder = new BdecodingService();
+        $decoder = new Bdecoder();
         $responseContent = $decoder->decode($responseContent);
         if (! empty($responseContent['peers'])) {
             $responseContent['peers'] = bin2hex($responseContent['peers']);
@@ -1631,7 +1633,7 @@ class AnnounceServiceTest extends TestCase
         $response->assertStatus(Response::HTTP_OK);
         $response->assertHeader('Content-Type', 'text/plain; charset=UTF-8');
         $responseContent = $response->getContent();
-        $decoder = new BdecodingService();
+        $decoder = new Bdecoder();
         $responseContent = $decoder->decode($responseContent);
         if (! empty($responseContent['peers'])) {
             $responseContent['peers'] = bin2hex($responseContent['peers']);
@@ -1734,7 +1736,7 @@ class AnnounceServiceTest extends TestCase
         $response->assertStatus(Response::HTTP_OK);
         $response->assertHeader('Content-Type', 'text/plain; charset=UTF-8');
         $responseContent = $response->getContent();
-        $decoder = new BdecodingService();
+        $decoder = new Bdecoder();
         $responseContent = $decoder->decode($responseContent);
         $this->assertSame($expectedResponse, $responseContent);
         $this->assertSame(2, Peer::count());
@@ -1838,7 +1840,7 @@ class AnnounceServiceTest extends TestCase
         $response->assertStatus(Response::HTTP_OK);
         $response->assertHeader('Content-Type', 'text/plain; charset=UTF-8');
         $responseContent = $response->getContent();
-        $decoder = new BdecodingService();
+        $decoder = new Bdecoder();
         $responseContent = $decoder->decode($responseContent);
         if (! empty($responseContent['peers'])) {
             $responseContent['peers'] = bin2hex($responseContent['peers']);
@@ -1898,7 +1900,7 @@ class AnnounceServiceTest extends TestCase
         );
         $response->assertStatus(Response::HTTP_OK);
         $expectedResponse = ['failure reason' => __('messages.validation.variable.required', ['var' => 'passkey'])];
-        $decoder = new BdecodingService();
+        $decoder = new Bdecoder();
         $actualResponse = $decoder->decode($response->getContent());
         $this->assertSame($expectedResponse, $actualResponse);
         $this->assertSame(0, Peer::count());
@@ -1914,7 +1916,7 @@ class AnnounceServiceTest extends TestCase
         );
         $response->assertStatus(Response::HTTP_OK);
         $expectedResponse = ['failure reason' => __('messages.validation.variable.size', ['var' => 'passkey'])];
-        $decoder = new BdecodingService();
+        $decoder = new Bdecoder();
         $actualResponse = $decoder->decode($response->getContent());
         $this->assertSame($expectedResponse, $actualResponse);
         $this->assertSame(0, Peer::count());
@@ -1930,7 +1932,7 @@ class AnnounceServiceTest extends TestCase
         );
         $response->assertStatus(Response::HTTP_OK);
         $expectedResponse = ['failure reason' => __('messages.announce.invalid_passkey')];
-        $decoder = new BdecodingService();
+        $decoder = new Bdecoder();
         $actualResponse = $decoder->decode($response->getContent());
         $this->assertSame($expectedResponse, $actualResponse);
         $this->assertSame(0, Peer::count());
@@ -1946,7 +1948,7 @@ class AnnounceServiceTest extends TestCase
         );
         $response->assertStatus(Response::HTTP_OK);
         $expectedResponse = ['failure reason' => __('messages.validation.variable.required', ['var' => 'info_hash'])];
-        $decoder = new BdecodingService();
+        $decoder = new Bdecoder();
         $actualResponse = $decoder->decode($response->getContent());
         $this->assertSame($expectedResponse, $actualResponse);
         $this->assertSame(0, Peer::count());
@@ -1962,7 +1964,7 @@ class AnnounceServiceTest extends TestCase
         );
         $response->assertStatus(Response::HTTP_OK);
         $expectedResponse = ['failure reason' => __('messages.validation.variable.size', ['var' => 'info_hash'])];
-        $decoder = new BdecodingService();
+        $decoder = new Bdecoder();
         $actualResponse = $decoder->decode($response->getContent());
         $this->assertSame($expectedResponse, $actualResponse);
         $this->assertSame(0, Peer::count());
@@ -1978,7 +1980,7 @@ class AnnounceServiceTest extends TestCase
         );
         $response->assertStatus(Response::HTTP_OK);
         $expectedResponse = ['failure reason' => __('messages.announce.invalid_info_hash')];
-        $decoder = new BdecodingService();
+        $decoder = new Bdecoder();
         $actualResponse = $decoder->decode($response->getContent());
         $this->assertSame($expectedResponse, $actualResponse);
         $this->assertSame(0, Peer::count());
@@ -1994,7 +1996,7 @@ class AnnounceServiceTest extends TestCase
         );
         $response->assertStatus(Response::HTTP_OK);
         $expectedResponse = ['failure reason' => __('messages.validation.variable.required', ['var' => 'peer_id'])];
-        $decoder = new BdecodingService();
+        $decoder = new Bdecoder();
         $actualResponse = $decoder->decode($response->getContent());
         $this->assertSame($expectedResponse, $actualResponse);
         $this->assertSame(0, Peer::count());
@@ -2010,7 +2012,7 @@ class AnnounceServiceTest extends TestCase
         );
         $response->assertStatus(Response::HTTP_OK);
         $expectedResponse = ['failure reason' => __('messages.validation.variable.size', ['var' => 'peer_id'])];
-        $decoder = new BdecodingService();
+        $decoder = new Bdecoder();
         $actualResponse = $decoder->decode($response->getContent());
         $this->assertSame($expectedResponse, $actualResponse);
         $this->assertSame(0, Peer::count());
@@ -2032,7 +2034,7 @@ class AnnounceServiceTest extends TestCase
         );
         $response->assertStatus(Response::HTTP_OK);
         $expectedResponse = ['failure reason' => __('messages.announce.invalid_peer_id')];
-        $decoder = new BdecodingService();
+        $decoder = new Bdecoder();
         $actualResponse = $decoder->decode($response->getContent());
         $this->assertSame($expectedResponse, $actualResponse);
         $this->assertSame(0, Peer::count());
@@ -2051,7 +2053,7 @@ class AnnounceServiceTest extends TestCase
         );
         $response->assertStatus(Response::HTTP_OK);
         $expectedResponse = ['failure reason' => __('messages.announce.invalid_peer_id')];
-        $decoder = new BdecodingService();
+        $decoder = new Bdecoder();
         $actualResponse = $decoder->decode($response->getContent());
         $this->assertSame($expectedResponse, $actualResponse);
         $this->assertSame(0, Peer::count());
@@ -2068,7 +2070,7 @@ class AnnounceServiceTest extends TestCase
         );
         $response->assertStatus(Response::HTTP_OK);
         $expectedResponse = ['failure reason' => __('messages.announce.invalid_ip_or_port')];
-        $decoder = new BdecodingService();
+        $decoder = new Bdecoder();
         $actualResponse = $decoder->decode($response->getContent());
         $this->assertSame($expectedResponse, $actualResponse);
         $this->assertSame(0, Peer::count());
@@ -2084,7 +2086,7 @@ class AnnounceServiceTest extends TestCase
         );
         $response->assertStatus(Response::HTTP_OK);
         $expectedResponse = ['failure reason' => __('messages.validation.variable.required', ['var' => 'port'])];
-        $decoder = new BdecodingService();
+        $decoder = new Bdecoder();
         $actualResponse = $decoder->decode($response->getContent());
         $this->assertSame($expectedResponse, $actualResponse);
         $this->assertSame(0, Peer::count());
@@ -2100,7 +2102,7 @@ class AnnounceServiceTest extends TestCase
         );
         $response->assertStatus(Response::HTTP_OK);
         $expectedResponse = ['failure reason' => __('messages.validation.variable.port', ['port' => 'xyz'])];
-        $decoder = new BdecodingService();
+        $decoder = new Bdecoder();
         $actualResponse = $decoder->decode($response->getContent());
         $this->assertSame($expectedResponse, $actualResponse);
         $this->assertSame(0, Peer::count());
@@ -2116,7 +2118,7 @@ class AnnounceServiceTest extends TestCase
         );
         $response->assertStatus(Response::HTTP_OK);
         $expectedResponse = ['failure reason' => __('messages.validation.variable.port', ['port' => 0])];
-        $decoder = new BdecodingService();
+        $decoder = new Bdecoder();
         $actualResponse = $decoder->decode($response->getContent());
         $this->assertSame($expectedResponse, $actualResponse);
         $this->assertSame(0, Peer::count());
@@ -2132,7 +2134,7 @@ class AnnounceServiceTest extends TestCase
         );
         $response->assertStatus(Response::HTTP_OK);
         $expectedResponse = ['failure reason' => __('messages.validation.variable.port', ['port' => 65536])];
-        $decoder = new BdecodingService();
+        $decoder = new Bdecoder();
         $actualResponse = $decoder->decode($response->getContent());
         $this->assertSame($expectedResponse, $actualResponse);
         $this->assertSame(0, Peer::count());
@@ -2148,7 +2150,7 @@ class AnnounceServiceTest extends TestCase
         );
         $response->assertStatus(Response::HTTP_OK);
         $expectedResponse = ['failure reason' => __('messages.validation.variable.required', ['var' => 'uploaded'])];
-        $decoder = new BdecodingService();
+        $decoder = new Bdecoder();
         $actualResponse = $decoder->decode($response->getContent());
         $this->assertSame($expectedResponse, $actualResponse);
         $this->assertSame(0, Peer::count());
@@ -2164,7 +2166,7 @@ class AnnounceServiceTest extends TestCase
         );
         $response->assertStatus(Response::HTTP_OK);
         $expectedResponse = ['failure reason' => __('messages.validation.variable.integer', ['var' => 'uploaded'])];
-        $decoder = new BdecodingService();
+        $decoder = new Bdecoder();
         $actualResponse = $decoder->decode($response->getContent());
         $this->assertSame($expectedResponse, $actualResponse);
         $this->assertSame(0, Peer::count());
@@ -2180,7 +2182,7 @@ class AnnounceServiceTest extends TestCase
         );
         $response->assertStatus(Response::HTTP_OK);
         $expectedResponse = ['failure reason' => __('messages.validation.variable.uploaded', ['uploaded' => -1])];
-        $decoder = new BdecodingService();
+        $decoder = new Bdecoder();
         $actualResponse = $decoder->decode($response->getContent());
         $this->assertSame($expectedResponse, $actualResponse);
         $this->assertSame(0, Peer::count());
@@ -2196,7 +2198,7 @@ class AnnounceServiceTest extends TestCase
         );
         $response->assertStatus(Response::HTTP_OK);
         $expectedResponse = ['failure reason' => __('messages.validation.variable.required', ['var' => 'downloaded'])];
-        $decoder = new BdecodingService();
+        $decoder = new Bdecoder();
         $actualResponse = $decoder->decode($response->getContent());
         $this->assertSame($expectedResponse, $actualResponse);
         $this->assertSame(0, Peer::count());
@@ -2212,7 +2214,7 @@ class AnnounceServiceTest extends TestCase
         );
         $response->assertStatus(Response::HTTP_OK);
         $expectedResponse = ['failure reason' => __('messages.validation.variable.integer', ['var' => 'downloaded'])];
-        $decoder = new BdecodingService();
+        $decoder = new Bdecoder();
         $actualResponse = $decoder->decode($response->getContent());
         $this->assertSame($expectedResponse, $actualResponse);
         $this->assertSame(0, Peer::count());
@@ -2228,7 +2230,7 @@ class AnnounceServiceTest extends TestCase
         );
         $response->assertStatus(Response::HTTP_OK);
         $expectedResponse = ['failure reason' => __('messages.validation.variable.downloaded', ['downloaded' => -1])];
-        $decoder = new BdecodingService();
+        $decoder = new Bdecoder();
         $actualResponse = $decoder->decode($response->getContent());
         $this->assertSame($expectedResponse, $actualResponse);
         $this->assertSame(0, Peer::count());
@@ -2244,7 +2246,7 @@ class AnnounceServiceTest extends TestCase
         );
         $response->assertStatus(Response::HTTP_OK);
         $expectedResponse = ['failure reason' => __('messages.validation.variable.required', ['var' => 'left'])];
-        $decoder = new BdecodingService();
+        $decoder = new Bdecoder();
         $actualResponse = $decoder->decode($response->getContent());
         $this->assertSame($expectedResponse, $actualResponse);
         $this->assertSame(0, Peer::count());
@@ -2260,7 +2262,7 @@ class AnnounceServiceTest extends TestCase
         );
         $response->assertStatus(Response::HTTP_OK);
         $expectedResponse = ['failure reason' => __('messages.validation.variable.integer', ['var' => 'left'])];
-        $decoder = new BdecodingService();
+        $decoder = new Bdecoder();
         $actualResponse = $decoder->decode($response->getContent());
         $this->assertSame($expectedResponse, $actualResponse);
         $this->assertSame(0, Peer::count());
@@ -2276,7 +2278,7 @@ class AnnounceServiceTest extends TestCase
         );
         $response->assertStatus(Response::HTTP_OK);
         $expectedResponse = ['failure reason' => __('messages.validation.variable.left', ['left' => -1])];
-        $decoder = new BdecodingService();
+        $decoder = new Bdecoder();
         $actualResponse = $decoder->decode($response->getContent());
         $this->assertSame($expectedResponse, $actualResponse);
         $this->assertSame(0, Peer::count());

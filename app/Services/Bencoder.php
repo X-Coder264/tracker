@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace App\Http\Services;
+namespace App\Services;
 
-class BencodingService
+class Bencoder
 {
     /**
      * @param mixed $data

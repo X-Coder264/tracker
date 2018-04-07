@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Http\Services;
+namespace App\Services;
 
 use App\Http\Models\Torrent;
 use Illuminate\Support\Facades\Cache;
@@ -12,23 +12,23 @@ use Illuminate\Contracts\Filesystem\FileNotFoundException;
 class TorrentInfoService
 {
     /**
-     * @var SizeFormattingService
+     * @var SizeFormatter
      */
-    private $sizeFormattingService;
+    private $sizeFormatter;
 
     /**
-     * @var BdecodingService
+     * @var Bdecoder
      */
-    private $bdecodingService;
+    private $bdecoder;
 
     /**
-     * @param SizeFormattingService $sizeFormattingService
-     * @param BdecodingService      $bdecodingService
+     * @param SizeFormatter $sizeFormatter
+     * @param Bdecoder      $bdecoder
      */
-    public function __construct(SizeFormattingService $sizeFormattingService, BdecodingService $bdecodingService)
+    public function __construct(SizeFormatter $sizeFormatter, Bdecoder $bdecoder)
     {
-        $this->sizeFormattingService = $sizeFormattingService;
-        $this->bdecodingService = $bdecodingService;
+        $this->sizeFormatter = $sizeFormatter;
+        $this->bdecoder = $bdecoder;
     }
 
     /**
@@ -64,7 +64,7 @@ class TorrentInfoService
         if (isset($torrentInfoDict['files'])) {
             // multiple file mode
             foreach ($torrentInfoDict['files'] as $file) {
-                $size = $this->sizeFormattingService->getFormattedSize($file['length']);
+                $size = $this->sizeFormatter->getFormattedSize($file['length']);
                 $fileName = '';
                 foreach ($file['path'] as $path) {
                     $fileName .= $path . '/';
@@ -75,7 +75,7 @@ class TorrentInfoService
             }
         } else {
             // single file mode
-            $size = $this->sizeFormattingService->getFormattedSize($torrentInfoDict['length']);
+            $size = $this->sizeFormatter->getFormattedSize($torrentInfoDict['length']);
             $fileName = $torrentInfoDict['name'];
             $fileNamesAndSizes[] = [$fileName, $size];
         }
@@ -96,7 +96,7 @@ class TorrentInfoService
             'torrent.' . $torrent->id . '.files',
             function () use ($torrent) {
                 $torrentFile = Storage::disk('public')->get("torrents/{$torrent->id}.torrent");
-                $decodedTorrent = $this->bdecodingService->decode($torrentFile);
+                $decodedTorrent = $this->bdecoder->decode($torrentFile);
 
                 return $this->getTorrentFileNamesAndSizesFromTorrentInfoDict($decodedTorrent['info']);
             }

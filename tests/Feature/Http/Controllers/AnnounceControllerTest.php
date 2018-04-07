@@ -1,19 +1,21 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Tests\Feature\Http\Controllers;
 
 use Tests\TestCase;
 use Illuminate\Http\Response;
-use App\Http\Services\AnnounceService;
+use App\Services\AnnounceManager;
 
 class AnnounceControllerTest extends TestCase
 {
     public function testStore()
     {
-        $announceService = $this->createMock(AnnounceService::class);
+        $announceService = $this->createMock(AnnounceManager::class);
         $returnValue = 'test xyz 264';
         $announceService->method('announce')->willReturn($returnValue);
-        $this->app->instance(AnnounceService::class, $announceService);
+        $this->app->instance(AnnounceManager::class, $announceService);
 
         $response = $this->get(route('announce'));
 

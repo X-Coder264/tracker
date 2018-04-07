@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace App\Http\Services;
+namespace App\Services;
 
 use App\Http\Models\User;
 
-class PasskeyService
+class PasskeyGenerator
 {
     /**
      * @return string

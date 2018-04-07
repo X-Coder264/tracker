@@ -5,19 +5,19 @@ declare(strict_types=1);
 namespace App\Http\Controllers;
 
 use App\Http\Models\User;
+use App\Services\Bdecoder;
+use App\Services\Bencoder;
 use Illuminate\Support\Str;
 use App\Http\Models\Torrent;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use App\Services\PasskeyGenerator;
+use App\Services\TorrentInfoService;
 use Illuminate\Support\Facades\Auth;
-use App\Http\Services\PasskeyService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Cache;
-use App\Http\Services\BdecodingService;
-use App\Http\Services\BencodingService;
+use App\Services\TorrentUploadService;
 use Illuminate\Support\Facades\Storage;
-use App\Http\Services\TorrentInfoService;
-use App\Http\Services\TorrentUploadService;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
 
@@ -107,17 +107,17 @@ class TorrentController extends Controller
 
     /**
      * @param Torrent          $torrent
-     * @param BencodingService $encoder
-     * @param BdecodingService $decoder
-     * @param PasskeyService   $passkeyService
+     * @param Bencoder         $encoder
+     * @param Bdecoder         $decoder
+     * @param PasskeyGenerator $passkeyGenerator
      *
      * @return Response
      */
     public function download(
         Torrent $torrent,
-        BencodingService $encoder,
-        BdecodingService $decoder,
-        PasskeyService $passkeyService
+        Bencoder $encoder,
+        Bdecoder $decoder,
+        PasskeyGenerator $passkeyGenerator
     ): Response {
         try {
             $torrentFile = Storage::disk('public')->get("torrents/{$torrent->id}.torrent");
@@ -129,7 +129,7 @@ class TorrentController extends Controller
 
         $passkey = Auth::user()->passkey;
         if (empty($passkey)) {
-            $passkey = $passkeyService->generateUniquePasskey();
+            $passkey = $passkeyGenerator->generateUniquePasskey();
             User::where('id', '=', Auth::id())->update(['passkey' => $passkey]);
         }
 

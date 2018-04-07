@@ -1,15 +1,17 @@
 <?php
 
-namespace Tests\Unit\Http\Services;
+declare(strict_types=1);
+
+namespace Tests\Unit\Services;
 
 use Exception;
 use Tests\TestCase;
-use App\Http\Services\BdecodingService;
+use App\Services\Bdecoder;
 
-class BdecodingServiceTest extends TestCase
+class BdecoderTest extends TestCase
 {
     /**
-     * @var BdecodingService
+     * @var Bdecoder
      */
     protected $decoder;
 
@@ -17,7 +19,7 @@ class BdecodingServiceTest extends TestCase
     {
         parent::setUp();
 
-        $this->decoder = new BdecodingService();
+        $this->decoder = new Bdecoder();
     }
 
     public function testStringDecoding()

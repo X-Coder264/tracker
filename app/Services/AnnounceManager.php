@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Http\Services;
+namespace App\Services;
 
 use stdClass;
 use Illuminate\Http\Request;
@@ -15,7 +15,7 @@ use Illuminate\Support\Facades\Validator;
 /**
  * Note: For performance reasons the announce uses the query builder instead of Eloquent.
  */
-class AnnounceService
+class AnnounceManager
 {
     /**
      * @var Request
@@ -23,7 +23,7 @@ class AnnounceService
     protected $request;
 
     /**
-     * @var BencodingService
+     * @var Bencoder
      */
     protected $encoder;
 
@@ -108,9 +108,9 @@ class AnnounceService
     protected $uploadedInThisAnnounceCycle = 0;
 
     /**
-     * @param BencodingService $encoder
+     * @param Bencoder $encoder
      */
-    public function __construct(BencodingService $encoder)
+    public function __construct(Bencoder $encoder)
     {
         $this->encoder = $encoder;
     }

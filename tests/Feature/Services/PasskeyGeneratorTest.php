@@ -1,14 +1,16 @@
 <?php
 
-namespace Tests\Feature\Http\Services;
+declare(strict_types=1);
+
+namespace Tests\Feature\Services;
 
 use Tests\TestCase;
 use ReflectionClass;
 use App\Http\Models\User;
-use App\Http\Services\PasskeyService;
+use App\Services\PasskeyGenerator;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
-class PasskeyServiceTest extends TestCase
+class PasskeyGeneratorTest extends TestCase
 {
     use RefreshDatabase;
 
@@ -16,8 +18,8 @@ class PasskeyServiceTest extends TestCase
     {
         $user = factory(User::class)->create();
 
-        $passkeyService = new PasskeyService();
-        $reflectionClass = new ReflectionClass(PasskeyService::class);
+        $passkeyService = new PasskeyGenerator();
+        $reflectionClass = new ReflectionClass(PasskeyGenerator::class);
         $reflectionMethod = $reflectionClass->getMethod('getUserWithTheSpecifiedPasskey');
         $reflectionMethod->setAccessible(true);
         $fetchedUser = $reflectionMethod->invokeArgs($passkeyService, [$user->passkey]);
