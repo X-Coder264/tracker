@@ -88,13 +88,14 @@ class TorrentUploadService
             "/torrents/{$torrent->id}.torrent",
             $this->encoder->encode($decodedTorrent)
         );
+
         if (false !== $stored) {
             return $torrent;
-        } else {
-            $torrent->delete();
-
-            throw new FileNotWritableException(__('messages.file-not-writable-exception.error-message'));
         }
+
+        $torrent->delete();
+
+        throw new FileNotWritableException(__('messages.file-not-writable-exception.error-message'));
     }
 
     /**
