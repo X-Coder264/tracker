@@ -1742,16 +1742,16 @@
         },
         {
             "name": "spatie/laravel-permission",
-            "version": "2.11.0",
+            "version": "2.12.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/spatie/laravel-permission.git",
-                "reference": "cc98e4dca988af6fb546e7e95248481713782cbe"
+                "reference": "666e19211a036a608806489adf5d7e8249938d31"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/spatie/laravel-permission/zipball/cc98e4dca988af6fb546e7e95248481713782cbe",
-                "reference": "cc98e4dca988af6fb546e7e95248481713782cbe",
+                "url": "https://api.github.com/repos/spatie/laravel-permission/zipball/666e19211a036a608806489adf5d7e8249938d31",
+                "reference": "666e19211a036a608806489adf5d7e8249938d31",
                 "shasum": ""
             },
             "require": {
@@ -1802,7 +1802,7 @@
                 "security",
                 "spatie"
             ],
-            "time": "2018-04-16T15:09:56+00:00"
+            "time": "2018-04-22T22:06:50+00:00"
         },
         {
             "name": "swiftmailer/swiftmailer",
