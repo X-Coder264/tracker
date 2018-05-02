@@ -155,7 +155,7 @@ class TorrentUploadServiceTest extends TestCase
     public function testTorrentMustHaveAnUniqueInfoHash()
     {
         $infoHash = 'ccd285bd6d7fc749e9ed34d8b1e8a0f1b582d977';
-        factory(Torrent::class)->create(['infoHash' => $infoHash, 'seeders' => 0, 'leechers' => 0]);
+        factory(Torrent::class)->create(['info_hash' => $infoHash, 'seeders' => 0, 'leechers' => 0]);
         $user = factory(User::class)->create();
         $this->actingAs($user);
 
@@ -212,7 +212,7 @@ class TorrentUploadServiceTest extends TestCase
         $this->assertSame($formatter->getFormattedSize($torrentSize), $torrent->size);
         $this->assertSame($torrentName, $torrent->name);
         $this->assertSame($torrentDescription, $torrent->description);
-        $this->assertSame($expectedHash, $torrent->infoHash);
+        $this->assertSame($expectedHash, $torrent->info_hash);
     }
 
     public function testTorrentsHaveTheCorrectAnnounceUrl()

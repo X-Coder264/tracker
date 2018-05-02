@@ -59,7 +59,7 @@ class UserTest extends TestCase
         $this->assertSame($user->torrents[0]->id, $torrent->id);
         $this->assertSame($user->torrents[0]->name, $torrent->name);
         $this->assertSame($user->torrents[0]->size, $torrent->size);
-        $this->assertSame($user->torrents[0]->infoHash, $torrent->infoHash);
+        $this->assertSame($user->torrents[0]->info_hash, $torrent->info_hash);
     }
 
     public function testLanguageRelationship()

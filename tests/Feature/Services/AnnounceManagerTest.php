@@ -31,7 +31,7 @@ class AnnounceManagerTest extends TestCase
         $IP = '98.165.38.50';
         $port = 60000;
         $userAgent = 'my test user agent';
-        $torrent = factory(Torrent::class)->create(['infoHash' => $infoHash, 'seeders' => 0, 'leechers' => 0]);
+        $torrent = factory(Torrent::class)->create(['info_hash' => $infoHash, 'seeders' => 0, 'leechers' => 0]);
         $user = factory(User::class)->create();
 
         $response = $this->get(
@@ -111,7 +111,7 @@ class AnnounceManagerTest extends TestCase
         $IP = '98.165.38.50';
         $port = 60000;
         $userAgent = 'my test user agent';
-        $torrent = factory(Torrent::class)->create(['infoHash' => $infoHash, 'seeders' => 1, 'leechers' => 1]);
+        $torrent = factory(Torrent::class)->create(['info_hash' => $infoHash, 'seeders' => 1, 'leechers' => 1]);
         $user = factory(User::class)->create();
         $peerOne = factory(Peer::class)->create(['torrent_id' => $torrent->id, 'seeder' => true, 'peer_id' => $peerIdOne]);
         $peerOneIP = factory(PeerIP::class)->create(['peerID' => $peerOne->id, 'IP' => '98.165.38.51', 'port' => 55555]);
@@ -221,7 +221,7 @@ class AnnounceManagerTest extends TestCase
         $IP = '98.165.38.50';
         $port = 60000;
         $userAgent = 'my test user agent';
-        $torrent = factory(Torrent::class)->create(['infoHash' => $infoHash, 'seeders' => 0, 'leechers' => 0]);
+        $torrent = factory(Torrent::class)->create(['info_hash' => $infoHash, 'seeders' => 0, 'leechers' => 0]);
         $user = factory(User::class)->create();
 
         $response = $this->get(
@@ -288,7 +288,7 @@ class AnnounceManagerTest extends TestCase
         $IP = '98.165.38.50';
         $port = 60000;
         $userAgent = 'my test user agent';
-        $torrent = factory(Torrent::class)->create(['infoHash' => $infoHash, 'seeders' => 1, 'leechers' => 0]);
+        $torrent = factory(Torrent::class)->create(['info_hash' => $infoHash, 'seeders' => 1, 'leechers' => 0]);
         $user = factory(User::class)->create();
         $peer = factory(Peer::class)->create(
             [
@@ -380,7 +380,7 @@ class AnnounceManagerTest extends TestCase
         $userAgent = 'my test user agent';
         $torrent = factory(Torrent::class)->create(
             [
-                'infoHash' => $infoHash,
+                'info_hash' => $infoHash,
                 'seeders'  => 0,
                 'leechers' => 1,
                 'size'     => 3000,
@@ -478,7 +478,7 @@ class AnnounceManagerTest extends TestCase
         $userAgent = 'my test user agent';
         $torrent = factory(Torrent::class)->create(
             [
-                'infoHash' => $infoHash,
+                'info_hash' => $infoHash,
                 'seeders'  => 1,
                 'leechers' => 2,
                 'size'     => 5000,
@@ -607,7 +607,7 @@ class AnnounceManagerTest extends TestCase
         $userAgent = 'my test user agent';
         $torrent = factory(Torrent::class)->create(
             [
-                'infoHash' => $infoHash,
+                'info_hash' => $infoHash,
                 'seeders'  => 1,
                 'leechers' => 0,
                 'size'     => 1000,
@@ -718,7 +718,7 @@ class AnnounceManagerTest extends TestCase
         $userAgent = 'my test user agent';
         $torrent = factory(Torrent::class)->create(
             [
-                'infoHash' => $infoHash,
+                'info_hash' => $infoHash,
                 'seeders'  => 0,
                 'leechers' => 1,
                 'size'     => 5000,
@@ -827,7 +827,7 @@ class AnnounceManagerTest extends TestCase
         $userAgent = 'my test user agent';
         $torrent = factory(Torrent::class)->create(
             [
-                'infoHash' => $infoHash,
+                'info_hash' => $infoHash,
                 'seeders'  => 0,
                 'leechers' => 1,
                 'size'     => 5000,
@@ -914,7 +914,7 @@ class AnnounceManagerTest extends TestCase
         $userAgent = 'my test user agent';
         $torrent = factory(Torrent::class)->create(
             [
-                'infoHash' => $infoHash,
+                'info_hash' => $infoHash,
                 'seeders'  => 0,
                 'leechers' => 0,
                 'size'     => 5000,
@@ -1011,7 +1011,7 @@ class AnnounceManagerTest extends TestCase
         $userAgent = 'my test user agent';
         $torrent = factory(Torrent::class)->create(
             [
-                'infoHash' => $infoHash,
+                'info_hash' => $infoHash,
                 'seeders'  => 0,
                 'leechers' => 0,
                 'size'     => 5000,
@@ -1084,7 +1084,7 @@ class AnnounceManagerTest extends TestCase
         $userAgent = 'my test user agent';
         $torrent = factory(Torrent::class)->create(
             [
-                'infoHash' => $infoHash,
+                'info_hash' => $infoHash,
                 'seeders'  => 0,
                 'leechers' => 0,
                 'size'     => 5000,
@@ -1156,7 +1156,7 @@ class AnnounceManagerTest extends TestCase
         $IPv6 = '2001::53aa:64c:0:7f83:bc43:dec9';
         $port = 60000;
         $userAgent = 'my test user agent';
-        $torrent = factory(Torrent::class)->create(['infoHash' => $infoHash, 'seeders' => 2, 'leechers' => 0]);
+        $torrent = factory(Torrent::class)->create(['info_hash' => $infoHash, 'seeders' => 2, 'leechers' => 0]);
         $user = factory(User::class)->create();
         $peerOne = factory(Peer::class)->create(['torrent_id' => $torrent->id, 'seeder' => true]);
         $peerOneIP = factory(PeerIP::class)->create(['peerID' => $peerOne->id, 'IP' => '98.165.38.51', 'port' => 55555]);
@@ -1266,7 +1266,7 @@ class AnnounceManagerTest extends TestCase
         $IPv6 = '2001::53aa:64c:0:7f83:bc43:dec9';
         $port = 60000;
         $userAgent = 'my test user agent';
-        $torrent = factory(Torrent::class)->create(['infoHash' => $infoHash, 'seeders' => 2, 'leechers' => 0]);
+        $torrent = factory(Torrent::class)->create(['info_hash' => $infoHash, 'seeders' => 2, 'leechers' => 0]);
         $user = factory(User::class)->create();
         $peerOne = factory(Peer::class)->create(['torrent_id' => $torrent->id, 'seeder' => true]);
         $peerOneIP = factory(PeerIP::class)->create(['peerID' => $peerOne->id, 'IP' => '98.165.38.51', 'port' => 55555]);
@@ -1371,7 +1371,7 @@ class AnnounceManagerTest extends TestCase
         $IPv6 = '2001::53aa:64c:0:7f83:bc43:dec9';
         $port = 60000;
         $userAgent = 'my test user agent';
-        $torrent = factory(Torrent::class)->create(['infoHash' => $infoHash, 'seeders' => 2, 'leechers' => 0]);
+        $torrent = factory(Torrent::class)->create(['info_hash' => $infoHash, 'seeders' => 2, 'leechers' => 0]);
         $user = factory(User::class)->create();
         $peerOne = factory(Peer::class)->create(['torrent_id' => $torrent->id, 'seeder' => true]);
         $peerOneIP = factory(PeerIP::class)->create(['peerID' => $peerOne->id, 'IP' => '98.165.38.51', 'port' => 55555]);
@@ -1478,7 +1478,7 @@ class AnnounceManagerTest extends TestCase
         $port = 60000;
         $IPv6Endpoint = '[' . $IPv6 . ']:' . $IPv6Port;
         $userAgent = 'my test user agent';
-        $torrent = factory(Torrent::class)->create(['infoHash' => $infoHash, 'seeders' => 2, 'leechers' => 0]);
+        $torrent = factory(Torrent::class)->create(['info_hash' => $infoHash, 'seeders' => 2, 'leechers' => 0]);
         $user = factory(User::class)->create();
         $peerOne = factory(Peer::class)->create(['torrent_id' => $torrent->id, 'seeder' => true]);
         $peerOneIP = factory(PeerIP::class)->create(['peerID' => $peerOne->id, 'IP' => '98.165.38.51', 'port' => 55555]);
@@ -1585,7 +1585,7 @@ class AnnounceManagerTest extends TestCase
         $port = 60000;
         $IPv4Endpoint = $IPv4 . ':' . $IPv4Port;
         $userAgent = 'my test user agent';
-        $torrent = factory(Torrent::class)->create(['infoHash' => $infoHash, 'seeders' => 2, 'leechers' => 0]);
+        $torrent = factory(Torrent::class)->create(['info_hash' => $infoHash, 'seeders' => 2, 'leechers' => 0]);
         $user = factory(User::class)->create();
         $peerOne = factory(Peer::class)->create(['torrent_id' => $torrent->id, 'seeder' => true]);
         $peerOneIP = factory(PeerIP::class)->create(['peerID' => $peerOne->id, 'IP' => '98.165.38.51', 'port' => 55555]);
@@ -1691,7 +1691,7 @@ class AnnounceManagerTest extends TestCase
         $IP = '98.165.38.50';
         $port = 60000;
         $userAgent = 'my test user agent';
-        $torrent = factory(Torrent::class)->create(['infoHash' => $infoHash, 'seeders' => 1, 'leechers' => 1]);
+        $torrent = factory(Torrent::class)->create(['info_hash' => $infoHash, 'seeders' => 1, 'leechers' => 1]);
         $user = factory(User::class)->create();
         $peerOne = factory(Peer::class)->create(['torrent_id' => $torrent->id, 'seeder' => true, 'peer_id' => $peerIdOne]);
         $peerOneIP = factory(PeerIP::class)->create(['peerID' => $peerOne->id, 'IP' => '98.165.38.51', 'port' => 55555]);
@@ -1789,7 +1789,7 @@ class AnnounceManagerTest extends TestCase
         $IP = '98.165.38.50';
         $port = 60000;
         $userAgent = 'my test user agent';
-        $torrent = factory(Torrent::class)->create(['infoHash' => $infoHash, 'seeders' => 1, 'leechers' => 1]);
+        $torrent = factory(Torrent::class)->create(['info_hash' => $infoHash, 'seeders' => 1, 'leechers' => 1]);
         $user = factory(User::class)->create();
         $peerOne = factory(Peer::class)->create(['torrent_id' => $torrent->id, 'seeder' => true, 'peer_id' => $peerIdOne]);
         $peerOneIP = factory(PeerIP::class)->create(['peerID' => $peerOne->id, 'IP' => '98.165.38.51', 'port' => 55555]);
@@ -2295,7 +2295,7 @@ class AnnounceManagerTest extends TestCase
         $infoHash = 'ccd285bd6d7fc749e9ed34d8b1e8a0f1b582d977';
         $peerId = '2d7142333345302d64354e334474384672517776';
         $user = factory(User::class)->create();
-        $torrent = factory(Torrent::class)->create(['uploader_id' => $user->id, 'infoHash' => $infoHash]);
+        $torrent = factory(Torrent::class)->create(['uploader_id' => $user->id, 'info_hash' => $infoHash]);
 
         return array_merge([
             'info_hash'  => hex2bin($infoHash),

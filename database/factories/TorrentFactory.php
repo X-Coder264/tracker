@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Factory;
 $factory->define(Torrent::class, function (Faker $faker) {
     return [
         'name' => $faker->unique()->firstName,
-        'infoHash' => $faker->unique()->text(40),
+        'info_hash' => $faker->unique()->text(40),
         'size' => $faker->numberBetween(500, 500000),
         'uploader_id' => function () {
             return factory(User::class)->create()->id;

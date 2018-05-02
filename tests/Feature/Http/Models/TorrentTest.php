@@ -33,7 +33,7 @@ class TorrentTest extends TestCase
         factory(User::class)->create();
         $torrent = new Torrent();
         $torrent->name = 'test name';
-        $torrent->infoHash = 'fefsrgererw';
+        $torrent->info_hash = 'fefsrgererw';
         $torrent->size = 34356212;
         $torrent->uploader_id = 1;
         $torrent->description = 'test description';

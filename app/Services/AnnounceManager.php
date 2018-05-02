@@ -163,7 +163,7 @@ class AnnounceManager
             return $this->announceErrorResponse(__('messages.announce.invalid_passkey'));
         }
 
-        $this->torrent = DB::table('torrents')->where('infoHash', bin2hex($this->request->input('info_hash')))
+        $this->torrent = DB::table('torrents')->where('info_hash', bin2hex($this->request->input('info_hash')))
                                               ->select(['id', 'seeders', 'leechers', 'slug'])
                                               ->first();
 

@@ -73,7 +73,7 @@ class TorrentUploadService
 
             $infoHash = $this->getTorrentInfoHash($decodedTorrent['info']);
 
-            $torrent = Torrent::where('infoHash', '=', $infoHash)->select('infoHash')->first();
+            $torrent = Torrent::where('info_hash', '=', $infoHash)->select('info_hash')->first();
         } while (null !== $torrent);
 
         $torrent = new Torrent();
@@ -81,7 +81,7 @@ class TorrentUploadService
         $torrent->size = $torrentSize;
         $torrent->description = $request->input('description');
         $torrent->uploader_id = Auth::id();
-        $torrent->infoHash = $infoHash;
+        $torrent->info_hash = $infoHash;
         $torrent->save();
 
         $stored = Storage::disk('public')->put(
