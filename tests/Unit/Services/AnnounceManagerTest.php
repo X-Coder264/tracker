@@ -173,7 +173,7 @@ class AnnounceManagerTest extends TestCase
                     $this->app->make(DatabaseManager::class),
                     $this->app->make(CacheManager::class),
                     $this->app->make(ValidationFactory::class),
-                    $this->app->make(Translator::class)
+                    $this->app->make(Translator::class),
                 ]
             )
             ->setMethods(['getPeers'])
@@ -278,7 +278,7 @@ class AnnounceManagerTest extends TestCase
                     $this->app->make(DatabaseManager::class),
                     $this->app->make(CacheManager::class),
                     $this->app->make(ValidationFactory::class),
-                    $this->app->make(Translator::class)
+                    $this->app->make(Translator::class),
                 ]
             )
             ->setMethods(['getPeers'])

@@ -12,9 +12,9 @@ use App\Http\Models\Torrent;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Auth\AuthManager;
+use App\Services\PasskeyGenerator;
 use Illuminate\Cache\CacheManager;
 use Illuminate\Routing\Redirector;
-use App\Services\PasskeyGenerator;
 use App\Services\TorrentInfoService;
 use Illuminate\Http\RedirectResponse;
 use App\Services\TorrentUploadService;
@@ -83,8 +83,8 @@ class TorrentController extends Controller
      * @param TorrentUploadService $torrentUploadService
      * @param Redirector $redirector
      * @param Translator $translator
-     * @return RedirectResponse
      * @throws FileNotWritableException
+     * @return RedirectResponse
      */
     public function store(
         Request $request,

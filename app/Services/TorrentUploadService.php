@@ -8,8 +8,8 @@ use App\Http\Models\Torrent;
 use Illuminate\Http\Request;
 use Illuminate\Auth\AuthManager;
 use Illuminate\Filesystem\Filesystem;
-use Illuminate\Filesystem\FilesystemManager;
 use App\Exceptions\FileNotWritableException;
+use Illuminate\Filesystem\FilesystemManager;
 use Illuminate\Contracts\Routing\UrlGenerator;
 use Illuminate\Contracts\Translation\Translator;
 

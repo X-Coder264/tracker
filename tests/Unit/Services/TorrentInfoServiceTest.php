@@ -121,7 +121,7 @@ class TorrentInfoServiceTest extends TestCase
                     $formatter,
                     $decoder,
                     $this->app->make(CacheManager::class),
-                    $this->app->make(FilesystemManager::class)
+                    $this->app->make(FilesystemManager::class),
                 ]
             )
             ->setMethods(['getTorrentFileNamesAndSizesFromTorrentInfoDict'])

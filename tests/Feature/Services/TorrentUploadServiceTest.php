@@ -192,7 +192,7 @@ class TorrentUploadServiceTest extends TestCase
                     $this->app->make(Filesystem::class),
                     $this->app->make(FilesystemManager::class),
                     $this->app->make(UrlGenerator::class),
-                    $this->app->make(Translator::class)
+                    $this->app->make(Translator::class),
                 ]
             )
             ->setMethods(['getTorrentInfoHash'])
