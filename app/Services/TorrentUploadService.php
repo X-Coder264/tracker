@@ -56,14 +56,14 @@ class TorrentUploadService
     private $translator;
 
     /**
-     * @param Bencoder $encoder
-     * @param Bdecoder $decoder
+     * @param Bencoder           $encoder
+     * @param Bdecoder           $decoder
      * @param TorrentInfoService $torrentInfoService
-     * @param AuthManager $authManager
-     * @param Filesystem $filesystem
-     * @param FilesystemManager $filesystemManager
-     * @param UrlGenerator $urlGenerator
-     * @param Translator $translator
+     * @param AuthManager        $authManager
+     * @param Filesystem         $filesystem
+     * @param FilesystemManager  $filesystemManager
+     * @param UrlGenerator       $urlGenerator
+     * @param Translator         $translator
      */
     public function __construct(
         Bencoder $encoder,

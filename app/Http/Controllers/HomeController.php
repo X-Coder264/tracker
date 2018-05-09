@@ -11,6 +11,7 @@ class HomeController extends Controller
 {
     /**
      * @param ResponseFactory $responseFactory
+     *
      * @return Response
      */
     public function index(ResponseFactory $responseFactory): Response

@@ -29,9 +29,9 @@ class SetUserLocale
     private $application;
 
     /**
-     * @param AuthManager $authManager
+     * @param AuthManager  $authManager
      * @param CacheManager $cacheManager
-     * @param Application $application
+     * @param Application  $application
      */
     public function __construct(AuthManager $authManager, CacheManager $cacheManager, Application $application)
     {

@@ -28,9 +28,10 @@ use Illuminate\Contracts\Filesystem\FileNotFoundException;
 class TorrentController extends Controller
 {
     /**
-     * @param Request $request
-     * @param CacheManager $cacheManager
+     * @param Request         $request
+     * @param CacheManager    $cacheManager
      * @param ResponseFactory $responseFactory
+     *
      * @return Response
      */
     public function index(Request $request, CacheManager $cacheManager, ResponseFactory $responseFactory): Response
@@ -47,6 +48,7 @@ class TorrentController extends Controller
 
     /**
      * @param ResponseFactory $responseFactory
+     *
      * @return Response
      */
     public function create(ResponseFactory $responseFactory): Response
@@ -55,9 +57,10 @@ class TorrentController extends Controller
     }
 
     /**
-     * @param Torrent $torrent
+     * @param Torrent            $torrent
      * @param TorrentInfoService $torrentInfoService
-     * @param ResponseFactory $responseFactory
+     * @param ResponseFactory    $responseFactory
+     *
      * @return Response
      */
     public function show(Torrent $torrent, TorrentInfoService $torrentInfoService, ResponseFactory $responseFactory): Response
@@ -79,11 +82,12 @@ class TorrentController extends Controller
     }
 
     /**
-     * @param Request $request
+     * @param Request              $request
      * @param TorrentUploadService $torrentUploadService
-     * @param Redirector $redirector
-     * @param Translator $translator
+     * @param Redirector           $redirector
+     * @param Translator           $translator
      * @throws FileNotWritableException
+     *
      * @return RedirectResponse
      */
     public function store(
@@ -118,13 +122,14 @@ class TorrentController extends Controller
     }
 
     /**
-     * @param Torrent $torrent
-     * @param Bencoder $encoder
-     * @param Bdecoder $decoder
+     * @param Torrent          $torrent
+     * @param Bencoder         $encoder
+     * @param Bdecoder         $decoder
      * @param PasskeyGenerator $passkeyGenerator
-     * @param AuthManager $authManager
-     * @param Factory $filesystem
-     * @param Translator $translator
+     * @param AuthManager      $authManager
+     * @param Factory          $filesystem
+     * @param Translator       $translator
+     *
      * @return Response
      */
     public function download(

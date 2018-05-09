@@ -19,8 +19,9 @@ use Illuminate\Contracts\Routing\ResponseFactory;
 class UserController extends Controller
 {
     /**
-     * @param User $user
+     * @param User            $user
      * @param ResponseFactory $responseFactory
+     *
      * @return Response
      */
     public function edit(User $user, ResponseFactory $responseFactory): Response
@@ -31,12 +32,13 @@ class UserController extends Controller
     }
 
     /**
-     * @param Request $request
-     * @param User $user
-     * @param Translator $translator
-     * @param Application $application
+     * @param Request      $request
+     * @param User         $user
+     * @param Translator   $translator
+     * @param Application  $application
      * @param CacheManager $cacheManager
-     * @param Redirector $redirector
+     * @param Redirector   $redirector
+     *
      * @return RedirectResponse
      */
     public function update(Request $request, User $user, Translator $translator, Application $application, CacheManager $cacheManager, Redirector $redirector): RedirectResponse

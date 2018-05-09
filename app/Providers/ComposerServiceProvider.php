@@ -19,8 +19,8 @@ class ComposerServiceProvider extends ServiceProvider
     private $viewsThatNeedTimezoneInfo = ['torrents.index', 'torrents.show'];
 
     /**
-     * @param ViewFactory $viewFactory
-     * @param AuthManager $authManager
+     * @param ViewFactory  $viewFactory
+     * @param AuthManager  $authManager
      * @param CacheManager $cacheManager
      */
     public function boot(ViewFactory $viewFactory, AuthManager $authManager, CacheManager $cacheManager)

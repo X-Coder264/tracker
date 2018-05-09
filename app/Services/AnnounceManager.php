@@ -130,11 +130,11 @@ class AnnounceManager
     private $uploadedInThisAnnounceCycle = 0;
 
     /**
-     * @param Bencoder $encoder
-     * @param DatabaseManager $databaseManager
-     * @param CacheManager $cacheManager
+     * @param Bencoder          $encoder
+     * @param DatabaseManager   $databaseManager
+     * @param CacheManager      $cacheManager
      * @param ValidationFactory $validationFactory
-     * @param Translator $translator
+     * @param Translator        $translator
      */
     public function __construct(
         Bencoder $encoder,

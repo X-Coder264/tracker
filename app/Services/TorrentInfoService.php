@@ -32,9 +32,9 @@ class TorrentInfoService
     private $filesystemManager;
 
     /**
-     * @param SizeFormatter $sizeFormatter
-     * @param Bdecoder $bdecoder
-     * @param CacheManager $cacheManager
+     * @param SizeFormatter     $sizeFormatter
+     * @param Bdecoder          $bdecoder
+     * @param CacheManager      $cacheManager
      * @param FilesystemManager $filesystemManager
      */
     public function __construct(

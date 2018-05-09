@@ -16,8 +16,9 @@ use Illuminate\Contracts\Routing\ResponseFactory;
 class TorrentCommentController extends Controller
 {
     /**
-     * @param Torrent $torrent
+     * @param Torrent         $torrent
      * @param ResponseFactory $responseFactory
+     *
      * @return Response
      */
     public function create(Torrent $torrent, ResponseFactory $responseFactory): Response
@@ -26,10 +27,11 @@ class TorrentCommentController extends Controller
     }
 
     /**
-     * @param Request $request
-     * @param Torrent $torrent
+     * @param Request     $request
+     * @param Torrent     $torrent
      * @param AuthManager $authManager
-     * @param Redirector $redirector
+     * @param Redirector  $redirector
+     *
      * @return RedirectResponse
      */
     public function store(Request $request, Torrent $torrent, AuthManager $authManager, Redirector $redirector): RedirectResponse

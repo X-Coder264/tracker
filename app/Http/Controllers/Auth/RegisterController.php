@@ -42,7 +42,7 @@ class RegisterController extends Controller
 
     /**
      * @param ValidatorFactory $validatorFactory
-     * @param UrlGenerator $urlGenerator
+     * @param UrlGenerator     $urlGenerator
      */
     public function __construct(ValidatorFactory $validatorFactory, UrlGenerator $urlGenerator)
     {
@@ -55,6 +55,7 @@ class RegisterController extends Controller
      * Show the application registration form.
      *
      * @param ResponseFactory $responseFactory
+     *
      * @return Response
      */
     public function showRegistrationForm(ResponseFactory $responseFactory): Response

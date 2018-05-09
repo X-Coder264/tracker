@@ -14,9 +14,10 @@ use Illuminate\Contracts\Routing\ResponseFactory;
 class IndexController extends Controller
 {
     /**
-     * @param AuthManager $authManager
-     * @param Repository $configRepository
+     * @param AuthManager     $authManager
+     * @param Repository      $configRepository
      * @param ResponseFactory $responseFactory
+     *
      * @return Response
      */
     public function index(AuthManager $authManager, Repository $configRepository, ResponseFactory $responseFactory): Response

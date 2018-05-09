@@ -27,8 +27,8 @@ class RedirectIfAuthenticated
     private $urlGenerator;
 
     /**
-     * @param AuthManager $authManager
-     * @param Redirector $redirector
+     * @param AuthManager  $authManager
+     * @param Redirector   $redirector
      * @param UrlGenerator $urlGenerator
      */
     public function __construct(AuthManager $authManager, Redirector $redirector, UrlGenerator $urlGenerator)
