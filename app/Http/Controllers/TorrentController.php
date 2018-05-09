@@ -86,6 +86,7 @@ class TorrentController extends Controller
      * @param TorrentUploadService $torrentUploadService
      * @param Redirector           $redirector
      * @param Translator           $translator
+     *
      * @throws FileNotWritableException
      *
      * @return RedirectResponse
