@@ -7,17 +7,18 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use App\Services\AnnounceManager;
+use Illuminate\Contracts\Routing\ResponseFactory;
 
 class AnnounceController extends Controller
 {
     /**
      * @param Request $request
-     * @param $announceManager $announceManager
-     *
+     * @param AnnounceManager $announceManager $announceManager
+     * @param ResponseFactory $responseFactory
      * @return Response
      */
-    public function store(Request $request, AnnounceManager $announceManager): Response
+    public function store(Request $request, AnnounceManager $announceManager, ResponseFactory $responseFactory): Response
     {
-        return response($announceManager->announce($request))->header('Content-Type', 'text/plain');
+        return $responseFactory->make($announceManager->announce($request))->header('Content-Type', 'text/plain');
     }
 }

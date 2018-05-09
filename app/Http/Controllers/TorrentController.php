@@ -11,13 +11,17 @@ use Illuminate\Support\Str;
 use App\Http\Models\Torrent;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Auth\AuthManager;
+use Illuminate\Cache\CacheManager;
+use Illuminate\Routing\Redirector;
 use App\Services\PasskeyGenerator;
 use App\Services\TorrentInfoService;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Support\Facades\Cache;
 use App\Services\TorrentUploadService;
-use Illuminate\Support\Facades\Storage;
+use App\Exceptions\FileNotWritableException;
+use Illuminate\Contracts\Filesystem\Factory;
+use Illuminate\Contracts\Translation\Translator;
+use Illuminate\Contracts\Routing\ResponseFactory;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
 
@@ -25,36 +29,38 @@ class TorrentController extends Controller
 {
     /**
      * @param Request $request
-     *
+     * @param CacheManager $cacheManager
+     * @param ResponseFactory $responseFactory
      * @return Response
      */
-    public function index(Request $request): Response
+    public function index(Request $request, CacheManager $cacheManager, ResponseFactory $responseFactory): Response
     {
-        Cache::forget('torrents');
-        $torrents = Cache::remember('torrents', 10, function () {
+        $cacheManager->forget('torrents');
+        $torrents = $cacheManager->remember('torrents', 10, function () {
             return Torrent::with(['uploader'])->where('seeders', '>', 0)
                                               ->orderBy('id', 'desc')
                                               ->paginate(3);
         });
 
-        return response()->view('torrents.index', compact('torrents'));
+        return $responseFactory->view('torrents.index', compact('torrents'));
     }
 
     /**
+     * @param ResponseFactory $responseFactory
      * @return Response
      */
-    public function create(): Response
+    public function create(ResponseFactory $responseFactory): Response
     {
-        return response()->view('torrents.create');
+        return $responseFactory->view('torrents.create');
     }
 
     /**
-     * @param Torrent            $torrent
+     * @param Torrent $torrent
      * @param TorrentInfoService $torrentInfoService
-     *
+     * @param ResponseFactory $responseFactory
      * @return Response
      */
-    public function show(Torrent $torrent, TorrentInfoService $torrentInfoService): Response
+    public function show(Torrent $torrent, TorrentInfoService $torrentInfoService, ResponseFactory $responseFactory): Response
     {
         try {
             $torrentFileNamesAndSizes = $torrentInfoService->getTorrentFileNamesAndSizes($torrent);
@@ -66,20 +72,26 @@ class TorrentController extends Controller
         $numberOfPeers = $torrent->peers->count();
         $torrentComments = $torrent->comments()->with('user')->paginate(10);
 
-        return response()->view(
+        return $responseFactory->view(
             'torrents.show',
             compact('torrent', 'numberOfPeers', 'torrentFileNamesAndSizes', 'torrentComments')
         );
     }
 
     /**
-     * @param Request              $request
+     * @param Request $request
      * @param TorrentUploadService $torrentUploadService
-     *
+     * @param Redirector $redirector
+     * @param Translator $translator
      * @return RedirectResponse
+     * @throws FileNotWritableException
      */
-    public function store(Request $request, TorrentUploadService $torrentUploadService): RedirectResponse
-    {
+    public function store(
+        Request $request,
+        TorrentUploadService $torrentUploadService,
+        Redirector $redirector,
+        Translator $translator
+    ): RedirectResponse {
         $this->validate(
             $request,
             [
@@ -101,36 +113,42 @@ class TorrentController extends Controller
 
         $torrent = $torrentUploadService->upload($request);
 
-        return redirect()->route('torrents.show', $torrent)
-                         ->with('success', __('messages.torrents.store-successfully-uploaded-torrent.message'));
+        return $redirector->route('torrents.show', $torrent)
+                         ->with('success', $translator->trans('messages.torrents.store-successfully-uploaded-torrent.message'));
     }
 
     /**
-     * @param Torrent          $torrent
-     * @param Bencoder         $encoder
-     * @param Bdecoder         $decoder
+     * @param Torrent $torrent
+     * @param Bencoder $encoder
+     * @param Bdecoder $decoder
      * @param PasskeyGenerator $passkeyGenerator
-     *
+     * @param AuthManager $authManager
+     * @param Factory $filesystem
+     * @param Translator $translator
      * @return Response
      */
     public function download(
         Torrent $torrent,
         Bencoder $encoder,
         Bdecoder $decoder,
-        PasskeyGenerator $passkeyGenerator
+        PasskeyGenerator $passkeyGenerator,
+        AuthManager $authManager,
+        Factory $filesystem,
+        Translator $translator
     ): Response {
         try {
-            $torrentFile = Storage::disk('public')->get("torrents/{$torrent->id}.torrent");
+            $torrentFile = $filesystem->disk('public')->get("torrents/{$torrent->id}.torrent");
         } catch (FileNotFoundException $e) {
-            abort(Response::HTTP_NOT_FOUND, __('messages.torrent-file-missing.error-message'));
+            abort(Response::HTTP_NOT_FOUND, $translator->trans('messages.torrent-file-missing.error-message'));
         }
 
         $decodedTorrent = $decoder->decode($torrentFile);
 
-        $passkey = Auth::user()->passkey;
+        $passkey = $authManager->user()->passkey;
+
         if (empty($passkey)) {
             $passkey = $passkeyGenerator->generateUniquePasskey();
-            User::where('id', '=', Auth::id())->update(['passkey' => $passkey]);
+            User::where('id', '=', $authManager->id())->update(['passkey' => $passkey]);
         }
 
         $decodedTorrent['announce'] = route('announce', ['passkey' => $passkey]);

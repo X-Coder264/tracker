@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use Illuminate\Contracts\Routing\UrlGenerator;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 
 class LoginController extends Controller
@@ -23,17 +24,24 @@ class LoginController extends Controller
     use AuthenticatesUsers;
 
     /**
-     * Where to redirect users after login.
-     *
-     * @var string
+     * @var UrlGenerator
      */
-    protected $redirectTo = '/';
+    private $urlGenerator;
 
     /**
-     * Create a new controller instance.
+     * @param UrlGenerator $urlGenerator
      */
-    public function __construct()
+    public function __construct(UrlGenerator $urlGenerator)
     {
         $this->middleware('guest')->except('logout');
+        $this->urlGenerator = $urlGenerator;
+    }
+
+    /**
+     * @return string
+     */
+    public function redirectTo(): string
+    {
+        return $this->urlGenerator->route('home.index');
     }
 }

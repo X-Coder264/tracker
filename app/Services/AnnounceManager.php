@@ -5,12 +5,14 @@ declare(strict_types=1);
 namespace App\Services;
 
 use stdClass;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
-use Illuminate\Support\Carbon;
+use Illuminate\Cache\CacheManager;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Validator;
+use Illuminate\Database\Query\Builder;
+use Illuminate\Database\DatabaseManager;
+use Illuminate\Contracts\Translation\Translator;
+use Illuminate\Contracts\Validation\Factory as ValidationFactory;
 
 /**
  * Note: For performance reasons the announce uses the query builder instead of Eloquent.
@@ -20,99 +22,132 @@ class AnnounceManager
     /**
      * @var Request
      */
-    protected $request;
+    private $request;
 
     /**
      * @var Bencoder
      */
-    protected $encoder;
+    private $encoder;
+
+    /**
+     * @var DatabaseManager
+     */
+    private $databaseManager;
+
+    /**
+     * @var CacheManager
+     */
+    private $cacheManager;
+
+    /**
+     * @var ValidationFactory
+     */
+    private $validationFactory;
+
+    /**
+     * @var Translator
+     */
+    private $translator;
 
     /**
      * @var stdClass
      */
-    protected $user;
+    private $user;
 
     /**
      * @var null|stdClass
      */
-    protected $peer = null;
+    private $peer = null;
 
     /**
      * @var string
      */
-    protected $peerID;
+    private $peerID;
 
     /**
      * @var stdClass
      */
-    protected $torrent;
+    private $torrent;
 
     /**
      * @var bool
      */
-    protected $seeder;
+    private $seeder;
 
     /**
      * @var string|null
      */
-    protected $event;
+    private $event;
 
     /**
      * @var null|stdClass
      */
-    protected $snatch;
+    private $snatch;
 
     /**
      * @var int
      */
-    protected $numberOfWantedPeers = 50;
+    private $numberOfWantedPeers = 50;
 
     /**
      * @var null|string
      */
-    protected $ipv4Address = null;
+    private $ipv4Address = null;
 
     /**
      * @var null|string
      */
-    protected $ipv6Address = null;
+    private $ipv6Address = null;
 
     /**
      * @var null|int
      */
-    protected $ipv4Port = null;
+    private $ipv4Port = null;
 
     /**
      * @var null|int
      */
-    protected $ipv6Port = null;
+    private $ipv6Port = null;
 
     /**
      * @var int
      */
-    protected $seedTime = 0;
+    private $seedTime = 0;
 
     /**
      * @var int
      */
-    protected $leechTime = 0;
+    private $leechTime = 0;
 
     /**
      * @var int
      */
-    protected $downloadedInThisAnnounceCycle = 0;
+    private $downloadedInThisAnnounceCycle = 0;
 
     /**
      * @var int
      */
-    protected $uploadedInThisAnnounceCycle = 0;
+    private $uploadedInThisAnnounceCycle = 0;
 
     /**
      * @param Bencoder $encoder
+     * @param DatabaseManager $databaseManager
+     * @param CacheManager $cacheManager
+     * @param ValidationFactory $validationFactory
+     * @param Translator $translator
      */
-    public function __construct(Bencoder $encoder)
-    {
+    public function __construct(
+        Bencoder $encoder,
+        DatabaseManager $databaseManager,
+        CacheManager $cacheManager,
+        ValidationFactory $validationFactory,
+        Translator $translator
+    ) {
         $this->encoder = $encoder;
+        $this->databaseManager = $databaseManager;
+        $this->cacheManager = $cacheManager;
+        $this->validationFactory = $validationFactory;
+        $this->translator = $translator;
     }
 
     /**
@@ -153,35 +188,38 @@ class AnnounceManager
 
         $this->peerID = bin2hex($this->request->input('peer_id'));
 
-        $this->user = Cache::remember('user.' . $this->request->input('passkey'), 24 * 60, function () {
-            return DB::table('users')->where('passkey', '=', $this->request->input('passkey'))
+        $this->user = $this->cacheManager->remember('user.' . $this->request->input('passkey'), 24 * 60, function () {
+            return $this->databaseManager->table('users')
+                ->where('passkey', '=', $this->request->input('passkey'))
                 ->select(['id', 'slug', 'uploaded', 'downloaded'])
                 ->first();
         });
 
         if (null === $this->user) {
-            return $this->announceErrorResponse(__('messages.announce.invalid_passkey'));
+            return $this->announceErrorResponse($this->translator->trans('messages.announce.invalid_passkey'));
         }
 
-        $this->torrent = DB::table('torrents')->where('info_hash', bin2hex($this->request->input('info_hash')))
-                                              ->select(['id', 'seeders', 'leechers', 'slug'])
-                                              ->first();
+        $this->torrent = $this->databaseManager->table('torrents')
+                                               ->where('info_hash', bin2hex($this->request->input('info_hash')))
+                                               ->select(['id', 'seeders', 'leechers', 'slug'])
+                                               ->first();
 
         if (null === $this->torrent) {
-            return $this->announceErrorResponse(__('messages.announce.invalid_info_hash'));
+            return $this->announceErrorResponse($this->translator->trans('messages.announce.invalid_info_hash'));
         }
 
         $left = (int) $this->request->input('left');
         $this->seeder = 0 === $left ? true : false;
 
-        $this->peer = DB::table('peers')->where('peer_id', '=', $this->peerID)
+        $this->peer = $this->databaseManager->table('peers')
+            ->where('peer_id', '=', $this->peerID)
             ->where('torrent_id', '=', $this->torrent->id)
             ->where('user_id', '=', $this->user->id)
             ->first();
 
         if ('completed' === $this->event || 'stopped' === $this->event) {
             if (null === $this->peer) {
-                return $this->announceErrorResponse(__('messages.announce.invalid_peer_id'));
+                return $this->announceErrorResponse($this->translator->trans('messages.announce.invalid_peer_id'));
             }
         }
 
@@ -202,7 +240,8 @@ class AnnounceManager
             }
         }
 
-        $this->snatch = DB::table('snatches')->where('torrent_id', '=', $this->torrent->id)
+        $this->snatch = $this->databaseManager->table('snatches')
+                                ->where('torrent_id', '=', $this->torrent->id)
                                 ->where('user_id', '=', $this->user->id)
                                 ->first();
 
@@ -226,28 +265,28 @@ class AnnounceManager
      *
      * @return null|string
      */
-    protected function validateInfoHashAndPeerID(): ?string
+    private function validateInfoHashAndPeerID(): ?string
     {
         if ($this->request->filled('info_hash')) {
             if (20 !== strlen($this->request->input('info_hash'))) {
-                $errorMessage = __('messages.validation.variable.size', ['var' => 'info_hash']);
+                $errorMessage = $this->translator->trans('messages.validation.variable.size', ['var' => 'info_hash']);
 
                 return $this->announceErrorResponse($errorMessage);
             }
         } else {
-            $errorMessage = __('messages.validation.variable.required', ['var' => 'info_hash']);
+            $errorMessage = $this->translator->trans('messages.validation.variable.required', ['var' => 'info_hash']);
 
             return $this->announceErrorResponse($errorMessage);
         }
 
         if ($this->request->filled('peer_id')) {
             if (20 !== strlen($this->request->input('peer_id'))) {
-                $errorMessage = __('messages.validation.variable.size', ['var' => 'peer_id']);
+                $errorMessage = $this->translator->trans('messages.validation.variable.size', ['var' => 'peer_id']);
 
                 return $this->announceErrorResponse($errorMessage);
             }
         } else {
-            $errorMessage = __('messages.validation.variable.required', ['var' => 'peer_id']);
+            $errorMessage = $this->translator->trans('messages.validation.variable.required', ['var' => 'peer_id']);
 
             return $this->announceErrorResponse($errorMessage);
         }
@@ -260,9 +299,9 @@ class AnnounceManager
      *
      * @return null|string
      */
-    protected function validateRequest(): ?string
+    private function validateRequest(): ?string
     {
-        $validator = Validator::make(
+        $validator = $this->validationFactory->make(
             $this->request->all(),
             [
                 'passkey'    => 'required|string|size:64',
@@ -273,23 +312,23 @@ class AnnounceManager
                 'numwant'    => 'sometimes|integer',
             ],
             [
-                'passkey.required'    => __('messages.validation.variable.required', ['var' => 'passkey']),
-                'passkey.string'      => __('messages.validation.variable.string', ['var' => 'passkey']),
-                'passkey.size'        => __('messages.validation.variable.size', ['var' => 'passkey']),
-                'port.required'       => __('messages.validation.variable.required', ['var' => 'port']),
-                'port.integer'        => __('messages.validation.variable.port', ['port' => $this->request->input('port')]),
-                'port.min'            => __('messages.validation.variable.port', ['port' => $this->request->input('port')]),
-                'port.max'            => __('messages.validation.variable.port', ['port' => $this->request->input('port')]),
-                'uploaded.required'   => __('messages.validation.variable.required', ['var' => 'uploaded']),
-                'uploaded.integer'    => __('messages.validation.variable.integer', ['var' => 'uploaded']),
-                'uploaded.min'        => __('messages.validation.variable.uploaded', ['uploaded' => $this->request->input('uploaded')]),
-                'downloaded.required' => __('messages.validation.variable.required', ['var' => 'downloaded']),
-                'downloaded.integer'  => __('messages.validation.variable.integer', ['var' => 'downloaded']),
-                'downloaded.min'      => __('messages.validation.variable.downloaded', ['downloaded' => $this->request->input('downloaded')]),
-                'left.required'       => __('messages.validation.variable.required', ['var' => 'left']),
-                'left.integer'        => __('messages.validation.variable.integer', ['var' => 'left']),
-                'left.min'            => __('messages.validation.variable.left', ['left' => $this->request->input('left')]),
-                'numwant.integer'     => __('messages.validation.variable.integer', ['var' => 'numwant']),
+                'passkey.required'    => $this->translator->trans('messages.validation.variable.required', ['var' => 'passkey']),
+                'passkey.string'      => $this->translator->trans('messages.validation.variable.string', ['var' => 'passkey']),
+                'passkey.size'        => $this->translator->trans('messages.validation.variable.size', ['var' => 'passkey']),
+                'port.required'       => $this->translator->trans('messages.validation.variable.required', ['var' => 'port']),
+                'port.integer'        => $this->translator->trans('messages.validation.variable.port', ['port' => $this->request->input('port')]),
+                'port.min'            => $this->translator->trans('messages.validation.variable.port', ['port' => $this->request->input('port')]),
+                'port.max'            => $this->translator->trans('messages.validation.variable.port', ['port' => $this->request->input('port')]),
+                'uploaded.required'   => $this->translator->trans('messages.validation.variable.required', ['var' => 'uploaded']),
+                'uploaded.integer'    => $this->translator->trans('messages.validation.variable.integer', ['var' => 'uploaded']),
+                'uploaded.min'        => $this->translator->trans('messages.validation.variable.uploaded', ['uploaded' => $this->request->input('uploaded')]),
+                'downloaded.required' => $this->translator->trans('messages.validation.variable.required', ['var' => 'downloaded']),
+                'downloaded.integer'  => $this->translator->trans('messages.validation.variable.integer', ['var' => 'downloaded']),
+                'downloaded.min'      => $this->translator->trans('messages.validation.variable.downloaded', ['downloaded' => $this->request->input('downloaded')]),
+                'left.required'       => $this->translator->trans('messages.validation.variable.required', ['var' => 'left']),
+                'left.integer'        => $this->translator->trans('messages.validation.variable.integer', ['var' => 'left']),
+                'left.min'            => $this->translator->trans('messages.validation.variable.left', ['left' => $this->request->input('left')]),
+                'numwant.integer'     => $this->translator->trans('messages.validation.variable.integer', ['var' => 'numwant']),
             ]
         );
 
@@ -305,7 +344,7 @@ class AnnounceManager
     /**
      * @return null|string
      */
-    protected function validateAndSetIPAddress(): ?string
+    private function validateAndSetIPAddress(): ?string
     {
         $this->ipv4Port = $this->request->input('port');
         $this->ipv6Port = $this->request->input('port');
@@ -380,7 +419,7 @@ class AnnounceManager
         // return an error if there is not at least one IP address and port set
         if (false === ((null !== $this->ipv4Address && null !== $this->ipv4Port) ||
                 (null !== $this->ipv6Address && null !== $this->ipv6Port))) {
-            return $this->announceErrorResponse(__('messages.announce.invalid_ip_or_port'));
+            return $this->announceErrorResponse($this->translator->trans('messages.announce.invalid_ip_or_port'));
         }
 
         return null;
@@ -391,7 +430,7 @@ class AnnounceManager
      *
      * @return bool
      */
-    protected function validateIPv4Address(string $IP): bool
+    private function validateIPv4Address(string $IP): bool
     {
         if (filter_var($IP, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
             return true;
@@ -405,7 +444,7 @@ class AnnounceManager
      *
      * @return bool
      */
-    protected function validateIPv6Address(string $IP): bool
+    private function validateIPv6Address(string $IP): bool
     {
         if (filter_var($IP, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6)) {
             return true;
@@ -419,20 +458,20 @@ class AnnounceManager
      *
      * @return string
      */
-    protected function getDateFormat(): string
+    private function getDateFormat(): string
     {
-        return DB::getQueryGrammar()->getDateFormat();
+        return $this->databaseManager->getQueryGrammar()->getDateFormat();
     }
 
     /**
      * @param int $seeder
      * @param int $leecher
      */
-    protected function adjustTorrentPeers(int $seeder, int $leecher): void
+    private function adjustTorrentPeers(int $seeder, int $leecher): void
     {
         $this->torrent->seeders = $this->torrent->seeders + $seeder;
         $this->torrent->leechers = $this->torrent->leechers + $leecher;
-        DB::table('torrents')->where('id', '=', $this->torrent->id)
+        $this->databaseManager->table('torrents')->where('id', '=', $this->torrent->id)
             ->update(
                 [
                     'seeders'  => $this->torrent->seeders,
@@ -444,10 +483,10 @@ class AnnounceManager
     /**
      * Insert a new peer into the DB.
      */
-    protected function insertPeer(): void
+    private function insertPeer(): void
     {
         $this->peer = new stdClass();
-        $this->peer->id = DB::table('peers')->insertGetId(
+        $this->peer->id = $this->databaseManager->table('peers')->insertGetId(
             [
                 'peer_id'    => $this->peerID,
                 'torrent_id' => $this->torrent->id,
@@ -465,10 +504,10 @@ class AnnounceManager
     /**
      * Update the peer if it already exists in the DB.
      */
-    protected function updatePeerIfItExists(): void
+    private function updatePeerIfItExists(): void
     {
         if (null !== $this->peer) {
-            DB::table('peers')
+            $this->databaseManager->table('peers')
                 ->where('id', '=', $this->peer->id)
                 ->update(
                     [
@@ -485,10 +524,10 @@ class AnnounceManager
     /**
      * Insert a new snatch into the DB.
      */
-    protected function insertSnatch(): void
+    private function insertSnatch(): void
     {
         $this->snatch = new stdClass();
-        $this->snatch->id = DB::table('snatches')->insertGetId(
+        $this->snatch->id = $this->databaseManager->table('snatches')->insertGetId(
             [
                 'torrent_id'     => $this->torrent->id,
                 'user_id'        => $this->user->id,
@@ -506,7 +545,7 @@ class AnnounceManager
     /**
      * Update the snatch if it already exists in the DB.
      */
-    protected function updateSnatchIfItExists(): void
+    private function updateSnatchIfItExists(): void
     {
         if (null !== $this->snatch) {
             if (0 === (int) $this->request->input('left') && null === $this->snatch->finished_at) {
@@ -514,7 +553,7 @@ class AnnounceManager
             } else {
                 $finishedAt = $this->snatch->finished_at;
             }
-            DB::table('snatches')
+            $this->databaseManager->table('snatches')
                 ->where('id', '=', $this->snatch->id)
                 ->update(
                     [
@@ -535,12 +574,12 @@ class AnnounceManager
     /**
      * Update the user uploaded and downloaded data.
      */
-    protected function updateUser(): void
+    private function updateUser(): void
     {
         $this->user->uploaded = $this->user->uploaded + $this->uploadedInThisAnnounceCycle;
         $this->user->downloaded = $this->user->downloaded + $this->downloadedInThisAnnounceCycle;
 
-        DB::table('users')
+        $this->databaseManager->table('users')
             ->where('id', '=', $this->user->id)
             ->update(
                 [
@@ -548,18 +587,18 @@ class AnnounceManager
                     'downloaded' => $this->user->downloaded,
                 ]
             );
-        Cache::put('user.' . $this->request->input('passkey'), $this->user, 24 * 60);
+        $this->cacheManager->put('user.' . $this->request->input('passkey'), $this->user, 24 * 60);
     }
 
     /**
      * Insert the peer IP address(es).
      */
-    protected function insertPeerIPs(): void
+    private function insertPeerIPs(): void
     {
-        DB::table('peers_ip')->where('peerID', '=', $this->peer->id)->delete();
+        $this->databaseManager->table('peers_ip')->where('peerID', '=', $this->peer->id)->delete();
 
         if (false !== isset($this->ipv4Address) && false !== isset($this->ipv4Port)) {
-            DB::table('peers_ip')->insert(
+            $this->databaseManager->table('peers_ip')->insert(
                 [
                     'peerID' => $this->peer->id,
                     'IP'     => $this->ipv4Address,
@@ -570,7 +609,7 @@ class AnnounceManager
         }
 
         if (false !== isset($this->ipv6Address) && false !== isset($this->ipv6Port)) {
-            DB::table('peers_ip')->insert(
+            $this->databaseManager->table('peers_ip')->insert(
                 [
                     'peerID' => $this->peer->id,
                     'IP'     => $this->ipv6Address,
@@ -584,7 +623,7 @@ class AnnounceManager
     /**
      * @return string
      */
-    protected function startedEventAnnounceResponse(): string
+    private function startedEventAnnounceResponse(): string
     {
         if (null !== $this->peer) {
             $this->updatePeerIfItExists();
@@ -613,9 +652,9 @@ class AnnounceManager
     /**
      * @return string
      */
-    protected function stoppedEventAnnounceResponse(): string
+    private function stoppedEventAnnounceResponse(): string
     {
-        DB::table('peers')->where('id', '=', $this->peer->id)->delete();
+        $this->databaseManager->table('peers')->where('id', '=', $this->peer->id)->delete();
 
         if (true === $this->seeder) {
             $this->adjustTorrentPeers(-1, 0);
@@ -631,7 +670,7 @@ class AnnounceManager
     /**
      * @return string
      */
-    protected function completedEventAnnounceResponse(): string
+    private function completedEventAnnounceResponse(): string
     {
         $this->updatePeerIfItExists();
         $this->insertPeerIPs();
@@ -644,7 +683,7 @@ class AnnounceManager
     /**
      * @return string
      */
-    protected function noEventAnnounceResponse(): string
+    private function noEventAnnounceResponse(): string
     {
         if (null !== $this->peer) {
             $this->updatePeerIfItExists();
@@ -666,11 +705,11 @@ class AnnounceManager
     /**
      * @return Collection
      */
-    protected function getPeers(): Collection
+    private function getPeers(): Collection
     {
-        return DB::table('peers')
+        return $this->databaseManager->table('peers')
             ->join('peers_ip', 'peers.id', '=', 'peers_ip.peerID')
-            ->when($this->seeder, function ($query) {
+            ->when($this->seeder, function (Builder $query) {
                 return $query->where('seeder', '!=', true);
             })
             ->where('user_id', '!=', $this->user->id)
@@ -684,7 +723,7 @@ class AnnounceManager
     /**
      * @return string
      */
-    protected function announceSuccessResponse(): string
+    private function announceSuccessResponse(): string
     {
         $this->updateUser();
 
@@ -701,7 +740,7 @@ class AnnounceManager
     /**
      * @return array
      */
-    protected function getSeedersAndLeechersCount(): array
+    private function getSeedersAndLeechersCount(): array
     {
         $seedersCount = (int) $this->torrent->seeders;
         $leechersCount = (int) $this->torrent->leechers;
@@ -720,7 +759,7 @@ class AnnounceManager
     /**
      * @return array
      */
-    protected function getCommonResponsePart(): array
+    private function getCommonResponsePart(): array
     {
         $response['interval'] = 40 * 60; // 40 minutes
         $response['min interval'] = 1 * 60; // 1 minute
@@ -735,7 +774,7 @@ class AnnounceManager
     /**
      * @return string
      */
-    protected function compactResponse(): string
+    private function compactResponse(): string
     {
         $response = $this->getCommonResponsePart();
 
@@ -763,7 +802,7 @@ class AnnounceManager
     /**
      * @return string
      */
-    protected function nonCompactResponse(): string
+    private function nonCompactResponse(): string
     {
         $response = $this->getCommonResponsePart();
         $response['peers'] = [];
@@ -787,7 +826,7 @@ class AnnounceManager
      *
      * @return string
      */
-    protected function announceErrorResponse($error): string
+    private function announceErrorResponse($error): string
     {
         $response['failure reason'] = '';
         if (is_array($error)) {

@@ -7,12 +7,39 @@ namespace App\Http\Middleware;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\App;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Cache;
+use Illuminate\Auth\AuthManager;
+use Illuminate\Cache\CacheManager;
+use Illuminate\Foundation\Application;
 
 class SetUserLocale
 {
+    /**
+     * @var AuthManager
+     */
+    private $authManager;
+
+    /**
+     * @var CacheManager
+     */
+    private $cacheManager;
+
+    /**
+     * @var Application
+     */
+    private $application;
+
+    /**
+     * @param AuthManager $authManager
+     * @param CacheManager $cacheManager
+     * @param Application $application
+     */
+    public function __construct(AuthManager $authManager, CacheManager $cacheManager, Application $application)
+    {
+        $this->authManager = $authManager;
+        $this->cacheManager = $cacheManager;
+        $this->application = $application;
+    }
+
     /**
      * Handle an incoming request.
      *
@@ -23,11 +50,11 @@ class SetUserLocale
      */
     public function handle($request, $next)
     {
-        if (true === Auth::check()) {
-            $locale = Cache::rememberForever('user.' . Auth::user()->slug . '.locale', function () {
-                return Auth::user()->language->localeShort;
+        if (true === $this->authManager->check()) {
+            $locale = $this->cacheManager->rememberForever('user.' . $this->authManager->user()->slug . '.locale', function () {
+                return $this->authManager->user()->language->localeShort;
             });
-            App::setLocale($locale);
+            $this->application->setLocale($locale);
             Carbon::setLocale($locale);
         }
 

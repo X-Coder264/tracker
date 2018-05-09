@@ -6,41 +6,83 @@ namespace App\Services;
 
 use App\Http\Models\Torrent;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\File;
-use Illuminate\Support\Facades\Storage;
+use Illuminate\Auth\AuthManager;
+use Illuminate\Filesystem\Filesystem;
+use Illuminate\Filesystem\FilesystemManager;
 use App\Exceptions\FileNotWritableException;
+use Illuminate\Contracts\Routing\UrlGenerator;
+use Illuminate\Contracts\Translation\Translator;
 
 class TorrentUploadService
 {
     /**
      * @var Bencoder
      */
-    protected $encoder;
+    private $encoder;
 
     /**
      * @var Bdecoder
      */
-    protected $decoder;
+    private $decoder;
 
     /**
      * @var TorrentInfoService
      */
-    protected $torrentInfoService;
+    private $torrentInfoService;
 
     /**
-     * @param Bencoder           $encoder
-     * @param Bdecoder           $decoder
+     * @var AuthManager
+     */
+    private $authManager;
+
+    /**
+     * @var Filesystem
+     */
+    private $filesystem;
+
+    /**
+     * @var FilesystemManager
+     */
+    private $filesystemManager;
+
+    /**
+     * @var UrlGenerator
+     */
+    private $urlGenerator;
+
+    /**
+     * @var Translator
+     */
+    private $translator;
+
+    /**
+     * @param Bencoder $encoder
+     * @param Bdecoder $decoder
      * @param TorrentInfoService $torrentInfoService
+     * @param AuthManager $authManager
+     * @param Filesystem $filesystem
+     * @param FilesystemManager $filesystemManager
+     * @param UrlGenerator $urlGenerator
+     * @param Translator $translator
      */
     public function __construct(
         Bencoder $encoder,
         Bdecoder $decoder,
-        TorrentInfoService $torrentInfoService
+        TorrentInfoService $torrentInfoService,
+        AuthManager $authManager,
+        Filesystem $filesystem,
+        FilesystemManager $filesystemManager,
+        UrlGenerator $urlGenerator,
+        Translator $translator
     ) {
         $this->encoder = $encoder;
         $this->decoder = $decoder;
         $this->torrentInfoService = $torrentInfoService;
+        $this->authManager = $authManager;
+        $this->filesystem = $filesystem;
+        $this->filesystemManager = $filesystemManager;
+        $this->urlGenerator = $urlGenerator;
+        $this->translator = $translator;
     }
 
     /**
@@ -55,7 +97,7 @@ class TorrentUploadService
         $torrentFile = $request->file('torrent');
         $torrentFilePath = $torrentFile->getRealPath();
 
-        $torrentContent = File::get($torrentFilePath);
+        $torrentContent = $this->filesystem->get($torrentFilePath);
         $decodedTorrent = $this->decoder->decode($torrentContent);
 
         // the torrent must be private
@@ -64,7 +106,7 @@ class TorrentUploadService
         $torrentSize = $this->torrentInfoService->getTorrentSize($decodedTorrent['info']);
 
         // TODO: add support for multiple announce URLs
-        $decodedTorrent['announce'] = route('announce');
+        $decodedTorrent['announce'] = $this->urlGenerator->route('announce');
 
         do {
             // add entropy to randomize info_hash in order to prevent peer leaking attacks
@@ -80,11 +122,11 @@ class TorrentUploadService
         $torrent->name = $request->input('name');
         $torrent->size = $torrentSize;
         $torrent->description = $request->input('description');
-        $torrent->uploader_id = Auth::id();
+        $torrent->uploader_id = $this->authManager->id();
         $torrent->info_hash = $infoHash;
         $torrent->save();
 
-        $stored = Storage::disk('public')->put(
+        $stored = $this->filesystemManager->disk('public')->put(
             "/torrents/{$torrent->id}.torrent",
             $this->encoder->encode($decodedTorrent)
         );
@@ -95,7 +137,7 @@ class TorrentUploadService
 
         $torrent->delete();
 
-        throw new FileNotWritableException(__('messages.file-not-writable-exception.error-message'));
+        throw new FileNotWritableException($this->translator->trans('messages.file-not-writable-exception.error-message'));
     }
 
     /**

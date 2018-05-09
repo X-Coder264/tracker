@@ -7,29 +7,32 @@ namespace App\Http\Controllers;
 use App\Http\Models\Torrent;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Auth\AuthManager;
+use Illuminate\Routing\Redirector;
 use App\Http\Models\TorrentComment;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Contracts\Routing\ResponseFactory;
 
 class TorrentCommentController extends Controller
 {
     /**
      * @param Torrent $torrent
-     *
+     * @param ResponseFactory $responseFactory
      * @return Response
      */
-    public function create(Torrent $torrent): Response
+    public function create(Torrent $torrent, ResponseFactory $responseFactory): Response
     {
-        return response()->view('torrent-comments.create', compact('torrent'));
+        return $responseFactory->view('torrent-comments.create', compact('torrent'));
     }
 
     /**
      * @param Request $request
      * @param Torrent $torrent
-     *
+     * @param AuthManager $authManager
+     * @param Redirector $redirector
      * @return RedirectResponse
      */
-    public function store(Request $request, Torrent $torrent): RedirectResponse
+    public function store(Request $request, Torrent $torrent, AuthManager $authManager, Redirector $redirector): RedirectResponse
     {
         $this->validate(
             $request,
@@ -42,11 +45,11 @@ class TorrentCommentController extends Controller
         );
 
         $torrentComment = new TorrentComment();
-        $torrentComment->user_id = Auth::id();
+        $torrentComment->user_id = $authManager->id();
         $torrentComment->comment = $request->input('comment');
 
         $torrent->comments()->save($torrentComment);
 
-        return redirect()->route('torrents.show', $torrent)->with('torrentCommentSuccess', 'Bla');
+        return $redirector->route('torrents.show', $torrent)->with('torrentCommentSuccess', 'Bla');
     }
 }

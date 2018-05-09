@@ -8,6 +8,8 @@ use Carbon\Carbon;
 use Tests\TestCase;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
+use Illuminate\Auth\AuthManager;
+use Illuminate\Cache\CacheManager;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Route;
@@ -34,7 +36,11 @@ class SetUserLocaleTest extends TestCase
 
         Auth::shouldReceive('user')->andReturn($user);
 
-        $middleware = new SetUserLocale();
+        $middleware = new SetUserLocale(
+            $this->app->make(AuthManager::class),
+            $this->app->make(CacheManager::class),
+            $this->app
+        );
 
         $request = new Request();
         $next = new class() {
@@ -65,7 +71,11 @@ class SetUserLocaleTest extends TestCase
         $this->app->setLocale($localeBefore);
         Carbon::setLocale($localeBefore);
 
-        $middleware = new SetUserLocale();
+        $middleware = new SetUserLocale(
+            $this->app->make(AuthManager::class),
+            $this->app->make(CacheManager::class),
+            $this->app
+        );
 
         $request = new Request();
         $next = new class() {

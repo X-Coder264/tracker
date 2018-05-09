@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Http\Models\Torrent;
-use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Storage;
+use Illuminate\Cache\CacheManager;
+use Illuminate\Filesystem\FilesystemManager;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
 
 class TorrentInfoService
@@ -22,13 +22,31 @@ class TorrentInfoService
     private $bdecoder;
 
     /**
-     * @param SizeFormatter $sizeFormatter
-     * @param Bdecoder      $bdecoder
+     * @var CacheManager
      */
-    public function __construct(SizeFormatter $sizeFormatter, Bdecoder $bdecoder)
-    {
+    private $cacheManager;
+
+    /**
+     * @var FilesystemManager
+     */
+    private $filesystemManager;
+
+    /**
+     * @param SizeFormatter $sizeFormatter
+     * @param Bdecoder $bdecoder
+     * @param CacheManager $cacheManager
+     * @param FilesystemManager $filesystemManager
+     */
+    public function __construct(
+        SizeFormatter $sizeFormatter,
+        Bdecoder $bdecoder,
+        CacheManager $cacheManager,
+        FilesystemManager $filesystemManager
+    ) {
         $this->sizeFormatter = $sizeFormatter;
         $this->bdecoder = $bdecoder;
+        $this->cacheManager = $cacheManager;
+        $this->filesystemManager = $filesystemManager;
     }
 
     /**
@@ -92,10 +110,10 @@ class TorrentInfoService
      */
     public function getTorrentFileNamesAndSizes(Torrent $torrent): array
     {
-        return Cache::rememberForever(
+        return $this->cacheManager->rememberForever(
             'torrent.' . $torrent->id . '.files',
             function () use ($torrent) {
-                $torrentFile = Storage::disk('public')->get("torrents/{$torrent->id}.torrent");
+                $torrentFile = $this->filesystemManager->disk('public')->get("torrents/{$torrent->id}.torrent");
                 $decodedTorrent = $this->bdecoder->decode($torrentFile);
 
                 return $this->getTorrentFileNamesAndSizesFromTorrentInfoDict($decodedTorrent['info']);

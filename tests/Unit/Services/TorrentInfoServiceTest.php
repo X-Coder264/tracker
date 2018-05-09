@@ -8,9 +8,11 @@ use Tests\TestCase;
 use App\Services\Bdecoder;
 use App\Http\Models\Torrent;
 use App\Services\SizeFormatter;
+use Illuminate\Cache\CacheManager;
 use App\Services\TorrentInfoService;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Filesystem\FilesystemManager;
 use PHPUnit\Framework\MockObject\MockObject;
 
 class TorrentInfoServiceTest extends TestCase
@@ -22,7 +24,12 @@ class TorrentInfoServiceTest extends TestCase
         /** @var SizeFormatter|MockObject $formatter */
         $formatter = $this->createMock(SizeFormatter::class);
 
-        $torrentInfoService = new TorrentInfoService($formatter, $decoder);
+        $torrentInfoService = new TorrentInfoService(
+            $formatter,
+            $decoder,
+            $this->app->make(CacheManager::class),
+            $this->app->make(FilesystemManager::class)
+        );
         // multiple file mode
         $torrentInfoDict['files'] = [
             ['length' => 10],
@@ -50,7 +57,12 @@ class TorrentInfoServiceTest extends TestCase
             ->method('getFormattedSize')
             ->will($this->returnValueMap($map));
 
-        $torrentInfoService = new TorrentInfoService($formatter, $decoder);
+        $torrentInfoService = new TorrentInfoService(
+            $formatter,
+            $decoder,
+            $this->app->make(CacheManager::class),
+            $this->app->make(FilesystemManager::class)
+        );
         // multiple file mode
         $torrentInfoDict['files'] = [
             [
@@ -104,7 +116,14 @@ class TorrentInfoServiceTest extends TestCase
         $returnValue = ['name' => 'test', 'length' => 500];
         /** @var TorrentInfoService|MockObject $torrentInfoService */
         $torrentInfoService = $this->getMockBuilder(TorrentInfoService::class)
-            ->setConstructorArgs([$formatter, $decoder])
+            ->setConstructorArgs(
+                [
+                    $formatter,
+                    $decoder,
+                    $this->app->make(CacheManager::class),
+                    $this->app->make(FilesystemManager::class)
+                ]
+            )
             ->setMethods(['getTorrentFileNamesAndSizesFromTorrentInfoDict'])
             ->getMock();
         $torrentInfoService->expects($this->once())

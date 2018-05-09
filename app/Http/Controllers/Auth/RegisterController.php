@@ -9,9 +9,11 @@ use App\Http\Models\Locale;
 use Illuminate\Http\Response;
 use Illuminate\Validation\Rule;
 use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Validator;
 use Illuminate\Foundation\Auth\RegistersUsers;
-use Illuminate\Contracts\Validation\Validator as ValidatorContract;
+use Illuminate\Contracts\Routing\UrlGenerator;
+use Illuminate\Contracts\Validation\Validator;
+use Illuminate\Contracts\Routing\ResponseFactory;
+use Illuminate\Contracts\Validation\Factory as ValidatorFactory;
 
 class RegisterController extends Controller
 {
@@ -29,30 +31,37 @@ class RegisterController extends Controller
     use RegistersUsers;
 
     /**
-     * Where to redirect users after registration.
-     *
-     * @var string
+     * @var ValidatorFactory
      */
-    protected $redirectTo = '/';
+    private $validatorFactory;
 
     /**
-     * Create a new controller instance.
+     * @var UrlGenerator
      */
-    public function __construct()
+    private $urlGenerator;
+
+    /**
+     * @param ValidatorFactory $validatorFactory
+     * @param UrlGenerator $urlGenerator
+     */
+    public function __construct(ValidatorFactory $validatorFactory, UrlGenerator $urlGenerator)
     {
         $this->middleware('guest');
+        $this->validatorFactory = $validatorFactory;
+        $this->urlGenerator = $urlGenerator;
     }
 
     /**
      * Show the application registration form.
      *
+     * @param ResponseFactory $responseFactory
      * @return Response
      */
-    public function showRegistrationForm(): Response
+    public function showRegistrationForm(ResponseFactory $responseFactory): Response
     {
         $locales = Locale::all();
 
-        return response()->view('auth.register', compact('locales'));
+        return $responseFactory->view('auth.register', compact('locales'));
     }
 
     /**
@@ -60,14 +69,14 @@ class RegisterController extends Controller
      *
      * @param array $data
      *
-     * @return ValidatorContract
+     * @return Validator
      */
-    protected function validator(array $data): ValidatorContract
+    protected function validator(array $data): Validator
     {
         $locales = Locale::select('id')->get();
         $localeIDs = $locales->pluck('id')->toArray();
 
-        return Validator::make($data, [
+        return $this->validatorFactory->make($data, [
             'name'     => 'required|string|max:255|unique:users',
             'email'    => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:8|confirmed',
@@ -95,5 +104,13 @@ class RegisterController extends Controller
             'timezone'  => $data['timezone'],
             'locale_id' => $data['locale'],
         ]);
+    }
+
+    /**
+     * @return string
+     */
+    public function redirectTo(): string
+    {
+        return $this->urlGenerator->route('home.index');
     }
 }

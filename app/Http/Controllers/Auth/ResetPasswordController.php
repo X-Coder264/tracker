@@ -8,6 +8,7 @@ use App\Http\Models\User;
 use Illuminate\Support\Str;
 use App\Http\Controllers\Controller;
 use Illuminate\Auth\Events\PasswordReset;
+use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Contracts\Auth\CanResetPassword;
 use Illuminate\Foundation\Auth\ResetsPasswords;
@@ -35,11 +36,17 @@ class ResetPasswordController extends Controller
     protected $redirectTo = '/';
 
     /**
-     * Create a new controller instance.
+     * @var Dispatcher
      */
-    public function __construct()
+    private $dispatcher;
+
+    /**
+     * @param Dispatcher $dispatcher
+     */
+    public function __construct(Dispatcher $dispatcher)
     {
         $this->middleware('guest');
+        $this->dispatcher = $dispatcher;
     }
 
     /**
@@ -70,7 +77,7 @@ class ResetPasswordController extends Controller
 
         $user->save();
 
-        event(new PasswordReset($user));
+        $this->dispatcher->dispatch(new PasswordReset($user));
 
         $this->guard()->login($user);
     }

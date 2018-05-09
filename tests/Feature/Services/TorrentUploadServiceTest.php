@@ -11,11 +11,16 @@ use App\Services\Bencoder;
 use App\Http\Models\Torrent;
 use Illuminate\Http\Response;
 use App\Services\SizeFormatter;
+use Illuminate\Auth\AuthManager;
 use Illuminate\Http\Testing\File;
 use Illuminate\Http\UploadedFile;
 use App\Services\TorrentInfoService;
+use Illuminate\Filesystem\Filesystem;
 use App\Services\TorrentUploadService;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Filesystem\FilesystemManager;
+use Illuminate\Contracts\Routing\UrlGenerator;
+use Illuminate\Contracts\Translation\Translator;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class TorrentUploadServiceTest extends TestCase
@@ -178,7 +183,18 @@ class TorrentUploadServiceTest extends TestCase
         $encoder->method('encode')->willReturn($torrentValue);
 
         $torrentUploadService = $this->getMockBuilder(TorrentUploadService::class)
-            ->setConstructorArgs([$encoder, $decoder, $infoService])
+            ->setConstructorArgs(
+                [
+                    $encoder,
+                    $decoder,
+                    $infoService,
+                    $this->app->make(AuthManager::class),
+                    $this->app->make(Filesystem::class),
+                    $this->app->make(FilesystemManager::class),
+                    $this->app->make(UrlGenerator::class),
+                    $this->app->make(Translator::class)
+                ]
+            )
             ->setMethods(['getTorrentInfoHash'])
             ->getMock();
         $expectedHash = 'test hash 264';

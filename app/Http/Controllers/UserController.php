@@ -9,31 +9,37 @@ use App\Http\Models\Locale;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Validation\Rule;
-use Illuminate\Support\Facades\App;
+use Illuminate\Cache\CacheManager;
+use Illuminate\Routing\Redirector;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Support\Facades\Cache;
+use Illuminate\Foundation\Application;
+use Illuminate\Contracts\Translation\Translator;
+use Illuminate\Contracts\Routing\ResponseFactory;
 
 class UserController extends Controller
 {
     /**
      * @param User $user
-     *
+     * @param ResponseFactory $responseFactory
      * @return Response
      */
-    public function edit(User $user): Response
+    public function edit(User $user, ResponseFactory $responseFactory): Response
     {
         $locales = Locale::all();
 
-        return response()->view('users.edit', compact('user', 'locales'));
+        return $responseFactory->view('users.edit', compact('user', 'locales'));
     }
 
     /**
      * @param Request $request
-     * @param User    $user
-     *
+     * @param User $user
+     * @param Translator $translator
+     * @param Application $application
+     * @param CacheManager $cacheManager
+     * @param Redirector $redirector
      * @return RedirectResponse
      */
-    public function update(Request $request, User $user): RedirectResponse
+    public function update(Request $request, User $user, Translator $translator, Application $application, CacheManager $cacheManager, Redirector $redirector): RedirectResponse
     {
         $locales = Locale::select('id')->get();
         $localeIDs = $locales->pluck('id')->toArray();
@@ -53,13 +59,13 @@ class UserController extends Controller
                 'timezone' => 'required|timezone',
             ],
             [
-                'email.required' => __('messages.validation.variable.required', ['var' => 'email']),
-                'email.email' => __('messages.validation.variable.email'),
-                'email.unique' => __('messages.validation.variable.email', ['var' => 'email']),
-                'locale_id.required' => __('messages.validation.variable.required', ['var' => 'language']),
-                'locale_id.in' => __('messages.validation.variable.invalid_value', ['var' => 'language']),
-                'timezone.required' => __('messages.validation.variable.required', ['var' => 'timezone']),
-                'timezone.timezone' => __('messages.validation.variable.invalid_value', ['var' => 'timezone']),
+                'email.required' => $translator->trans('messages.validation.variable.required', ['var' => 'email']),
+                'email.email' => $translator->trans('messages.validation.variable.email'),
+                'email.unique' => $translator->trans('messages.validation.variable.email', ['var' => 'email']),
+                'locale_id.required' => $translator->trans('messages.validation.variable.required', ['var' => 'language']),
+                'locale_id.in' => $translator->trans('messages.validation.variable.invalid_value', ['var' => 'language']),
+                'timezone.required' => $translator->trans('messages.validation.variable.required', ['var' => 'timezone']),
+                'timezone.timezone' => $translator->trans('messages.validation.variable.invalid_value', ['var' => 'timezone']),
             ]
         );
 
@@ -69,12 +75,12 @@ class UserController extends Controller
             'timezone' => $request->input('timezone'),
         ]);
 
-        App::setLocale($user->language->localeShort);
+        $application->setLocale($user->language->localeShort);
 
-        Cache::forget('user.' . $user->id);
-        Cache::forget('user.' . $user->slug . '.locale');
-        Cache::forget('user.' . $user->passkey);
+        $cacheManager->forget('user.' . $user->id);
+        $cacheManager->forget('user.' . $user->slug . '.locale');
+        $cacheManager->forget('user.' . $user->passkey);
 
-        return back()->with('success', __('messages.common.save_changes_successful'));
+        return $redirector->back()->with('success', $translator->trans('messages.common.save_changes_successful'));
     }
 }
