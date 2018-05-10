@@ -16,7 +16,6 @@
     },
     "require-dev": {
         "barryvdh/laravel-debugbar": "^3.1",
-        "barryvdh/laravel-ide-helper": "^2.4",
         "filp/whoops": "^2.1.14",
         "friendsofphp/php-cs-fixer": "^2.10",
         "fzaninotto/faker": "^1.7",
