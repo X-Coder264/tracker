@@ -131,6 +131,9 @@
                         <div class="card">
                             <div class="card-header">
                                 {{ $torrentComment->user->name }} - {{ $torrentComment->created_at->timezone($timezone) }} ({{ $torrentComment->created_at->diffForHumans() }})
+                                @if ($torrentComment->user_id === Auth::id())
+                                    <a class="btn btn-primary" href="{{ route('torrent-comments.edit', $torrentComment) }}">Edit</a>
+                                @endif
                             </div>
                             <div class="card-body">
                                 <div class="row">

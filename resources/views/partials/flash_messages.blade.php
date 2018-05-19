@@ -6,6 +6,7 @@
         </div>
     </div>
 @endif
+
 @if (session('error'))
     <div class="card text-white bg-danger">
         <div class="card-body">
@@ -14,6 +15,7 @@
         </div>
     </div>
 @endif
+
 @if (session('status'))
     <div class="card text-white bg-warning">
         <div class="card-body">
@@ -22,6 +24,7 @@
         </div>
     </div>
 @endif
+
 @if ($errors->any())
     <div class="card text-white bg-danger">
         <div class="card-body">

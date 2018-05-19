@@ -78,8 +78,12 @@ return [
     'common.torrent_table_last_announce' => 'Zadnji put kontaktirao tracker',
     'common.torrent_table_torrent_client' => 'Torrent klijent',
     'common.submit' => 'Pošalji',
-    'torrent-comments.show.header' => 'Napiši komentar za :torrent',
+    'torrent-comments.create.header' => 'Napiši komentar za :torrent',
+    'torrent-comments.edit.header' => 'Uredi komentar',
     'file-not-writable-exception.error-message' => 'Datoteka se nije uspjela zapisati na disk. Molimo pokušajte kasnije.',
     'file-not-readable.error-message' => 'Greška, datoteku nije bilo moguće pročitati.',
     'torrent-file-missing.error-message' => 'Ne postoji na disku .torrent datoteka za ovaj torrent.',
+    'validation.torrent-comment-required' => 'Tekst komentara je obavezno polje.',
+    'torrent-comments.create-success-message' => 'Vaš komentar je uspješno poslan.',
+    'torrent-comments.update-success-message' => 'Vaš komentar je uspješno uređen.',
 ];

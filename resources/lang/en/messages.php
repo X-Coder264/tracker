@@ -78,8 +78,12 @@ return [
     'common.torrent_table_last_announce' => 'Last announce',
     'common.torrent_table_torrent_client' => 'Torrent client',
     'common.submit' => 'Submit',
-    'torrent-comments.show.header' => 'Write a comment for :torrent',
+    'torrent-comments.create.header' => 'Write a comment for :torrent',
+    'torrent-comments.edit.header' => 'Edit the comment',
     'file-not-writable-exception.error-message' => 'Failed to write the file to the disk. Please try again later.',
     'file-not-readable.error-message' => 'Error, the file could not be read.',
     'torrent-file-missing.error-message' => 'The .torrent file for this torrent is missing.',
+    'validation.torrent-comment-required' => 'The comment text field is required.',
+    'torrent-comments.create-success-message' => 'Your comment has been successfully sent.',
+    'torrent-comments.update-success-message' => 'Your comment has been successfully updated.',
 ];

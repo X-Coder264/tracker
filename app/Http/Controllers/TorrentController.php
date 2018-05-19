@@ -24,6 +24,7 @@ use Illuminate\Contracts\Translation\Translator;
 use Illuminate\Contracts\Routing\ResponseFactory;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class TorrentController extends Controller
 {
@@ -60,15 +61,22 @@ class TorrentController extends Controller
      * @param Torrent            $torrent
      * @param TorrentInfoService $torrentInfoService
      * @param ResponseFactory    $responseFactory
+     * @param Translator         $translator
+     *
+     * @throws NotFoundHttpException
      *
      * @return Response
      */
-    public function show(Torrent $torrent, TorrentInfoService $torrentInfoService, ResponseFactory $responseFactory): Response
-    {
+    public function show(
+        Torrent $torrent,
+        TorrentInfoService $torrentInfoService,
+        ResponseFactory $responseFactory,
+        Translator $translator
+    ): Response {
         try {
             $torrentFileNamesAndSizes = $torrentInfoService->getTorrentFileNamesAndSizes($torrent);
         } catch (FileNotFoundException $e) {
-            abort(Response::HTTP_NOT_FOUND, __('messages.torrent-file-missing.error-message'));
+            throw new NotFoundHttpException($translator->trans('messages.torrent-file-missing.error-message'));
         }
 
         $torrent->load(['uploader', 'peers.user']);
@@ -131,6 +139,8 @@ class TorrentController extends Controller
      * @param Factory          $filesystem
      * @param Translator       $translator
      *
+     * @throws NotFoundHttpException
+     *
      * @return Response
      */
     public function download(
@@ -145,7 +155,7 @@ class TorrentController extends Controller
         try {
             $torrentFile = $filesystem->disk('public')->get("torrents/{$torrent->id}.torrent");
         } catch (FileNotFoundException $e) {
-            abort(Response::HTTP_NOT_FOUND, $translator->trans('messages.torrent-file-missing.error-message'));
+            throw new NotFoundHttpException($translator->trans('messages.torrent-file-missing.error-message'));
         }
 
         $decodedTorrent = $decoder->decode($torrentFile);

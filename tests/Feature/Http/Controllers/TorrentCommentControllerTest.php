@@ -27,6 +27,9 @@ class TorrentCommentControllerTest extends TestCase
         $response->assertStatus(Response::HTTP_OK);
         $response->assertViewIs('torrent-comments.create');
         $response->assertViewHas('torrent');
+        $response->assertViewHas('torrentComment');
+        $this->assertInstanceOf(Torrent::class, $response->original->torrent);
+        $this->assertInstanceOf(TorrentComment::class, $response->original->torrentComment);
     }
 
     public function testStore()
@@ -53,13 +56,61 @@ class TorrentCommentControllerTest extends TestCase
         $this->assertSame($comment, $torrentComment->comment);
     }
 
-    public function testCommentIsRequired()
+    public function testEdit()
+    {
+        $this->withoutExceptionHandling();
+
+        $user = factory(User::class)->create();
+        $torrentComment = factory(TorrentComment::class)->create(['user_id' => $user->id]);
+        $this->actingAs($user);
+        $response = $this->get(route('torrent-comments.edit', $torrentComment));
+
+        $response->assertStatus(Response::HTTP_OK);
+        $response->assertViewIs('torrent-comments.edit');
+        $response->assertViewHas('torrentComment');
+        $this->assertInstanceOf(TorrentComment::class, $response->original->torrentComment);
+        $response->assertSee($torrentComment->comment);
+    }
+
+    public function testUpdate()
+    {
+        $this->withoutExceptionHandling();
+
+        $user = factory(User::class)->create();
+        $torrent = factory(Torrent::class)->create(['uploader_id' => $user->id]);
+        $torrentComment = factory(TorrentComment::class)->create(
+            [
+                'user_id' => $user->id,
+                'torrent_id' => $torrent->id,
+                'comment' => 'test 123',
+            ]
+        );
+        $this->actingAs($user);
+
+        $comment = 'test comment';
+
+        $response = $this->put(route('torrent-comments.update', $torrentComment), [
+            'comment' => $comment,
+        ]);
+
+        $response->assertStatus(Response::HTTP_FOUND);
+        $response->assertRedirect(route('torrents.show', $torrent));
+        $response->assertSessionHas('torrentCommentSuccess');
+
+        $torrentComment = TorrentComment::findOrFail(1);
+        $this->assertSame($user->id, (int) $torrentComment->user_id);
+        $this->assertSame($torrent->id, (int) $torrentComment->torrent_id);
+        $this->assertSame($comment, $torrentComment->comment);
+    }
+
+    public function testCommentIsRequiredOnCreate()
     {
         $user = factory(User::class)->create();
         $torrent = factory(Torrent::class)->create(['uploader_id' => $user->id]);
         $this->actingAs($user);
 
-        $response = $this->from(route('torrent-comments.create', $torrent))->post(route('torrent-comments.store', $torrent), [
+        $response = $this->from(route('torrent-comments.create', $torrent))
+            ->post(route('torrent-comments.store', $torrent), [
             'comment' => '',
         ]);
 
@@ -67,5 +118,30 @@ class TorrentCommentControllerTest extends TestCase
         $response->assertRedirect(route('torrent-comments.create', $torrent));
         $response->assertSessionHasErrors('comment');
         $this->assertSame(0, TorrentComment::count());
+    }
+
+    public function testCommentIsRequiredOnUpdate()
+    {
+        $user = factory(User::class)->create();
+        $torrent = factory(Torrent::class)->create(['uploader_id' => $user->id]);
+        $oldComment = 'test 123';
+        $torrentComment = factory(TorrentComment::class)->create(
+            [
+                'user_id' => $user->id,
+                'torrent_id' => $torrent->id,
+                'comment' => $oldComment,
+            ]
+        );
+        $this->actingAs($user);
+
+        $response = $this->from(route('torrent-comments.edit', $torrentComment))
+            ->put(route('torrent-comments.update', $torrentComment), [
+            'comment' => '',
+        ]);
+
+        $response->assertStatus(Response::HTTP_FOUND);
+        $response->assertRedirect(route('torrent-comments.edit', $torrentComment));
+        $response->assertSessionHasErrors('comment');
+        $this->assertSame($oldComment, TorrentComment::findOrFail(1)->comment);
     }
 }
