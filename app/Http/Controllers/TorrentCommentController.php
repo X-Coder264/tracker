@@ -25,6 +25,7 @@ class TorrentCommentController extends Controller
     public function create(Torrent $torrent, ResponseFactory $responseFactory): Response
     {
         $torrentComment = new TorrentComment();
+
         return $responseFactory->view('torrent-comments.create', compact('torrent', 'torrentComment'));
     }
 
