@@ -30,11 +30,11 @@ class TorrentCommentController extends Controller
     }
 
     /**
-     * @param TorrentCommentRequest     $request
-     * @param Torrent                   $torrent
-     * @param AuthManager               $authManager
-     * @param Redirector                $redirector
-     * @param Translator                $translator
+     * @param TorrentCommentRequest $request
+     * @param Torrent               $torrent
+     * @param AuthManager           $authManager
+     * @param Redirector            $redirector
+     * @param Translator            $translator
      *
      * @return RedirectResponse
      */
