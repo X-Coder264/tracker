@@ -122,7 +122,7 @@ class TorrentUploadService
         $torrent->name = $request->input('name');
         $torrent->size = $torrentSize;
         $torrent->description = $request->input('description');
-        $torrent->uploader_id = $this->authManager->id();
+        $torrent->uploader_id = $this->authManager->guard()->id();
         $torrent->info_hash = $infoHash;
         $torrent->save();
 

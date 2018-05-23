@@ -51,8 +51,9 @@ class SetUserLocale
     public function handle($request, $next)
     {
         if (true === $this->authManager->check()) {
-            $locale = $this->cacheManager->rememberForever('user.' . $this->authManager->user()->slug . '.locale', function () {
-                return $this->authManager->user()->language->localeShort;
+            $user = $this->authManager->user();
+            $locale = $this->cacheManager->rememberForever('user.' . $user->slug . '.locale', function () use ($user) {
+                return $user->language->localeShort;
             });
             $this->application->setLocale($locale);
             Carbon::setLocale($locale);

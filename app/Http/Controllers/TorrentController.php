@@ -160,7 +160,7 @@ class TorrentController extends Controller
 
         $decodedTorrent = $decoder->decode($torrentFile);
 
-        $passkey = $authManager->user()->passkey;
+        $passkey = $authManager->guard()->user()->passkey;
 
         if (empty($passkey)) {
             $passkey = $passkeyGenerator->generateUniquePasskey();

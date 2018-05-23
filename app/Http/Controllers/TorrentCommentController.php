@@ -46,7 +46,7 @@ class TorrentCommentController extends Controller
         Translator $translator
     ): RedirectResponse {
         $torrentComment = new TorrentComment();
-        $torrentComment->user_id = $authManager->id();
+        $torrentComment->user_id = $authManager->guard()->id();
         $torrentComment->comment = $request->input('comment');
 
         $torrent->comments()->save($torrentComment);

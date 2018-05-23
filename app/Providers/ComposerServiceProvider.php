@@ -26,8 +26,8 @@ class ComposerServiceProvider extends ServiceProvider
     public function boot(ViewFactory $viewFactory, AuthManager $authManager, CacheManager $cacheManager)
     {
         $viewFactory->composer($this->viewsThatNeedTimezoneInfo, function (View $view) use ($authManager, $cacheManager) {
-            $user = $cacheManager->remember('user.' . $authManager->id(), 24 * 60, function () use ($authManager) {
-                return User::with('language')->find($authManager->id());
+            $user = $cacheManager->remember('user.' . $authManager->guard()->id(), 24 * 60, function () use ($authManager) {
+                return User::with('language')->find($authManager->guard()->id());
             });
 
             $view->with('timezone', $user->timezone);

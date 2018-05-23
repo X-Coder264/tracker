@@ -22,7 +22,7 @@ class IndexController extends Controller
      */
     public function index(AuthManager $authManager, Repository $configRepository, ResponseFactory $responseFactory): Response
     {
-        $user = $authManager->user();
+        $user = $authManager->guard()->user();
         $projectName = $configRepository->get('app.name');
         $enumerations = json_encode(['timezones' => (object) DateTimeZone::listIdentifiers()]);
 
