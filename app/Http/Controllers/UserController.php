@@ -41,8 +41,14 @@ class UserController extends Controller
      *
      * @return RedirectResponse
      */
-    public function update(Request $request, User $user, Translator $translator, Application $application, CacheManager $cacheManager, Redirector $redirector): RedirectResponse
-    {
+    public function update(
+        Request $request,
+        User $user,
+        Translator $translator,
+        Application $application,
+        CacheManager $cacheManager,
+        Redirector $redirector
+    ): RedirectResponse {
         $locales = Locale::select('id')->get();
         $localeIDs = $locales->pluck('id')->toArray();
 
