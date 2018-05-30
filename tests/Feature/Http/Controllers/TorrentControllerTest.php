@@ -158,7 +158,7 @@ class TorrentControllerTest extends TestCase
         $response->assertStatus(Response::HTTP_OK);
         $this->assertSame($encoderReturnValue, $response->getContent());
         $response->assertHeader('Content-Type', 'application/x-bittorrent');
-        $response->assertHeader('Content-Disposition', 'attachment; filename="' . $torrent->name . '.torrent"');
+        $response->assertHeader('Content-Disposition', 'attachment; filename=' . $torrent->name . '.torrent');
     }
 
     public function testDownloadWithUTF8TorrentFileNameWhichIncludesSpecialCharacters()
@@ -196,13 +196,13 @@ class TorrentControllerTest extends TestCase
         $this->assertSame($encoderReturnValue, $response->getContent());
         $response->assertHeader('Content-Type', 'application/x-bittorrent');
         $fileName = str_replace(['/', '\\'], '', $torrent->name . '.torrent');
-        $contentDisposition = sprintf(
-            '%s; filename="%s"' . "; filename*=utf-8''%s",
+        $dispositionHeader = sprintf(
+            '%s; filename=%s' . "; filename*=utf-8''%s",
             ResponseHeaderBag::DISPOSITION_ATTACHMENT,
             'ccsdz.torrent',
             rawurlencode($fileName)
         );
-        $response->assertHeader('Content-Disposition', $contentDisposition);
+        $response->assertHeader('Content-Disposition', $dispositionHeader);
     }
 
     public function testUserGetsAPasskeyIfHeDidNotHaveItBefore()

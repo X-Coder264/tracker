@@ -173,13 +173,13 @@ class TorrentController extends Controller
         $response->headers->set('Content-Type', 'application/x-bittorrent');
         // TODO: add support for adding a prefix (or suffix) to the name of the file
         $fileName = str_replace(['/', '\\'], '', $torrent->name . '.torrent');
-        $disposition = $response->headers->makeDisposition(
+        $dispositionHeader = $response->headers->makeDisposition(
             ResponseHeaderBag::DISPOSITION_ATTACHMENT,
             $fileName,
             str_replace('%', '', Str::ascii($fileName))
         );
 
-        $response->headers->set('Content-Disposition', $disposition);
+        $response->headers->set('Content-Disposition', $dispositionHeader);
 
         return $response;
     }
