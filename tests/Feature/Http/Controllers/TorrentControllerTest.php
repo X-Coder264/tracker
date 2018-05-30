@@ -247,7 +247,7 @@ class TorrentControllerTest extends TestCase
         $response->assertStatus(Response::HTTP_OK);
         $this->assertSame($encoderReturnValue, $response->getContent());
         $response->assertHeader('Content-Type', 'application/x-bittorrent');
-        $response->assertHeader('Content-Disposition', 'attachment; filename="' . $torrent->name . '.torrent"');
+        $response->assertHeader('Content-Disposition', 'attachment; filename=' . $torrent->name . '.torrent');
         $user = $this->user->fresh();
         $this->assertSame($passkey, $user->passkey);
     }
