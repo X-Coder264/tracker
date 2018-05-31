@@ -29,23 +29,23 @@
             <div class="collapse navbar-collapse" id="nav-content">
                 <ul class="navbar-nav w-100">
                     @guest
-                        <li class="nav-item nav-item">
+                        <li class="nav-item">
                             <a class="nav-item nav-link" href="{{ route('login') }}">{{ __('messages.common.login') }}</a>
                         </li>
-                        <li class="nav-item nav-item">
-                            <a class="nav-item nav-link" href="{{ route('register') }}">{{ __('messages.common.register') }}</a>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ route('register') }}">{{ __('messages.common.register') }}</a>
                         </li>
                     @else
                             <li class="nav-item">
-                                <a class="nav-item nav-link" href="{{ route('torrents.index') }}">{{ __('messages.navigation.torrent.index') }}</a>
+                                <a class="nav-link" href="{{ route('torrents.index') }}">{{ __('messages.navigation.torrent.index') }}</a>
                             </li>
 
                             <li class="nav-item">
-                                <a class="nav-item nav-link" href="{{ route('torrents.create') }}">{{ __('messages.navigation.torrent.create') }}</a>
+                                <a class="nav-link" href="{{ route('torrents.create') }}">{{ __('messages.navigation.torrent.create') }}</a>
                             </li>
 
                             <li class="dropdown show nav-item ml-auto">
-                                <a class="nav-item nav-link dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <a class="nav-link dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                     {{ Auth::user()->name }}
                                 </a>
 
