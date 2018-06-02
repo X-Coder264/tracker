@@ -7,6 +7,7 @@ namespace App\Http\Controllers;
 use App\Http\Models\User;
 use App\Services\Bdecoder;
 use App\Services\Bencoder;
+use Illuminate\Contracts\Routing\UrlGenerator;
 use Illuminate\Support\Str;
 use App\Http\Models\Torrent;
 use Illuminate\Http\Request;
@@ -136,10 +137,9 @@ class TorrentController extends Controller
      * @param Bdecoder         $decoder
      * @param PasskeyGenerator $passkeyGenerator
      * @param AuthManager      $authManager
+     * @param UrlGenerator     $urlGenerator
      * @param Factory          $filesystem
      * @param Translator       $translator
-     *
-     * @throws NotFoundHttpException
      *
      * @return Response
      */
@@ -149,6 +149,7 @@ class TorrentController extends Controller
         Bdecoder $decoder,
         PasskeyGenerator $passkeyGenerator,
         AuthManager $authManager,
+        UrlGenerator $urlGenerator,
         Factory $filesystem,
         Translator $translator
     ): Response {
@@ -167,7 +168,7 @@ class TorrentController extends Controller
             User::where('id', '=', $authManager->guard()->id())->update(['passkey' => $passkey]);
         }
 
-        $decodedTorrent['announce'] = route('announce', ['passkey' => $passkey]);
+        $decodedTorrent['announce'] = $urlGenerator->route('announce', ['passkey' => $passkey]);
 
         $response = new Response($encoder->encode($decodedTorrent));
         $response->headers->set('Content-Type', 'application/x-bittorrent');
