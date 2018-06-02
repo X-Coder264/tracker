@@ -164,7 +164,7 @@ class TorrentController extends Controller
 
         if (empty($passkey)) {
             $passkey = $passkeyGenerator->generateUniquePasskey();
-            User::where('id', '=', $authManager->id())->update(['passkey' => $passkey]);
+            User::where('id', '=', $authManager->guard()->id())->update(['passkey' => $passkey]);
         }
 
         $decodedTorrent['announce'] = route('announce', ['passkey' => $passkey]);
