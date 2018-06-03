@@ -7,7 +7,6 @@ namespace App\Http\Middleware;
 use Closure;
 use Illuminate\Auth\AuthManager;
 use Illuminate\Routing\Redirector;
-use Illuminate\Contracts\Routing\UrlGenerator;
 
 class RedirectIfAuthenticated
 {
@@ -22,20 +21,13 @@ class RedirectIfAuthenticated
     private $redirector;
 
     /**
-     * @var UrlGenerator
+     * @param AuthManager $authManager
+     * @param Redirector  $redirector
      */
-    private $urlGenerator;
-
-    /**
-     * @param AuthManager  $authManager
-     * @param Redirector   $redirector
-     * @param UrlGenerator $urlGenerator
-     */
-    public function __construct(AuthManager $authManager, Redirector $redirector, UrlGenerator $urlGenerator)
+    public function __construct(AuthManager $authManager, Redirector $redirector)
     {
         $this->authManager = $authManager;
         $this->redirector = $redirector;
-        $this->urlGenerator = $urlGenerator;
     }
 
     /**
@@ -50,7 +42,7 @@ class RedirectIfAuthenticated
     public function handle($request, Closure $next, $guard = null)
     {
         if ($this->authManager->guard($guard)->check()) {
-            return $this->redirector->to($this->urlGenerator->route('home.index'));
+            return $this->redirector->route('home.index');
         }
 
         return $next($request);
