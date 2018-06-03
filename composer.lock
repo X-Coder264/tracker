@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "43f519af84cb7d486d9586c2162673a3",
+    "content-hash": "569bf6bdcf7f0ba847c85a0be10dd25c",
     "packages": [
         {
             "name": "cloudcreativity/json-api",
