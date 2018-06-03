@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use App\Http\Models\User;
 use Illuminate\Database\Seeder;
 
