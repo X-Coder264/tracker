@@ -9,13 +9,17 @@ use App\Http\Models\User;
 use App\Http\Models\Locale;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Event;
+use Illuminate\Auth\Events\Registered;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class RegisterControllerTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function testIndex()
+    public function testUserCanViewTheRegistrationForm()
     {
         $this->withoutExceptionHandling();
 
@@ -27,9 +31,17 @@ class RegisterControllerTest extends TestCase
         $response->assertViewHas('locales');
     }
 
-    public function testRegister()
+    public function testUserCanRegister()
     {
         $this->withoutExceptionHandling();
+
+        $realDispatcher = $this->app->make(Dispatcher::class);
+
+        Event::fake();
+
+        // this is needed as the slug for the user is generated in an observer event, otherwise the INSERT query would fail
+        // as the user slug cannot be null
+        Model::setEventDispatcher($realDispatcher);
 
         $name = 'test name';
         $email = 'test@gmail.com';
@@ -49,6 +61,8 @@ class RegisterControllerTest extends TestCase
         $response->assertStatus(Response::HTTP_FOUND);
         $response->assertRedirect(route('home.index'));
 
+        $this->assertSame(1, User::count());
+
         $user = User::findOrFail(1);
         $this->assertSame($user->name, $name);
         $this->assertSame($user->email, $email);
@@ -58,6 +72,9 @@ class RegisterControllerTest extends TestCase
         $this->assertNull($user->passkey);
         $this->assertNotNull($user->slug);
         $this->assertAuthenticatedAs($user);
+        Event::assertDispatched(Registered::class, function (Registered $event) use ($user) {
+            return $event->user->id === $user->id;
+        });
     }
 
     public function testNameIsRequired()
@@ -80,6 +97,7 @@ class RegisterControllerTest extends TestCase
         $response->assertStatus(Response::HTTP_FOUND);
         $response->assertRedirect(route('register'));
         $response->assertSessionHasErrors('name');
+        $this->assertSessionHasOldInput();
         $this->assertSame(0, User::count());
         $this->assertGuest();
     }
@@ -93,6 +111,7 @@ class RegisterControllerTest extends TestCase
         $response->assertStatus(Response::HTTP_FOUND);
         $response->assertRedirect(route('register'));
         $response->assertSessionHasErrors('name');
+        $this->assertSessionHasOldInput();
         $this->assertSame(1, User::count());
         $this->assertGuest();
     }
@@ -117,6 +136,7 @@ class RegisterControllerTest extends TestCase
         $response->assertStatus(Response::HTTP_FOUND);
         $response->assertRedirect(route('register'));
         $response->assertSessionHasErrors('email');
+        $this->assertSessionHasOldInput();
         $this->assertSame(0, User::count());
         $this->assertGuest();
     }
@@ -130,6 +150,7 @@ class RegisterControllerTest extends TestCase
         $response->assertStatus(Response::HTTP_FOUND);
         $response->assertRedirect(route('register'));
         $response->assertSessionHasErrors('email');
+        $this->assertSessionHasOldInput();
         $this->assertSame(1, User::count());
         $this->assertGuest();
     }
@@ -142,6 +163,7 @@ class RegisterControllerTest extends TestCase
         $response->assertStatus(Response::HTTP_FOUND);
         $response->assertRedirect(route('register'));
         $response->assertSessionHasErrors('email');
+        $this->assertSessionHasOldInput();
         $this->assertSame(0, User::count());
         $this->assertGuest();
     }
@@ -155,6 +177,7 @@ class RegisterControllerTest extends TestCase
         $response->assertStatus(Response::HTTP_FOUND);
         $response->assertRedirect(route('register'));
         $response->assertSessionHasErrors('password');
+        $this->assertSessionHasOldInput();
         $this->assertSame(0, User::count());
         $this->assertGuest();
     }
@@ -168,6 +191,7 @@ class RegisterControllerTest extends TestCase
         $response->assertStatus(Response::HTTP_FOUND);
         $response->assertRedirect(route('register'));
         $response->assertSessionHasErrors('password');
+        $this->assertSessionHasOldInput();
         $this->assertSame(0, User::count());
         $this->assertGuest();
     }
@@ -180,6 +204,7 @@ class RegisterControllerTest extends TestCase
         $response->assertStatus(Response::HTTP_FOUND);
         $response->assertRedirect(route('register'));
         $response->assertSessionHasErrors('password');
+        $this->assertSessionHasOldInput();
         $this->assertSame(0, User::count());
         $this->assertGuest();
     }
@@ -192,6 +217,7 @@ class RegisterControllerTest extends TestCase
         $response->assertStatus(Response::HTTP_FOUND);
         $response->assertRedirect(route('register'));
         $response->assertSessionHasErrors('locale');
+        $this->assertSessionHasOldInput();
         $this->assertSame(0, User::count());
         $this->assertGuest();
     }
@@ -204,6 +230,7 @@ class RegisterControllerTest extends TestCase
         $response->assertStatus(Response::HTTP_FOUND);
         $response->assertRedirect(route('register'));
         $response->assertSessionHasErrors('locale');
+        $this->assertSessionHasOldInput();
         $this->assertSame(0, User::count());
         $this->assertGuest();
     }
@@ -216,6 +243,7 @@ class RegisterControllerTest extends TestCase
         $response->assertStatus(Response::HTTP_FOUND);
         $response->assertRedirect(route('register'));
         $response->assertSessionHasErrors('timezone');
+        $this->assertSessionHasOldInput();
         $this->assertSame(0, User::count());
         $this->assertGuest();
     }
@@ -228,6 +256,7 @@ class RegisterControllerTest extends TestCase
         $response->assertStatus(Response::HTTP_FOUND);
         $response->assertRedirect(route('register'));
         $response->assertSessionHasErrors('timezone');
+        $this->assertSessionHasOldInput();
         $this->assertSame(0, User::count());
         $this->assertGuest();
     }
@@ -239,6 +268,13 @@ class RegisterControllerTest extends TestCase
         $response = $this->get(route('register'));
         $response->assertStatus(Response::HTTP_FOUND);
         $response->assertRedirect(route('home.index'));
+    }
+
+    private function assertSessionHasOldInput()
+    {
+        $this->assertTrue(session()->hasOldInput('name'));
+        $this->assertTrue(session()->hasOldInput('email'));
+        $this->assertFalse(session()->hasOldInput('password'));
     }
 
     /**

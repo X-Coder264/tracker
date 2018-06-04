@@ -8,14 +8,13 @@ use Tests\TestCase;
 use App\Http\Models\User;
 use App\Http\Models\Locale;
 use Illuminate\Http\Response;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class LoginControllerTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function testIndex()
+    public function testUserCanViewTheLoginForm()
     {
         $this->withoutExceptionHandling();
 
@@ -25,7 +24,7 @@ class LoginControllerTest extends TestCase
         $response->assertViewIs('auth.login');
     }
 
-    public function testLogin()
+    public function testUserCanLoginWithCorrectCredentials()
     {
         $this->withoutExceptionHandling();
 
@@ -48,6 +47,62 @@ class LoginControllerTest extends TestCase
 
         $response->assertStatus(Response::HTTP_FOUND);
         $response->assertRedirect(route('home.index'));
+        $this->assertAuthenticatedAs($user);
+    }
+
+    public function testUserCannotLoginWithIncorrectPassword()
+    {
+        $user = factory(User::class)->create([
+            'password' => 'test123',
+        ]);
+
+        $response = $this->from(route('login'))->post(route('login'), [
+            'email' => $user->email,
+            'password' => 'invalid-xyz',
+        ]);
+
+        $response->assertRedirect(route('login'));
+        $response->assertSessionHasErrors('email');
+        $this->assertTrue(session()->hasOldInput('email'));
+        $this->assertFalse(session()->hasOldInput('password'));
+        $this->assertGuest();
+    }
+
+    public function testUserCannotLoginWithEmailThatDoesNotExist()
+    {
+        $response = $this->from(route('login'))->post(route('login'), [
+            'email' => 'test123@gmail.com',
+            'password' => 'xyz-invalid-password',
+        ]);
+
+        $response->assertRedirect(route('login'));
+        $response->assertSessionHasErrors('email');
+        $this->assertTrue(session()->hasOldInput('email'));
+        $this->assertFalse(session()->hasOldInput('password'));
+        $this->assertGuest();
+    }
+
+    public function testRememberMeFunctionality()
+    {
+        $password = 'test1234';
+
+        $user = factory(User::class)->create([
+            'password' => $password,
+        ]);
+
+        $response = $this->post(route('login'), [
+            'email' => $user->email,
+            'password' => $password,
+            'remember' => 'on',
+        ]);
+
+        $response->assertStatus(Response::HTTP_FOUND);
+        $response->assertRedirect(route('home.index'));
+        $response->assertCookie(auth()->guard()->getRecallerName(), vsprintf('%s|%s|%s', [
+            $user->id,
+            $user->getRememberToken(),
+            $user->password,
+        ]));
         $this->assertAuthenticatedAs($user);
     }
 
@@ -86,6 +141,46 @@ class LoginControllerTest extends TestCase
         $response->assertRedirect(route('home.index'));
     }
 
+    public function testUserCanLogout()
+    {
+        $user = factory(User::class)->create();
+        $this->actingAs($user);
+        $response = $this->post(route('logout'));
+
+        $response->assertRedirect('/');
+        $this->assertGuest();
+    }
+
+    public function testUserCannotMakeMoreThanFiveAttemptsInOneMinute()
+    {
+        $user = factory(User::class)->create([
+            'password' => 'test123',
+        ]);
+
+        foreach (range(0, 5) as $x) {
+            $response = $this->from(route('login'))->post(route('login'), [
+                'email' => $user->email,
+                'password' => 'test123-invalid-password',
+            ]);
+        }
+
+        $response->assertRedirect(route('login'));
+        $response->assertSessionHasErrors('email');
+        $this->assertContains(
+            'Too many login attempts.',
+            collect($response
+                ->baseResponse
+                ->getSession()
+                ->get('errors')
+                ->getBag('default')
+                ->get('email')
+            )->first()
+        );
+        $this->assertTrue(session()->hasOldInput('email'));
+        $this->assertFalse(session()->hasOldInput('password'));
+        $this->assertGuest();
+    }
+
     /**
      * @param array $overrides
      *
@@ -100,7 +195,7 @@ class LoginControllerTest extends TestCase
         $user = new User();
         $user->name = 'test';
         $user->email = $email;
-        $user->password = Hash::make($password);
+        $user->password = $password;
         $user->locale_id = $locale->id;
         $user->timezone = 'Europe/Zagreb';
         $user->save();
