@@ -168,7 +168,8 @@ class LoginControllerTest extends TestCase
         $response->assertSessionHasErrors('email');
         $this->assertContains(
             'Too many login attempts.',
-            collect($response
+            collect(
+                $response
                 ->baseResponse
                 ->getSession()
                 ->get('errors')

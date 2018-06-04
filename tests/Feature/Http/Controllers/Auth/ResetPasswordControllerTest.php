@@ -115,7 +115,7 @@ class ResetPasswordControllerTest extends TestCase
         $response->assertRedirect(route('password.reset', $token));
         $response->assertSessionHasErrors('email');
         $this->assertFalse(session()->hasOldInput('password'));
-        $this->assertEquals($user->email, $user->fresh()->email);
+        $this->assertSame($user->email, $user->fresh()->email);
         $this->assertTrue(Hash::check($password, $user->fresh()->password));
         $this->assertGuest();
     }
