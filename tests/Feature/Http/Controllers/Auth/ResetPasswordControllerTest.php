@@ -122,6 +122,7 @@ class ResetPasswordControllerTest extends TestCase
 
     /**
      * @param User $user
+     *
      * @return string
      */
     private function getValidToken(User $user): string
