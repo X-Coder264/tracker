@@ -1,0 +1,11 @@
+version: '3.6'
+
+services:
+  redis:
+    hostname: redis
+    image: redis:4.0-alpine
+    volumes:
+      - redis:/data
+
+volumes:
+  redis:

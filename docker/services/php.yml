@@ -1,0 +1,35 @@
+version: '3.6'
+
+services:
+  php:
+    image: tracker-php:1.0
+    hostname: php
+    environment:
+      PHP_IDE_CONFIG: serverName=tracker.loc
+      XDEBUG_CONFIG: remote_host=${DOKMAN_HOST_IP}
+    build:
+      context: ../
+      dockerfile: ./images/php.Dockerfile
+      args:
+        HOST_USER_ID: ${DOKMAN_HOST_USER_ID}
+        HOST_GROUP_ID: ${DOKMAN_HOST_GROUP_ID}
+    user: app
+    working_dir: /app
+    command: ["php-fpm", "-F"]
+    volumes:
+      # images
+      - images:/tmp/images
+      # php configurations
+      - ../configurations/php/php.ini:/usr/local/etc/php/php.ini
+      - ../configurations/php/www.conf:/usr/local/etc/php-fpm.d/www.conf
+      - ../configurations/php/xdebug.ini:/usr/local/etc/php/conf.d/custom-xdebug.ini
+      # helper scripts
+      - ../scripts/php/xdebug:/usr/local/bin/xdebug
+      - ../scripts/php/xprofile:/usr/local/bin/xprofile
+      # application
+      - ../../:/app
+      # ssh keys
+      - ~/.ssh/:/home/app/.ssh/
+
+volumes:
+  images:
