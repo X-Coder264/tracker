@@ -3,9 +3,10 @@ version: '3.6'
 services:
   mysql:
     hostname: mysql
-    image: mysql:8.0
+    image: mysql:5.7
     volumes:
       - mysql:/var/lib/mysql
+      #- ../configurations/my.cnf:/etc/conf.d/docker.cnf
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_PASSWORD}
       MYSQL_DATABASE: ${MYSQL_DATABASE}
