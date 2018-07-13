@@ -75,6 +75,6 @@ class Validators extends AbstractValidatorProvider
      */
     protected function relationshipRules(RelationshipsValidatorInterface $relationships, $record = null)
     {
-        $relationships->hasOne('locale', ResourceTypes::LOCALE, is_null($record), false);
+        $relationships->hasOne('locale', ResourceTypes::LOCALE, null === $record, false);
     }
 }

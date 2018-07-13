@@ -68,6 +68,6 @@ class BencoderTest extends TestCase
 
     public function testInvalidDataEncoding()
     {
-        $this->assertSame(null, $this->encoder->encode(true));
+        $this->assertNull($this->encoder->encode(true));
     }
 }

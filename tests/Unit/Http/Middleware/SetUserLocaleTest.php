@@ -24,6 +24,7 @@ class SetUserLocaleTest extends TestCase
 
         $user = new class() {
             public $language;
+
             public $slug = 'test_slug';
 
             public function __construct()
