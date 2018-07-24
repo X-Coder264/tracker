@@ -17,6 +17,14 @@
 
 LaraTracker is a BitTorrent tracker TDD app written using Laravel.
 
+## Project requirements
+
+PHP: `7.2+`
+
+SQL database: `MySQL, PostgreSQL or SQL Server`
+
+Caching: `Redis (recommended) or Memcached`
+
 ## Docker setup for local development
 
 0. Clone the project (note the `--recursive` flag)
