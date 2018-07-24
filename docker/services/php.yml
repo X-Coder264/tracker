@@ -6,7 +6,8 @@ services:
     hostname: php
     environment:
       PHP_IDE_CONFIG: serverName=tracker.loc
-      XDEBUG_CONFIG: remote_host=${DOKMAN_HOST_IP}
+      XDEBUG_REMOTE_HOST: ${DOKMAN_HOST_IP}
+      XDEBUG_REMOTE_PORT: ${PHP_XDEBUG_PORT}
     build:
       context: ../
       dockerfile: ./images/php.Dockerfile
