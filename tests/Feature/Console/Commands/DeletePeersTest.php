@@ -7,6 +7,7 @@ namespace Tests\Feature\Console\Commands;
 use Carbon\Carbon;
 use Tests\TestCase;
 use App\Http\Models\Peer;
+use App\Console\Commands\DeletePeers;
 use Illuminate\Console\Scheduling\Event;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -21,7 +22,7 @@ class DeletePeersTest extends TestCase
         factory(Peer::class)->create(['updated_at' => Carbon::now()->subMinutes(50)]);
         $nonObsoletePeer = factory(Peer::class)->create(['updated_at' => Carbon::now()->subMinutes(40)]);
 
-        $this->artisan('peers:delete');
+        $this->artisan(DeletePeers::class);
 
         $this->assertSame(1, Peer::count());
 

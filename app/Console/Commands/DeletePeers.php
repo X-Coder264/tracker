@@ -5,9 +5,8 @@ declare(strict_types=1);
 namespace App\Console\Commands;
 
 use Carbon\Carbon;
-use App\Http\Models\Peer;
 use Illuminate\Console\Command;
-use Illuminate\Support\Collection;
+use Illuminate\Database\DatabaseManager;
 
 class DeletePeers extends Command
 {
@@ -25,12 +24,20 @@ class DeletePeers extends Command
      */
     protected $description = 'Deletes all obsolete peers';
 
-    public function handle(): void
+    /**
+     * @param DatabaseManager $databaseManager
+     */
+    public function handle(DatabaseManager $databaseManager): void
     {
-        /** @var Collection $obsoletePeerIds */
-        $obsoletePeerIds = Peer::select('id')->where('updated_at', '<', Carbon::now()->subMinutes(45))->get()->pluck('id');
+        $obsoletePeerIds = $databaseManager
+            ->table('peers')
+            ->where('updated_at', '<', Carbon::now()->subMinutes(45))
+            ->select('id')
+            ->get()
+            ->pluck('id');
+
         if ($obsoletePeerIds->isNotEmpty()) {
-            Peer::destroy($obsoletePeerIds->all());
+            $databaseManager->table('peers')->whereIn('id', $obsoletePeerIds)->delete();
         }
     }
 }
