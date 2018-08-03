@@ -1746,16 +1746,16 @@
         },
         {
             "name": "spatie/laravel-permission",
-            "version": "2.12.2",
+            "version": "2.13.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/spatie/laravel-permission.git",
-                "reference": "2affce0021cb9b6f4e249f7c5d94eb68039ffccc"
+                "reference": "cbc7529dabdb7b6543e0d2b3f55b81f44bed9fa5"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/spatie/laravel-permission/zipball/2affce0021cb9b6f4e249f7c5d94eb68039ffccc",
-                "reference": "2affce0021cb9b6f4e249f7c5d94eb68039ffccc",
+                "url": "https://api.github.com/repos/spatie/laravel-permission/zipball/cbc7529dabdb7b6543e0d2b3f55b81f44bed9fa5",
+                "reference": "cbc7529dabdb7b6543e0d2b3f55b81f44bed9fa5",
                 "shasum": ""
             },
             "require": {
@@ -1806,7 +1806,7 @@
                 "security",
                 "spatie"
             ],
-            "time": "2018-06-14T02:52:40+00:00"
+            "time": "2018-08-02T20:20:03+00:00"
         },
         {
             "name": "swiftmailer/swiftmailer",
@@ -4361,16 +4361,16 @@
         },
         {
             "name": "phpunit/phpunit",
-            "version": "7.2.7",
+            "version": "7.3.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/phpunit.git",
-                "reference": "8e878aff7917ef66e702e03d1359b16eee254e2c"
+                "reference": "0b6b29faf95c03fd7867e866438b78d5692b6f03"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/8e878aff7917ef66e702e03d1359b16eee254e2c",
-                "reference": "8e878aff7917ef66e702e03d1359b16eee254e2c",
+                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/0b6b29faf95c03fd7867e866438b78d5692b6f03",
+                "reference": "0b6b29faf95c03fd7867e866438b78d5692b6f03",
                 "shasum": ""
             },
             "require": {
@@ -4415,7 +4415,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "7.2-dev"
+                    "dev-master": "7.3-dev"
                 }
             },
             "autoload": {
@@ -4441,7 +4441,7 @@
                 "testing",
                 "xunit"
             ],
-            "time": "2018-07-15T05:20:50+00:00"
+            "time": "2018-08-03T06:02:45+00:00"
         },
         {
             "name": "sebastian/code-unit-reverse-lookup",
