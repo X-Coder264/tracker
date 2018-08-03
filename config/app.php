@@ -112,6 +112,23 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Application Whoops Editor
+    |--------------------------------------------------------------------------
+    |
+    | When using the pretty error page feature, Whoops comes with the ability
+    | to open referenced files directly in your IDE or editor. This feature
+    | only works in case your php-source files are locally accessible to
+    | the machine on which the editor is installed.
+    |
+    | Supported: "sublime", "textmate", "emacs", "macvim", "phpstorm", "idea", "vscode", "atom"
+    | See: PrettyPageHandler $editors attribute
+    |
+    */
+
+    'editor' => env('APP_WHOOPS_EDITOR', false),
+
+    /*
+    |--------------------------------------------------------------------------
     | Autoloaded Service Providers
     |--------------------------------------------------------------------------
     |
