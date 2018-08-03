@@ -2,6 +2,9 @@
 
 declare(strict_types=1);
 
+use Illuminate\Routing\Router;
+use Illuminate\Support\Facades\Route;
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -13,27 +16,28 @@ declare(strict_types=1);
 |
 */
 
-Auth::routes();
-Route::get('announce', 'AnnounceController@store')->name('announce');
+/** @var Router $router */
+$router->auth();
+$router->get('announce', 'AnnounceController@store')->name('announce');
 
-Route::middleware(['auth'])->group(function () {
-    Route::get('/', 'HomeController@index')->name('home.index');
+Route::middleware(['auth'])->group(function () use ($router) {
+    $router->get('/', 'HomeController@index')->name('home.index');
 
-    Route::get('/cms', 'Admin\IndexController@index')->name('admin.index');
+    $router->get('/cms', 'Admin\IndexController@index')->name('admin.index');
     // catch all route for the admin CMS (except the API ones), we are leaving the routing for the CMS to the frontend router
-    Route::get('/cms/{all}', 'Admin\IndexController@index')->where(['all' => '^(?!api).*$']);
+    $router->get('/cms/{all}', 'Admin\IndexController@index')->where(['all' => '^(?!api).*$']);
 
-    Route::get('torrents', 'TorrentController@index')->name('torrents.index');
-    Route::get('torrents/create', 'TorrentController@create')->name('torrents.create');
-    Route::get('torrents/download/{torrent}', 'TorrentController@download')->name('torrents.download');
-    Route::get('torrents/{torrent}', 'TorrentController@show')->name('torrents.show');
-    Route::post('torrents', 'TorrentController@store')->name('torrents.store');
+    $router->get('torrents', 'TorrentController@index')->name('torrents.index');
+    $router->get('torrents/create', 'TorrentController@create')->name('torrents.create');
+    $router->get('torrents/download/{torrent}', 'TorrentController@download')->name('torrents.download');
+    $router->get('torrents/{torrent}', 'TorrentController@show')->name('torrents.show');
+    $router->post('torrents', 'TorrentController@store')->name('torrents.store');
 
-    Route::get('torrent-comments/{torrent}/create', 'TorrentCommentController@create')->name('torrent-comments.create');
-    Route::get('torrent-comments/{torrentComment}', 'TorrentCommentController@edit')->name('torrent-comments.edit');
-    Route::post('torrent-comments/{torrent}', 'TorrentCommentController@store')->name('torrent-comments.store');
-    Route::put('torrent-comments/{torrentComment}', 'TorrentCommentController@update')->name('torrent-comments.update');
+    $router->get('torrent-comments/{torrent}/create', 'TorrentCommentController@create')->name('torrent-comments.create');
+    $router->get('torrent-comments/{torrentComment}', 'TorrentCommentController@edit')->name('torrent-comments.edit');
+    $router->post('torrent-comments/{torrent}', 'TorrentCommentController@store')->name('torrent-comments.store');
+    $router->put('torrent-comments/{torrentComment}', 'TorrentCommentController@update')->name('torrent-comments.update');
 
-    Route::get('users/{user}/edit', 'UserController@edit')->name('users.edit');
-    Route::put('users/{user}', 'UserController@update')->name('users.update');
+    $router->get('users/{user}/edit', 'UserController@edit')->name('users.edit');
+    $router->put('users/{user}', 'UserController@update')->name('users.update');
 });
