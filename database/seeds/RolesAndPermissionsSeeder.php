@@ -3,15 +3,16 @@
 declare(strict_types=1);
 
 use Illuminate\Database\Seeder;
+use Illuminate\Cache\CacheManager;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
 
 class RolesAndPermissionsSeeder extends Seeder
 {
-    public function run()
+    public function run(CacheManager $cacheManager)
     {
         // Reset cached roles and permissions
-        app()['cache']->forget('spatie.permission.cache');
+        $cacheManager->forget('spatie.permission.cache');
 
         // create permissions
         Permission::create(['name' => 'edit articles']);
