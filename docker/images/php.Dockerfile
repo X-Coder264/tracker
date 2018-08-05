@@ -4,11 +4,21 @@ ARG HOST_USER_ID
 ARG HOST_GROUP_ID
 
 ARG DEBIAN_FRONTEND=noninteractive
+ARG GD_JPEG_DEPS="freetype-dev libpng-dev libjpeg-turbo-dev"
 
 RUN set -xe && \
     apk add --no-cache --upgrade apk-tools zlib && \
     apk add --no-cache --update --virtual .phpize-deps $PHPIZE_DEPS && \
-    apk add --no-cache libpng-dev freetype-dev libjpeg-turbo-dev curl-dev libxml2-dev git openssh-client zlib-dev && \
+    apk add --no-cache \
+        libpng \
+        freetype \
+        libjpeg-turbo \
+        curl-dev \
+        libxml2-dev \
+        git \
+        openssh-client \
+        zlib-dev && \
+    apk add --no-cache --virtual .jpeg-deps ${GD_JPEG_DEPS} && \
     # create app user
     addgroup -S -g ${HOST_GROUP_ID} app && \
     adduser -S -s /bin/sh -DS -u ${HOST_USER_ID} -G app app && \
@@ -16,6 +26,12 @@ RUN set -xe && \
     php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" && \
     php composer-setup.php --install-dir=/usr/bin --filename=composer && \
     php -r "unlink('composer-setup.php');" && \
+    # configure php extensions
+    docker-php-ext-configure gd \
+            --with-gd \
+            --with-freetype-dir=/usr/include/ \
+            --with-png-dir=/usr/include/ \
+            --with-jpeg-dir=/usr/include/ && \
     # install php extensions
     pecl channel-update pecl.php.net && \
     pecl install xdebug apcu && \
