@@ -16,7 +16,7 @@
     },
     "require-dev": {
         "barryvdh/laravel-debugbar": "^3.1",
-        "beyondcode/laravel-dump-server": "^1.1",
+        "beyondcode/laravel-dump-server": "^1.2.1",
         "filp/whoops": "^2.2",
         "friendsofphp/php-cs-fixer": "^2.12",
         "fzaninotto/faker": "^1.7",
