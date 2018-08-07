@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="{{ app()->getLocale() }}">
+<html lang="{{ config('app.locale') }}">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
@@ -30,29 +30,29 @@
                 <ul class="navbar-nav w-100">
                     @guest
                         <li class="nav-item">
-                            <a class="nav-item nav-link" href="{{ route('login') }}">{{ __('messages.common.login') }}</a>
+                            <a class="nav-item nav-link" href="{{ route('login') }}">{{ trans('messages.common.login') }}</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="{{ route('register') }}">{{ __('messages.common.register') }}</a>
+                            <a class="nav-link" href="{{ route('register') }}">{{ trans('messages.common.register') }}</a>
                         </li>
                     @else
                             <li class="nav-item">
-                                <a class="nav-link" href="{{ route('torrents.index') }}">{{ __('messages.navigation.torrent.index') }}</a>
+                                <a class="nav-link" href="{{ route('torrents.index') }}">{{ trans('messages.navigation.torrent.index') }}</a>
                             </li>
 
                             <li class="nav-item">
-                                <a class="nav-link" href="{{ route('torrents.create') }}">{{ __('messages.navigation.torrent.create') }}</a>
+                                <a class="nav-link" href="{{ route('torrents.create') }}">{{ trans('messages.navigation.torrent.create') }}</a>
                             </li>
 
                             <li class="dropdown show nav-item ml-auto">
                                 <a class="nav-link dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                    {{ Auth::user()->name }}
+                                    {{ auth()->user()->name }}
                                 </a>
 
                                 <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuLink">
-                                    <a class="dropdown-item" href="{{ route('users.edit', Auth::user()) }}">{{ __('messages.navigation.users.edit_page') }}</a>
+                                    <a class="dropdown-item" href="{{ route('users.edit', auth()->user()) }}">{{ trans('messages.navigation.users.edit_page') }}</a>
                                     <a class="dropdown-item" href="{{ route('logout') }}" onclick="event.preventDefault();
-                                                 document.getElementById('logout-form').submit();">{{ __('messages.navigation.logout') }}</a>
+                                                 document.getElementById('logout-form').submit();">{{ trans('messages.navigation.logout') }}</a>
                                     <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
                                         {{ csrf_field() }}
                                     </form>

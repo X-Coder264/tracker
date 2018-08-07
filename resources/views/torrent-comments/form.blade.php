@@ -10,4 +10,4 @@
     </div>
 </div>
 
-<button type="submit" class="btn btn-primary">{{ __('messages.common.submit') }}</button>
+<button type="submit" class="btn btn-primary">{{ trans('messages.common.submit') }}</button>

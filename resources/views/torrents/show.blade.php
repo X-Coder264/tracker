@@ -23,26 +23,26 @@
                         <div class="card-header" role="tab" id="peers">
                             <h5 class="mb-0">
                                 <a data-toggle="collapse" data-parent="#accordion" href="#peersTable" aria-expanded="true" aria-controls="peersTable">
-                                    {{ __('messages.torrents.show.peers') }} ({{ $numberOfPeers }})
+                                    {{ trans('messages.torrents.show.peers') }} ({{ $numberOfPeers }})
                                 </a>
                             </h5>
                         </div>
                         <div class="collapse" id="peersTable" role="tabpanel" aria-labelledby="peers">
                             @if (0 === $numberOfPeers)
                                 <div class="card-body">
-                                    {{ __('messages.torrents.show.no_peers') }}
+                                    {{ trans('messages.torrents.show.no_peers') }}
                                 </div>
                             @else
                                 <div class="table-responsive-lg">
                                     <table class="table table-hover table-bordered">
                                         <thead>
                                         <tr>
-                                            <th>{{ __('messages.common.torrent_table_username') }}</th>
-                                            <th>{{ __('messages.common.torrent_table_uploaded') }}</th>
-                                            <th>{{ __('messages.common.torrent_table_downloaded') }}</th>
-                                            <th>{{ __('messages.common.torrent_table_ratio') }}</th>
-                                            <th>{{ __('messages.common.torrent_table_last_announce') }}</th>
-                                            <th>{{ __('messages.common.torrent_table_torrent_client') }}</th>
+                                            <th>{{ trans('messages.common.torrent_table_username') }}</th>
+                                            <th>{{ trans('messages.common.torrent_table_uploaded') }}</th>
+                                            <th>{{ trans('messages.common.torrent_table_downloaded') }}</th>
+                                            <th>{{ trans('messages.common.torrent_table_ratio') }}</th>
+                                            <th>{{ trans('messages.common.torrent_table_last_announce') }}</th>
+                                            <th>{{ trans('messages.common.torrent_table_torrent_client') }}</th>
                                         </tr>
                                         </thead>
                                         <tbody>
@@ -70,20 +70,20 @@
                         <div class="card-header" role="tab" id="files">
                             <h5 class="mb-0">
                                 <a data-toggle="collapse" data-parent="#accordion" href="#filesTable" aria-expanded="true" aria-controls="filesTable">
-                                   {{ __('messages.torrents.show.files') }} ({{ count($torrentFileNamesAndSizes) }})
+                                   {{ trans('messages.torrents.show.files') }} ({{ count($torrentFileNamesAndSizes) }})
                                 </a>
                             </h5>
                         </div>
                         <div class="collapse" id="filesTable" role="tabpanel" aria-labelledby="files">
                             @if (count($torrentFileNamesAndSizes) === 0)
-                                {{ __('messages.common.error') }}
+                                {{ trans('messages.common.error') }}
                             @else
                                 <div class="table-responsive-lg">
                                     <table class="table table-hover table-bordered">
                                         <thead>
                                         <tr>
-                                            <th>{{ __('messages.torrents.show.file_name') }}</th>
-                                            <th>{{ __('messages.common.size') }}</th>
+                                            <th>{{ trans('messages.torrents.show.file_name') }}</th>
+                                            <th>{{ trans('messages.common.size') }}</th>
                                         </tr>
                                         </thead>
                                         <tbody>
@@ -105,24 +105,24 @@
         <br>
         <div class="card">
             <div class="card-header">
-                {{ __('messages.torrents.show.torrent_comments') }}
+                {{ trans('messages.torrents.show.torrent_comments') }}
             </div>
 
             <div class="card-body">
                 @if (session('torrentCommentSuccess'))
                     <div class="card text-white bg-success">
                         <div class="card-body">
-                            <h4 class="card-title">{{ __('messages.flash_messages.success') }}</h4>
+                            <h4 class="card-title">{{ trans('messages.flash_messages.success') }}</h4>
                             <p class="card-text">{{ session('torrentCommentSuccess') }}</p>
                         </div>
                     </div>
                     <br>
                 @endif
-                <a href="{{ route('torrent-comments.create', $torrent) }}" class="btn btn-primary btn-block">{{ __('messages.torrents.show.add_comment') }}</a><br>
+                <a href="{{ route('torrent-comments.create', $torrent) }}" class="btn btn-primary btn-block">{{ trans('messages.torrents.show.add_comment') }}</a><br>
                 @if ($torrentComments->isEmpty())
                         <div class="card text-dark bg-warning">
                             <div class="card-body">
-                                <p class="card-text">{{ __('messages.torrents.show.no_comments') }}</p>
+                                <p class="card-text">{{ trans('messages.torrents.show.no_comments') }}</p>
                             </div>
                         </div>
                 @else
@@ -131,7 +131,7 @@
                         <div class="card">
                             <div class="card-header">
                                 {{ $torrentComment->user->name }} - {{ $torrentComment->created_at->timezone($timezone) }} ({{ $torrentComment->created_at->diffForHumans() }})
-                                @if ($torrentComment->user_id === Auth::id())
+                                @if ($torrentComment->user_id === auth()->id())
                                     <a class="btn btn-primary" href="{{ route('torrent-comments.edit', $torrentComment) }}">Edit</a>
                                 @endif
                             </div>

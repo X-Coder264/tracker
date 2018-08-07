@@ -4,7 +4,7 @@
 <div class="col-12 mx-auto">
     <div class="card">
         <div class="card-header">
-            {{ __('messages.torrent-comments.create.header', ['torrent' => $torrent->name]) }}
+            {{ trans('messages.torrent-comments.create.header', ['torrent' => $torrent->name]) }}
         </div>
 
         <div class="card-body">

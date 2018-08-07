@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Middleware;
 
 use Closure;
+use App\Http\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Auth\AuthManager;
@@ -51,6 +52,7 @@ class SetUserLocale
     public function handle($request, $next)
     {
         if (true === $this->authManager->check()) {
+            /** @var User $user */
             $user = $this->authManager->user();
             $locale = $this->cacheManager->rememberForever('user.' . $user->slug . '.locale', function () use ($user) {
                 return $user->language->localeShort;

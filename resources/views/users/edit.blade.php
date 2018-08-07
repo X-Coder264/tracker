@@ -4,7 +4,7 @@
     <div class="col-12 col-lg-10 col-xl-10 mx-auto">
         <div class="card">
             <div class="card-header">
-                {{ __('messages.users.edit.page_title') }}
+                {{ trans('messages.users.edit.page_title') }}
             </div>
 
             <div class="card-body">
@@ -15,7 +15,7 @@
                     {{ csrf_field() }}
 
                     <div class="form-group">
-                        <label for="email" class="col control-label">{{ __('messages.common.email') }}</label>
+                        <label for="email" class="col control-label">{{ trans('messages.common.email') }}</label>
 
                         <div class="col">
                             <input id="email" type="email" class="form-control" name="email" value="{{ old('email', $user->email) }}" required>
@@ -23,7 +23,7 @@
                     </div>
 
                     <div class="form-group">
-                        <label for="locale" class="col control-label">{{ __('messages.common.language') }}</label>
+                        <label for="locale" class="col control-label">{{ trans('messages.common.language') }}</label>
 
                         <div class="col">
                             <select class="form-control" name="locale_id" id="locale" required>
@@ -36,7 +36,7 @@
 
                     @include('partials.timezones_select')
 
-                    <button type="submit" class="btn btn-primary">{{ __('messages.common.save_changes') }}</button>
+                    <button type="submit" class="btn btn-primary">{{ trans('messages.common.save_changes') }}</button>
                 </form>
             </div>
         </div>
