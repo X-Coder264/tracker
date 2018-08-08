@@ -39,9 +39,11 @@ class UserControllerTest extends TestCase
         $this->actingAs($user);
         $email = 'testtttt@gmail.com';
         $timezone = 'Europe/Paris';
+
         Cache::shouldReceive('forget')->once()->with('user.' . $user->id);
         Cache::shouldReceive('forget')->once()->with('user.' . $user->slug . '.locale');
         Cache::shouldReceive('forget')->once()->with('user.' . $user->passkey);
+
         $response = $this->from(route('users.edit', $user))->put(
             route('users.update', $user),
             [
@@ -63,7 +65,71 @@ class UserControllerTest extends TestCase
         $this->assertSame($user->remember_token, $updatedUser->remember_token);
         $this->assertSame($user->slug, $updatedUser->slug);
         $this->assertSame($locale->localeShort, $this->app->getLocale());
-        $this->assertSame($locale->localeShort, $this->app->get('translator')->getLocale());
+        $this->assertSame($locale->localeShort, $this->app->make('translator')->getLocale());
+    }
+
+    public function testNonLoggedInUserCannotUpdateAnything(): void
+    {
+        $this->withoutMiddleware(SetUserLocale::class);
+        $user = factory(User::class)->create();
+        $locale = factory(Locale::class)->create();
+        $email = 'testtttt@gmail.com';
+        $timezone = 'Europe/Paris';
+
+        Cache::shouldReceive('forget')->never();
+
+        $response = $this->from(route('login'))->put(
+            route('users.update', $user),
+            [
+                'email' => $email,
+                'locale_id' => $locale->id,
+                'timezone' => $timezone,
+            ]
+        );
+
+        $response->assertStatus(Response::HTTP_FOUND);
+        $response->assertRedirect(route('login'));
+        $updatedUser = User::findOrFail($user->id);
+        $this->assertSame($user->name, $updatedUser->name);
+        $this->assertSame($user->email, $updatedUser->email);
+        $this->assertSame($user->locale_id, (int) $updatedUser->locale_id);
+        $this->assertSame($user->timezone, $updatedUser->timezone);
+        $this->assertSame($user->passkey, $updatedUser->passkey);
+        $this->assertSame($user->remember_token, $updatedUser->remember_token);
+        $this->assertSame($user->slug, $updatedUser->slug);
+    }
+
+    public function testUserCanUpdateOnlyHisOwnData(): void
+    {
+        $this->withoutMiddleware(SetUserLocale::class);
+
+        $user = factory(User::class)->create();
+        $anotherUser = factory(User::class)->create();
+        $locale = factory(Locale::class)->create();
+        $this->actingAs($user);
+        $email = 'testtttt@gmail.com';
+        $timezone = 'Europe/Paris';
+
+        Cache::shouldReceive('forget')->never();
+
+        $response = $this->from(route('users.edit', $user))->put(
+            route('users.update', $anotherUser),
+            [
+                'email' => $email,
+                'locale_id' => $locale->id,
+                'timezone' => $timezone,
+            ]
+        );
+
+        $response->assertStatus(Response::HTTP_FORBIDDEN);
+        $anotherUserFresh = $anotherUser->fresh();
+        $this->assertSame($anotherUser->name, $anotherUserFresh->name);
+        $this->assertSame($anotherUser->email, $anotherUserFresh->email);
+        $this->assertSame($anotherUser->locale_id, (int) $anotherUserFresh->locale_id);
+        $this->assertSame($anotherUser->timezone, $anotherUserFresh->timezone);
+        $this->assertSame($anotherUser->passkey, $anotherUserFresh->passkey);
+        $this->assertSame($anotherUser->remember_token, $anotherUserFresh->remember_token);
+        $this->assertSame($anotherUser->slug, $anotherUserFresh->slug);
     }
 
     public function testEmailIsRequired()

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Requests;
 
+use Illuminate\Auth\AuthManager;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Contracts\Translation\Translator;
 
@@ -12,11 +13,13 @@ class TorrentCommentRequest extends FormRequest
     /**
      * Determine if the user is authorized to make this request.
      *
+     * @param AuthManager $authManager
+     *
      * @return bool
      */
-    public function authorize(): bool
+    public function authorize(AuthManager $authManager): bool
     {
-        return true;
+        return $authManager->guard()->check();
     }
 
     /**
