@@ -42,12 +42,12 @@ class DeletePeersTest extends TestCase
             return stripos($event->command, 'peers:delete');
         });
 
-        if (0 === $events->count()) {
+        if (1 !== $events->count()) {
             $this->fail('The command DeletePeers was not scheduled.');
         }
 
         $events->each(function (Event $event) {
-            $this->assertSame('*/15 * * * *', $event->expression);
+            $this->assertSame('*/15 * * * *', $event->getExpression());
         });
     }
 }
