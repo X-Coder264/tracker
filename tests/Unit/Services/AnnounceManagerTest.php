@@ -23,7 +23,7 @@ class AnnounceManagerTest extends TestCase
 {
     public function testIPv4AddressValidation()
     {
-        $announceService = new AnnounceManager(
+        $announceManager = new AnnounceManager(
             new Bencoder(),
             $this->app->make(DatabaseManager::class),
             $this->app->make(CacheManager::class),
@@ -34,16 +34,16 @@ class AnnounceManagerTest extends TestCase
         $method = $reflectionClass->getMethod('validateIPv4Address');
         $method->setAccessible(true);
 
-        $this->assertTrue($method->invokeArgs($announceService, ['95.152.44.55']));
-        $this->assertFalse($method->invokeArgs($announceService, ['95.152.44.555']));
-        $this->assertFalse($method->invokeArgs($announceService, ['95.152.44.']));
-        $this->assertFalse($method->invokeArgs($announceService, ['95.152.44']));
-        $this->assertFalse($method->invokeArgs($announceService, ['2b63:1478:1ac5:37ef:4e8c:75df:14cd:93f2']));
+        $this->assertTrue($method->invokeArgs($announceManager, ['95.152.44.55']));
+        $this->assertFalse($method->invokeArgs($announceManager, ['95.152.44.555']));
+        $this->assertFalse($method->invokeArgs($announceManager, ['95.152.44.']));
+        $this->assertFalse($method->invokeArgs($announceManager, ['95.152.44']));
+        $this->assertFalse($method->invokeArgs($announceManager, ['2b63:1478:1ac5:37ef:4e8c:75df:14cd:93f2']));
     }
 
     public function testIPv6AddressValidation()
     {
-        $announceService = new AnnounceManager(
+        $announceManager = new AnnounceManager(
             new Bencoder(),
             $this->app->make(DatabaseManager::class),
             $this->app->make(CacheManager::class),
@@ -54,14 +54,14 @@ class AnnounceManagerTest extends TestCase
         $method = $reflectionClass->getMethod('validateIPv6Address');
         $method->setAccessible(true);
 
-        $this->assertTrue($method->invokeArgs($announceService, ['2b63:1478:1ac5:37ef:4e8c:75df:14cd:93f2']));
-        $this->assertTrue($method->invokeArgs($announceService, ['2001:3452:4952:2837::']));
-        $this->assertTrue($method->invokeArgs($announceService, ['FE80::0202:B3FF:FE1E:8329']));
-        $this->assertTrue($method->invokeArgs($announceService, ['1200:0000:AB00:1234:0000:2552:7777:1313']));
-        $this->assertTrue($method->invokeArgs($announceService, ['21DA:D3:0:2F3B:2AA:FF:FE28:9C5A']));
-        $this->assertFalse($method->invokeArgs($announceService, ['1200::AB00:1234::2552:7777:1313']));
-        $this->assertFalse($method->invokeArgs($announceService, ['[2001:db8:0:1]:80']));
-        $this->assertFalse($method->invokeArgs($announceService, ['1200:0000:AB00:1234:O000:2552:7777:1313']));
+        $this->assertTrue($method->invokeArgs($announceManager, ['2b63:1478:1ac5:37ef:4e8c:75df:14cd:93f2']));
+        $this->assertTrue($method->invokeArgs($announceManager, ['2001:3452:4952:2837::']));
+        $this->assertTrue($method->invokeArgs($announceManager, ['FE80::0202:B3FF:FE1E:8329']));
+        $this->assertTrue($method->invokeArgs($announceManager, ['1200:0000:AB00:1234:0000:2552:7777:1313']));
+        $this->assertTrue($method->invokeArgs($announceManager, ['21DA:D3:0:2F3B:2AA:FF:FE28:9C5A']));
+        $this->assertFalse($method->invokeArgs($announceManager, ['1200::AB00:1234::2552:7777:1313']));
+        $this->assertFalse($method->invokeArgs($announceManager, ['[2001:db8:0:1]:80']));
+        $this->assertFalse($method->invokeArgs($announceManager, ['1200:0000:AB00:1234:O000:2552:7777:1313']));
     }
 
     public function testErrorResponseWithStringParameter()
@@ -77,7 +77,7 @@ class AnnounceManagerTest extends TestCase
             ->with($this->equalTo(['failure reason' => $error]))
             ->willReturn($returnValue);
 
-        $announceService = new AnnounceManager(
+        $announceManager = new AnnounceManager(
             $encoder,
             $this->app->make(DatabaseManager::class),
             $this->app->make(CacheManager::class),
@@ -88,7 +88,7 @@ class AnnounceManagerTest extends TestCase
         $method = $reflectionClass->getMethod('announceErrorResponse');
         $method->setAccessible(true);
 
-        $this->assertSame($returnValue, $method->invokeArgs($announceService, [$error]));
+        $this->assertSame($returnValue, $method->invokeArgs($announceManager, [$error]));
     }
 
     public function testErrorResponseWithArrayParameter()
@@ -105,7 +105,7 @@ class AnnounceManagerTest extends TestCase
             ->with($this->equalTo(['failure reason' => $errorMessage]))
             ->willReturn($returnValue);
 
-        $announceService = new AnnounceManager(
+        $announceManager = new AnnounceManager(
             $encoder,
             $this->app->make(DatabaseManager::class),
             $this->app->make(CacheManager::class),
@@ -116,13 +116,11 @@ class AnnounceManagerTest extends TestCase
         $method = $reflectionClass->getMethod('announceErrorResponse');
         $method->setAccessible(true);
 
-        $this->assertSame($returnValue, $method->invokeArgs($announceService, [$error]));
+        $this->assertSame($returnValue, $method->invokeArgs($announceManager, [$error]));
     }
 
     public function testCompactResponse()
     {
-        $this->markTestSkipped();
-
         $torrent = factory(Torrent::class)->make(['seeders' => 1, 'leechers' => 0, 'uploader_id' => 1]);
         $peer = factory(Peer::class)->make(['torrent_id' => 1, 'user_id' => 1, 'seeder' => true]);
 
@@ -166,7 +164,7 @@ class AnnounceManagerTest extends TestCase
             ))
             ->willReturn($returnValue);
 
-        $announceService = $this->getMockBuilder(AnnounceManager::class)
+        $announceManager = $this->getMockBuilder(AnnounceManager::class)
             ->setConstructorArgs(
                 [
                     $encoder,
@@ -178,7 +176,7 @@ class AnnounceManagerTest extends TestCase
             )
             ->setMethods(['getPeers'])
             ->getMock();
-        $announceService->expects($this->once())
+        $announceManager->expects($this->once())
             ->method('getPeers')
             ->willReturn($peers);
 
@@ -187,16 +185,15 @@ class AnnounceManagerTest extends TestCase
         $reflectionMethod->setAccessible(true);
         $reflectionProperty = $reflectionClass->getProperty('torrent');
         $reflectionProperty->setAccessible(true);
-        $reflectionProperty->setValue($announceService, $torrent);
+        $reflectionProperty->setValue($announceManager, $torrent);
         $reflectionProperty = $reflectionClass->getProperty('seeder');
         $reflectionProperty->setAccessible(true);
-        $reflectionProperty->setValue($announceService, true);
-        $this->assertSame($returnValue, $reflectionMethod->invoke($announceService));
+        $reflectionProperty->setValue($announceManager, true);
+        $this->assertSame($returnValue, $reflectionMethod->invoke($announceManager));
     }
 
     public function testNonCompactResponse()
     {
-        $this->markTestSkipped();
         $torrent = factory(Torrent::class)->make(['seeders' => 1, 'leechers' => 0, 'uploader_id' => 1]);
         $peer = factory(Peer::class)->make(
             [
@@ -271,7 +268,7 @@ class AnnounceManagerTest extends TestCase
             ))
             ->willReturn($returnValue);
 
-        $announceService = $this->getMockBuilder(AnnounceManager::class)
+        $announceManager = $this->getMockBuilder(AnnounceManager::class)
             ->setConstructorArgs(
                 [
                     $encoder,
@@ -283,7 +280,7 @@ class AnnounceManagerTest extends TestCase
             )
             ->setMethods(['getPeers'])
             ->getMock();
-        $announceService->expects($this->once())
+        $announceManager->expects($this->once())
             ->method('getPeers')
             ->willReturn($peers);
 
@@ -292,10 +289,10 @@ class AnnounceManagerTest extends TestCase
         $reflectionMethod->setAccessible(true);
         $reflectionProperty = $reflectionClass->getProperty('torrent');
         $reflectionProperty->setAccessible(true);
-        $reflectionProperty->setValue($announceService, $torrent);
+        $reflectionProperty->setValue($announceManager, $torrent);
         $reflectionProperty = $reflectionClass->getProperty('seeder');
         $reflectionProperty->setAccessible(true);
-        $reflectionProperty->setValue($announceService, true);
-        $this->assertSame($returnValue, $reflectionMethod->invoke($announceService));
+        $reflectionProperty->setValue($announceManager, true);
+        $this->assertSame($returnValue, $reflectionMethod->invoke($announceManager));
     }
 }

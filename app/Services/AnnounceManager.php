@@ -705,7 +705,7 @@ class AnnounceManager
     /**
      * @return Collection
      */
-    private function getPeers(): Collection
+    protected function getPeers(): Collection
     {
         return $this->databaseManager->table('peers')
             ->join('peers_ip', 'peers.id', '=', 'peers_ip.peerID')
