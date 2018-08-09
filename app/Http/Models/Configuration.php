@@ -22,10 +22,10 @@ class Configuration extends Model
      * @param Builder $query
      * @param string  $name
      *
-     * @return self
+     * @return Builder
      */
-    public function scopeGetConfigurationValue(Builder $query, string $name): self
+    public function scopeGetConfigurationValue(Builder $query, string $name): Builder
     {
-        return $query->where('name', '=', $name)->first();
+        return $query->where('name', '=', $name);
     }
 }

@@ -13,6 +13,7 @@ use App\Http\Models\Torrent;
 use Illuminate\Http\Response;
 use Illuminate\Http\Testing\File;
 use App\Services\PasskeyGenerator;
+use Illuminate\Cache\CacheManager;
 use App\Http\Models\TorrentComment;
 use App\Services\TorrentInfoService;
 use Illuminate\Support\Facades\Storage;
@@ -38,11 +39,11 @@ class TorrentControllerTest extends TestCase
         $this->actingAs($this->user);
     }
 
-    public function testIndex()
+    public function testIndex33()
     {
         $this->withoutExceptionHandling();
 
-        $visibleTorrent = factory(Torrent::class)->create(['uploader_id' => $this->user->id, 'seeders' => 1]);
+        $visibleTorrent = factory(Torrent::class)->create(['uploader_id' => $this->user->id, 'seeders' => 1, 'name' => 'test']);
         $deadTorrent = factory(Torrent::class)->create(['uploader_id' => $this->user->id, 'seeders' => 0]);
 
         $response = $this->get(route('torrents.index'));
@@ -50,9 +51,20 @@ class TorrentControllerTest extends TestCase
         $response->assertViewIs('torrents.index');
         $response->assertViewHas(['torrents', 'timezone']);
         $this->assertInstanceOf(LengthAwarePaginator::class, $response->original->torrents);
+        $this->assertSame(1, $response->original->torrents->count());
+        $this->assertTrue($response->original->torrents[0]->is($visibleTorrent));
         $response->assertSee($visibleTorrent->name);
         $response->assertSee($visibleTorrent->uploader->name);
         $response->assertDontSee($deadTorrent->name);
+
+        $cacheManager = $this->app->make(CacheManager::class);
+        $cachedTorrents = $cacheManager->tags('torrents')->get('torrents.page.1');
+
+        $this->assertInstanceOf(LengthAwarePaginator::class, $cachedTorrents);
+        $this->assertSame(1, $cachedTorrents->count());
+        $this->assertTrue($cachedTorrents[0]->is($visibleTorrent));
+
+        $cacheManager->tags('torrents')->flush();
     }
 
     public function testCreate()
@@ -93,6 +105,7 @@ class TorrentControllerTest extends TestCase
         $response->assertViewHas('torrent');
         $response->assertViewHas('numberOfPeers', 1);
         $response->assertViewHas('torrentFileNamesAndSizes', $returnValue);
+        $response->assertViewHas('filesCount', 1);
         $response->assertViewHas('torrentComments');
         $response->assertViewHas('timezone', $this->user->timezone);
         $this->assertInstanceOf(LengthAwarePaginator::class, $response->original->torrentComments);

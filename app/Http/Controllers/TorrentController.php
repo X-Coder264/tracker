@@ -39,8 +39,7 @@ class TorrentController extends Controller
      */
     public function index(Request $request, CacheManager $cacheManager, ResponseFactory $responseFactory): Response
     {
-        $cacheManager->forget('torrents');
-        $torrents = $cacheManager->remember('torrents', 10, function () {
+        $torrents = $cacheManager->tags('torrents')->remember('torrents.page.' . $request->input('page', 1), 10, function () {
             return Torrent::with(['uploader'])->where('seeders', '>', 0)
                                               ->orderBy('id', 'desc')
                                               ->paginate(3);
@@ -81,19 +80,22 @@ class TorrentController extends Controller
             throw new NotFoundHttpException($translator->trans('messages.torrent-file-missing.error-message'));
         }
 
+        $filesCount = count($torrentFileNamesAndSizes);
+
         $torrent->load(['uploader', 'peers.user']);
         $numberOfPeers = $torrent->peers->count();
         $torrentComments = $torrent->comments()->with('user')->paginate(10);
 
         return $responseFactory->view(
             'torrents.show',
-            compact('torrent', 'numberOfPeers', 'torrentFileNamesAndSizes', 'torrentComments')
+            compact('torrent', 'numberOfPeers', 'torrentFileNamesAndSizes', 'torrentComments', 'filesCount')
         );
     }
 
     /**
      * @param TorrentUploadRequest $request
      * @param TorrentUploadManager $torrentUploadManager
+     * @param CacheManager         $cacheManager
      * @param Redirector           $redirector
      * @param Translator           $translator
      *
@@ -104,10 +106,13 @@ class TorrentController extends Controller
     public function store(
         TorrentUploadRequest $request,
         TorrentUploadManager $torrentUploadManager,
+        CacheManager $cacheManager,
         Redirector $redirector,
         Translator $translator
     ): RedirectResponse {
         $torrent = $torrentUploadManager->upload($request);
+
+        $cacheManager->tags('torrents')->flush();
 
         return $redirector->route('torrents.show', $torrent)
                          ->with('success', $translator->trans('messages.torrents.store-successfully-uploaded-torrent.message'));

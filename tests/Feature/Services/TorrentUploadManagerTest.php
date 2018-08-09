@@ -14,6 +14,7 @@ use App\Services\SizeFormatter;
 use Illuminate\Auth\AuthManager;
 use Illuminate\Http\Testing\File;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Cache\CacheManager;
 use App\Services\TorrentInfoService;
 use Illuminate\Filesystem\Filesystem;
 use App\Services\TorrentUploadManager;
@@ -29,6 +30,15 @@ class TorrentUploadManagerTest extends TestCase
 
     public function testTorrentUpload()
     {
+        $cacheManager = $this->app->make(CacheManager::class);
+        $cachedTorrents = $cacheManager->tags('torrents')->get('torrents.page.1');
+        $this->assertNull($cachedTorrents);
+
+        // put some stupid value there just so that we can assert at the end that it was flushed
+        $cacheManager->tags('torrents')->put('torrents.page.1', 'something', 10);
+        $value = $cacheManager->tags('torrents')->get('torrents.page.1');
+        $this->assertSame('something', $value);
+
         $user = factory(User::class)->create();
         $this->actingAs($user);
 
@@ -74,6 +84,10 @@ class TorrentUploadManagerTest extends TestCase
         $this->assertSame($formatter->getFormattedSize($torrentSize), $torrent->size);
         $this->assertSame($torrentName, $torrent->name);
         $this->assertSame($torrentDescription, $torrent->description);
+
+        // the value must be flushed at the end
+        $cachedTorrents = $cacheManager->tags('torrents')->get('torrents.page.1');
+        $this->assertNull($cachedTorrents);
     }
 
     public function testAllTorrentsGetThePrivateFlagSet()

@@ -6,7 +6,7 @@
 
         <div class="card">
             <div class="card-header">
-                <a href="{{ route('torrents.download', $torrent) }}">{{ $torrent->name }}</a>
+                <a href="{{ route('torrents.download', $torrent) }}" class="btn btn-primary">{{ $torrent->name }}</a>
             </div>
 
             <div class="card-body">
@@ -70,12 +70,12 @@
                         <div class="card-header" role="tab" id="files">
                             <h5 class="mb-0">
                                 <a data-toggle="collapse" data-parent="#accordion" href="#filesTable" aria-expanded="true" aria-controls="filesTable">
-                                   {{ trans('messages.torrents.show.files') }} ({{ count($torrentFileNamesAndSizes) }})
+                                   {{ trans('messages.torrents.show.files') }} ({{ $filesCount }})
                                 </a>
                             </h5>
                         </div>
                         <div class="collapse" id="filesTable" role="tabpanel" aria-labelledby="files">
-                            @if (count($torrentFileNamesAndSizes) === 0)
+                            @if (0 === $filesCount)
                                 {{ trans('messages.common.error') }}
                             @else
                                 <div class="table-responsive-lg">
@@ -127,25 +127,7 @@
                         </div>
                 @else
                     @foreach ($torrentComments as $torrentComment)
-                        <br>
-                        <div class="card">
-                            <div class="card-header">
-                                {{ $torrentComment->user->name }} - {{ $torrentComment->created_at->timezone($timezone) }} ({{ $torrentComment->created_at->diffForHumans() }})
-                                @if ($torrentComment->user_id === auth()->id())
-                                    <a class="btn btn-primary" href="{{ route('torrent-comments.edit', $torrentComment) }}">Edit</a>
-                                @endif
-                            </div>
-                            <div class="card-body">
-                                <div class="row">
-                                    <div class="col-2 d-none d-sm-block">
-                                        <img src="https://i.imgur.com/eJhRU6c.jpg" class="img-fluid">
-                                    </div>
-                                    <div class="col-10">
-                                        <p class="card-text">{{ $torrentComment->comment }}</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                        @include('partials.torrent_comment', ['torrentComment' => $torrentComment])
                     @endforeach
                     <br>
                     {{ $torrentComments->render() }}

@@ -21,8 +21,6 @@ class Snatch extends Model
      * @var array
      */
     protected $dates = [
-        'created_at',
-        'updated_at',
         'finished_at',
     ];
 }
