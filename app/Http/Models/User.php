@@ -24,7 +24,7 @@ class User extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'name', 'email', 'password', 'timezone', 'locale_id',
+        'name', 'email', 'password', 'timezone', 'locale_id', 'torrents_per_page',
     ];
 
     /**

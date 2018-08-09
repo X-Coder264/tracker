@@ -32,19 +32,28 @@ class TorrentControllerTest extends TestCase
      */
     private $user;
 
+    /**
+     * @var int
+     */
+    private $torrentsPerPage = 3;
+
+    /**
+     * Setup the test environment.
+     */
     protected function setUp()
     {
         parent::setUp();
-        $this->user = factory(User::class)->create();
+
+        $this->user = factory(User::class)->create(['torrents_per_page' => $this->torrentsPerPage]);
         $this->actingAs($this->user);
     }
 
-    public function testIndex33()
+    public function testIndex()
     {
         $this->withoutExceptionHandling();
 
-        $visibleTorrent = factory(Torrent::class)->create(['uploader_id' => $this->user->id, 'seeders' => 1, 'name' => 'test']);
-        $deadTorrent = factory(Torrent::class)->create(['uploader_id' => $this->user->id, 'seeders' => 0]);
+        $visibleTorrent = factory(Torrent::class)->states('alive')->create(['uploader_id' => $this->user->id, 'name' => 'test']);
+        $deadTorrent = factory(Torrent::class)->states('dead')->create(['uploader_id' => $this->user->id]);
 
         $response = $this->get(route('torrents.index'));
         $response->assertStatus(Response::HTTP_OK);
@@ -58,7 +67,35 @@ class TorrentControllerTest extends TestCase
         $response->assertDontSee($deadTorrent->name);
 
         $cacheManager = $this->app->make(CacheManager::class);
-        $cachedTorrents = $cacheManager->tags('torrents')->get('torrents.page.1');
+        $cachedTorrents = $cacheManager->tags('torrents')->get('torrents.page.1.perPage.' . $this->torrentsPerPage);
+
+        $this->assertInstanceOf(LengthAwarePaginator::class, $cachedTorrents);
+        $this->assertSame(1, $cachedTorrents->count());
+        $this->assertTrue($cachedTorrents[0]->is($visibleTorrent));
+
+        $cacheManager->tags('torrents')->flush();
+    }
+
+    public function testIndexWithNonNumericPage(): void
+    {
+        $this->withoutExceptionHandling();
+
+        $visibleTorrent = factory(Torrent::class)->states('alive')->create(['uploader_id' => $this->user->id, 'name' => 'test']);
+        $deadTorrent = factory(Torrent::class)->states('dead')->create(['uploader_id' => $this->user->id]);
+
+        $response = $this->get(route('torrents.index', ['page' => 'invalid-string']));
+        $response->assertStatus(Response::HTTP_OK);
+        $response->assertViewIs('torrents.index');
+        $response->assertViewHas(['torrents', 'timezone']);
+        $this->assertInstanceOf(LengthAwarePaginator::class, $response->original->torrents);
+        $this->assertSame(1, $response->original->torrents->count());
+        $this->assertTrue($response->original->torrents[0]->is($visibleTorrent));
+        $response->assertSee($visibleTorrent->name);
+        $response->assertSee($visibleTorrent->uploader->name);
+        $response->assertDontSee($deadTorrent->name);
+
+        $cacheManager = $this->app->make(CacheManager::class);
+        $cachedTorrents = $cacheManager->tags('torrents')->get('torrents.page.1.perPage.' . $this->torrentsPerPage);
 
         $this->assertInstanceOf(LengthAwarePaginator::class, $cachedTorrents);
         $this->assertSame(1, $cachedTorrents->count());

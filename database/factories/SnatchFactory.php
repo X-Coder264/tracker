@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use Carbon\Carbon;
 use App\Http\Models\User;
 use App\Http\Models\Snatch;
 use App\Http\Models\Torrent;
@@ -27,3 +28,10 @@ $factory->define(Snatch::class, function (Faker $faker) {
         'userAgent' => $faker->text(255),
     ];
 });
+
+$factory->state(Snatch::class, 'snatched', [
+    'finished_at' => Carbon::now()->subMinutes(10),
+    'left' => 0,
+    'leechTime' => 500,
+    'downloaded' => 800,
+]);

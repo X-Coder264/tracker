@@ -34,11 +34,13 @@ class UserControllerTest extends TestCase
         $this->withoutExceptionHandling();
 
         $this->withoutMiddleware(SetUserLocale::class);
-        $user = factory(User::class)->create();
+
+        $user = factory(User::class)->create(['torrents_per_page' => 20]);
         $locale = factory(Locale::class)->create();
         $this->actingAs($user);
         $email = 'testtttt@gmail.com';
         $timezone = 'Europe/Paris';
+        $torrentsPerPage = 40;
 
         Cache::shouldReceive('forget')->once()->with('user.' . $user->id);
         Cache::shouldReceive('forget')->once()->with('user.' . $user->slug . '.locale');
@@ -50,6 +52,7 @@ class UserControllerTest extends TestCase
                 'email' => $email,
                 'locale_id' => $locale->id,
                 'timezone' => $timezone,
+                'torrents_per_page' => $torrentsPerPage,
             ]
         );
 
@@ -61,6 +64,7 @@ class UserControllerTest extends TestCase
         $this->assertSame($email, $updatedUser->email);
         $this->assertSame($locale->id, (int) $updatedUser->locale_id);
         $this->assertSame($timezone, $updatedUser->timezone);
+        $this->assertSame($torrentsPerPage, (int) $updatedUser->torrents_per_page);
         $this->assertSame($user->passkey, $updatedUser->passkey);
         $this->assertSame($user->remember_token, $updatedUser->remember_token);
         $this->assertSame($user->slug, $updatedUser->slug);
@@ -71,10 +75,12 @@ class UserControllerTest extends TestCase
     public function testNonLoggedInUserCannotUpdateAnything(): void
     {
         $this->withoutMiddleware(SetUserLocale::class);
-        $user = factory(User::class)->create();
+
+        $user = factory(User::class)->create(['torrents_per_page' => 20]);
         $locale = factory(Locale::class)->create();
         $email = 'testtttt@gmail.com';
         $timezone = 'Europe/Paris';
+        $torrentsPerPage = 40;
 
         Cache::shouldReceive('forget')->never();
 
@@ -84,6 +90,7 @@ class UserControllerTest extends TestCase
                 'email' => $email,
                 'locale_id' => $locale->id,
                 'timezone' => $timezone,
+                'torrents_per_page' => $torrentsPerPage,
             ]
         );
 
@@ -94,6 +101,7 @@ class UserControllerTest extends TestCase
         $this->assertSame($user->email, $updatedUser->email);
         $this->assertSame($user->locale_id, (int) $updatedUser->locale_id);
         $this->assertSame($user->timezone, $updatedUser->timezone);
+        $this->assertSame($user->torrents_per_page, (int) $updatedUser->torrents_per_page);
         $this->assertSame($user->passkey, $updatedUser->passkey);
         $this->assertSame($user->remember_token, $updatedUser->remember_token);
         $this->assertSame($user->slug, $updatedUser->slug);
@@ -109,6 +117,7 @@ class UserControllerTest extends TestCase
         $this->actingAs($user);
         $email = 'testtttt@gmail.com';
         $timezone = 'Europe/Paris';
+        $torrentsPerPage = 40;
 
         Cache::shouldReceive('forget')->never();
 
@@ -118,6 +127,7 @@ class UserControllerTest extends TestCase
                 'email' => $email,
                 'locale_id' => $locale->id,
                 'timezone' => $timezone,
+                'torrents_per_page' => $torrentsPerPage,
             ]
         );
 
@@ -127,6 +137,7 @@ class UserControllerTest extends TestCase
         $this->assertSame($anotherUser->email, $anotherUserFresh->email);
         $this->assertSame($anotherUser->locale_id, (int) $anotherUserFresh->locale_id);
         $this->assertSame($anotherUser->timezone, $anotherUserFresh->timezone);
+        $this->assertSame($anotherUser->torrents_per_page, (int) $anotherUserFresh->torrents_per_page);
         $this->assertSame($anotherUser->passkey, $anotherUserFresh->passkey);
         $this->assertSame($anotherUser->remember_token, $anotherUserFresh->remember_token);
         $this->assertSame($anotherUser->slug, $anotherUserFresh->slug);
@@ -237,6 +248,66 @@ class UserControllerTest extends TestCase
         $response->assertSessionHasErrors('timezone');
     }
 
+    public function testTorrentsPerPageIsRequired()
+    {
+        $user = factory(User::class)->create();
+        $this->actingAs($user);
+        $response = $this->from(route('users.edit', $user))->put(
+            route('users.update', $user),
+            $this->validParams([
+                'torrents_per_page' => '',
+            ])
+        );
+
+        $response->assertRedirect(route('users.edit', $user));
+        $response->assertSessionHasErrors('torrents_per_page');
+    }
+
+    public function testTorrentsPerPageMustBeAValidInteger()
+    {
+        $user = factory(User::class)->create();
+        $this->actingAs($user);
+        $response = $this->from(route('users.edit', $user))->put(
+            route('users.update', $user),
+            $this->validParams([
+                'torrents_per_page' => 'wtf',
+            ])
+        );
+
+        $response->assertRedirect(route('users.edit', $user));
+        $response->assertSessionHasErrors('torrents_per_page');
+    }
+
+    public function testTorrentsPerPageMustBeGreaterThanZero(): void
+    {
+        $user = factory(User::class)->create();
+        $this->actingAs($user);
+        $response = $this->from(route('users.edit', $user))->put(
+            route('users.update', $user),
+            $this->validParams([
+                'torrents_per_page' => 0,
+            ])
+        );
+
+        $response->assertRedirect(route('users.edit', $user));
+        $response->assertSessionHasErrors('torrents_per_page');
+    }
+
+    public function testTorrentsPerPageMaxIsFifty(): void
+    {
+        $user = factory(User::class)->create();
+        $this->actingAs($user);
+        $response = $this->from(route('users.edit', $user))->put(
+            route('users.update', $user),
+            $this->validParams([
+                'torrents_per_page' => 51,
+            ])
+        );
+
+        $response->assertRedirect(route('users.edit', $user));
+        $response->assertSessionHasErrors('torrents_per_page');
+    }
+
     /**
      * @param array $overrides
      *
@@ -250,6 +321,7 @@ class UserControllerTest extends TestCase
             'email' => 'test@gmail.com',
             'locale_id' => $locale->id,
             'timezone' => 'Europe/Zagreb',
+            'torrents_per_page' => 20,
         ], $overrides);
     }
 }

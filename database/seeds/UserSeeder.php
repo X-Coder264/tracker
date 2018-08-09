@@ -19,6 +19,7 @@ class UserSeeder extends Seeder
         $user->passkey = bin2hex(random_bytes(32));
         $user->locale_id = 1;
         $user->timezone = 'Europe/Zagreb';
+        $user->torrents_per_page = 15;
         $user->save();
         $user->assignRole('Admin');
 

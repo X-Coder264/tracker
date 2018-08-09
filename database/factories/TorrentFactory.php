@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\Http\Models\User;
+use Illuminate\Support\Str;
 use App\Http\Models\Torrent;
 use Faker\Generator as Faker;
 use Illuminate\Database\Eloquent\Factory;
@@ -11,7 +12,7 @@ use Illuminate\Database\Eloquent\Factory;
 $factory->define(Torrent::class, function (Faker $faker) {
     return [
         'name' => $faker->unique()->firstName,
-        'info_hash' => $faker->unique()->text(40),
+        'info_hash' => sha1(Str::random(200)),
         'size' => $faker->numberBetween(500, 500000),
         'uploader_id' => function () {
             return factory(User::class)->create()->id;
@@ -21,3 +22,11 @@ $factory->define(Torrent::class, function (Faker $faker) {
         'leechers' => $faker->numberBetween(0, 100),
     ];
 });
+
+$factory->state(Torrent::class, 'alive', [
+    'seeders' => 1,
+]);
+
+$factory->state(Torrent::class, 'dead', [
+    'seeders' => 0,
+]);

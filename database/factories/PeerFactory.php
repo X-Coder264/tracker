@@ -24,3 +24,15 @@ $factory->define(Peer::class, function (Faker $faker) {
         'userAgent' => $faker->text(255),
     ];
 });
+
+$factory->state(Peer::class, 'seeder', [
+    'seeder' => true,
+    'downloaded' => 400,
+    'uploaded' => 200,
+]);
+
+$factory->state(Peer::class, 'leecher', [
+    'seeder' => false,
+    'downloaded' => 100,
+    'uploaded' => 20,
+]);

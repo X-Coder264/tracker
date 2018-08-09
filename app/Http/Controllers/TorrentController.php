@@ -32,17 +32,32 @@ class TorrentController extends Controller
 {
     /**
      * @param Request         $request
+     * @param AuthManager     $authManager
      * @param CacheManager    $cacheManager
      * @param ResponseFactory $responseFactory
      *
      * @return Response
      */
-    public function index(Request $request, CacheManager $cacheManager, ResponseFactory $responseFactory): Response
-    {
-        $torrents = $cacheManager->tags('torrents')->remember('torrents.page.' . $request->input('page', 1), 10, function () {
+    public function index(
+        Request $request,
+        CacheManager $cacheManager,
+        AuthManager $authManager,
+        ResponseFactory $responseFactory
+    ): Response {
+        $page = (int) $request->input('page', 1);
+
+        if (0 === $page) {
+            $page = 1;
+        }
+
+        /** @var User $user */
+        $user = $authManager->guard()->user();
+        $torrentPerPage = $user->torrents_per_page;
+
+        $torrents = $cacheManager->tags('torrents')->remember('torrents.page.' . $page . '.perPage.' . $torrentPerPage, 10, function () use ($authManager, $torrentPerPage) {
             return Torrent::with(['uploader'])->where('seeders', '>', 0)
                                               ->orderBy('id', 'desc')
-                                              ->paginate(3);
+                                              ->paginate($torrentPerPage);
         });
 
         return $responseFactory->view('torrents.index', compact('torrents'));

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use App\Http\Models\User;
 use App\Http\Models\Locale;
+use Illuminate\Support\Str;
 use Faker\Generator as Faker;
 use Illuminate\Database\Eloquent\Factory;
 
@@ -27,13 +28,14 @@ $factory->define(User::class, function (Faker $faker) {
         'email' => $faker->unique()->safeEmail,
         'password' => $password ?: $password = 'secret',
         'passkey' => bin2hex(random_bytes(32)),
-        'remember_token' => str_random(10),
+        'remember_token' => Str::random(10),
         'locale_id' => function () {
             return factory(Locale::class)->create()->id;
         },
         'timezone' => 'Europe/Zagreb',
         'uploaded' => $faker->numberBetween(0, 10000000),
         'downloaded' => $faker->numberBetween(0, 1000000),
+        'torrents_per_page' => $faker->numberBetween(5, 30),
         'slug' => $faker->unique()->text(255),
     ];
 });

@@ -24,6 +24,7 @@ class CreateUsersTable extends Migration
             $table->foreign('locale_id')->references('id')->on('locales')->onUpdate('cascade')->onDelete('cascade');
             $table->unsignedBigInteger('uploaded')->default(0);
             $table->unsignedBigInteger('downloaded')->default(0);
+            $table->integer('torrents_per_page')->default(20);
             $table->rememberToken();
             $table->string('slug')->unique();
             $table->timestamps();

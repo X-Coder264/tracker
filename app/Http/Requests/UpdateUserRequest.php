@@ -45,6 +45,7 @@ class UpdateUserRequest extends FormRequest
                 Rule::in($localeIDs),
             ],
             'timezone' => 'required|timezone',
+            'torrents_per_page' => 'required|integer|min:1|max:50',
         ];
     }
 

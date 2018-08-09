@@ -87,4 +87,5 @@ return [
     'torrent-comments.create-success-message' => 'Your comment has been successfully sent.',
     'torrent-comments.update-success-message' => 'Your comment has been successfully updated.',
     'validation.torrent-upload-invalid-torrent-file' => 'This must be a valid .torrent file.',
+    'user.edit-torrents-per-page' => 'Number of torrents per page',
 ];

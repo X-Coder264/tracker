@@ -30,17 +30,17 @@ class TorrentUploadManagerTest extends TestCase
 
     public function testTorrentUpload()
     {
+        $user = factory(User::class)->create(['torrents_per_page' => 5]);
+        $this->actingAs($user);
+
         $cacheManager = $this->app->make(CacheManager::class);
-        $cachedTorrents = $cacheManager->tags('torrents')->get('torrents.page.1');
+        $cachedTorrents = $cacheManager->tags('torrents')->get('torrents.page.1.perPage.5');
         $this->assertNull($cachedTorrents);
 
         // put some stupid value there just so that we can assert at the end that it was flushed
-        $cacheManager->tags('torrents')->put('torrents.page.1', 'something', 10);
-        $value = $cacheManager->tags('torrents')->get('torrents.page.1');
+        $cacheManager->tags('torrents')->put('torrents.page.1.perPage.5', 'something', 10);
+        $value = $cacheManager->tags('torrents')->get('torrents.page.1.perPage.5');
         $this->assertSame('something', $value);
-
-        $user = factory(User::class)->create();
-        $this->actingAs($user);
 
         Storage::fake('public');
 
@@ -86,7 +86,7 @@ class TorrentUploadManagerTest extends TestCase
         $this->assertSame($torrentDescription, $torrent->description);
 
         // the value must be flushed at the end
-        $cachedTorrents = $cacheManager->tags('torrents')->get('torrents.page.1');
+        $cachedTorrents = $cacheManager->tags('torrents')->get('torrents.page.1.perPage.5');
         $this->assertNull($cachedTorrents);
     }
 

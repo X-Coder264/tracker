@@ -1,44 +1,60 @@
 @extends('layouts.app')
 
 @section('content')
-    <div class="col-12 col-lg-10 col-xl-10 mx-auto">
-        <div class="card">
-            <div class="card-header">
-                {{ trans('messages.users.edit.page_title') }}
-            </div>
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    {{ trans('messages.users.edit.page_title') }}
+                </div>
 
-            <div class="card-body">
-                @include('partials.flash_messages')
-                <br>
-                <form method="POST" action="{{ route('users.update', $user) }}">
-                    {{ method_field('PUT') }}
-                    {{ csrf_field() }}
+                <div class="card-body">
+                    @include('partials.flash_messages')
+                    <br>
+                    <form method="POST" action="{{ route('users.update', $user) }}">
+                        {{ method_field('PUT') }}
+                        {{ csrf_field() }}
 
-                    <div class="form-group">
-                        <label for="email" class="col control-label">{{ trans('messages.common.email') }}</label>
+                        <div class="form-group row">
+                            <label for="email" class="col-sm-4 col-form-label text-md-right">{{ trans('messages.common.email') }}</label>
 
-                        <div class="col">
-                            <input id="email" type="email" class="form-control" name="email" value="{{ old('email', $user->email) }}" required>
+                            <div class="col-md-6">
+                                <input id="email" type="email" class="form-control" name="email" value="{{ old('email', $user->email) }}" required>
+                            </div>
                         </div>
-                    </div>
 
-                    <div class="form-group">
-                        <label for="locale" class="col control-label">{{ trans('messages.common.language') }}</label>
+                        <div class="form-group row">
+                            <label for="locale" class="col-sm-4 col-form-label text-md-right">{{ trans('messages.common.language') }}</label>
 
-                        <div class="col">
-                            <select class="form-control" name="locale_id" id="locale" required>
-                                @foreach ($locales as $locale)
-                                    <option value="{{ $locale->id }}" @if($locale->id === $user->locale_id) selected @endif>{{ $locale->locale }}</option>
-                                @endforeach
-                            </select>
+                            <div class="col-md-6">
+                                <select class="form-control" name="locale_id" id="locale" required>
+                                    @foreach ($locales as $locale)
+                                        <option value="{{ $locale->id }}" @if($locale->id === $user->locale_id) selected @endif>{{ $locale->locale }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
                         </div>
-                    </div>
 
-                    @include('partials.timezones_select')
+                        @include('partials.timezones_select')
 
-                    <button type="submit" class="btn btn-primary">{{ trans('messages.common.save_changes') }}</button>
-                </form>
+                        <div class="form-group row">
+                            <label for="torrents_per_page" class="col-sm-4 col-form-label text-md-right">{{ trans('messages.user.edit-torrents-per-page') }}</label>
+
+                            <div class="col-md-6">
+                                <input id="torrents_per_page" type="number" class="form-control" name="torrents_per_page" value="{{ old('torrents_per_page', $user->torrents_per_page) }}" required>
+                            </div>
+                        </div>
+
+                        <div class="form-group row mb-0">
+                            <div class="col-md-8 offset-md-4">
+                                <button type="submit" class="btn btn-primary">{{ trans('messages.common.save_changes') }}</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
+</div>
 @endsection

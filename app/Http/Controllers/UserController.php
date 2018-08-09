@@ -52,6 +52,7 @@ class UserController extends Controller
             'email' => $request->input('email'),
             'locale_id' => $request->input('locale_id'),
             'timezone' => $request->input('timezone'),
+            'torrents_per_page' => $request->input('torrents_per_page'),
         ]);
 
         $application->setLocale($user->language->localeShort);
