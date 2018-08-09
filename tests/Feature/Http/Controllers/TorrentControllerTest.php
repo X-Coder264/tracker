@@ -120,7 +120,7 @@ class TorrentControllerTest extends TestCase
 
         $response = $this->get(route('torrents.show', $torrent));
         $response->assertStatus(Response::HTTP_NOT_FOUND);
-        $response->assertSee(__('messages.torrent-file-missing.error-message'));
+        $response->assertSee(trans('messages.torrent-file-missing.error-message'));
         $response->assertDontSee($torrent->name);
     }
 
@@ -258,7 +258,7 @@ class TorrentControllerTest extends TestCase
         Storage::shouldReceive('disk->get')->once()->with("torrents/{$torrent->id}.torrent")->andThrow(new FileNotFoundException());
         $response = $this->get(route('torrents.download', $torrent));
         $response->assertStatus(Response::HTTP_NOT_FOUND);
-        $response->assertSee(__('messages.torrent-file-missing.error-message'));
+        $response->assertSee(trans('messages.torrent-file-missing.error-message'));
         $response->assertDontSee($torrent->name);
     }
 

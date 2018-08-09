@@ -1899,7 +1899,7 @@ class AnnounceManagerTest extends TestCase
             ]))
         );
         $response->assertStatus(Response::HTTP_OK);
-        $expectedResponse = ['failure reason' => __('messages.validation.variable.required', ['var' => 'passkey'])];
+        $expectedResponse = ['failure reason' => trans('messages.validation.variable.required', ['var' => 'passkey'])];
         $decoder = new Bdecoder();
         $actualResponse = $decoder->decode($response->getContent());
         $this->assertSame($expectedResponse, $actualResponse);
@@ -1915,7 +1915,7 @@ class AnnounceManagerTest extends TestCase
             ]))
         );
         $response->assertStatus(Response::HTTP_OK);
-        $expectedResponse = ['failure reason' => __('messages.validation.variable.size', ['var' => 'passkey'])];
+        $expectedResponse = ['failure reason' => trans('messages.validation.variable.size', ['var' => 'passkey'])];
         $decoder = new Bdecoder();
         $actualResponse = $decoder->decode($response->getContent());
         $this->assertSame($expectedResponse, $actualResponse);
@@ -1931,7 +1931,7 @@ class AnnounceManagerTest extends TestCase
             ]))
         );
         $response->assertStatus(Response::HTTP_OK);
-        $expectedResponse = ['failure reason' => __('messages.announce.invalid_passkey')];
+        $expectedResponse = ['failure reason' => trans('messages.announce.invalid_passkey')];
         $decoder = new Bdecoder();
         $actualResponse = $decoder->decode($response->getContent());
         $this->assertSame($expectedResponse, $actualResponse);
@@ -1947,7 +1947,7 @@ class AnnounceManagerTest extends TestCase
             ]))
         );
         $response->assertStatus(Response::HTTP_OK);
-        $expectedResponse = ['failure reason' => __('messages.validation.variable.required', ['var' => 'info_hash'])];
+        $expectedResponse = ['failure reason' => trans('messages.validation.variable.required', ['var' => 'info_hash'])];
         $decoder = new Bdecoder();
         $actualResponse = $decoder->decode($response->getContent());
         $this->assertSame($expectedResponse, $actualResponse);
@@ -1963,7 +1963,7 @@ class AnnounceManagerTest extends TestCase
             ]))
         );
         $response->assertStatus(Response::HTTP_OK);
-        $expectedResponse = ['failure reason' => __('messages.validation.variable.size', ['var' => 'info_hash'])];
+        $expectedResponse = ['failure reason' => trans('messages.validation.variable.size', ['var' => 'info_hash'])];
         $decoder = new Bdecoder();
         $actualResponse = $decoder->decode($response->getContent());
         $this->assertSame($expectedResponse, $actualResponse);
@@ -1979,7 +1979,7 @@ class AnnounceManagerTest extends TestCase
             ]))
         );
         $response->assertStatus(Response::HTTP_OK);
-        $expectedResponse = ['failure reason' => __('messages.announce.invalid_info_hash')];
+        $expectedResponse = ['failure reason' => trans('messages.announce.invalid_info_hash')];
         $decoder = new Bdecoder();
         $actualResponse = $decoder->decode($response->getContent());
         $this->assertSame($expectedResponse, $actualResponse);
@@ -1995,7 +1995,7 @@ class AnnounceManagerTest extends TestCase
             ]))
         );
         $response->assertStatus(Response::HTTP_OK);
-        $expectedResponse = ['failure reason' => __('messages.validation.variable.required', ['var' => 'peer_id'])];
+        $expectedResponse = ['failure reason' => trans('messages.validation.variable.required', ['var' => 'peer_id'])];
         $decoder = new Bdecoder();
         $actualResponse = $decoder->decode($response->getContent());
         $this->assertSame($expectedResponse, $actualResponse);
@@ -2011,7 +2011,7 @@ class AnnounceManagerTest extends TestCase
             ]))
         );
         $response->assertStatus(Response::HTTP_OK);
-        $expectedResponse = ['failure reason' => __('messages.validation.variable.size', ['var' => 'peer_id'])];
+        $expectedResponse = ['failure reason' => trans('messages.validation.variable.size', ['var' => 'peer_id'])];
         $decoder = new Bdecoder();
         $actualResponse = $decoder->decode($response->getContent());
         $this->assertSame($expectedResponse, $actualResponse);
@@ -2033,7 +2033,7 @@ class AnnounceManagerTest extends TestCase
             ]))
         );
         $response->assertStatus(Response::HTTP_OK);
-        $expectedResponse = ['failure reason' => __('messages.announce.invalid_peer_id')];
+        $expectedResponse = ['failure reason' => trans('messages.announce.invalid_peer_id')];
         $decoder = new Bdecoder();
         $actualResponse = $decoder->decode($response->getContent());
         $this->assertSame($expectedResponse, $actualResponse);
@@ -2052,7 +2052,7 @@ class AnnounceManagerTest extends TestCase
             ]))
         );
         $response->assertStatus(Response::HTTP_OK);
-        $expectedResponse = ['failure reason' => __('messages.announce.invalid_peer_id')];
+        $expectedResponse = ['failure reason' => trans('messages.announce.invalid_peer_id')];
         $decoder = new Bdecoder();
         $actualResponse = $decoder->decode($response->getContent());
         $this->assertSame($expectedResponse, $actualResponse);
@@ -2069,7 +2069,7 @@ class AnnounceManagerTest extends TestCase
             ]
         );
         $response->assertStatus(Response::HTTP_OK);
-        $expectedResponse = ['failure reason' => __('messages.announce.invalid_ip_or_port')];
+        $expectedResponse = ['failure reason' => trans('messages.announce.invalid_ip_or_port')];
         $decoder = new Bdecoder();
         $actualResponse = $decoder->decode($response->getContent());
         $this->assertSame($expectedResponse, $actualResponse);
@@ -2085,7 +2085,7 @@ class AnnounceManagerTest extends TestCase
             ]))
         );
         $response->assertStatus(Response::HTTP_OK);
-        $expectedResponse = ['failure reason' => __('messages.validation.variable.required', ['var' => 'port'])];
+        $expectedResponse = ['failure reason' => trans('messages.validation.variable.required', ['var' => 'port'])];
         $decoder = new Bdecoder();
         $actualResponse = $decoder->decode($response->getContent());
         $this->assertSame($expectedResponse, $actualResponse);
@@ -2101,7 +2101,7 @@ class AnnounceManagerTest extends TestCase
             ]))
         );
         $response->assertStatus(Response::HTTP_OK);
-        $expectedResponse = ['failure reason' => __('messages.validation.variable.port', ['port' => 'xyz'])];
+        $expectedResponse = ['failure reason' => trans('messages.validation.variable.port', ['port' => 'xyz'])];
         $decoder = new Bdecoder();
         $actualResponse = $decoder->decode($response->getContent());
         $this->assertSame($expectedResponse, $actualResponse);
@@ -2117,7 +2117,7 @@ class AnnounceManagerTest extends TestCase
             ]))
         );
         $response->assertStatus(Response::HTTP_OK);
-        $expectedResponse = ['failure reason' => __('messages.validation.variable.port', ['port' => 0])];
+        $expectedResponse = ['failure reason' => trans('messages.validation.variable.port', ['port' => 0])];
         $decoder = new Bdecoder();
         $actualResponse = $decoder->decode($response->getContent());
         $this->assertSame($expectedResponse, $actualResponse);
@@ -2133,7 +2133,7 @@ class AnnounceManagerTest extends TestCase
             ]))
         );
         $response->assertStatus(Response::HTTP_OK);
-        $expectedResponse = ['failure reason' => __('messages.validation.variable.port', ['port' => 65536])];
+        $expectedResponse = ['failure reason' => trans('messages.validation.variable.port', ['port' => 65536])];
         $decoder = new Bdecoder();
         $actualResponse = $decoder->decode($response->getContent());
         $this->assertSame($expectedResponse, $actualResponse);
@@ -2149,7 +2149,7 @@ class AnnounceManagerTest extends TestCase
             ]))
         );
         $response->assertStatus(Response::HTTP_OK);
-        $expectedResponse = ['failure reason' => __('messages.validation.variable.required', ['var' => 'uploaded'])];
+        $expectedResponse = ['failure reason' => trans('messages.validation.variable.required', ['var' => 'uploaded'])];
         $decoder = new Bdecoder();
         $actualResponse = $decoder->decode($response->getContent());
         $this->assertSame($expectedResponse, $actualResponse);
@@ -2165,7 +2165,7 @@ class AnnounceManagerTest extends TestCase
             ]))
         );
         $response->assertStatus(Response::HTTP_OK);
-        $expectedResponse = ['failure reason' => __('messages.validation.variable.integer', ['var' => 'uploaded'])];
+        $expectedResponse = ['failure reason' => trans('messages.validation.variable.integer', ['var' => 'uploaded'])];
         $decoder = new Bdecoder();
         $actualResponse = $decoder->decode($response->getContent());
         $this->assertSame($expectedResponse, $actualResponse);
@@ -2181,7 +2181,7 @@ class AnnounceManagerTest extends TestCase
             ]))
         );
         $response->assertStatus(Response::HTTP_OK);
-        $expectedResponse = ['failure reason' => __('messages.validation.variable.uploaded', ['uploaded' => -1])];
+        $expectedResponse = ['failure reason' => trans('messages.validation.variable.uploaded', ['uploaded' => -1])];
         $decoder = new Bdecoder();
         $actualResponse = $decoder->decode($response->getContent());
         $this->assertSame($expectedResponse, $actualResponse);
@@ -2197,7 +2197,7 @@ class AnnounceManagerTest extends TestCase
             ]))
         );
         $response->assertStatus(Response::HTTP_OK);
-        $expectedResponse = ['failure reason' => __('messages.validation.variable.required', ['var' => 'downloaded'])];
+        $expectedResponse = ['failure reason' => trans('messages.validation.variable.required', ['var' => 'downloaded'])];
         $decoder = new Bdecoder();
         $actualResponse = $decoder->decode($response->getContent());
         $this->assertSame($expectedResponse, $actualResponse);
@@ -2213,7 +2213,7 @@ class AnnounceManagerTest extends TestCase
             ]))
         );
         $response->assertStatus(Response::HTTP_OK);
-        $expectedResponse = ['failure reason' => __('messages.validation.variable.integer', ['var' => 'downloaded'])];
+        $expectedResponse = ['failure reason' => trans('messages.validation.variable.integer', ['var' => 'downloaded'])];
         $decoder = new Bdecoder();
         $actualResponse = $decoder->decode($response->getContent());
         $this->assertSame($expectedResponse, $actualResponse);
@@ -2229,7 +2229,7 @@ class AnnounceManagerTest extends TestCase
             ]))
         );
         $response->assertStatus(Response::HTTP_OK);
-        $expectedResponse = ['failure reason' => __('messages.validation.variable.downloaded', ['downloaded' => -1])];
+        $expectedResponse = ['failure reason' => trans('messages.validation.variable.downloaded', ['downloaded' => -1])];
         $decoder = new Bdecoder();
         $actualResponse = $decoder->decode($response->getContent());
         $this->assertSame($expectedResponse, $actualResponse);
@@ -2245,7 +2245,7 @@ class AnnounceManagerTest extends TestCase
             ]))
         );
         $response->assertStatus(Response::HTTP_OK);
-        $expectedResponse = ['failure reason' => __('messages.validation.variable.required', ['var' => 'left'])];
+        $expectedResponse = ['failure reason' => trans('messages.validation.variable.required', ['var' => 'left'])];
         $decoder = new Bdecoder();
         $actualResponse = $decoder->decode($response->getContent());
         $this->assertSame($expectedResponse, $actualResponse);
@@ -2261,7 +2261,7 @@ class AnnounceManagerTest extends TestCase
             ]))
         );
         $response->assertStatus(Response::HTTP_OK);
-        $expectedResponse = ['failure reason' => __('messages.validation.variable.integer', ['var' => 'left'])];
+        $expectedResponse = ['failure reason' => trans('messages.validation.variable.integer', ['var' => 'left'])];
         $decoder = new Bdecoder();
         $actualResponse = $decoder->decode($response->getContent());
         $this->assertSame($expectedResponse, $actualResponse);
@@ -2277,7 +2277,7 @@ class AnnounceManagerTest extends TestCase
             ]))
         );
         $response->assertStatus(Response::HTTP_OK);
-        $expectedResponse = ['failure reason' => __('messages.validation.variable.left', ['left' => -1])];
+        $expectedResponse = ['failure reason' => trans('messages.validation.variable.left', ['left' => -1])];
         $decoder = new Bdecoder();
         $actualResponse = $decoder->decode($response->getContent());
         $this->assertSame($expectedResponse, $actualResponse);

@@ -13,7 +13,7 @@ use Illuminate\Filesystem\FilesystemManager;
 use Illuminate\Contracts\Routing\UrlGenerator;
 use Illuminate\Contracts\Translation\Translator;
 
-class TorrentUploadService
+class TorrentUploadManager
 {
     /**
      * @var Bencoder

@@ -86,4 +86,5 @@ return [
     'validation.torrent-comment-required' => 'Tekst komentara je obavezno polje.',
     'torrent-comments.create-success-message' => 'Vaš komentar je uspješno poslan.',
     'torrent-comments.update-success-message' => 'Vaš komentar je uspješno uređen.',
+    'validation.torrent-upload-invalid-torrent-file' => 'Ovo mora biti validna .torrent datoteka.',
 ];

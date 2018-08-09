@@ -86,4 +86,5 @@ return [
     'validation.torrent-comment-required' => 'The comment text field is required.',
     'torrent-comments.create-success-message' => 'Your comment has been successfully sent.',
     'torrent-comments.update-success-message' => 'Your comment has been successfully updated.',
+    'validation.torrent-upload-invalid-torrent-file' => 'This must be a valid .torrent file.',
 ];

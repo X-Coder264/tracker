@@ -7,7 +7,7 @@ namespace App\Http\Requests;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Contracts\Translation\Translator;
 
-class TorrentCommentRequest extends FormRequest
+class TorrentUploadRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -27,7 +27,9 @@ class TorrentCommentRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'comment' => 'required|string',
+            'torrent'     => 'required|file|mimetypes:application/x-bittorrent',
+            'name'        => 'required|string|min:5|max:255|unique:torrents',
+            'description' => 'required|string',
         ];
     }
 
@@ -42,7 +44,7 @@ class TorrentCommentRequest extends FormRequest
         $translator = $this->container->make(Translator::class);
 
         return [
-            'comment.required' => $translator->trans('messages.validation.torrent-comment-required'),
+            'torrent.mimetypes'    => $translator->trans('messages.validation.torrent-upload-invalid-torrent-file'),
         ];
     }
 }

@@ -16,14 +16,14 @@ use Illuminate\Http\Testing\File;
 use Illuminate\Http\UploadedFile;
 use App\Services\TorrentInfoService;
 use Illuminate\Filesystem\Filesystem;
-use App\Services\TorrentUploadService;
+use App\Services\TorrentUploadManager;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Filesystem\FilesystemManager;
 use Illuminate\Contracts\Routing\UrlGenerator;
 use Illuminate\Contracts\Translation\Translator;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
-class TorrentUploadServiceTest extends TestCase
+class TorrentUploadManagerTest extends TestCase
 {
     use RefreshDatabase;
 
@@ -63,7 +63,7 @@ class TorrentUploadServiceTest extends TestCase
 
         $response->assertStatus(Response::HTTP_FOUND);
         $response->assertRedirect(route('torrents.show', $torrent));
-        $response->assertSessionHas('success', __('messages.torrents.store-successfully-uploaded-torrent.message'));
+        $response->assertSessionHas('success', trans('messages.torrents.store-successfully-uploaded-torrent.message'));
 
         Storage::disk('public')->assertExists('torrents/1.torrent');
         $this->assertSame($torrentValue, Storage::disk('public')->get('torrents/1.torrent'));
@@ -111,7 +111,7 @@ class TorrentUploadServiceTest extends TestCase
 
         $response->assertStatus(Response::HTTP_FOUND);
         $response->assertRedirect(route('torrents.show', $torrent));
-        $response->assertSessionHas('success', __('messages.torrents.store-successfully-uploaded-torrent.message'));
+        $response->assertSessionHas('success', trans('messages.torrents.store-successfully-uploaded-torrent.message'));
 
         Storage::disk('public')->assertExists('torrents/1.torrent');
         $decodedTorrent = $decoder->decode(Storage::disk('public')->get('torrents/1.torrent'));
@@ -149,7 +149,7 @@ class TorrentUploadServiceTest extends TestCase
 
         $response->assertStatus(Response::HTTP_FOUND);
         $response->assertRedirect(route('torrents.show', $torrent));
-        $response->assertSessionHas('success', __('messages.torrents.store-successfully-uploaded-torrent.message'));
+        $response->assertSessionHas('success', trans('messages.torrents.store-successfully-uploaded-torrent.message'));
 
         $decoder = new Bdecoder();
         Storage::disk('public')->assertExists('torrents/1.torrent');
@@ -182,7 +182,7 @@ class TorrentUploadServiceTest extends TestCase
         $torrentValue = '123456';
         $encoder->method('encode')->willReturn($torrentValue);
 
-        $torrentUploadService = $this->getMockBuilder(TorrentUploadService::class)
+        $torrentUploadService = $this->getMockBuilder(TorrentUploadManager::class)
             ->setConstructorArgs(
                 [
                     $encoder,
@@ -202,7 +202,7 @@ class TorrentUploadServiceTest extends TestCase
             ->method('getTorrentInfoHash')
             ->will($this->onConsecutiveCalls($infoHash, $expectedHash));
 
-        $this->app->instance(TorrentUploadService::class, $torrentUploadService);
+        $this->app->instance(TorrentUploadManager::class, $torrentUploadService);
 
         $torrentName = 'Test name';
         $torrentDescription = 'Test description';
@@ -217,7 +217,7 @@ class TorrentUploadServiceTest extends TestCase
 
         $response->assertStatus(Response::HTTP_FOUND);
         $response->assertRedirect(route('torrents.show', $torrent));
-        $response->assertSessionHas('success', __('messages.torrents.store-successfully-uploaded-torrent.message'));
+        $response->assertSessionHas('success', trans('messages.torrents.store-successfully-uploaded-torrent.message'));
 
         Storage::disk('public')->assertExists('torrents/2.torrent');
         $this->assertSame($torrentValue, Storage::disk('public')->get('torrents/2.torrent'));
@@ -262,7 +262,7 @@ class TorrentUploadServiceTest extends TestCase
 
         $response->assertStatus(Response::HTTP_FOUND);
         $response->assertRedirect(route('torrents.show', $torrent));
-        $response->assertSessionHas('success', __('messages.torrents.store-successfully-uploaded-torrent.message'));
+        $response->assertSessionHas('success', trans('messages.torrents.store-successfully-uploaded-torrent.message'));
 
         $decoder = new Bdecoder();
         Storage::disk('public')->assertExists('torrents/1.torrent');
@@ -306,7 +306,7 @@ class TorrentUploadServiceTest extends TestCase
 
         $response->assertStatus(Response::HTTP_FOUND);
         $response->assertRedirect(route('torrents.create'));
-        $response->assertSessionHas('error', __('messages.file-not-writable-exception.error-message'));
+        $response->assertSessionHas('error', trans('messages.file-not-writable-exception.error-message'));
         $response->assertSessionHas('_old_input');
     }
 }

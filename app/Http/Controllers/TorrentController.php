@@ -17,7 +17,8 @@ use Illuminate\Cache\CacheManager;
 use Illuminate\Routing\Redirector;
 use App\Services\TorrentInfoService;
 use Illuminate\Http\RedirectResponse;
-use App\Services\TorrentUploadService;
+use App\Services\TorrentUploadManager;
+use App\Http\Requests\TorrentUploadRequest;
 use App\Exceptions\FileNotWritableException;
 use Illuminate\Contracts\Filesystem\Factory;
 use Illuminate\Contracts\Routing\UrlGenerator;
@@ -91,8 +92,8 @@ class TorrentController extends Controller
     }
 
     /**
-     * @param Request              $request
-     * @param TorrentUploadService $torrentUploadService
+     * @param TorrentUploadRequest $request
+     * @param TorrentUploadManager $torrentUploadManager
      * @param Redirector           $redirector
      * @param Translator           $translator
      *
@@ -101,31 +102,12 @@ class TorrentController extends Controller
      * @return RedirectResponse
      */
     public function store(
-        Request $request,
-        TorrentUploadService $torrentUploadService,
+        TorrentUploadRequest $request,
+        TorrentUploadManager $torrentUploadManager,
         Redirector $redirector,
         Translator $translator
     ): RedirectResponse {
-        $this->validate(
-            $request,
-            [
-                'torrent'     => 'required|file|mimetypes:application/x-bittorrent',
-                'name'        => 'required|string|min:5|max:255|unique:torrents',
-                'description' => 'required|string',
-            ],
-            [
-                'torrent.required'     => 'Test',
-                'torrent.file'         => 'Test',
-                'torrent.mimetypes'    => 'Test',
-                'name.required'        => 'Test',
-                'name.min'             => 'Test',
-                'name.max'             => 'Test',
-                'name.unique'          => 'Test',
-                'description.required' => 'Test',
-            ]
-        );
-
-        $torrent = $torrentUploadService->upload($request);
+        $torrent = $torrentUploadManager->upload($request);
 
         return $redirector->route('torrents.show', $torrent)
                          ->with('success', $translator->trans('messages.torrents.store-successfully-uploaded-torrent.message'));

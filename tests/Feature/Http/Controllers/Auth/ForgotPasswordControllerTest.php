@@ -57,18 +57,18 @@ class ForgotPasswordControllerTest extends TestCase
             $mailData = $notification->toMail($user)->toArray();
 
             $this->assertSame('info', $mailData['level']);
-            $this->assertSame(__('messages.reset_password.subject'), $mailData['subject']);
+            $this->assertSame(trans('messages.reset_password.subject'), $mailData['subject']);
             $this->assertSame(
-                __('messages.reset_password.greeting', ['name' => $user->name]),
+                trans('messages.reset_password.greeting', ['name' => $user->name]),
                 $mailData['greeting']
             );
             $this->assertSame(
-                __('messages.reset_password.salutation', ['site' => config('app.name')]),
+                trans('messages.reset_password.salutation', ['site' => config('app.name')]),
                 $mailData['salutation']
             );
-            $this->assertSame(__('messages.reset_password.email-line-1'), $mailData['introLines'][0]);
-            $this->assertSame(__('messages.reset_password.email-line-2'), $mailData['outroLines'][0]);
-            $this->assertSame(__('messages.reset_password.action'), $mailData['actionText']);
+            $this->assertSame(trans('messages.reset_password.email-line-1'), $mailData['introLines'][0]);
+            $this->assertSame(trans('messages.reset_password.email-line-2'), $mailData['outroLines'][0]);
+            $this->assertSame(trans('messages.reset_password.action'), $mailData['actionText']);
             $this->assertSame(route('password.reset', $notification->token), $mailData['actionUrl']);
 
             $this->assertTrue(Hash::check($notification->token, $token->token));

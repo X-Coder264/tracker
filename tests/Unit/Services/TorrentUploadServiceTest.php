@@ -11,7 +11,7 @@ use App\Services\Bencoder;
 use Illuminate\Auth\AuthManager;
 use App\Services\TorrentInfoService;
 use Illuminate\Filesystem\Filesystem;
-use App\Services\TorrentUploadService;
+use App\Services\TorrentUploadManager;
 use Illuminate\Filesystem\FilesystemManager;
 use PHPUnit\Framework\MockObject\MockObject;
 use Illuminate\Contracts\Routing\UrlGenerator;
@@ -36,7 +36,7 @@ class TorrentUploadServiceTest extends TestCase
         $decoder = $this->createMock(Bdecoder::class);
         /** @var MockObject|TorrentInfoService $torrentInfoService */
         $torrentInfoService = $this->createMock(TorrentInfoService::class);
-        $torrentUploadService = new TorrentUploadService(
+        $torrentUploadService = new TorrentUploadManager(
             $encoder,
             $decoder,
             $torrentInfoService,
@@ -46,7 +46,7 @@ class TorrentUploadServiceTest extends TestCase
             $this->app->make(UrlGenerator::class),
             $this->app->make(Translator::class)
         );
-        $reflectionClass = new ReflectionClass(TorrentUploadService::class);
+        $reflectionClass = new ReflectionClass(TorrentUploadManager::class);
         $method = $reflectionClass->getMethod('getTorrentInfoHash');
         $method->setAccessible(true);
 
