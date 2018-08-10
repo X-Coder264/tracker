@@ -63,7 +63,7 @@ class RegisterControllerTest extends TestCase
 
         $this->assertSame(1, User::count());
 
-        $user = User::findOrFail(1);
+        $user = User::firstOrFail();
         $this->assertSame($user->name, $name);
         $this->assertSame($user->email, $email);
         $this->assertTrue(Hash::check($password, $user->password));

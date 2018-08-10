@@ -1,7 +1,12 @@
 language: php
 
-php:
-  - 7.2
+sudo: required
+dist: trusty
+
+matrix:
+  fast_finish: true
+  include:
+  - php: 7.2
 
 cache:
   directories:
@@ -11,15 +16,28 @@ env:
   global:
     - CHECK_PHP_SYNTAX="yes"
 
-sudo: false
-
 services:
   - redis-server
+  - mysql
+
+addons:
+  apt:
+    sources:
+      - mysql-5.7-trusty
+    packages:
+      - mysql-server
+      - mysql-client
+
+before_install:
+  - sudo mysql -e "use mysql; update user set authentication_string=PASSWORD('test') where User='root'; update user set plugin='mysql_native_password';FLUSH PRIVILEGES;"
+  - sudo mysql_upgrade --user=root --password=test
+  - sudo service mysql restart
+  - mysql --user=root --password=test -e 'CREATE DATABASE tracker CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;'
 
 install:
-  - cp .env.example .env
   - composer self-update
   - travis_retry composer install --no-interaction --prefer-source
+  - cp .env.example .env
   - php artisan key:generate
   # Install coveralls.phar
   - wget -c -nc --retry-connrefused --tries=0 https://github.com/php-coveralls/php-coveralls/releases/download/v2.0.0/php-coveralls.phar

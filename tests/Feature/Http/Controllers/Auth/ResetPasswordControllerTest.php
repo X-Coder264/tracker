@@ -39,7 +39,7 @@ class ResetPasswordControllerTest extends TestCase
         $response->assertSessionHas('status');
         $this->assertAuthenticatedAs($user);
 
-        $updatedUser = User::findOrFail(1);
+        $updatedUser = User::firstOrFail();
         $this->assertNotSame($user->password, $updatedUser->password);
         $this->assertSame($user->email, $updatedUser->email);
         $this->assertTrue(Hash::check($newPassword, $updatedUser->password));

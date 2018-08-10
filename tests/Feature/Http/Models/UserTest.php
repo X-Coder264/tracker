@@ -22,12 +22,12 @@ class UserTest extends TestCase
     {
         $password = 'test password 123';
 
-        factory(Locale::class)->create();
+        $locale = factory(Locale::class)->create();
         $user = new User();
         $user->email = 'test@gmail.com';
         $user->name = 'test name';
         $user->password = $password;
-        $user->locale_id = 1;
+        $user->locale_id = $locale->id;
         $user->timezone = 'Europe/Zagreb';
         $user->save();
 
@@ -36,12 +36,12 @@ class UserTest extends TestCase
 
     public function testUserHasSlug()
     {
-        factory(Locale::class)->create();
+        $locale = factory(Locale::class)->create();
         $user = new User();
         $user->email = 'test@gmail.com';
         $user->name = 'test name';
         $user->password = 'test test';
-        $user->locale_id = 1;
+        $user->locale_id = $locale->id;
         $user->timezone = 'Europe/Zagreb';
         $user->save();
 
@@ -52,8 +52,8 @@ class UserTest extends TestCase
     {
         factory(Torrent::class)->create();
 
-        $user = User::findOrFail(1);
-        $torrent = Torrent::findOrFail(1);
+        $user = User::firstOrFail();
+        $torrent = Torrent::firstOrFail();
         $this->assertInstanceOf(HasMany::class, $user->torrents());
         $this->assertInstanceOf(Collection::class, $user->torrents);
         $this->assertSame($user->torrents[0]->id, $torrent->id);
@@ -64,11 +64,11 @@ class UserTest extends TestCase
 
     public function testLanguageRelationship()
     {
-        factory(User::class)->create();
+        $user = factory(User::class)->create();
 
-        $user = User::findOrFail(1);
-        $this->assertInstanceOf(BelongsTo::class, $user->language());
-        $this->assertInstanceOf(Locale::class, $user->language);
-        $this->assertSame(1, $user->language->id);
+        $freshUser = $user->fresh();
+        $this->assertInstanceOf(BelongsTo::class, $freshUser->language());
+        $this->assertInstanceOf(Locale::class, $freshUser->language);
+        $this->assertSame($user->language->id, $freshUser->language->id);
     }
 }

@@ -22,7 +22,7 @@ class TorrentTest extends TestCase
     public function testSizeAccessor()
     {
         factory(Torrent::class)->create();
-        $torrent = Torrent::findOrFail(1);
+        $torrent = Torrent::firstOrFail();
         $returnValue = '500 MB';
         SizeFormatter::shouldReceive('getFormattedSize')->once()->with($torrent->getOriginal('size'))->andReturn($returnValue);
         $this->assertSame($returnValue, $torrent->size);
@@ -30,12 +30,12 @@ class TorrentTest extends TestCase
 
     public function testTorrentHasSlug()
     {
-        factory(User::class)->create();
+        $user = factory(User::class)->create();
         $torrent = new Torrent();
         $torrent->name = 'test name';
         $torrent->info_hash = 'fefsrgererw';
         $torrent->size = 34356212;
-        $torrent->uploader_id = 1;
+        $torrent->uploader_id = $user->id;
         $torrent->description = 'test description';
         $torrent->save();
 
@@ -46,8 +46,8 @@ class TorrentTest extends TestCase
     {
         factory(Torrent::class)->create();
 
-        $user = User::findOrFail(1);
-        $torrent = Torrent::findOrFail(1);
+        $user = User::firstOrFail();
+        $torrent = Torrent::firstOrFail();
         $this->assertInstanceOf(BelongsTo::class, $torrent->uploader());
         $this->assertInstanceOf(User::class, $torrent->uploader);
         $this->assertSame($torrent->uploader->id, $user->id);
@@ -59,8 +59,8 @@ class TorrentTest extends TestCase
     {
         factory(Peer::class)->create();
 
-        $torrent = Torrent::findOrFail(1);
-        $peer = Peer::findOrFail(1);
+        $torrent = Torrent::firstOrFail();
+        $peer = Peer::firstOrFail();
         $this->assertInstanceOf(HasMany::class, $torrent->peers());
         $this->assertInstanceOf(Collection::class, $torrent->peers);
         $this->assertSame($torrent->peers[0]->id, $peer->id);
@@ -77,8 +77,8 @@ class TorrentTest extends TestCase
     {
         factory(TorrentComment::class)->create();
 
-        $torrent = Torrent::findOrFail(1);
-        $torrentComment = TorrentComment::findOrFail(1);
+        $torrent = Torrent::firstOrFail();
+        $torrentComment = TorrentComment::firstOrFail();
         $this->assertInstanceOf(HasMany::class, $torrent->comments());
         $this->assertInstanceOf(Collection::class, $torrent->comments);
         $this->assertSame($torrent->comments[0]->id, $torrentComment->id);

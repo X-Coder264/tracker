@@ -8,6 +8,16 @@
                 <div class="card-header">{{ trans('messages.common.login') }}</div>
 
                 <div class="card-body">
+
+                    @if (session('error'))
+                        <div class="card text-white bg-danger">
+                            <div class="card-body">
+                                <h4 class="card-title">{{ trans('messages.common.error') }}</h4>
+                                <p class="card-text">{{ session('error') }}</p>
+                            </div>
+                        </div>
+                    @endif
+
                     <form method="POST" action="{{ route('login') }}">
                         {{ csrf_field() }}
 

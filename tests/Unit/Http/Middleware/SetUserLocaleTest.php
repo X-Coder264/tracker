@@ -6,19 +6,17 @@ namespace Tests\Unit\Http\Middleware;
 
 use Carbon\Carbon;
 use Tests\TestCase;
-use Illuminate\Support\Str;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Router;
 use Illuminate\Auth\AuthManager;
 use Illuminate\Cache\CacheManager;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Route;
 use App\Http\Middleware\SetUserLocale;
-use Illuminate\Routing\RouteCollection;
 
 class SetUserLocaleTest extends TestCase
 {
-    public function testForALoggedInUserItSetsHisLocale()
+    public function testForALoggedInUserItSetsHisLocale(): void
     {
         Auth::shouldReceive('check')->andReturn(true);
 
@@ -64,7 +62,7 @@ class SetUserLocaleTest extends TestCase
         $this->assertSame($request, $result);
     }
 
-    public function testIfTheUserIsNotLoggedInJustCallTheNextMiddlewareInThePipe()
+    public function testIfTheUserIsNotLoggedInJustCallTheNextMiddlewareInThePipe(): void
     {
         Auth::shouldReceive('check')->andReturn(false);
 
@@ -98,18 +96,10 @@ class SetUserLocaleTest extends TestCase
         $this->assertSame($request, $result);
     }
 
-    public function testMiddlewareIsAppliedToAllWebRoutes()
+    public function testMiddlewareIsAppliedOnAllWebRoutes(): void
     {
-        /** @var RouteCollection $allRoutes */
-        $allRoutes = Route::getRoutes()->getRoutesByName();
-
-        foreach ($allRoutes as $route) {
-            if (! Str::startsWith($route->uri, ['_', 'api', 'cms/api'])) {
-                $this->assertContains(
-                    SetUserLocale::class,
-                    Route::gatherRouteMiddleware($route)
-                );
-            }
-        }
+        /** @var Router $router */
+        $router = $this->app->make(Router::class);
+        $this->assertTrue(in_array(SetUserLocale::class, $router->getMiddlewareGroups()['web']));
     }
 }

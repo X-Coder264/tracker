@@ -36,6 +36,11 @@ $factory->define(User::class, function (Faker $faker) {
         'uploaded' => $faker->numberBetween(0, 10000000),
         'downloaded' => $faker->numberBetween(0, 1000000),
         'torrents_per_page' => $faker->numberBetween(5, 30),
+        'banned' => false,
         'slug' => $faker->unique()->text(255),
     ];
 });
+
+$factory->state(User::class, 'banned', [
+    'banned' => true,
+]);

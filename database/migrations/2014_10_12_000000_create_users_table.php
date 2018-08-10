@@ -25,6 +25,7 @@ class CreateUsersTable extends Migration
             $table->unsignedBigInteger('uploaded')->default(0);
             $table->unsignedBigInteger('downloaded')->default(0);
             $table->integer('torrents_per_page')->default(20);
+            $table->boolean('banned')->default(false);
             $table->rememberToken();
             $table->string('slug')->unique();
             $table->timestamps();

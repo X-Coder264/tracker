@@ -97,7 +97,7 @@ class TorrentCommentControllerTest extends TestCase
         $response->assertRedirect(route('torrents.show', $torrent));
         $response->assertSessionHas('torrentCommentSuccess');
 
-        $torrentComment = TorrentComment::findOrFail(1);
+        $torrentComment = TorrentComment::firstOrFail();
         $this->assertSame($user->id, (int) $torrentComment->user_id);
         $this->assertSame($torrent->id, (int) $torrentComment->torrent_id);
         $this->assertSame($comment, $torrentComment->comment);
@@ -142,6 +142,6 @@ class TorrentCommentControllerTest extends TestCase
         $response->assertStatus(Response::HTTP_FOUND);
         $response->assertRedirect(route('torrent-comments.edit', $torrentComment));
         $response->assertSessionHasErrors('comment');
-        $this->assertSame($oldComment, TorrentComment::findOrFail(1)->comment);
+        $this->assertSame($oldComment, TorrentComment::firstOrFail()->comment);
     }
 }

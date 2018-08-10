@@ -50,6 +50,34 @@ class LoginControllerTest extends TestCase
         $this->assertAuthenticatedAs($user);
     }
 
+    public function testBannedUserCannotLogin(): void
+    {
+        $this->withoutExceptionHandling();
+
+        $locale = factory(Locale::class)->create();
+        $email = 'test@gmail.com';
+        $password = '12345678';
+
+        $user = new User();
+        $user->name = 'test';
+        $user->email = $email;
+        $user->password = $password;
+        $user->locale_id = $locale->id;
+        $user->timezone = 'Europe/Zagreb';
+        $user->banned = true;
+        $user->save();
+
+        $response = $this->post(route('login'), [
+            'email'    => $email,
+            'password' => $password,
+        ]);
+
+        $response->assertStatus(302);
+        $response->assertRedirect(route('login'));
+        $this->assertGuest();
+        $response->assertSessionHas('error', trans('messages.user.banned'));
+    }
+
     public function testUserCannotLoginWithIncorrectPassword()
     {
         $user = factory(User::class)->create([

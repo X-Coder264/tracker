@@ -88,4 +88,5 @@ return [
     'torrent-comments.update-success-message' => 'Vaš komentar je uspješno uređen.',
     'validation.torrent-upload-invalid-torrent-file' => 'Ovo mora biti validna .torrent datoteka.',
     'user.edit-torrents-per-page' => 'Broj torrenta po stranici',
+    'user.banned' => 'Vaš korisnički račun je baniran.',
 ];

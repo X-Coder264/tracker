@@ -69,14 +69,14 @@ class TorrentUploadManagerTest extends TestCase
             'description' => $torrentDescription,
         ]);
 
-        $torrent = Torrent::findOrFail(1);
+        $torrent = Torrent::firstOrFail();
 
         $response->assertStatus(Response::HTTP_FOUND);
         $response->assertRedirect(route('torrents.show', $torrent));
         $response->assertSessionHas('success', trans('messages.torrents.store-successfully-uploaded-torrent.message'));
 
-        Storage::disk('public')->assertExists('torrents/1.torrent');
-        $this->assertSame($torrentValue, Storage::disk('public')->get('torrents/1.torrent'));
+        Storage::disk('public')->assertExists("torrents/{$torrent->id}.torrent");
+        $this->assertSame($torrentValue, Storage::disk('public')->get("torrents/{$torrent->id}.torrent"));
 
         $formatter = new SizeFormatter();
 
@@ -121,14 +121,14 @@ class TorrentUploadManagerTest extends TestCase
             'description' => $torrentDescription,
         ]);
 
-        $torrent = Torrent::findOrFail(1);
+        $torrent = Torrent::firstOrFail();
 
         $response->assertStatus(Response::HTTP_FOUND);
         $response->assertRedirect(route('torrents.show', $torrent));
         $response->assertSessionHas('success', trans('messages.torrents.store-successfully-uploaded-torrent.message'));
 
-        Storage::disk('public')->assertExists('torrents/1.torrent');
-        $decodedTorrent = $decoder->decode(Storage::disk('public')->get('torrents/1.torrent'));
+        Storage::disk('public')->assertExists("torrents/{$torrent->id}.torrent");
+        $decodedTorrent = $decoder->decode(Storage::disk('public')->get("torrents/{$torrent->id}.torrent"));
         $this->assertSame(1, $decodedTorrent['info']['private']);
     }
 
@@ -159,15 +159,15 @@ class TorrentUploadManagerTest extends TestCase
             'description' => $torrentDescription,
         ]);
 
-        $torrent = Torrent::findOrFail(1);
+        $torrent = Torrent::firstOrFail();
 
         $response->assertStatus(Response::HTTP_FOUND);
         $response->assertRedirect(route('torrents.show', $torrent));
         $response->assertSessionHas('success', trans('messages.torrents.store-successfully-uploaded-torrent.message'));
 
         $decoder = new Bdecoder();
-        Storage::disk('public')->assertExists('torrents/1.torrent');
-        $decodedTorrent = $decoder->decode(Storage::disk('public')->get('torrents/1.torrent'));
+        Storage::disk('public')->assertExists("torrents/{$torrent->id}.torrent");
+        $decodedTorrent = $decoder->decode(Storage::disk('public')->get("torrents/{$torrent->id}.torrent"));
         $this->assertSame(128, strlen($decodedTorrent['info']['entropy']));
     }
 
@@ -227,14 +227,14 @@ class TorrentUploadManagerTest extends TestCase
             'description' => $torrentDescription,
         ]);
 
-        $torrent = Torrent::findOrFail(2);
+        $torrent = Torrent::latest('id')->firstOrFail();
 
         $response->assertStatus(Response::HTTP_FOUND);
         $response->assertRedirect(route('torrents.show', $torrent));
         $response->assertSessionHas('success', trans('messages.torrents.store-successfully-uploaded-torrent.message'));
 
-        Storage::disk('public')->assertExists('torrents/2.torrent');
-        $this->assertSame($torrentValue, Storage::disk('public')->get('torrents/2.torrent'));
+        Storage::disk('public')->assertExists("torrents/{$torrent->id}.torrent");
+        $this->assertSame($torrentValue, Storage::disk('public')->get("torrents/{$torrent->id}.torrent"));
 
         $formatter = new SizeFormatter();
 
@@ -272,15 +272,15 @@ class TorrentUploadManagerTest extends TestCase
             'description' => $torrentDescription,
         ]);
 
-        $torrent = Torrent::findOrFail(1);
+        $torrent = Torrent::firstOrFail();
 
         $response->assertStatus(Response::HTTP_FOUND);
         $response->assertRedirect(route('torrents.show', $torrent));
         $response->assertSessionHas('success', trans('messages.torrents.store-successfully-uploaded-torrent.message'));
 
         $decoder = new Bdecoder();
-        Storage::disk('public')->assertExists('torrents/1.torrent');
-        $decodedTorrent = $decoder->decode(Storage::disk('public')->get('torrents/1.torrent'));
+        Storage::disk('public')->assertExists("torrents/{$torrent->id}.torrent");
+        $decodedTorrent = $decoder->decode(Storage::disk('public')->get("torrents/{$torrent->id}.torrent"));
         $this->assertSame(route('announce'), $decodedTorrent['announce']);
     }
 

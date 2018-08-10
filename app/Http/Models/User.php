@@ -24,7 +24,7 @@ class User extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'name', 'email', 'password', 'timezone', 'locale_id', 'torrents_per_page',
+        'name', 'email', 'password', 'timezone', 'locale_id', 'torrents_per_page', 'banned',
     ];
 
     /**
@@ -34,6 +34,15 @@ class User extends Authenticatable
      */
     protected $hidden = [
         'password', 'remember_token',
+    ];
+
+    /**
+     * The attributes that should be cast to native types.
+     *
+     * @var array
+     */
+    protected $casts = [
+        'banned' => 'bool',
     ];
 
     /**

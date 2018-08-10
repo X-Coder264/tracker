@@ -22,7 +22,7 @@ class PeerTest extends TestCase
     public function testUploadedAccessor()
     {
         factory(Peer::class)->create();
-        $peer = Peer::findOrFail(1);
+        $peer = Peer::firstOrFail();
         $returnValue = '500 MB';
         SizeFormatter::shouldReceive('getFormattedSize')->once()->with($peer->getOriginal('uploaded'))->andReturn($returnValue);
         $this->assertSame($returnValue, $peer->uploaded);
@@ -31,7 +31,7 @@ class PeerTest extends TestCase
     public function testDownloadedAccessor()
     {
         factory(Peer::class)->create();
-        $peer = Peer::findOrFail(1);
+        $peer = Peer::firstOrFail();
         $returnValue = '500 MB';
         SizeFormatter::shouldReceive('getFormattedSize')->once()->with($peer->getOriginal('downloaded'))->andReturn($returnValue);
         $this->assertSame($returnValue, $peer->downloaded);
@@ -39,10 +39,11 @@ class PeerTest extends TestCase
 
     public function testUserRelationship()
     {
-        factory(Peer::class)->create(['user_id' => 1]);
+        $user = factory(User::class)->create();
 
-        $user = User::findOrFail(1);
-        $peer = Peer::findOrFail(1);
+        factory(Peer::class)->create(['user_id' => $user->id]);
+
+        $peer = Peer::firstOrFail();
         $this->assertInstanceOf(BelongsTo::class, $peer->user());
         $this->assertInstanceOf(User::class, $peer->user);
         $this->assertSame($peer->user->id, $user->id);
@@ -52,10 +53,12 @@ class PeerTest extends TestCase
 
     public function testTorrentRelationship()
     {
-        factory(Peer::class)->create(['user_id' => 1]);
+        $user = factory(User::class)->create();
 
-        $torrent = Torrent::findOrFail(1);
-        $peer = Peer::findOrFail(1);
+        factory(Peer::class)->create(['user_id' => $user->id]);
+
+        $torrent = Torrent::firstOrFail();
+        $peer = Peer::firstOrFail();
         $this->assertInstanceOf(BelongsTo::class, $peer->torrent());
         $this->assertInstanceOf(Torrent::class, $peer->torrent);
         $this->assertSame($peer->torrent->id, $torrent->id);
@@ -67,8 +70,8 @@ class PeerTest extends TestCase
     {
         factory(PeerIP::class)->create();
 
-        $IP = PeerIP::findOrFail(1);
-        $peer = Peer::findOrFail(1);
+        $IP = PeerIP::firstOrFail();
+        $peer = Peer::firstOrFail();
         $this->assertInstanceOf(HasMany::class, $peer->IPs());
         $this->assertInstanceOf(Collection::class, $peer->IPs);
         $this->assertSame($peer->IPs[0]->id, $IP->id);

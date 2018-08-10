@@ -62,7 +62,7 @@ class AnnounceManagerTest extends TestCase
             $response->getContent()
         );
         $this->assertSame(1, Peer::count());
-        $peer = Peer::findOrFail(1);
+        $peer = Peer::firstOrFail();
         $this->assertSame($peerId, $peer->peer_id);
         $this->assertSame($user->id, (int) $peer->user_id);
         $this->assertSame($torrent->id, (int) $peer->torrent_id);
@@ -73,12 +73,12 @@ class AnnounceManagerTest extends TestCase
         $this->assertInstanceOf(Carbon::class, $peer->created_at);
         $this->assertInstanceOf(Carbon::class, $peer->updated_at);
         $this->assertSame(1, PeerIP::count());
-        $peerIP = PeerIP::findOrFail(1);
+        $peerIP = PeerIP::firstOrFail();
         $this->assertSame($IP, $peerIP->IP);
         $this->assertSame($port, (int) $peerIP->port);
         $this->assertFalse((bool) $peerIP->isIPv6);
         $this->assertSame(1, Snatch::count());
-        $snatch = Snatch::findOrFail(1);
+        $snatch = Snatch::firstOrFail();
         $this->assertSame($user->id, (int) $snatch->user_id);
         $this->assertSame($torrent->id, (int) $snatch->torrent_id);
         $this->assertSame(0, (int) $snatch->getOriginal('uploaded'));
@@ -174,7 +174,7 @@ class AnnounceManagerTest extends TestCase
             )
         );
         $this->assertSame(3, Peer::count());
-        $peer = Peer::findOrFail(3);
+        $peer = Peer::latest('id')->firstOrFail();
         $this->assertSame($peerId, $peer->peer_id);
         $this->assertSame($user->id, (int) $peer->user_id);
         $this->assertSame($torrent->id, (int) $peer->torrent_id);
@@ -185,12 +185,12 @@ class AnnounceManagerTest extends TestCase
         $this->assertInstanceOf(Carbon::class, $peer->created_at);
         $this->assertInstanceOf(Carbon::class, $peer->updated_at);
         $this->assertSame(3, PeerIP::count());
-        $peerIP = PeerIP::findOrFail(3);
+        $peerIP = PeerIP::latest('id')->firstOrFail();
         $this->assertSame($IP, $peerIP->IP);
         $this->assertSame($port, (int) $peerIP->port);
         $this->assertFalse((bool) $peerIP->isIPv6);
         $this->assertSame(1, Snatch::count());
-        $snatch = Snatch::findOrFail(1);
+        $snatch = Snatch::firstOrFail();
         $this->assertSame($user->id, (int) $snatch->user_id);
         $this->assertSame($torrent->id, (int) $snatch->torrent_id);
         $this->assertSame(0, (int) $snatch->getOriginal('uploaded'));
@@ -252,7 +252,7 @@ class AnnounceManagerTest extends TestCase
             $response->getContent()
         );
         $this->assertSame(1, Peer::count());
-        $peer = Peer::findOrFail(1);
+        $peer = Peer::firstOrFail();
         $this->assertSame($peerId, $peer->peer_id);
         $this->assertSame($user->id, (int) $peer->user_id);
         $this->assertSame($torrent->id, (int) $peer->torrent_id);
@@ -263,7 +263,7 @@ class AnnounceManagerTest extends TestCase
         $this->assertInstanceOf(Carbon::class, $peer->created_at);
         $this->assertInstanceOf(Carbon::class, $peer->updated_at);
         $this->assertSame(1, PeerIP::count());
-        $peerIP = PeerIP::findOrFail(1);
+        $peerIP = PeerIP::firstOrFail();
         $this->assertSame($IP, $peerIP->IP);
         $this->assertSame($port, (int) $peerIP->port);
         $this->assertFalse((bool) $peerIP->isIPv6);
@@ -502,7 +502,7 @@ class AnnounceManagerTest extends TestCase
                 'updated_at' => Carbon::now()->subMinutes(40),
             ]
         );
-        $leecherIP = factory(PeerIP::class)->create(['peerID' => $leecher->id, 'IP' => $IP, 'port' => $port]);
+        factory(PeerIP::class)->create(['peerID' => $leecher->id, 'IP' => $IP, 'port' => $port]);
         $snatch = factory(Snatch::class)->create(
             [
                 'torrent_id'     => $torrent->id,
@@ -568,7 +568,7 @@ class AnnounceManagerTest extends TestCase
         $this->assertInstanceOf(Carbon::class, $peer->created_at);
         $this->assertInstanceOf(Carbon::class, $peer->updated_at);
         $this->assertSame(3, PeerIP::count());
-        $peerIP = PeerIP::findOrFail(4);
+        $peerIP = PeerIP::latest('id')->firstOrFail();
         $this->assertSame($IP, $peerIP->IP);
         $this->assertSame($port, (int) $peerIP->port);
         $this->assertFalse((bool) $peerIP->isIPv6);
@@ -668,7 +668,7 @@ class AnnounceManagerTest extends TestCase
             $response->getContent()
         );
         $this->assertSame(1, Peer::count());
-        $peer = Peer::findOrFail(1);
+        $peer = Peer::firstOrFail();
         $this->assertSame($peerId, $peer->peer_id);
         $this->assertSame($user->id, (int) $peer->user_id);
         $this->assertSame($torrent->id, (int) $peer->torrent_id);
@@ -679,7 +679,7 @@ class AnnounceManagerTest extends TestCase
         $this->assertInstanceOf(Carbon::class, $peer->created_at);
         $this->assertInstanceOf(Carbon::class, $peer->updated_at);
         $this->assertSame(1, PeerIP::count());
-        $peerIP = PeerIP::findOrFail(2);
+        $peerIP = PeerIP::firstOrFail();
         $this->assertSame($IP, $peerIP->IP);
         $this->assertSame($port, (int) $peerIP->port);
         $this->assertFalse((bool) $peerIP->isIPv6);
@@ -778,7 +778,7 @@ class AnnounceManagerTest extends TestCase
             $response->getContent()
         );
         $this->assertSame(1, Peer::count());
-        $peer = Peer::findOrFail(1);
+        $peer = Peer::firstOrFail();
         $this->assertSame($peerId, $peer->peer_id);
         $this->assertSame($user->id, (int) $peer->user_id);
         $this->assertSame($torrent->id, (int) $peer->torrent_id);
@@ -789,7 +789,7 @@ class AnnounceManagerTest extends TestCase
         $this->assertInstanceOf(Carbon::class, $peer->created_at);
         $this->assertInstanceOf(Carbon::class, $peer->updated_at);
         $this->assertSame(1, PeerIP::count());
-        $peerIP = PeerIP::findOrFail(2);
+        $peerIP = PeerIP::firstOrFail();
         $this->assertSame($IP, $peerIP->IP);
         $this->assertSame($port, (int) $peerIP->port);
         $this->assertFalse((bool) $peerIP->isIPv6);
@@ -876,7 +876,7 @@ class AnnounceManagerTest extends TestCase
             $response->getContent()
         );
         $this->assertSame(1, Peer::count());
-        $peer = Peer::findOrFail(1);
+        $peer = Peer::firstOrFail();
         $this->assertSame($peerId, $peer->peer_id);
         $this->assertSame($user->id, (int) $peer->user_id);
         $this->assertSame($torrent->id, (int) $peer->torrent_id);
@@ -887,7 +887,7 @@ class AnnounceManagerTest extends TestCase
         $this->assertInstanceOf(Carbon::class, $peer->created_at);
         $this->assertInstanceOf(Carbon::class, $peer->updated_at);
         $this->assertSame(1, PeerIP::count());
-        $peerIP = PeerIP::findOrFail(2);
+        $peerIP = PeerIP::firstOrFail();
         $this->assertSame($IP, $peerIP->IP);
         $this->assertSame($port, (int) $peerIP->port);
         $this->assertFalse((bool) $peerIP->isIPv6);
@@ -962,7 +962,7 @@ class AnnounceManagerTest extends TestCase
             $response->getContent()
         );
         $this->assertSame(1, Peer::count());
-        $peer = Peer::findOrFail(1);
+        $peer = Peer::firstOrFail();
         $this->assertSame($peerId, $peer->peer_id);
         $this->assertSame($user->id, (int) $peer->user_id);
         $this->assertSame($torrent->id, (int) $peer->torrent_id);
@@ -973,7 +973,7 @@ class AnnounceManagerTest extends TestCase
         $this->assertInstanceOf(Carbon::class, $peer->created_at);
         $this->assertInstanceOf(Carbon::class, $peer->updated_at);
         $this->assertSame(1, PeerIP::count());
-        $peerIP = PeerIP::findOrFail(1);
+        $peerIP = PeerIP::firstOrFail();
         $this->assertSame($IP, $peerIP->IP);
         $this->assertSame($port, (int) $peerIP->port);
         $this->assertFalse((bool) $peerIP->isIPv6);
@@ -1046,7 +1046,7 @@ class AnnounceManagerTest extends TestCase
             $response->getContent()
         );
         $this->assertSame(1, Peer::count());
-        $peer = Peer::findOrFail(1);
+        $peer = Peer::firstOrFail();
         $this->assertSame($peerId, $peer->peer_id);
         $this->assertSame($user->id, (int) $peer->user_id);
         $this->assertSame($torrent->id, (int) $peer->torrent_id);
@@ -1057,7 +1057,7 @@ class AnnounceManagerTest extends TestCase
         $this->assertInstanceOf(Carbon::class, $peer->created_at);
         $this->assertInstanceOf(Carbon::class, $peer->updated_at);
         $this->assertSame(1, PeerIP::count());
-        $peerIP = PeerIP::findOrFail(1);
+        $peerIP = PeerIP::firstOrFail();
         $this->assertSame($IP, $peerIP->IP);
         $this->assertSame($port, (int) $peerIP->port);
         $this->assertFalse((bool) $peerIP->isIPv6);
@@ -1119,7 +1119,7 @@ class AnnounceManagerTest extends TestCase
             $response->getContent()
         );
         $this->assertSame(1, Peer::count());
-        $peer = Peer::findOrFail(1);
+        $peer = Peer::firstOrFail();
         $this->assertSame($peerId, $peer->peer_id);
         $this->assertSame($user->id, (int) $peer->user_id);
         $this->assertSame($torrent->id, (int) $peer->torrent_id);
@@ -1130,7 +1130,7 @@ class AnnounceManagerTest extends TestCase
         $this->assertInstanceOf(Carbon::class, $peer->created_at);
         $this->assertInstanceOf(Carbon::class, $peer->updated_at);
         $this->assertSame(1, PeerIP::count());
-        $peerIP = PeerIP::findOrFail(1);
+        $peerIP = PeerIP::firstOrFail();
         $this->assertSame($IP, $peerIP->IP);
         $this->assertSame($port, (int) $peerIP->port);
         $this->assertFalse((bool) $peerIP->isIPv6);
@@ -1215,7 +1215,7 @@ class AnnounceManagerTest extends TestCase
         }
         $this->assertSame($expectedResponse, $responseContent);
         $this->assertSame(3, Peer::count());
-        $peer = Peer::findOrFail(3);
+        $peer = Peer::latest('id')->firstOrFail();
         $this->assertSame($peerId, $peer->peer_id);
         $this->assertSame($user->id, (int) $peer->user_id);
         $this->assertSame($torrent->id, (int) $peer->torrent_id);
@@ -1226,16 +1226,16 @@ class AnnounceManagerTest extends TestCase
         $this->assertInstanceOf(Carbon::class, $peer->created_at);
         $this->assertInstanceOf(Carbon::class, $peer->updated_at);
         $this->assertSame(4, PeerIP::count());
-        $peerIP = PeerIP::findOrFail(3);
+        $peerIP = $peer->IPs[0];
         $this->assertSame($IPv4, $peerIP->IP);
         $this->assertSame($port, (int) $peerIP->port);
         $this->assertFalse((bool) $peerIP->isIPv6);
-        $peerIP = PeerIP::findOrFail(4);
+        $peerIP = $peer->IPs[1];
         $this->assertSame($IPv6, $peerIP->IP);
         $this->assertSame($port, (int) $peerIP->port);
         $this->assertTrue((bool) $peerIP->isIPv6);
         $this->assertSame(1, Snatch::count());
-        $snatch = Snatch::findOrFail(1);
+        $snatch = Snatch::firstOrFail();
         $this->assertSame($user->id, (int) $snatch->user_id);
         $this->assertSame($torrent->id, (int) $snatch->torrent_id);
         $this->assertSame(0, (int) $snatch->getOriginal('uploaded'));
@@ -1324,7 +1324,7 @@ class AnnounceManagerTest extends TestCase
         }
         $this->assertSame($expectedResponse, $responseContent);
         $this->assertSame(3, Peer::count());
-        $peer = Peer::findOrFail(3);
+        $peer = Peer::latest('id')->firstOrFail();
         $this->assertSame($peerId, $peer->peer_id);
         $this->assertSame($user->id, (int) $peer->user_id);
         $this->assertSame($torrent->id, (int) $peer->torrent_id);
@@ -1335,12 +1335,12 @@ class AnnounceManagerTest extends TestCase
         $this->assertInstanceOf(Carbon::class, $peer->created_at);
         $this->assertInstanceOf(Carbon::class, $peer->updated_at);
         $this->assertSame(3, PeerIP::count());
-        $peerIP = PeerIP::findOrFail(3);
+        $peerIP = PeerIP::latest('id')->firstOrFail();
         $this->assertSame($IPv6, $peerIP->IP);
         $this->assertSame($port, (int) $peerIP->port);
         $this->assertTrue((bool) $peerIP->isIPv6);
         $this->assertSame(1, Snatch::count());
-        $snatch = Snatch::findOrFail(1);
+        $snatch = Snatch::firstOrFail();
         $this->assertSame($user->id, (int) $snatch->user_id);
         $this->assertSame($torrent->id, (int) $snatch->torrent_id);
         $this->assertSame(0, (int) $snatch->getOriginal('uploaded'));
@@ -1429,7 +1429,7 @@ class AnnounceManagerTest extends TestCase
         }
         $this->assertSame($expectedResponse, $responseContent);
         $this->assertSame(3, Peer::count());
-        $peer = Peer::findOrFail(3);
+        $peer = Peer::latest('id')->firstOrFail();
         $this->assertSame($peerId, $peer->peer_id);
         $this->assertSame($user->id, (int) $peer->user_id);
         $this->assertSame($torrent->id, (int) $peer->torrent_id);
@@ -1440,12 +1440,12 @@ class AnnounceManagerTest extends TestCase
         $this->assertInstanceOf(Carbon::class, $peer->created_at);
         $this->assertInstanceOf(Carbon::class, $peer->updated_at);
         $this->assertSame(3, PeerIP::count());
-        $peerIP = PeerIP::findOrFail(3);
+        $peerIP = PeerIP::latest('id')->firstOrFail();
         $this->assertSame($IPv6, $peerIP->IP);
         $this->assertSame($port, (int) $peerIP->port);
         $this->assertTrue((bool) $peerIP->isIPv6);
         $this->assertSame(1, Snatch::count());
-        $snatch = Snatch::findOrFail(1);
+        $snatch = Snatch::firstOrFail();
         $this->assertSame($user->id, (int) $snatch->user_id);
         $this->assertSame($torrent->id, (int) $snatch->torrent_id);
         $this->assertSame(0, (int) $snatch->getOriginal('uploaded'));
@@ -1536,7 +1536,7 @@ class AnnounceManagerTest extends TestCase
         }
         $this->assertSame($expectedResponse, $responseContent);
         $this->assertSame(3, Peer::count());
-        $peer = Peer::findOrFail(3);
+        $peer = Peer::latest('id')->firstOrFail();
         $this->assertSame($peerId, $peer->peer_id);
         $this->assertSame($user->id, (int) $peer->user_id);
         $this->assertSame($torrent->id, (int) $peer->torrent_id);
@@ -1547,12 +1547,12 @@ class AnnounceManagerTest extends TestCase
         $this->assertInstanceOf(Carbon::class, $peer->created_at);
         $this->assertInstanceOf(Carbon::class, $peer->updated_at);
         $this->assertSame(3, PeerIP::count());
-        $peerIP = PeerIP::findOrFail(3);
+        $peerIP = PeerIP::latest('id')->firstOrFail();
         $this->assertSame($IPv6, $peerIP->IP);
         $this->assertSame($IPv6Port, (int) $peerIP->port);
         $this->assertTrue((bool) $peerIP->isIPv6);
         $this->assertSame(1, Snatch::count());
-        $snatch = Snatch::findOrFail(1);
+        $snatch = Snatch::firstOrFail();
         $this->assertSame($user->id, (int) $snatch->user_id);
         $this->assertSame($torrent->id, (int) $snatch->torrent_id);
         $this->assertSame(0, (int) $snatch->getOriginal('uploaded'));
@@ -1643,7 +1643,7 @@ class AnnounceManagerTest extends TestCase
         }
         $this->assertSame($expectedResponse, $responseContent);
         $this->assertSame(3, Peer::count());
-        $peer = Peer::findOrFail(3);
+        $peer = Peer::latest('id')->firstOrFail();
         $this->assertSame($peerId, $peer->peer_id);
         $this->assertSame($user->id, (int) $peer->user_id);
         $this->assertSame($torrent->id, (int) $peer->torrent_id);
@@ -1654,12 +1654,12 @@ class AnnounceManagerTest extends TestCase
         $this->assertInstanceOf(Carbon::class, $peer->created_at);
         $this->assertInstanceOf(Carbon::class, $peer->updated_at);
         $this->assertSame(3, PeerIP::count());
-        $peerIP = PeerIP::findOrFail(3);
+        $peerIP = PeerIP::latest('id')->firstOrFail();
         $this->assertSame($IPv4, $peerIP->IP);
         $this->assertSame($IPv4Port, (int) $peerIP->port);
         $this->assertFalse((bool) $peerIP->isIPv6);
         $this->assertSame(1, Snatch::count());
-        $snatch = Snatch::findOrFail(1);
+        $snatch = Snatch::firstOrFail();
         $this->assertSame($user->id, (int) $snatch->user_id);
         $this->assertSame($torrent->id, (int) $snatch->torrent_id);
         $this->assertSame(0, (int) $snatch->getOriginal('uploaded'));
@@ -1740,7 +1740,7 @@ class AnnounceManagerTest extends TestCase
         $responseContent = $decoder->decode($responseContent);
         $this->assertSame($expectedResponse, $responseContent);
         $this->assertSame(2, Peer::count());
-        $peer = Peer::findOrFail(2);
+        $peer = Peer::latest('id')->firstOrFail();
         $this->assertSame($peerId, $peer->peer_id);
         $this->assertSame($user->id, (int) $peer->user_id);
         $this->assertSame($torrent->id, (int) $peer->torrent_id);
@@ -1751,12 +1751,12 @@ class AnnounceManagerTest extends TestCase
         $this->assertInstanceOf(Carbon::class, $peer->created_at);
         $this->assertInstanceOf(Carbon::class, $peer->updated_at);
         $this->assertSame(2, PeerIP::count());
-        $peerIP = PeerIP::findOrFail(2);
+        $peerIP = PeerIP::latest('id')->firstOrFail();
         $this->assertSame($IP, $peerIP->IP);
         $this->assertSame($port, (int) $peerIP->port);
         $this->assertFalse((bool) $peerIP->isIPv6);
         $this->assertSame(1, Snatch::count());
-        $snatch = Snatch::findOrFail(1);
+        $snatch = Snatch::firstOrFail();
         $this->assertSame($user->id, (int) $snatch->user_id);
         $this->assertSame($torrent->id, (int) $snatch->torrent_id);
         $this->assertSame(0, (int) $snatch->getOriginal('uploaded'));
@@ -1853,7 +1853,7 @@ class AnnounceManagerTest extends TestCase
             )
         );
         $this->assertSame(3, Peer::count());
-        $peer = Peer::findOrFail(3);
+        $peer = Peer::latest('id')->firstOrFail();
         $this->assertSame($peerId, $peer->peer_id);
         $this->assertSame($user->id, (int) $peer->user_id);
         $this->assertSame($torrent->id, (int) $peer->torrent_id);
@@ -1864,12 +1864,12 @@ class AnnounceManagerTest extends TestCase
         $this->assertInstanceOf(Carbon::class, $peer->created_at);
         $this->assertInstanceOf(Carbon::class, $peer->updated_at);
         $this->assertSame(3, PeerIP::count());
-        $peerIP = PeerIP::findOrFail(3);
+        $peerIP = PeerIP::latest('id')->firstOrFail();
         $this->assertSame($IP, $peerIP->IP);
         $this->assertSame($port, (int) $peerIP->port);
         $this->assertFalse((bool) $peerIP->isIPv6);
         $this->assertSame(1, Snatch::count());
-        $snatch = Snatch::findOrFail(1);
+        $snatch = Snatch::firstOrFail();
         $this->assertSame($user->id, (int) $snatch->user_id);
         $this->assertSame($torrent->id, (int) $snatch->torrent_id);
         $this->assertSame(0, (int) $snatch->getOriginal('uploaded'));

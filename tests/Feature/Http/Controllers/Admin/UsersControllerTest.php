@@ -91,17 +91,18 @@ class UsersControllerTest extends AdminApiTestCase
         $response = $this->makeRequest('POST', route('admin.users.create'), $data);
         $jsonResponse = $response->getJsonResponse();
 
-        $this->assertSame(3, (int) $jsonResponse['data']['id']);
+        $user = User::latest('id')->firstOrFail();
+
+        $this->assertSame($user->id, (int) $jsonResponse['data']['id']);
         $this->assertSame($name, $jsonResponse['data']['attributes']['name']);
         $this->assertSame($email, $jsonResponse['data']['attributes']['email']);
         $this->assertSame($timezone, $jsonResponse['data']['attributes']['timezone']);
-        $this->assertSame(route('admin.users.read', 3), $jsonResponse['data']['links']['self']);
+        $this->assertSame(route('admin.users.read', $user->id), $jsonResponse['data']['links']['self']);
         $this->assertArrayHasKey('slug', $jsonResponse['data']['attributes']);
         $this->assertArrayHasKey('created-at', $jsonResponse['data']['attributes']);
         $this->assertArrayHasKey('updated-at', $jsonResponse['data']['attributes']);
         $this->assertArrayNotHasKey('password', $jsonResponse['data']['attributes']);
         $this->assertSame(3, User::count());
-        $user = User::findOrFail(3);
         $this->assertSame($name, $user->name);
         $this->assertSame($email, $user->email);
         $this->assertSame($timezone, $user->timezone);
@@ -370,15 +371,15 @@ class UsersControllerTest extends AdminApiTestCase
         $jsonResponse = $response->getJsonResponse();
 
         $this->assertSame(3, $jsonResponse['meta']['total']);
-        $this->assertSame(1, (int) $jsonResponse['data'][0]['id']);
-        $this->assertSame(2, (int) $jsonResponse['data'][1]['id']);
+        $this->assertSame($users[0]->id, (int) $jsonResponse['data'][0]['id']);
+        $this->assertSame($users[1]->id, (int) $jsonResponse['data'][1]['id']);
         $this->assertCount(2, $jsonResponse['data']);
 
         $response = $this->makeRequest('GET', route('admin.users.index', ['page[offset]' => 1, 'page[limit]' => 2, 'sort' => 'id']));
         $jsonResponse = $response->getJsonResponse();
 
         $this->assertSame(3, $jsonResponse['meta']['total']);
-        $this->assertSame(3, (int) $jsonResponse['data'][0]['id']);
+        $this->assertSame($users[2]->id, (int) $jsonResponse['data'][0]['id']);
         $this->assertCount(1, $jsonResponse['data']);
 
         $response = $this->makeRequest('GET', route('admin.users.index', ['page[offset]' => 2, 'page[limit]' => 2, 'sort' => 'id']));
