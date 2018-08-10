@@ -39,5 +39,7 @@ class DeletePeers extends Command
         if ($obsoletePeerIds->isNotEmpty()) {
             $databaseManager->table('peers')->whereIn('id', $obsoletePeerIds)->delete();
         }
+
+        $this->info(sprintf('%s obsolete peers were deleted.', $obsoletePeerIds->count()));
     }
 }
