@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Http\Models;
+namespace App\Models;
 
 use Facades\App\Services\SizeFormatter;
 use Illuminate\Database\Eloquent\Model;
@@ -26,7 +26,7 @@ class Torrent extends Model
     /**
      * @return array
      */
-    public function sluggable()
+    public function sluggable(): array
     {
         return [
             'slug' => [
@@ -81,5 +81,13 @@ class Torrent extends Model
     public function comments(): HasMany
     {
         return $this->hasMany(TorrentComment::class);
+    }
+
+    /**
+     * @return BelongsTo
+     */
+    public function category(): BelongsTo
+    {
+        return $this->belongsTo(TorrentCategory::class);
     }
 }

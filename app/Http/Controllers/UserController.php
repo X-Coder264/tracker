@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
-use App\Http\Models\User;
-use App\Http\Models\Locale;
+use App\Models\User;
+use App\Models\Locale;
 use Illuminate\Http\Response;
 use Illuminate\Cache\CacheManager;
 use Illuminate\Routing\Redirector;

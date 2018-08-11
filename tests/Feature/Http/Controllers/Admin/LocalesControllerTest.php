@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Http\Controllers\Admin;
 
-use App\Http\Models\User;
-use App\Http\Models\Locale;
+use App\Models\User;
+use App\Models\Locale;
 use Tests\AdminApiTestCase;
 use Illuminate\Support\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;

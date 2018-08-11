@@ -6,6 +6,7 @@
     "type": "project",
     "require": {
         "php": "^7.2",
+        "ext-json": "*",
         "cloudcreativity/laravel-json-api": "^0.12.0",
         "cviebrock/eloquent-sluggable": "^4.5",
         "fideloper/proxy": "^4.0",

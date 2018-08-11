@@ -6,12 +6,12 @@ namespace Tests\Feature\Services;
 
 use stdClass;
 use Tests\TestCase;
-use App\Http\Models\Peer;
-use App\Http\Models\User;
+use App\Models\Peer;
+use App\Models\User;
+use App\Models\PeerIP;
+use App\Models\Snatch;
+use App\Models\Torrent;
 use App\Services\Bdecoder;
-use App\Http\Models\PeerIP;
-use App\Http\Models\Snatch;
-use App\Http\Models\Torrent;
 use Illuminate\Http\Response;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;

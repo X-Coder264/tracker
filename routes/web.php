@@ -21,7 +21,7 @@ $router->auth();
 $router->get('announce', 'AnnounceController@store')->name('announce');
 
 Route::middleware(['auth'])->group(function () use ($router) {
-    $router->get('/', 'HomeController@index')->name('home.index');
+    $router->get('/', 'HomeController@index')->name('home');
 
     $router->get('/cms', 'Admin\IndexController@index')->name('admin.index');
     // catch all route for the admin CMS (except the API ones), we are leaving the routing for the CMS to the frontend router

@@ -22,7 +22,7 @@
                 <span class="navbar-toggler-icon"></span>
             </button>
 
-            <a class="navbar-brand" href="{{ route('home.index') }}">
+            <a class="navbar-brand" href="{{ route('home') }}">
                 {{ config('app.name', 'Tracker') }}
             </a>
 

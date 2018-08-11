@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services;
 
-use App\Http\Models\User;
+use App\Models\User;
 
 class PasskeyGenerator
 {
@@ -32,7 +32,7 @@ class PasskeyGenerator
     /**
      * @param string $passkey
      *
-     * @return User|null
+     * @return \App\Models\User|null
      */
     protected function getUserWithTheSpecifiedPasskey(string $passkey): ?User
     {

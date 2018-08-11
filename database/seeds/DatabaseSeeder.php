@@ -14,6 +14,7 @@ class DatabaseSeeder extends Seeder
         $this->call(LocaleSeeder::class);
         $this->call(RolesAndPermissionsSeeder::class);
         $this->call(UserSeeder::class);
+        $this->call(TorrentCategorySeeder::class);
         $this->call(TorrentSeeder::class);
         $this->call(PeerSeeder::class);
     }

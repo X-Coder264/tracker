@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Tests\Feature\Http\Controllers\Auth;
 
 use Tests\TestCase;
-use App\Http\Models\User;
-use App\Http\Models\Locale;
+use App\Models\User;
+use App\Models\Locale;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Event;
@@ -59,7 +59,7 @@ class RegisterControllerTest extends TestCase
         ]);
 
         $response->assertStatus(Response::HTTP_FOUND);
-        $response->assertRedirect(route('home.index'));
+        $response->assertRedirect(route('home'));
 
         $this->assertSame(1, User::count());
 
@@ -267,7 +267,7 @@ class RegisterControllerTest extends TestCase
         $this->actingAs($user);
         $response = $this->get(route('register'));
         $response->assertStatus(Response::HTTP_FOUND);
-        $response->assertRedirect(route('home.index'));
+        $response->assertRedirect(route('home'));
     }
 
     private function assertSessionHasOldInput()

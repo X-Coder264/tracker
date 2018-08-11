@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services;
 
-use App\Http\Models\Torrent;
+use App\Models\Torrent;
 use Illuminate\Cache\CacheManager;
 use Illuminate\Filesystem\FilesystemManager;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;

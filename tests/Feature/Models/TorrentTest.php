@@ -2,13 +2,14 @@
 
 declare(strict_types=1);
 
-namespace Tests\Feature\Http\Models;
+namespace Tests\Feature\Models;
 
 use Tests\TestCase;
-use App\Http\Models\Peer;
-use App\Http\Models\User;
-use App\Http\Models\Torrent;
-use App\Http\Models\TorrentComment;
+use App\Models\Peer;
+use App\Models\User;
+use App\Models\Torrent;
+use App\Models\TorrentComment;
+use App\Models\TorrentCategory;
 use Facades\App\Services\SizeFormatter;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -36,6 +37,7 @@ class TorrentTest extends TestCase
         $torrent->info_hash = 'fefsrgererw';
         $torrent->size = 34356212;
         $torrent->uploader_id = $user->id;
+        $torrent->category_id = factory(TorrentCategory::class)->create()->id;
         $torrent->description = 'test description';
         $torrent->save();
 
@@ -86,5 +88,19 @@ class TorrentTest extends TestCase
         $this->assertSame($torrent->comments[0]->comment, $torrentComment->comment);
         $this->assertSame($torrent->comments[0]->created_at->format('Y-m-d H:i:s'), $torrentComment->created_at->format('Y-m-d H:i:s'));
         $this->assertSame($torrent->comments[0]->updated_at->format('Y-m-d H:i:s'), $torrentComment->updated_at->format('Y-m-d H:i:s'));
+    }
+
+    public function testCategoryRelationship(): void
+    {
+        factory(Torrent::class)->create();
+
+        $torrentCategory = TorrentCategory::firstOrFail();
+        $torrent = Torrent::firstOrFail();
+        $this->assertInstanceOf(BelongsTo::class, $torrent->category());
+        $this->assertInstanceOf(TorrentCategory::class, $torrent->category);
+        $this->assertTrue($torrent->category->is($torrentCategory));
+        $this->assertSame($torrent->category->id, $torrentCategory->id);
+        $this->assertSame($torrent->category->name, $torrentCategory->name);
+        $this->assertSame($torrent->category->slug, $torrentCategory->slug);
     }
 }

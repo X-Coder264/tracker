@@ -40,7 +40,7 @@ class LoginController extends Controller
      */
     public function redirectTo(): string
     {
-        return $this->urlGenerator->route('home.index');
+        return $this->urlGenerator->route('home');
     }
 
     /**

@@ -30,6 +30,7 @@ class TorrentUploadRequest extends FormRequest
             'torrent'     => 'required|file|mimetypes:application/x-bittorrent',
             'name'        => 'required|string|min:5|max:255|unique:torrents',
             'description' => 'required|string',
+            'category'    => 'required|exists:torrent_categories,id',
         ];
     }
 

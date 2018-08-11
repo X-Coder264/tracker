@@ -2,7 +2,8 @@
 
 declare(strict_types=1);
 
-use App\Http\Models\Peer;
+use App\Models\Peer;
+use App\Models\Torrent;
 use Illuminate\Database\Seeder;
 
 class PeerSeeder extends Seeder
@@ -15,7 +16,7 @@ class PeerSeeder extends Seeder
         $peer = new Peer();
         $peer->user_id = rand(1, 3);
         $peer->peer_id = '1234';
-        $peer->torrent_id = 1;
+        $peer->torrent_id = Torrent::firstOrFail()->id;
         $peer->userAgent = 'qBittorrent/3.3.16';
         $peer->save();
 
@@ -30,7 +31,7 @@ class PeerSeeder extends Seeder
         $peer = new Peer();
         $peer->user_id = rand(1, 3);
         $peer->peer_id = '12345';
-        $peer->torrent_id = 1;
+        $peer->torrent_id = Torrent::firstOrFail()->id;
         $peer->userAgent = 'qBittorrent/3.3.16';
         $peer->save();
 

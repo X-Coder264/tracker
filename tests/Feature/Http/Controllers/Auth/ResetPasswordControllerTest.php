@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Tests\Feature\Http\Controllers\Auth;
 
 use Tests\TestCase;
-use App\Http\Models\User;
+use App\Models\User;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Event;
@@ -35,7 +35,7 @@ class ResetPasswordControllerTest extends TestCase
         ]);
 
         $response->assertStatus(Response::HTTP_FOUND);
-        $response->assertRedirect(route('home.index'));
+        $response->assertRedirect(route('home'));
         $response->assertSessionHas('status');
         $this->assertAuthenticatedAs($user);
 

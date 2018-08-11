@@ -4,13 +4,14 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
-use App\Http\Models\User;
+use App\Models\User;
+use App\Models\Torrent;
 use App\Services\Bdecoder;
 use App\Services\Bencoder;
 use Illuminate\Support\Str;
-use App\Http\Models\Torrent;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use App\Models\TorrentCategory;
 use Illuminate\Auth\AuthManager;
 use App\Services\PasskeyGenerator;
 use Illuminate\Cache\CacheManager;
@@ -64,13 +65,18 @@ class TorrentController extends Controller
     }
 
     /**
+     * @param CacheManager    $cacheManager
      * @param ResponseFactory $responseFactory
      *
      * @return Response
      */
-    public function create(ResponseFactory $responseFactory): Response
+    public function create(CacheManager $cacheManager, ResponseFactory $responseFactory): Response
     {
-        return $responseFactory->view('torrents.create');
+        $categories = $cacheManager->remember('torrentCategories', 30, function () {
+            return TorrentCategory::all();
+        });
+
+        return $responseFactory->view('torrents.create', compact('categories'));
     }
 
     /**
@@ -99,6 +105,7 @@ class TorrentController extends Controller
 
         $torrent->load(['uploader', 'peers.user']);
         $numberOfPeers = $torrent->peers->count();
+
         $torrentComments = $torrent->comments()->with('user')->paginate(10);
 
         return $responseFactory->view(

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Tests\Feature\Http\Controllers;
 
 use Tests\TestCase;
-use App\Http\Models\User;
+use App\Models\User;
 use Illuminate\Http\Response;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
@@ -19,7 +19,7 @@ class HomeControllerTest extends TestCase
 
         $user = factory(User::class)->create();
         $this->actingAs($user);
-        $response = $this->get(route('home.index'));
+        $response = $this->get(route('home'));
 
         $response->assertStatus(Response::HTTP_OK);
         $response->assertViewIs('home.index');
@@ -27,7 +27,7 @@ class HomeControllerTest extends TestCase
 
     public function testGuestsCannotSeeTheHomePage()
     {
-        $response = $this->get(route('home.index'));
+        $response = $this->get(route('home'));
         $response->assertStatus(Response::HTTP_FOUND);
         $response->assertRedirect(route('login'));
     }

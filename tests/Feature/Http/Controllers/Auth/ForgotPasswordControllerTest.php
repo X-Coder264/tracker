@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Tests\Feature\Http\Controllers\Auth;
 
 use Tests\TestCase;
-use App\Http\Models\User;
+use App\Models\User;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
 use App\Notifications\ResetPassword;
@@ -31,7 +31,7 @@ class ForgotPasswordControllerTest extends TestCase
     {
         $user = factory(User::class)->make();
         $response = $this->actingAs($user)->get(route('password.request'));
-        $response->assertRedirect(route('home.index'));
+        $response->assertRedirect(route('home'));
     }
 
     public function testUserReceivesAnEmailWithAPasswordResetLink()

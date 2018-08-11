@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Requests;
 
-use App\Http\Models\Locale;
+use App\Models\Locale;
 use Illuminate\Validation\Rule;
 use Illuminate\Auth\AuthManager;
 use Illuminate\Foundation\Http\FormRequest;

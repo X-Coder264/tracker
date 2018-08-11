@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use App\Http\Models\Locale;
+use App\Models\Locale;
 use Illuminate\Database\Seeder;
 
 class LocaleSeeder extends Seeder

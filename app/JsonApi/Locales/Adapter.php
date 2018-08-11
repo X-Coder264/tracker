@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\JsonApi\Locales;
 
-use App\Http\Models\Locale;
+use App\Models\Locale;
 use App\JsonApi\OffsetStrategy;
 use Illuminate\Support\Collection;
 use Illuminate\Database\Eloquent\Builder;

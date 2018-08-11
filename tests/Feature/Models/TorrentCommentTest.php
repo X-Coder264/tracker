@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Tests\Feature\Http\Models;
+namespace Tests\Feature\Models;
 
 use Tests\TestCase;
-use App\Http\Models\User;
-use App\Http\Models\Torrent;
-use App\Http\Models\TorrentComment;
+use App\Models\User;
+use App\Models\Torrent;
+use App\Models\TorrentComment;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 

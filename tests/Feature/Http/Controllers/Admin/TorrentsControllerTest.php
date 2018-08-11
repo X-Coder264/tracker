@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Http\Controllers\Admin;
 
-use App\Http\Models\User;
+use App\Models\User;
+use App\Models\Torrent;
 use Tests\AdminApiTestCase;
-use App\Http\Models\Torrent;
 use Illuminate\Support\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 

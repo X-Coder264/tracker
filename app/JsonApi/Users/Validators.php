@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\JsonApi\Users;
 
-use App\Http\Models\User;
+use App\Models\User;
 use App\JsonApi\ResourceTypes;
 use CloudCreativity\LaravelJsonApi\Validators\AbstractValidatorProvider;
 use CloudCreativity\JsonApi\Contracts\Validators\RelationshipsValidatorInterface;
@@ -56,7 +56,7 @@ class Validators extends AbstractValidatorProvider
      */
     protected function attributeRules($record = null)
     {
-        /** @var User $record */
+        /** @var \App\Models\User $record */
 
         // The JSON API spec says the client does not have to send all attributes for an update request, so
         // if the record already exists we need to include a 'sometimes' before required.

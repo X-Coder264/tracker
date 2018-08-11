@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\JsonApi\Torrents;
 
-use App\Http\Models\Torrent;
+use App\Models\Torrent;
 use App\JsonApi\ResourceTypes;
 use CloudCreativity\LaravelJsonApi\Schema\EloquentSchema;
 

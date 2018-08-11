@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Tests\Feature\Http\Controllers\Auth;
 
 use Tests\TestCase;
-use App\Http\Models\User;
-use App\Http\Models\Locale;
+use App\Models\User;
+use App\Models\Locale;
 use Illuminate\Http\Response;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
@@ -46,7 +46,7 @@ class LoginControllerTest extends TestCase
         ]);
 
         $response->assertStatus(Response::HTTP_FOUND);
-        $response->assertRedirect(route('home.index'));
+        $response->assertRedirect(route('home'));
         $this->assertAuthenticatedAs($user);
     }
 
@@ -125,7 +125,7 @@ class LoginControllerTest extends TestCase
         ]);
 
         $response->assertStatus(Response::HTTP_FOUND);
-        $response->assertRedirect(route('home.index'));
+        $response->assertRedirect(route('home'));
         $response->assertCookie(auth()->guard()->getRecallerName(), vsprintf('%s|%s|%s', [
             $user->id,
             $user->getRememberToken(),
@@ -166,7 +166,7 @@ class LoginControllerTest extends TestCase
         $this->actingAs($user);
         $response = $this->get(route('login'));
         $response->assertStatus(Response::HTTP_FOUND);
-        $response->assertRedirect(route('home.index'));
+        $response->assertRedirect(route('home'));
     }
 
     public function testUserCanLogout()

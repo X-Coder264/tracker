@@ -38,9 +38,9 @@ return [
     | `'posts' => App\Post::class`
     */
     'resources' => [
-        'users'    => \App\Http\Models\User::class,
-        'locales'  => \App\Http\Models\Locale::class,
-        'torrents' => \App\Http\Models\Torrent::class,
+        'users'    => \App\Models\User::class,
+        'locales'  => \App\Models\Locale::class,
+        'torrents' => \App\Models\Torrent::class,
     ],
 
     /*

@@ -6,9 +6,9 @@
     <div class="row justify-content-center">
         <div class="col-md-8">
             <div class="card">
-                <div class="card-header">{{ trans('messages.home.index.page_title') }}</div>
+                <div class="card-header">{{ trans('messages.home.page_title') }}</div>
                 <div class="card-body">
-                    {{ trans('messages.home.index.no_news') }}
+                    {{ trans('messages.home.no_news') }}
                 </div>
             </div>
         </div>

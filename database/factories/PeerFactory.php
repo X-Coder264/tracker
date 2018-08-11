@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-use App\Http\Models\Peer;
-use App\Http\Models\User;
-use App\Http\Models\Torrent;
+use App\Models\Peer;
+use App\Models\User;
+use App\Models\Torrent;
 use Faker\Generator as Faker;
 use Illuminate\Database\Eloquent\Factory;
 

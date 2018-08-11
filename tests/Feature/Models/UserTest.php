@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Tests\Feature\Http\Models;
+namespace Tests\Feature\Models;
 
 use Tests\TestCase;
-use App\Http\Models\User;
-use App\Http\Models\Locale;
-use App\Http\Models\Torrent;
+use App\Models\User;
+use App\Models\Locale;
+use App\Models\Torrent;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Foundation\Testing\RefreshDatabase;

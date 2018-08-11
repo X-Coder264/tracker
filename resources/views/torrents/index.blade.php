@@ -20,12 +20,12 @@
                     <table class="table table-hover table-bordered">
                         <thead>
                             <tr>
-                                <th>{{ trans('messages.torrent.index.table_category') }}</th>
+                                <th>{{ trans('messages.common.category') }}</th>
                                 <th>{{ trans('messages.torrent.index.table_torrent_name') }}</th>
                                 <th>{{ trans('messages.common.size') }}</th>
-                                <th>{{ trans('messages.torrent.index.table_torrent_seeders') }}</th>
-                                <th>{{ trans('messages.torrent.index.table_torrent_leechers') }}</th>
-                                <th>{{ trans('messages.torrent.index.table_torrent_uploader') }}</th>
+                                <th>{{ trans('messages.common.torrent_seeders') }}</th>
+                                <th>{{ trans('messages.common.torrent_leechers') }}</th>
+                                <th>{{ trans('messages.common.uploader') }}</th>
                             </tr>
                         </thead>
                         <tbody>

@@ -3,8 +3,8 @@
 declare(strict_types=1);
 
 use Illuminate\Support\Str;
+use App\Models\Configuration;
 use Faker\Generator as Faker;
-use App\Http\Models\Configuration;
 use Illuminate\Database\Eloquent\Factory;
 
 /** @var Factory $factory */

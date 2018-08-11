@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Models\Torrent;
+use App\Models\Torrent;
 use App\JsonApi\Users\Hydrator;
 use CloudCreativity\LaravelJsonApi\Http\Controllers\EloquentController;
 

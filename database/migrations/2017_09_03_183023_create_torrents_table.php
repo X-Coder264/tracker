@@ -20,6 +20,8 @@ class CreateTorrentsTable extends Migration
             $table->unsignedBigInteger('size')->default(0);
             $table->integer('uploader_id')->unsigned()->index();
             $table->foreign('uploader_id')->references('id')->on('users')->onUpdate('cascade')->onDelete('cascade');
+            $table->integer('category_id')->unsigned()->index();
+            $table->foreign('category_id')->references('id')->on('torrent_categories')->onUpdate('cascade')->onDelete('cascade');
             $table->text('description');
             $table->smallInteger('seeders')->unsigned()->default(0)->index();
             $table->smallInteger('leechers')->unsigned()->default(0);

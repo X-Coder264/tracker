@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
-use App\Http\Models\Torrent;
+use App\Models\Torrent;
 use Illuminate\Http\Response;
+use App\Models\TorrentComment;
 use Illuminate\Auth\AuthManager;
 use Illuminate\Routing\Redirector;
-use App\Http\Models\TorrentComment;
 use Illuminate\Http\RedirectResponse;
 use App\Http\Requests\TorrentCommentRequest;
 use Illuminate\Contracts\Translation\Translator;

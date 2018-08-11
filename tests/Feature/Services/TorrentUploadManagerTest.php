@@ -5,11 +5,12 @@ declare(strict_types=1);
 namespace Tests\Feature\Services;
 
 use Tests\TestCase;
-use App\Http\Models\User;
+use App\Models\User;
+use App\Models\Torrent;
 use App\Services\Bdecoder;
 use App\Services\Bencoder;
-use App\Http\Models\Torrent;
 use Illuminate\Http\Response;
+use App\Models\TorrentCategory;
 use App\Services\SizeFormatter;
 use Illuminate\Auth\AuthManager;
 use Illuminate\Http\Testing\File;
@@ -30,6 +31,7 @@ class TorrentUploadManagerTest extends TestCase
 
     public function testTorrentUpload()
     {
+        $torrentCategory = factory(TorrentCategory::class)->create();
         $user = factory(User::class)->create(['torrents_per_page' => 5]);
         $this->actingAs($user);
 
@@ -67,6 +69,7 @@ class TorrentUploadManagerTest extends TestCase
             'torrent'     => File::create('file.torrent'),
             'name'        => $torrentName,
             'description' => $torrentDescription,
+            'category'    => $torrentCategory->id,
         ]);
 
         $torrent = Torrent::firstOrFail();
@@ -84,6 +87,8 @@ class TorrentUploadManagerTest extends TestCase
         $this->assertSame($formatter->getFormattedSize($torrentSize), $torrent->size);
         $this->assertSame($torrentName, $torrent->name);
         $this->assertSame($torrentDescription, $torrent->description);
+        $this->assertSame($user->id, $torrent->uploader_id);
+        $this->assertSame($torrentCategory->id, $torrent->category_id);
 
         // the value must be flushed at the end
         $cachedTorrents = $cacheManager->tags('torrents')->get('torrents.page.1.perPage.5');
@@ -119,6 +124,7 @@ class TorrentUploadManagerTest extends TestCase
             'torrent'     => $torrentFile,
             'name'        => $torrentName,
             'description' => $torrentDescription,
+            'category'    => factory(TorrentCategory::class)->create()->id,
         ]);
 
         $torrent = Torrent::firstOrFail();
@@ -157,6 +163,7 @@ class TorrentUploadManagerTest extends TestCase
             'torrent'     => $torrentFile,
             'name'        => $torrentName,
             'description' => $torrentDescription,
+            'category'    => factory(TorrentCategory::class)->create()->id,
         ]);
 
         $torrent = Torrent::firstOrFail();
@@ -225,6 +232,7 @@ class TorrentUploadManagerTest extends TestCase
             'torrent'     => File::create('file.torrent'),
             'name'        => $torrentName,
             'description' => $torrentDescription,
+            'category'    => factory(TorrentCategory::class)->create()->id,
         ]);
 
         $torrent = Torrent::latest('id')->firstOrFail();
@@ -270,6 +278,7 @@ class TorrentUploadManagerTest extends TestCase
             'torrent'     => $torrentFile,
             'name'        => $torrentName,
             'description' => $torrentDescription,
+            'category'    => factory(TorrentCategory::class)->create()->id,
         ]);
 
         $torrent = Torrent::firstOrFail();
@@ -314,6 +323,7 @@ class TorrentUploadManagerTest extends TestCase
             'torrent'     => File::create('file.torrent'),
             'name'        => $torrentName,
             'description' => $torrentDescription,
+            'category'    => factory(TorrentCategory::class)->create()->id,
         ]);
 
         $this->assertSame(0, Torrent::count());

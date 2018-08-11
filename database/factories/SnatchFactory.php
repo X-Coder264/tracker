@@ -3,9 +3,9 @@
 declare(strict_types=1);
 
 use Carbon\Carbon;
-use App\Http\Models\User;
-use App\Http\Models\Snatch;
-use App\Http\Models\Torrent;
+use App\Models\User;
+use App\Models\Snatch;
+use App\Models\Torrent;
 use Faker\Generator as Faker;
 use Illuminate\Database\Eloquent\Factory;
 

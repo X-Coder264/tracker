@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Auth;
 
-use App\Http\Models\User;
-use App\Http\Models\Locale;
+use App\Models\User;
+use App\Models\Locale;
 use Illuminate\Http\Response;
 use Illuminate\Validation\Rule;
 use App\Http\Controllers\Controller;
@@ -112,6 +112,6 @@ class RegisterController extends Controller
      */
     public function redirectTo(): string
     {
-        return $this->urlGenerator->route('home.index');
+        return $this->urlGenerator->route('home');
     }
 }

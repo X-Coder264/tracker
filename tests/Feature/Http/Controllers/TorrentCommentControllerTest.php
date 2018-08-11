@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace Tests\Feature\Http\Controllers;
 
 use Tests\TestCase;
-use App\Http\Models\User;
-use App\Http\Models\Torrent;
+use App\Models\User;
+use App\Models\Torrent;
 use Illuminate\Http\Response;
-use App\Http\Models\TorrentComment;
+use App\Models\TorrentComment;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class TorrentCommentControllerTest extends TestCase
@@ -20,6 +20,7 @@ class TorrentCommentControllerTest extends TestCase
         $this->withoutExceptionHandling();
 
         $user = factory(User::class)->create();
+        /** @var Torrent $torrent */
         $torrent = factory(Torrent::class)->create(['uploader_id' => $user->id]);
         $this->actingAs($user);
         $response = $this->get(route('torrent-comments.create', $torrent));
@@ -28,7 +29,7 @@ class TorrentCommentControllerTest extends TestCase
         $response->assertViewIs('torrent-comments.create');
         $response->assertViewHas('torrent');
         $response->assertViewHas('torrentComment');
-        $this->assertInstanceOf(Torrent::class, $response->original->torrent);
+        $this->assertTrue($torrent->is($response->original->torrent));
         $this->assertInstanceOf(TorrentComment::class, $response->original->torrentComment);
     }
 
@@ -50,7 +51,7 @@ class TorrentCommentControllerTest extends TestCase
         $response->assertRedirect(route('torrents.show', $torrent));
         $response->assertSessionHas('torrentCommentSuccess');
 
-        $torrentComment = TorrentComment::findOrFail(1);
+        $torrentComment = TorrentComment::firstOrFail();
         $this->assertSame($user->id, (int) $torrentComment->user_id);
         $this->assertSame($torrent->id, (int) $torrentComment->torrent_id);
         $this->assertSame($comment, $torrentComment->comment);

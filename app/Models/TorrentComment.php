@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Http\Models;
+namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Cviebrock\EloquentSluggable\Sluggable;
@@ -26,7 +26,7 @@ class TorrentComment extends Model
     /**
      * @return array
      */
-    public function sluggable()
+    public function sluggable(): array
     {
         return [
             'slug' => [

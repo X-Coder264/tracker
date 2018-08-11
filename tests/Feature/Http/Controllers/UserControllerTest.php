@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Tests\Feature\Http\Controllers;
 
 use Tests\TestCase;
-use App\Http\Models\User;
-use App\Http\Models\Locale;
+use App\Models\User;
+use App\Models\Locale;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Cache;
 use App\Http\Middleware\SetUserLocale;

@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Tests\Unit\Services;
 
 use Tests\TestCase;
+use App\Models\Torrent;
 use App\Services\Bdecoder;
-use App\Http\Models\Torrent;
 use App\Services\SizeFormatter;
 use Illuminate\Cache\CacheManager;
 use App\Services\TorrentInfoService;
@@ -102,7 +102,7 @@ class TorrentInfoServiceTest extends TestCase
         /** @var SizeFormatter|MockObject $formatter */
         $formatter = $this->createMock(SizeFormatter::class);
 
-        $torrent = factory(Torrent::class)->make(['uploader_id' => 1]);
+        $torrent = factory(Torrent::class)->make(['uploader_id' => 1, 'category_id' => 1]);
 
         $storageReturnValue = 'xyz';
         Storage::shouldReceive('disk->get')->once()->with("torrents/{$torrent->id}.torrent")->andReturn($storageReturnValue);

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services;
 
-use App\Http\Models\Torrent;
+use App\Models\Torrent;
 use Illuminate\Http\Request;
 use Illuminate\Auth\AuthManager;
 use Illuminate\Filesystem\Filesystem;
@@ -123,6 +123,7 @@ class TorrentUploadManager
         $torrent->size = $torrentSize;
         $torrent->description = $request->input('description');
         $torrent->uploader_id = $this->authManager->guard()->id();
+        $torrent->category_id = $request->input('category');
         $torrent->info_hash = $infoHash;
         $torrent->save();
 

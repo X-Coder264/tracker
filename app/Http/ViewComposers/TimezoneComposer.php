@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\ViewComposers;
 
-use App\Http\Models\User;
+use App\Models\User;
 use Illuminate\View\View;
 use Illuminate\Auth\AuthManager;
 use Illuminate\Cache\CacheManager;
@@ -39,7 +39,7 @@ class TimezoneComposer
     public function compose(View $view): void
     {
         $user = $this->cacheManager->remember('user.' . $this->authManager->guard()->id(), 24 * 60, function () {
-            return User::with('language')->find($this->authManager->guard()->id());
+            return User::with('language')->findOrFail($this->authManager->guard()->id());
         });
 
         $view->with('timezone', $user->timezone);

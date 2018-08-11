@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Http\Models;
+namespace App\Models;
 
 use App\Notifications\ResetPassword;
 use Illuminate\Support\Facades\Hash;
@@ -48,7 +48,7 @@ class User extends Authenticatable
     /**
      * @return array
      */
-    public function sluggable()
+    public function sluggable(): array
     {
         return [
             'slug' => [

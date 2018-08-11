@@ -6,7 +6,7 @@ namespace Tests\Feature\Console\Commands;
 
 use Carbon\Carbon;
 use Tests\TestCase;
-use App\Http\Models\Peer;
+use App\Models\Peer;
 use App\Console\Commands\DeletePeers;
 use Illuminate\Console\Scheduling\Event;
 use Illuminate\Console\Scheduling\Schedule;

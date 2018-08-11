@@ -2,8 +2,8 @@
 
 declare(strict_types=1);
 
-use App\Http\Models\Peer;
-use App\Http\Models\PeerIP;
+use App\Models\Peer;
+use App\Models\PeerIP;
 use Faker\Generator as Faker;
 use Illuminate\Database\Eloquent\Factory;
 

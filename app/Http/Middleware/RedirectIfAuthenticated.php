@@ -43,7 +43,7 @@ class RedirectIfAuthenticated
     public function handle(Request $request, Closure $next, $guard = null)
     {
         if ($this->authManager->guard($guard)->check()) {
-            return $this->redirector->route('home.index');
+            return $this->redirector->route('home');
         }
 
         return $next($request);

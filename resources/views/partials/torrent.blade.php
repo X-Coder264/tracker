@@ -1,5 +1,5 @@
 <tr>
-    <td>XYZ</td>
+    <td>{{ $torrent->category->name }}</td>
     <td>
         <a href="{{ route('torrents.show', $torrent) }}">{{ $torrent->name }}</a>
         <br>

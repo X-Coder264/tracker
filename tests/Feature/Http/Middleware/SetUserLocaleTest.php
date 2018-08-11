@@ -6,8 +6,8 @@ namespace Tests\Feature\Http\Middleware;
 
 use Carbon\Carbon;
 use Tests\TestCase;
-use App\Http\Models\User;
-use App\Http\Models\Locale;
+use App\Models\User;
+use App\Models\Locale;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Foundation\Testing\RefreshDatabase;

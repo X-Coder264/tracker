@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-use App\Http\Models\User;
-use App\Http\Models\Torrent;
+use App\Models\User;
+use App\Models\Torrent;
 use Faker\Generator as Faker;
-use App\Http\Models\TorrentComment;
+use App\Models\TorrentComment;
 use Illuminate\Database\Eloquent\Factory;
 
 /** @var Factory $factory */

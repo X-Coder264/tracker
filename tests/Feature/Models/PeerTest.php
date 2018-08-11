@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Tests\Feature\Http\Models;
+namespace Tests\Feature\Models;
 
 use Tests\TestCase;
-use App\Http\Models\Peer;
-use App\Http\Models\User;
-use App\Http\Models\PeerIP;
-use App\Http\Models\Torrent;
+use App\Models\Peer;
+use App\Models\User;
+use App\Models\PeerIP;
+use App\Models\Torrent;
 use Facades\App\Services\SizeFormatter;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Foundation\Testing\RefreshDatabase;

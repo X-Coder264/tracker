@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Tests\Feature\Http\Models;
+namespace Tests\Feature\Models;
 
 use Tests\TestCase;
-use App\Http\Models\Configuration;
+use App\Models\Configuration;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class ConfigurationTest extends TestCase

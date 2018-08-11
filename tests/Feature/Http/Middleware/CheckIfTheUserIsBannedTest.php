@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Tests\Feature\Http\Middleware;
 
 use Tests\TestCase;
-use App\Http\Models\User;
+use App\Models\User;
 use Illuminate\Routing\Router;
 use App\Http\Middleware\CheckIfTheUserIsBanned;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -21,7 +21,7 @@ class CheckIfTheUserIsBannedTest extends TestCase
         $user = factory(User::class)->states('banned')->create();
         $this->actingAs($user);
 
-        $response = $this->get(route('home.index'));
+        $response = $this->get(route('home'));
         $this->assertGuest();
         $response->assertStatus(302);
         $response->assertRedirect(route('login'));

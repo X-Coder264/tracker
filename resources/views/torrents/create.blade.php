@@ -54,6 +54,18 @@
                             </div>
                         </div>
 
+                        <div class="form-group row">
+                            <label for="category" class="col-sm-2 col-form-label">{{ trans('messages.common.language') }}</label>
+
+                            <div class="col-sm-10">
+                                <select class="form-control" name="category" id="category" required>
+                                    @foreach ($categories as $category)
+                                        <option value="{{ $category->id }}">{{ $category->name }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
+
                         <div class="form-group row mb-0">
                             <div class="col-md-8 offset-md-4">
                                 <button type="submit" class="btn btn-primary">{{ trans('messages.torrent.create.upload_button_text') }}</button>

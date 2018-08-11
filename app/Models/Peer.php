@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Http\Models;
+namespace App\Models;
 
 use Facades\App\Services\SizeFormatter;
 use Illuminate\Database\Eloquent\Model;
@@ -17,6 +17,15 @@ class Peer extends Model
      * @var array
      */
     protected $guarded = [];
+
+    /**
+     * The attributes that should be cast to native types.
+     *
+     * @var array
+     */
+    protected $casts = [
+        'seeder' => 'bool',
+    ];
 
     /**
      * Get the peer's uploaded attribute.

@@ -5,16 +5,17 @@ declare(strict_types=1);
 namespace Tests\Feature\Http\Controllers;
 
 use Tests\TestCase;
-use App\Http\Models\Peer;
-use App\Http\Models\User;
+use App\Models\Peer;
+use App\Models\User;
+use App\Models\Torrent;
 use App\Services\Bdecoder;
 use App\Services\Bencoder;
-use App\Http\Models\Torrent;
 use Illuminate\Http\Response;
+use App\Models\TorrentComment;
+use App\Models\TorrentCategory;
 use Illuminate\Http\Testing\File;
 use App\Services\PasskeyGenerator;
 use Illuminate\Cache\CacheManager;
-use App\Http\Models\TorrentComment;
 use App\Services\TorrentInfoService;
 use Illuminate\Support\Facades\Storage;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -64,6 +65,7 @@ class TorrentControllerTest extends TestCase
         $this->assertTrue($response->original->torrents[0]->is($visibleTorrent));
         $response->assertSee($visibleTorrent->name);
         $response->assertSee($visibleTorrent->uploader->name);
+        $response->assertSee($visibleTorrent->category->name);
         $response->assertDontSee($deadTorrent->name);
 
         $cacheManager = $this->app->make(CacheManager::class);
@@ -118,7 +120,7 @@ class TorrentControllerTest extends TestCase
     {
         $this->withoutExceptionHandling();
 
-        $torrent = factory(Torrent::class)->create(['uploader_id' => $this->user->id]);
+        $torrent = factory(Torrent::class)->create(['uploader_id' => $this->user->id, 'seeders' => 501, 'leechers' => 333]);
         $torrentComment = factory(TorrentComment::class)->create(
             ['torrent_id' => $torrent->id, 'user_id' => $torrent->uploader_id]
         );
@@ -146,17 +148,27 @@ class TorrentControllerTest extends TestCase
         $response->assertViewHas('torrentComments');
         $response->assertViewHas('timezone', $this->user->timezone);
         $this->assertInstanceOf(LengthAwarePaginator::class, $response->original->torrentComments);
+        $this->assertTrue($torrentComment->is($response->original->torrentComments[0]));
         $response->assertSee($torrent->name);
         $response->assertSee($torrent->description);
+        $response->assertSee($torrent->size);
+        $response->assertSee($torrent->seeders);
+        $response->assertSee($torrent->leechers);
+        $response->assertSee($torrent->uploader->name);
+        $response->assertSee($torrent->category->name);
         $response->assertSee($torrentComment->comment);
         $response->assertSee($peer->user->name);
         $response->assertSee($peer->updated_at->diffForHumans());
+        // peer downloaded stats
         $response->assertSee('2.00 KiB');
+        // peer uploaded stats
         $response->assertSee('6.00 KiB');
+        // peer ratio
         $response->assertSee('3.00');
         $response->assertSee($peer->userAgent);
         $response->assertSee('55.55 MiB');
         $response->assertSee('Test.txt');
+        $this->assertTrue($torrent->is($response->original->torrent));
     }
 
     public function testShowWhenTorrentInfoServiceThrowsAnException()
@@ -436,6 +448,28 @@ class TorrentControllerTest extends TestCase
         $this->assertSame(0, Torrent::count());
     }
 
+    public function testCategoryIsRequired()
+    {
+        $response = $this->from(route('torrents.create'))->post(route('torrents.store'), $this->validParams([
+            'category' => '',
+        ]));
+        $response->assertStatus(Response::HTTP_FOUND);
+        $response->assertRedirect(route('torrents.create'));
+        $response->assertSessionHasErrors('category');
+        $this->assertSame(0, Torrent::count());
+    }
+
+    public function testCategoryMustExistInDatabase()
+    {
+        $response = $this->from(route('torrents.create'))->post(route('torrents.store'), $this->validParams([
+            'category' => '9999999',
+        ]));
+        $response->assertStatus(Response::HTTP_FOUND);
+        $response->assertRedirect(route('torrents.create'));
+        $response->assertSessionHasErrors('category');
+        $this->assertSame(0, Torrent::count());
+    }
+
     /**
      * @param array $overrides
      *
@@ -447,6 +481,7 @@ class TorrentControllerTest extends TestCase
             'name'        => 'Test name',
             'description' => 'Test description',
             'torrent'     => File::create('file.torrent'),
+            'category'    => factory(TorrentCategory::class)->create()->id,
         ], $overrides);
     }
 }
