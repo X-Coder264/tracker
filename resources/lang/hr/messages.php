@@ -68,6 +68,7 @@ return [
     'login.reset-password-link-text' => 'Zaboravili ste lozinku?',
     'register.username' => 'Korisničko ime',
     'announce.invalid_passkey' => 'Neispravan passkey.',
+    'announce.banned_user' => 'Vaš korisnički račun je baniran.',
     'announce.invalid_info_hash' => 'Neispravan info_hash.',
     'announce.invalid_peer_id' => 'Neispravan peer_id.',
     'announce.invalid_ip_or_port' => 'Nije poslana ispravna IP adresa ili port.',

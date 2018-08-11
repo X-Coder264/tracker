@@ -1939,6 +1939,26 @@ class AnnounceManagerTest extends TestCase
         $this->assertSame(0, Snatch::count());
     }
 
+    public function testBannedUserCannotAnnounce()
+    {
+        $bannedUser = factory(User::class)->states('banned')->create();
+        $response = $this->get(
+            route('announce', $this->validParams([
+                'passkey' => $bannedUser->passkey,
+            ]))
+        );
+        $response->assertStatus(Response::HTTP_OK);
+        $expectedResponse = ['failure reason' => trans('messages.announce.banned_user')];
+        $decoder = new Bdecoder();
+        $actualResponse = $decoder->decode($response->getContent());
+        $this->assertSame($expectedResponse, $actualResponse);
+        $this->assertSame(0, Peer::count());
+        $this->assertSame(0, Snatch::count());
+        $freshBannedUser = $bannedUser->fresh();
+        $this->assertSame($bannedUser->uploaded, $freshBannedUser->uploaded);
+        $this->assertSame($bannedUser->downloaded, $freshBannedUser->downloaded);
+    }
+
     public function testInfoHashIsRequired()
     {
         $response = $this->get(

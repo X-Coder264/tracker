@@ -191,12 +191,16 @@ class AnnounceManager
         $this->user = $this->cacheManager->remember('user.' . $this->request->input('passkey'), 24 * 60, function () {
             return $this->databaseManager->table('users')
                 ->where('passkey', '=', $this->request->input('passkey'))
-                ->select(['id', 'slug', 'uploaded', 'downloaded'])
+                ->select(['id', 'slug', 'uploaded', 'downloaded', 'banned'])
                 ->first();
         });
 
         if (null === $this->user) {
             return $this->announceErrorResponse($this->translator->trans('messages.announce.invalid_passkey'));
+        }
+
+        if (true === (bool) $this->user->banned) {
+            return $this->announceErrorResponse($this->translator->trans('messages.announce.banned_user'));
         }
 
         $this->torrent = $this->databaseManager->table('torrents')
@@ -548,11 +552,11 @@ class AnnounceManager
     private function updateSnatchIfItExists(): void
     {
         if (null !== $this->snatch) {
+            $finishedAt = $this->snatch->finished_at;
             if (0 === (int) $this->request->input('left') && null === $this->snatch->finished_at) {
                 $finishedAt = Carbon::now()->format($this->getDateFormat());
-            } else {
-                $finishedAt = $this->snatch->finished_at;
             }
+
             $this->databaseManager->table('snatches')
                 ->where('id', '=', $this->snatch->id)
                 ->update(

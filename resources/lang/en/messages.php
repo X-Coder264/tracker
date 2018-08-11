@@ -68,6 +68,7 @@ return [
     'login.reset-password-link-text' => 'Forgot your password?',
     'register.username' => 'Username',
     'announce.invalid_passkey' => 'Invalid passkey.',
+    'announce.banned_user' => 'Your user account is banned.',
     'announce.invalid_info_hash' => 'Invalid info_hash.',
     'announce.invalid_peer_id' => 'Invalid peer_id.',
     'announce.invalid_ip_or_port' => 'A valid IP or port was not sent.',
