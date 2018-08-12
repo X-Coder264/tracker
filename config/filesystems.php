@@ -1,5 +1,7 @@
 <?php
 
+use Illuminate\Contracts\Filesystem\Filesystem;
+
 return [
 
     /*
@@ -52,7 +54,21 @@ return [
             'driver' => 'local',
             'root' => storage_path('app/public'),
             'url' => env('APP_URL').'/storage',
-            'visibility' => 'public',
+            'visibility' => Filesystem::VISIBILITY_PUBLIC,
+        ],
+
+        'torrents' => [
+            'driver' => 'local',
+            'root' => storage_path('app/torrents'),
+            'url' => null,
+            'visibility' => Filesystem::VISIBILITY_PRIVATE,
+        ],
+
+        'imdb-images' => [
+            'driver' => 'local',
+            'root' => storage_path('app/public/imdb-images'),
+            'url' => env('APP_URL').'/storage/imdb-images',
+            'visibility' => Filesystem::VISIBILITY_PUBLIC,
         ],
 
         's3' => [

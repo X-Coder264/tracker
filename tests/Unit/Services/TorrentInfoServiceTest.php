@@ -7,13 +7,14 @@ namespace Tests\Unit\Services;
 use Tests\TestCase;
 use App\Models\Torrent;
 use App\Services\Bdecoder;
+use App\Services\IMDBManager;
 use App\Services\SizeFormatter;
 use Illuminate\Cache\CacheManager;
 use App\Services\TorrentInfoService;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Filesystem\FilesystemManager;
 use PHPUnit\Framework\MockObject\MockObject;
+use Illuminate\Contracts\Filesystem\Factory as FilesystemManager;
 
 class TorrentInfoServiceTest extends TestCase
 {
@@ -28,7 +29,8 @@ class TorrentInfoServiceTest extends TestCase
             $formatter,
             $decoder,
             $this->app->make(CacheManager::class),
-            $this->app->make(FilesystemManager::class)
+            $this->app->make(FilesystemManager::class),
+            $this->app->make(IMDBManager::class)
         );
         // multiple file mode
         $torrentInfoDict['files'] = [
@@ -61,7 +63,8 @@ class TorrentInfoServiceTest extends TestCase
             $formatter,
             $decoder,
             $this->app->make(CacheManager::class),
-            $this->app->make(FilesystemManager::class)
+            $this->app->make(FilesystemManager::class),
+            $this->app->make(IMDBManager::class)
         );
         // multiple file mode
         $torrentInfoDict['files'] = [
@@ -105,7 +108,7 @@ class TorrentInfoServiceTest extends TestCase
         $torrent = factory(Torrent::class)->make(['uploader_id' => 1, 'category_id' => 1]);
 
         $storageReturnValue = 'xyz';
-        Storage::shouldReceive('disk->get')->once()->with("torrents/{$torrent->id}.torrent")->andReturn($storageReturnValue);
+        Storage::shouldReceive('disk->get')->once()->with("{$torrent->id}.torrent")->andReturn($storageReturnValue);
 
         $decoderReturnValue = ['info' => ['x' => 'y']];
         $decoder->expects($this->once())
@@ -122,6 +125,7 @@ class TorrentInfoServiceTest extends TestCase
                     $decoder,
                     $this->app->make(CacheManager::class),
                     $this->app->make(FilesystemManager::class),
+                    $this->app->make(IMDBManager::class),
                 ]
             )
             ->setMethods(['getTorrentFileNamesAndSizesFromTorrentInfoDict'])

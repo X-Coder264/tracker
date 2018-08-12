@@ -15,6 +15,15 @@ class TorrentCategory extends Model
     use SluggableScopeHelpers;
 
     /**
+     * The attributes that should be cast to native types.
+     *
+     * @var array
+     */
+    protected $casts = [
+        'imdb' => 'bool',
+    ];
+
+    /**
      * @return array
      */
     public function sluggable(): array

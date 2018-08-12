@@ -15,6 +15,7 @@ $factory->define(Torrent::class, function (Faker $faker) {
         'name' => $faker->unique()->firstName,
         'info_hash' => sha1(Str::random(200)),
         'size' => $faker->numberBetween(500, 500000),
+        'imdb_id' => null,
         'uploader_id' => function () {
             return factory(User::class)->create()->id;
         },
@@ -33,4 +34,8 @@ $factory->state(Torrent::class, 'alive', [
 
 $factory->state(Torrent::class, 'dead', [
     'seeders' => 0,
+]);
+
+$factory->state(Torrent::class, 'hasIMDB', [
+    'imdb_id' => '0468569',
 ]);

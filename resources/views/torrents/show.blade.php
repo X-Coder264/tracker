@@ -4,6 +4,39 @@
 <div class="col-12 mx-auto">
     @include('partials.flash_messages')
 
+    @if (null !== $imdbData)
+        <div class="table-responsive-lg">
+            <table class="table table-hover table-bordered">
+                <tbody>
+                    <tr>
+                        <th>{{ trans('messages.common.imdb-title') }}</th>
+                        <td>{{ $imdbData->title() }}</td>
+                    </tr>
+                    <tr>
+                        <th>{{ trans('messages.common.imdb-rating') }}</th>
+                        <td>{{ $imdbData->rating() }}</td>
+                    </tr>
+                    <tr>
+                        <th>{{ trans('messages.common.imdb-genres') }}</th>
+                        <td>{{ implode(', ', $imdbData->genres()) }}</td>
+                    </tr>
+                    @if (true === $posterExists)
+                        <tr>
+                            <th>{{ trans('messages.common.imdb-poster') }}</th>
+                            <td>
+                                <img src="{{ Storage::disk('imdb-images')->url("{$imdbData->imdbid()}.jpg") }}">
+                            </td>
+                        </tr>
+                    @endif
+                    <tr>
+                        <th>{{ trans('messages.common.imdb-plot') }}</th>
+                        <td>{{ $imdbData->plotoutline(true) }}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    @endif
+
     <div class="card">
         <div class="card-header">
             <a href="{{ route('torrents.download', $torrent) }}" class="btn btn-primary">{{ $torrent->name }}</a>

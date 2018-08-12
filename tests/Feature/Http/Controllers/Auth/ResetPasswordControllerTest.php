@@ -17,14 +17,14 @@ class ResetPasswordControllerTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function testUserCanResetPasswordWithAValidToken()
+    public function testUserCanResetPasswordWithAValidToken(): void
     {
         $this->withoutExceptionHandling();
 
-        Event::fake();
+        $user = factory(User::class)->create();
 
-        // all events are faked so the sluggable observer won't be fired and the slug cannot be null
-        $user = factory(User::class)->create(['slug' => 'test']);
+        Event::fake(PasswordReset::class);
+
         $token = $this->getValidToken($user);
         $newPassword = '1234567899';
 
@@ -46,7 +46,9 @@ class ResetPasswordControllerTest extends TestCase
         $this->assertTrue(Hash::check($newPassword, $updatedUser->password));
 
         Event::assertDispatched(PasswordReset::class, function (PasswordReset $event) use ($user) {
-            return $event->user->id === $user->id;
+            $this->assertTrue($user->is($event->user));
+
+            return true;
         });
     }
 

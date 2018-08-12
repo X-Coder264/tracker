@@ -16,6 +16,7 @@ class CreateTorrentCategoriesTable extends Migration
         Schema::create('torrent_categories', function (Blueprint $table) {
             $table->increments('id');
             $table->string('name');
+            $table->boolean('imdb')->default(false);
             $table->string('slug')->unique();
             $table->timestamps();
         });

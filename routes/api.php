@@ -2,6 +2,10 @@
 
 declare(strict_types=1);
 
+use Illuminate\Contracts\Routing\Registrar;
+use CloudCreativity\LaravelJsonApi\Facades\JsonApi;
+use CloudCreativity\LaravelJsonApi\Routing\ApiGroup;
+
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -13,7 +17,7 @@ declare(strict_types=1);
 |
 */
 
-JsonApi::register('default', ['namespace' => 'Admin'], function ($api, $router) {
+JsonApi::register('default', ['namespace' => 'Admin'], function (ApiGroup $api, Registrar $router) {
     $api->resource('users');
     $api->resource('locales');
     $api->resource('torrents');

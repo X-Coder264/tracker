@@ -21,6 +21,7 @@ return [
     'torrent.create.torrent_name' => 'Naziv torrenta',
     'torrent.create.torrent_description' => 'Opis torrenta',
     'torrent.create.upload_button_text' => 'Upload',
+    'torrent.IMDB-URL' => 'IMDB puni URL (npr. https://www.imdb.com/title/tt0468569/)',
     'torrent.index.table_torrent_name' => 'Torrent',
     'common.torrent_seeders' => 'Seederi',
     'common.torrent_leechers' => 'Leecheri',
@@ -96,4 +97,9 @@ return [
     'user.profile_last_seen_at_never' => 'Ovaj korisnik nije nikada bio online.',
     'common.seeding' => 'Torrenti na seedu',
     'common.leeching' => 'Torrenti na leechu',
+    'common.imdb-title' => 'Naziv',
+    'common.imdb-rating' => 'Ocjena',
+    'common.imdb-poster' => 'Poster',
+    'common.imdb-genres' => 'Žanrovi',
+    'common.imdb-plot' => 'Priča',
 ];

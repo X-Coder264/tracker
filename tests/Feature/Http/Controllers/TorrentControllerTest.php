@@ -4,15 +4,18 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Http\Controllers;
 
+use Imdb\Title;
 use Tests\TestCase;
 use App\Models\Peer;
 use App\Models\User;
 use App\Models\Torrent;
 use App\Services\Bdecoder;
 use App\Services\Bencoder;
+use App\Services\IMDBManager;
 use Illuminate\Http\Response;
 use App\Models\TorrentComment;
 use App\Models\TorrentCategory;
+use App\Services\SizeFormatter;
 use Illuminate\Http\Testing\File;
 use App\Services\PasskeyGenerator;
 use Illuminate\Cache\CacheManager;
@@ -23,6 +26,7 @@ use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
+use Illuminate\Contracts\Filesystem\Factory as FilesystemManager;
 
 class TorrentControllerTest extends TestCase
 {
@@ -120,7 +124,7 @@ class TorrentControllerTest extends TestCase
     {
         $this->withoutExceptionHandling();
 
-        $torrent = factory(Torrent::class)->create(['uploader_id' => $this->user->id, 'seeders' => 501, 'leechers' => 333]);
+        $torrent = factory(Torrent::class)->create(['uploader_id' => $this->user->id, 'seeders' => 501, 'leechers' => 333, 'imdb_id' => '0468569']);
         $torrentComment = factory(TorrentComment::class)->create(
             ['torrent_id' => $torrent->id, 'user_id' => $torrent->uploader_id]
         );
@@ -133,7 +137,19 @@ class TorrentControllerTest extends TestCase
             ]
         );
 
-        $torrentInfo = $this->createMock(TorrentInfoService::class);
+        $torrentInfo = $this->getMockBuilder(TorrentInfoService::class)
+            ->setConstructorArgs(
+                [
+                    $this->app->make(SizeFormatter::class),
+                    $this->app->make(Bdecoder::class),
+                    $this->app->make(CacheManager::class),
+                    $this->app->make(FilesystemManager::class),
+                    $this->app->make(IMDBManager::class),
+                ]
+            )
+            ->setMethods(['getTorrentFileNamesAndSizes'])
+            ->getMock();
+
         $returnValue = [['Test.txt', '55.55 MiB']];
         $torrentInfo->method('getTorrentFileNamesAndSizes')->willReturn($returnValue);
         $this->app->instance(TorrentInfoService::class, $torrentInfo);
@@ -146,9 +162,13 @@ class TorrentControllerTest extends TestCase
         $response->assertViewHas('torrentFileNamesAndSizes', $returnValue);
         $response->assertViewHas('filesCount', 1);
         $response->assertViewHas('torrentComments');
+        $response->assertViewHas('imdbData');
+        $response->assertViewHas('posterExists', false);
         $response->assertViewHas('timezone', $this->user->timezone);
         $this->assertInstanceOf(LengthAwarePaginator::class, $response->original->torrentComments);
         $this->assertTrue($torrentComment->is($response->original->torrentComments[0]));
+        $this->assertInstanceOf(Title::class, $response->original->imdbData);
+        $this->assertSame('0468569', $response->original->imdbData->imdbid());
         $response->assertSee($torrent->name);
         $response->assertSee($torrent->description);
         $response->assertSee($torrent->size);
@@ -159,6 +179,9 @@ class TorrentControllerTest extends TestCase
         $response->assertSee($torrentComment->comment);
         $response->assertSee($peer->user->name);
         $response->assertSee($peer->updated_at->diffForHumans());
+        $response->assertSee($response->original->imdbData->title());
+        $response->assertSee($response->original->imdbData->rating());
+        $response->assertSee(implode(', ', $response->original->imdbData->genres()));
         // peer downloaded stats
         $response->assertSee('2.00 KiB');
         // peer uploaded stats
@@ -198,7 +221,7 @@ class TorrentControllerTest extends TestCase
         $torrent = factory(Torrent::class)->create(['uploader_id' => $this->user->id, 'name' => 'xyz']);
 
         $storageReturnValue = 'something x264';
-        Storage::shouldReceive('disk->get')->once()->with("torrents/{$torrent->id}.torrent")->andReturn($storageReturnValue);
+        Storage::shouldReceive('disk->get')->once()->with("{$torrent->id}.torrent")->andReturn($storageReturnValue);
 
         $decoderReturnValue = ['info' => ['x' => 'y']];
         $decoder->expects($this->once())
@@ -235,7 +258,7 @@ class TorrentControllerTest extends TestCase
         $torrent = factory(Torrent::class)->create(['uploader_id' => $this->user->id, 'name' => 'čćš/đž%']);
 
         $storageReturnValue = 'something x264';
-        Storage::shouldReceive('disk->get')->once()->with("torrents/{$torrent->id}.torrent")->andReturn($storageReturnValue);
+        Storage::shouldReceive('disk->get')->once()->with("{$torrent->id}.torrent")->andReturn($storageReturnValue);
 
         $decoderReturnValue = ['info' => ['x' => 'y']];
         $decoder->expects($this->once())
@@ -283,7 +306,7 @@ class TorrentControllerTest extends TestCase
         $torrent = factory(Torrent::class)->create(['uploader_id' => $this->user->id]);
 
         $storageReturnValue = 'something x264';
-        Storage::shouldReceive('disk->get')->once()->with("torrents/{$torrent->id}.torrent")->andReturn($storageReturnValue);
+        Storage::shouldReceive('disk->get')->once()->with("{$torrent->id}.torrent")->andReturn($storageReturnValue);
 
         $decoderReturnValue = ['info' => ['x' => 'y']];
         $decoder->expects($this->once())
@@ -317,7 +340,7 @@ class TorrentControllerTest extends TestCase
     public function testDownloadWhenStorageThrowsAnException()
     {
         $torrent = factory(Torrent::class)->create(['uploader_id' => $this->user->id]);
-        Storage::shouldReceive('disk->get')->once()->with("torrents/{$torrent->id}.torrent")->andThrow(new FileNotFoundException());
+        Storage::shouldReceive('disk->get')->once()->with("{$torrent->id}.torrent")->andThrow(new FileNotFoundException());
         $response = $this->get(route('torrents.download', $torrent));
         $response->assertStatus(Response::HTTP_NOT_FOUND);
         $response->assertSee(trans('messages.torrent-file-missing.error-message'));

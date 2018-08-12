@@ -25,6 +25,7 @@ class CreateTorrentsTable extends Migration
             $table->text('description');
             $table->smallInteger('seeders')->unsigned()->default(0)->index();
             $table->smallInteger('leechers')->unsigned()->default(0);
+            $table->string('imdb_id')->nullable();
             $table->string('slug')->unique();
             $table->timestamps();
         });

@@ -21,6 +21,7 @@ return [
     'torrent.create.torrent_name' => 'Torrent name',
     'torrent.create.torrent_description' => 'Torrent description',
     'torrent.create.upload_button_text' => 'Upload',
+    'torrent.IMDB-URL' => 'IMDB full URL (e.g. https://www.imdb.com/title/tt0468569/)',
     'torrent.index.table_torrent_name' => 'Torrent',
     'common.torrent_seeders' => 'Seeders',
     'common.torrent_leechers' => 'Leechers',
@@ -96,4 +97,9 @@ return [
     'user.profile_last_seen_at_never' => 'This user was never seen.',
     'common.seeding' => 'Seeding',
     'common.leeching' => 'Leeching',
+    'common.imdb-title' => 'Title',
+    'common.imdb-rating' => 'Rating',
+    'common.imdb-poster' => 'Poster',
+    'common.imdb-genres' => 'Genres',
+    'common.imdb-plot' => 'Plot',
 ];

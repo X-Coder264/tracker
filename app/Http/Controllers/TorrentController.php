@@ -27,6 +27,7 @@ use Illuminate\Contracts\Translation\Translator;
 use Illuminate\Contracts\Routing\ResponseFactory;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
+use Illuminate\Contracts\Filesystem\Factory as FilesystemManager;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class TorrentController extends Controller
@@ -84,6 +85,7 @@ class TorrentController extends Controller
      * @param TorrentInfoService $torrentInfoService
      * @param ResponseFactory    $responseFactory
      * @param Translator         $translator
+     * @param FilesystemManager  $filesystemManager
      *
      * @throws NotFoundHttpException
      *
@@ -93,7 +95,8 @@ class TorrentController extends Controller
         Torrent $torrent,
         TorrentInfoService $torrentInfoService,
         ResponseFactory $responseFactory,
-        Translator $translator
+        Translator $translator,
+        FilesystemManager $filesystemManager
     ): Response {
         try {
             $torrentFileNamesAndSizes = $torrentInfoService->getTorrentFileNamesAndSizes($torrent);
@@ -108,9 +111,12 @@ class TorrentController extends Controller
 
         $torrentComments = $torrent->comments()->with('user')->paginate(10);
 
+        $imdbData = $torrentInfoService->getTorrentIMDBData($torrent);
+        $posterExists = $imdbData ? $filesystemManager->disk('imdb-images')->exists("{$imdbData->imdbid()}.jpg") : false;
+
         return $responseFactory->view(
             'torrents.show',
-            compact('torrent', 'numberOfPeers', 'torrentFileNamesAndSizes', 'torrentComments', 'filesCount')
+            compact('torrent', 'numberOfPeers', 'torrentFileNamesAndSizes', 'torrentComments', 'filesCount', 'imdbData', 'posterExists')
         );
     }
 
@@ -122,6 +128,7 @@ class TorrentController extends Controller
      * @param Translator           $translator
      *
      * @throws FileNotWritableException
+     * @throws FileNotFoundException
      *
      * @return RedirectResponse
      */
@@ -163,7 +170,7 @@ class TorrentController extends Controller
         Translator $translator
     ): Response {
         try {
-            $torrentFile = $filesystem->disk('public')->get("torrents/{$torrent->id}.torrent");
+            $torrentFile = $filesystem->disk('torrents')->get("{$torrent->id}.torrent");
         } catch (FileNotFoundException $e) {
             throw new NotFoundHttpException($translator->trans('messages.torrent-file-missing.error-message'));
         }

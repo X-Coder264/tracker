@@ -15,15 +15,15 @@ class IndexController extends Controller
 {
     /**
      * @param AuthManager     $authManager
-     * @param Repository      $configRepository
+     * @param Repository      $config
      * @param ResponseFactory $responseFactory
      *
      * @return Response
      */
-    public function index(AuthManager $authManager, Repository $configRepository, ResponseFactory $responseFactory): Response
+    public function index(AuthManager $authManager, Repository $config, ResponseFactory $responseFactory): Response
     {
         $user = $authManager->guard()->user();
-        $projectName = $configRepository->get('app.name');
+        $projectName = $config->get('app.name');
         $enumerations = json_encode(['timezones' => (object) DateTimeZone::listIdentifiers()]);
 
         return $responseFactory->view('admin.index', compact('user', 'projectName', 'enumerations'));

@@ -14,6 +14,7 @@ class TorrentCategorySeeder extends Seeder
     {
         $torrentCategory = new TorrentCategory();
         $torrentCategory->name = 'Movies/x264';
+        $torrentCategory->imdb = true;
         $torrentCategory->save();
     }
 }

@@ -42,6 +42,19 @@
                         </div>
 
                         <div class="form-group row">
+                            <label for="imdb_url" class="col-sm-2 col-form-label">{{ trans('messages.torrent.IMDB-URL') }}</label>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control{{ $errors->has('imdb_url') ? ' is-invalid' : '' }}" id="imdb_url" name="imdb_url" placeholder="{{ trans('messages.torrent.IMDB-URL') }}" value="{{ old('imdb_url') }}" required>
+
+                                @if ($errors->has('imdb_url'))
+                                    <div class="invalid-feedback" role="alert">
+                                        <strong>{{ $errors->first('imdb_url') }}</strong>
+                                    </div>
+                                @endif
+                            </div>
+                        </div>
+
+                        <div class="form-group row">
                             <label for="description" class="col-sm-2 col-form-label">{{ trans('messages.torrent.create.torrent_description') }}</label>
                             <div class="col-sm-10">
                                 <textarea id="description" name="description" class="form-control{{ $errors->has('description') ? ' is-invalid' : '' }}" placeholder="{{ trans('messages.torrent.create.torrent_description') }}" rows="10" required>{{ old('description') }}</textarea>
