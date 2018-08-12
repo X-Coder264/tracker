@@ -4,7 +4,7 @@
 @include('partials.flash_messages')
 <div class="container">
     <div class="row justify-content-center">
-        <div class="col-md-8">
+        <div class="col-md-10">
             <div class="card">
                 <div class="card-header">{{ trans('messages.home.page_title') }}</div>
                 <div class="card-body">

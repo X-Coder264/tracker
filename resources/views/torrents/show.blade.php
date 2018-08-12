@@ -65,8 +65,8 @@
                                     <thead>
                                     <tr>
                                         <th>{{ trans('messages.common.torrent_table_username') }}</th>
-                                        <th>{{ trans('messages.common.torrent_table_uploaded') }}</th>
-                                        <th>{{ trans('messages.common.torrent_table_downloaded') }}</th>
+                                        <th>{{ trans('messages.common.uploaded') }}</th>
+                                        <th>{{ trans('messages.common.downloaded') }}</th>
                                         <th>{{ trans('messages.common.torrent_table_ratio') }}</th>
                                         <th>{{ trans('messages.common.torrent_table_last_announce') }}</th>
                                         <th>{{ trans('messages.common.torrent_table_torrent_client') }}</th>

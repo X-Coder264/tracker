@@ -39,7 +39,7 @@ class TimezoneComposer
     public function compose(View $view): void
     {
         $user = $this->cacheManager->remember('user.' . $this->authManager->guard()->id(), 24 * 60, function () {
-            return User::with('language')->findOrFail($this->authManager->guard()->id());
+            return User::with(['language', 'torrents'])->findOrFail($this->authManager->guard()->id());
         });
 
         $view->with('timezone', $user->timezone);

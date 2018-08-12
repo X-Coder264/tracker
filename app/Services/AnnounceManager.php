@@ -15,7 +15,7 @@ use Illuminate\Contracts\Translation\Translator;
 use Illuminate\Contracts\Validation\Factory as ValidationFactory;
 
 /**
- * Note: For performance reasons the announce uses the query builder instead of Eloquent.
+ * Note: For performance reasons the query builder is used instead of Eloquent.
  */
 class AnnounceManager
 {

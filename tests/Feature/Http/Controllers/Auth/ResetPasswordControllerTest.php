@@ -23,7 +23,8 @@ class ResetPasswordControllerTest extends TestCase
 
         Event::fake();
 
-        $user = factory(User::class)->create();
+        // all events are faked so the sluggable observer won't be fired and the slug cannot be null
+        $user = factory(User::class)->create(['slug' => 'test']);
         $token = $this->getValidToken($user);
         $newPassword = '1234567899';
 

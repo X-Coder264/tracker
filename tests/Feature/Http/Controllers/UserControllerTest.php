@@ -29,6 +29,72 @@ class UserControllerTest extends TestCase
         $response->assertViewHas(['user', 'locales']);
     }
 
+    public function testLoggedInUserCanSeeOnlyHisEditPage(): void
+    {
+        $user = factory(User::class)->create();
+        $anotherUser = factory(User::class)->create();
+        $this->actingAs($user);
+        $response = $this->get(route('users.edit', $anotherUser));
+
+        $response->assertStatus(Response::HTTP_FOUND);
+        $response->assertRedirect(route('users.edit', $user));
+    }
+
+    public function testNonLoggedInUserCannotSeeAnyUserEditPage(): void
+    {
+        $user = factory(User::class)->create();
+        $response = $this->get(route('users.edit', $user));
+
+        $response->assertStatus(Response::HTTP_FOUND);
+        $response->assertRedirect(route('login'));
+    }
+
+    public function testShow(): void
+    {
+        $this->withoutExceptionHandling();
+
+        $user = factory(User::class)->create(['timezone' => 'Europe/Zagreb']);
+        $this->actingAs($user);
+        $response = $this->get(route('users.show', $user));
+
+        $response->assertStatus(Response::HTTP_OK);
+        $response->assertViewIs('users.show');
+        $response->assertViewHas(['user', 'timezone']);
+        $this->assertTrue($user->is($response->original->user));
+        $response->assertSee($user->uploaded);
+        $response->assertSee($user->downloaded);
+        $response->assertSee($user->last_seen_at->timezone('Europe/Zagreb')->format('d.m.Y. H:i'));
+        $response->assertSee($user->created_at->timezone('Europe/Zagreb')->format('d.m.Y. H:i'));
+    }
+
+    public function testLoggedInUsersCanSeeProfilePagesOfOtherUsers(): void
+    {
+        $this->withoutExceptionHandling();
+
+        $user = factory(User::class)->create(['timezone' => 'US/Central']);
+        $anotherUser = factory(User::class)->create(['timezone' => 'Europe/Zagreb']);
+        $this->actingAs($user);
+        $response = $this->get(route('users.show', $anotherUser));
+
+        $response->assertStatus(Response::HTTP_OK);
+        $response->assertViewIs('users.show');
+        $response->assertViewHas(['user', 'timezone']);
+        $this->assertTrue($anotherUser->is($response->original->user));
+        $response->assertSee($anotherUser->uploaded);
+        $response->assertSee($anotherUser->downloaded);
+        $response->assertSee($anotherUser->last_seen_at->timezone('US/Central')->format('d.m.Y. H:i'));
+        $response->assertSee($anotherUser->created_at->timezone('US/Central')->format('d.m.Y. H:i'));
+    }
+
+    public function testNonLoggedInUserCannotSeeAnyUserProfilePage(): void
+    {
+        $user = factory(User::class)->create();
+        $response = $this->get(route('users.show', $user));
+
+        $response->assertStatus(Response::HTTP_FOUND);
+        $response->assertRedirect(route('login'));
+    }
+
     public function testUpdate()
     {
         $this->withoutExceptionHandling();

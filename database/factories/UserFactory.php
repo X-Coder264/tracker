@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use Carbon\Carbon;
 use App\Models\User;
 use App\Models\Locale;
 use Illuminate\Support\Str;
@@ -37,7 +38,7 @@ $factory->define(User::class, function (Faker $faker) {
         'downloaded' => $faker->numberBetween(0, 1000000),
         'torrents_per_page' => $faker->numberBetween(5, 30),
         'banned' => false,
-        'slug' => $faker->unique()->text(255),
+        'last_seen_at' => Carbon::now()->subMinutes($faker->numberBetween(1, 100)),
     ];
 });
 

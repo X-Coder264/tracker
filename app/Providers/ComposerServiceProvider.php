@@ -6,6 +6,7 @@ namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
 use App\Http\ViewComposers\TimezoneComposer;
+use App\Http\ViewComposers\UserStatsComposer;
 use Illuminate\Contracts\View\Factory as ViewFactory;
 
 class ComposerServiceProvider extends ServiceProvider
@@ -13,13 +14,18 @@ class ComposerServiceProvider extends ServiceProvider
     /**
      * @var array
      */
-    private $viewsThatNeedTimezoneInfo = ['torrents.index', 'torrents.show'];
+    private $viewsThatNeedTimezoneInfo = ['torrents.index', 'torrents.show', 'users.show'];
 
     /**
      * @param ViewFactory $viewFactory
      */
     public function boot(ViewFactory $viewFactory)
     {
+        $viewFactory->composer(
+            ['layouts.app'],
+            UserStatsComposer::class
+        );
+
         $viewFactory->composer(
             $this->viewsThatNeedTimezoneInfo,
             TimezoneComposer::class

@@ -9,6 +9,7 @@ use App\Models\User;
 use App\Models\Locale;
 use App\Models\Torrent;
 use Illuminate\Support\Facades\Hash;
+use Facades\App\Services\SizeFormatter;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -46,6 +47,24 @@ class UserTest extends TestCase
         $user->save();
 
         $this->assertNotEmpty($user->slug);
+    }
+
+    public function testUploadedAccessor(): void
+    {
+        factory(User::class)->create();
+        $user = User::firstOrFail();
+        $returnValue = '500 MB';
+        SizeFormatter::shouldReceive('getFormattedSize')->once()->with($user->getOriginal('uploaded'))->andReturn($returnValue);
+        $this->assertSame($returnValue, $user->uploaded);
+    }
+
+    public function testDownloadedAccessor(): void
+    {
+        factory(User::class)->create();
+        $user = User::firstOrFail();
+        $returnValue = '500 MB';
+        SizeFormatter::shouldReceive('getFormattedSize')->once()->with($user->getOriginal('downloaded'))->andReturn($returnValue);
+        $this->assertSame($returnValue, $user->downloaded);
     }
 
     public function testTorrentRelationship()

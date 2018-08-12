@@ -7,6 +7,7 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use App\Models\Locale;
 use Illuminate\Http\Response;
+use Illuminate\Auth\AuthManager;
 use Illuminate\Cache\CacheManager;
 use Illuminate\Routing\Redirector;
 use Illuminate\Http\RedirectResponse;
@@ -14,6 +15,7 @@ use Illuminate\Foundation\Application;
 use App\Http\Requests\UpdateUserRequest;
 use Illuminate\Contracts\Translation\Translator;
 use Illuminate\Contracts\Routing\ResponseFactory;
+use Symfony\Component\HttpFoundation\Response as BaseResponse;
 
 class UserController extends Controller
 {
@@ -23,8 +25,24 @@ class UserController extends Controller
      *
      * @return Response
      */
-    public function edit(User $user, ResponseFactory $responseFactory): Response
+    public function show(User $user, ResponseFactory $responseFactory): Response
     {
+        return $responseFactory->view('users.show', compact('user'));
+    }
+
+    /**
+     * @param User            $user
+     * @param AuthManager     $authManager
+     * @param ResponseFactory $responseFactory
+     *
+     * @return Response|RedirectResponse
+     */
+    public function edit(User $user, AuthManager $authManager, ResponseFactory $responseFactory): BaseResponse
+    {
+        if (false === $user->is($authManager->guard()->user())) {
+            return $responseFactory->redirectToRoute('users.edit', $authManager->guard()->user());
+        }
+
         $locales = Locale::all();
 
         return $responseFactory->view('users.edit', compact('user', 'locales'));

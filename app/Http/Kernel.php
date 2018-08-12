@@ -39,6 +39,7 @@ class Kernel extends HttpKernel
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
             \App\Http\Middleware\SetUserLocale::class,
             \App\Http\Middleware\CheckIfTheUserIsBanned::class,
+            \App\Http\Middleware\UpdateUserLastSeenAtInfo::class,
         ],
 
         'api' => [

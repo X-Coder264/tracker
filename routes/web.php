@@ -39,5 +39,6 @@ Route::middleware(['auth'])->group(function () use ($router) {
     $router->put('torrent-comments/{torrentComment}', 'TorrentCommentController@update')->name('torrent-comments.update');
 
     $router->get('users/{user}/edit', 'UserController@edit')->name('users.edit');
+    $router->get('users/{user}', 'UserController@show')->name('users.show');
     $router->put('users/{user}', 'UserController@update')->name('users.update');
 });

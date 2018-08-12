@@ -51,6 +51,7 @@
 
                                 <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuLink">
                                     <a class="dropdown-item" href="{{ route('users.edit', auth()->user()) }}">{{ trans('messages.navigation.users.edit_page') }}</a>
+                                    <a class="dropdown-item" href="{{ route('users.show', auth()->user()) }}">{{ trans('messages.navigation.users.profile') }}</a>
                                     <a class="dropdown-item" href="{{ route('logout') }}" onclick="event.preventDefault();
                                                  document.getElementById('logout-form').submit();">{{ trans('messages.navigation.logout') }}</a>
                                     <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
@@ -64,6 +65,21 @@
         </nav>
 
         <main role="main" class="py-4">
+
+            @if (auth()->check())
+                <div class="row">
+                    <div class="col-md-10 mx-auto">
+                        <div class="card">
+                            <div class="card-body">
+                                {{ trans('messages.common.uploaded') }}: {{ auth()->user()->uploaded }} | {{ trans('messages.common.downloaded') }}: {{ auth()->user()->downloaded }} | {{ trans('messages.common.seeding') }}: {{ $numberOfSeedingTorrents }} | {{ trans('messages.common.leeching') }}: {{ $numberOfLeechingTorrents }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <br>
+            @endif
+
             @yield('content')
         </main>
     </div>

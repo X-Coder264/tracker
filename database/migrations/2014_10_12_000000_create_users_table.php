@@ -28,6 +28,7 @@ class CreateUsersTable extends Migration
             $table->boolean('banned')->default(false);
             $table->rememberToken();
             $table->string('slug')->unique();
+            $table->timestamp('last_seen_at')->nullable();
             $table->timestamps();
         });
     }

@@ -7,6 +7,7 @@ namespace App\Models;
 use App\Notifications\ResetPassword;
 use Illuminate\Support\Facades\Hash;
 use Spatie\Permission\Traits\HasRoles;
+use Facades\App\Services\SizeFormatter;
 use Illuminate\Notifications\Notifiable;
 use Cviebrock\EloquentSluggable\Sluggable;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -24,7 +25,7 @@ class User extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'name', 'email', 'password', 'timezone', 'locale_id', 'torrents_per_page', 'banned',
+        'name', 'email', 'password', 'timezone', 'locale_id', 'torrents_per_page', 'banned', 'last_seen_at',
     ];
 
     /**
@@ -43,6 +44,15 @@ class User extends Authenticatable
      */
     protected $casts = [
         'banned' => 'bool',
+    ];
+
+    /**
+     * The attributes that should be mutated to dates.
+     *
+     * @var array
+     */
+    protected $dates = [
+        'last_seen_at',
     ];
 
     /**
@@ -85,6 +95,30 @@ class User extends Authenticatable
     public function sendPasswordResetNotification($token): void
     {
         $this->notify(new ResetPassword($token));
+    }
+
+    /**
+     * Get the user's uploaded amount.
+     *
+     * @param $value
+     *
+     * @return string
+     */
+    public function getUploadedAttribute($value): string
+    {
+        return SizeFormatter::getFormattedSize((int) $value);
+    }
+
+    /**
+     * Get the user's downloaded amount.
+     *
+     * @param $value
+     *
+     * @return string
+     */
+    public function getDownloadedAttribute($value): string
+    {
+        return SizeFormatter::getFormattedSize((int) $value);
     }
 
     /**
