@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Services;
 
+use Exception;
 use Tests\TestCase;
 use App\Models\User;
 use App\Models\Torrent;
@@ -31,7 +32,7 @@ class TorrentUploadManagerTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function testTorrentUpload()
+    public function testTorrentUpload(): void
     {
         $this->withoutExceptionHandling();
 
@@ -70,7 +71,7 @@ class TorrentUploadManagerTest extends TestCase
         $torrentName = 'Test name';
         $torrentDescription = 'Test description';
 
-        $response = $this->post(route('torrents.store'), [
+        $response = $this->from(route('torrents.create'))->post(route('torrents.store'), [
             'torrent'     => File::create('file.torrent'),
             'name'        => $torrentName,
             'description' => $torrentDescription,
@@ -104,7 +105,143 @@ class TorrentUploadManagerTest extends TestCase
         $this->assertNull($cachedTorrents);
     }
 
-    public function testTorrentDoesNotHaveIMDBIdIfInvalidIMDBURLIsSupplied()
+    public function testTorrentUploadWithEmptyIMDBURL(): void
+    {
+        $this->withoutExceptionHandling();
+
+        $torrentCategory = factory(TorrentCategory::class)->states('canHaveIMDB')->create();
+        $user = factory(User::class)->create(['torrents_per_page' => 10]);
+        $this->actingAs($user);
+
+        $cacheManager = $this->app->make(CacheManager::class);
+        $cachedTorrentsFirstPage = $cacheManager->tags('torrents')->get('torrents.page.1.perPage.10');
+        $cachedTorrentsSecondPage = $cacheManager->tags('torrents')->get('torrents.page.2.perPage.10');
+        $this->assertNull($cachedTorrentsFirstPage);
+        $this->assertNull($cachedTorrentsSecondPage);
+
+        // put some stupid value there just so that we can assert at the end that it was flushed
+        $cacheManager->tags('torrents')->put('torrents.page.1.perPage.10', 'something', 15);
+        $cacheManager->tags('torrents')->put('torrents.page.2.perPage.10', 'something2', 15);
+        $this->assertSame('something', $cacheManager->tags('torrents')->get('torrents.page.1.perPage.10'));
+        $this->assertSame('something2', $cacheManager->tags('torrents')->get('torrents.page.2.perPage.10'));
+
+        Storage::fake('torrents');
+        Storage::fake('imdb-images');
+
+        $decoder = $this->createMock(Bdecoder::class);
+        $this->app->instance(Bdecoder::class, $decoder);
+
+        $decoder->method('decode')->willReturn(['test' => 'test']);
+
+        $encoder = $this->createMock(Bencoder::class);
+        $this->app->instance(Bencoder::class, $encoder);
+
+        $infoService = $this->createMock(TorrentInfoService::class);
+        $torrentSize = 5000;
+        $infoService->method('getTorrentSize')->willReturn($torrentSize);
+        $this->app->instance(TorrentInfoService::class, $infoService);
+
+        $torrentValue = '123456';
+        $encoder->method('encode')->willReturn($torrentValue);
+
+        $torrentName = 'Test name';
+        $torrentDescription = 'Test description';
+
+        $response = $this->from(route('torrents.create'))->post(route('torrents.store'), [
+            'torrent'     => File::create('file.torrent'),
+            'name'        => $torrentName,
+            'description' => $torrentDescription,
+            'category'    => $torrentCategory->id,
+            'imdb_url'    => '',
+        ]);
+
+        $torrent = Torrent::firstOrFail();
+
+        $response->assertStatus(Response::HTTP_FOUND);
+        $response->assertRedirect(route('torrents.show', $torrent));
+        $response->assertSessionHas('success', trans('messages.torrents.store-successfully-uploaded-torrent.message'));
+
+        Storage::disk('torrents')->assertExists("{$torrent->id}.torrent");
+        $this->assertSame($torrentValue, Storage::disk('torrents')->get("{$torrent->id}.torrent"));
+
+        $formatter = new SizeFormatter();
+
+        $this->assertSame($torrentSize, (int) $torrent->getOriginal('size'));
+        $this->assertSame($formatter->getFormattedSize($torrentSize), $torrent->size);
+        $this->assertSame($torrentName, $torrent->name);
+        $this->assertSame($torrentDescription, $torrent->description);
+        $this->assertSame($user->id, $torrent->uploader_id);
+        $this->assertSame($torrentCategory->id, $torrent->category_id);
+        $this->assertNull($torrent->imdb_id);
+
+        // the values must be flushed at the end
+        $cachedTorrentsFirstPage = $cacheManager->tags('torrents')->get('torrents.page.1.perPage.10');
+        $cachedTorrentsSecondPage = $cacheManager->tags('torrents')->get('torrents.page.2.perPage.10');
+        $this->assertNull($cachedTorrentsFirstPage);
+        $this->assertNull($cachedTorrentsSecondPage);
+    }
+
+    public function testTorrentDoesNotHaveIMDBDataEvenIfURLIsProvidedWhenTheCategoryCannotHaveIMDB(): void
+    {
+        $this->withoutExceptionHandling();
+
+        $torrentCategory = factory(TorrentCategory::class)->states('cannotHaveIMDB')->create();
+        $user = factory(User::class)->create();
+        $this->actingAs($user);
+
+        Storage::fake('torrents');
+        Storage::fake('imdb-images');
+
+        $decoder = $this->createMock(Bdecoder::class);
+        $this->app->instance(Bdecoder::class, $decoder);
+
+        $decoder->method('decode')->willReturn(['test' => 'test']);
+
+        $encoder = $this->createMock(Bencoder::class);
+        $this->app->instance(Bencoder::class, $encoder);
+
+        $infoService = $this->createMock(TorrentInfoService::class);
+        $torrentSize = 5000;
+        $infoService->method('getTorrentSize')->willReturn($torrentSize);
+        $this->app->instance(TorrentInfoService::class, $infoService);
+
+        $torrentValue = '123456';
+        $encoder->method('encode')->willReturn($torrentValue);
+
+        $torrentName = 'Test name';
+        $torrentDescription = 'Test description';
+
+        $response = $this->from(route('torrents.create'))->post(route('torrents.store'), [
+            'torrent'     => File::create('file.torrent'),
+            'name'        => $torrentName,
+            'description' => $torrentDescription,
+            'category'    => $torrentCategory->id,
+            'imdb_url'    => 'https://www.imdb.com/title/tt0468569/',
+        ]);
+
+        $torrent = Torrent::firstOrFail();
+
+        $response->assertStatus(Response::HTTP_FOUND);
+        $response->assertRedirect(route('torrents.show', $torrent));
+        $response->assertSessionHas('success', trans('messages.torrents.store-successfully-uploaded-torrent.message'));
+
+        Storage::disk('torrents')->assertExists("{$torrent->id}.torrent");
+        $this->assertSame($torrentValue, Storage::disk('torrents')->get("{$torrent->id}.torrent"));
+
+        Storage::disk('imdb-images')->assertMissing('0468569.jpg');
+
+        $formatter = new SizeFormatter();
+
+        $this->assertSame($torrentSize, (int) $torrent->getOriginal('size'));
+        $this->assertSame($formatter->getFormattedSize($torrentSize), $torrent->size);
+        $this->assertSame($torrentName, $torrent->name);
+        $this->assertSame($torrentDescription, $torrent->description);
+        $this->assertSame($user->id, $torrent->uploader_id);
+        $this->assertSame($torrentCategory->id, $torrent->category_id);
+        $this->assertNull($torrent->imdb_id);
+    }
+
+    public function testTorrentDoesNotHaveIMDBIdIfInvalidIMDBURLIsSupplied(): void
     {
         $this->withoutExceptionHandling();
 
@@ -142,7 +279,7 @@ class TorrentUploadManagerTest extends TestCase
         $torrentName = 'Test name';
         $torrentDescription = 'Test description';
 
-        $response = $this->post(route('torrents.store'), [
+        $response = $this->from(route('torrents.create'))->post(route('torrents.store'), [
             'torrent'     => File::create('file.torrent'),
             'name'        => $torrentName,
             'description' => $torrentDescription,
@@ -174,7 +311,40 @@ class TorrentUploadManagerTest extends TestCase
         $this->assertNull($cachedTorrents);
     }
 
-    public function testAllTorrentsGetThePrivateFlagSet()
+    public function testTorrentUploadWhenTheBdecoderThrowsAnException(): void
+    {
+        $torrentCategory = factory(TorrentCategory::class)->states('canHaveIMDB')->create();
+        $user = factory(User::class)->create();
+        $this->actingAs($user);
+
+        Storage::fake('torrents');
+        Storage::fake('imdb-images');
+
+        $decoder = $this->createMock(Bdecoder::class);
+        $decoder->method('decode')->willThrowException(new Exception());
+        $this->app->instance(Bdecoder::class, $decoder);
+
+        $torrentName = 'Test name';
+        $torrentDescription = 'Test description';
+
+        $response = $this->from(route('torrents.create'))->post(route('torrents.store'), [
+            'torrent'     => File::create('file.torrent'),
+            'name'        => $torrentName,
+            'description' => $torrentDescription,
+            'category'    => $torrentCategory->id,
+            'imdb_url'    => 'https://www.imdb.com/title/tt0468569/',
+        ]);
+
+        $this->assertSame(0, Torrent::count());
+
+        $response->assertStatus(Response::HTTP_FOUND);
+        $response->assertRedirect(route('torrents.create'));
+        $response->assertSessionHasErrors('torrent', trans('messages.validation.torrent-upload-invalid-torrent-file'));
+
+        Storage::disk('imdb-images')->assertMissing('0468569.jpg');
+    }
+
+    public function testAllTorrentsGetThePrivateFlagSet(): void
     {
         $this->withoutExceptionHandling();
 
@@ -199,7 +369,7 @@ class TorrentUploadManagerTest extends TestCase
         $torrentName = 'Test name';
         $torrentDescription = 'Test description';
 
-        $response = $this->post(route('torrents.store'), [
+        $response = $this->from(route('torrents.create'))->post(route('torrents.store'), [
             'torrent'     => $torrentFile,
             'name'        => $torrentName,
             'description' => $torrentDescription,
@@ -217,7 +387,7 @@ class TorrentUploadManagerTest extends TestCase
         $this->assertSame(1, $decodedTorrent['info']['private']);
     }
 
-    public function testTorrentsHaveEntropySet()
+    public function testTorrentsHaveEntropySet(): void
     {
         $this->withoutExceptionHandling();
 
@@ -238,7 +408,7 @@ class TorrentUploadManagerTest extends TestCase
         $torrentName = 'Test name';
         $torrentDescription = 'Test description';
 
-        $response = $this->post(route('torrents.store'), [
+        $response = $this->from(route('torrents.create'))->post(route('torrents.store'), [
             'torrent'     => $torrentFile,
             'name'        => $torrentName,
             'description' => $torrentDescription,
@@ -257,7 +427,7 @@ class TorrentUploadManagerTest extends TestCase
         $this->assertSame(128, strlen($decodedTorrent['info']['entropy']));
     }
 
-    public function testTorrentMustHaveAnUniqueInfoHash()
+    public function testTorrentMustHaveAnUniqueInfoHash(): void
     {
         $infoHash = 'ccd285bd6d7fc749e9ed34d8b1e8a0f1b582d977';
         factory(Torrent::class)->create(['info_hash' => $infoHash, 'seeders' => 0, 'leechers' => 0]);
@@ -310,7 +480,7 @@ class TorrentUploadManagerTest extends TestCase
         $torrentName = 'Test name';
         $torrentDescription = 'Test description';
 
-        $response = $this->post(route('torrents.store'), [
+        $response = $this->from(route('torrents.create'))->post(route('torrents.store'), [
             'torrent'     => File::create('file.torrent'),
             'name'        => $torrentName,
             'description' => $torrentDescription,
@@ -335,7 +505,7 @@ class TorrentUploadManagerTest extends TestCase
         $this->assertSame($expectedHash, $torrent->info_hash);
     }
 
-    public function testTorrentsHaveTheCorrectAnnounceUrl()
+    public function testTorrentsHaveTheCorrectAnnounceUrl(): void
     {
         $this->withoutExceptionHandling();
 
@@ -356,7 +526,7 @@ class TorrentUploadManagerTest extends TestCase
         $torrentName = 'Test name';
         $torrentDescription = 'Test description';
 
-        $response = $this->post(route('torrents.store'), [
+        $response = $this->from(route('torrents.create'))->post(route('torrents.store'), [
             'torrent'     => $torrentFile,
             'name'        => $torrentName,
             'description' => $torrentDescription,
@@ -375,7 +545,7 @@ class TorrentUploadManagerTest extends TestCase
         $this->assertSame(route('announce'), $decodedTorrent['announce']);
     }
 
-    public function testTorrentGetsDeletedIfTheFileWasNotSuccessfullyWrittenToTheDisk()
+    public function testTorrentGetsDeletedIfTheFileWasNotSuccessfullyWrittenToTheDisk(): void
     {
         $user = factory(User::class)->create();
         $this->actingAs($user);

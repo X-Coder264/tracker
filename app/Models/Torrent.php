@@ -6,6 +6,7 @@ namespace App\Models;
 
 use Facades\App\Services\SizeFormatter;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Builder;
 use Cviebrock\EloquentSluggable\Sluggable;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -55,6 +56,18 @@ class Torrent extends Model
     public function getSizeAttribute($value): string
     {
         return SizeFormatter::getFormattedSize((int) $value);
+    }
+
+    /**
+     * Scope a query to only include dead torrents.
+     *
+     * @param Builder $query
+     *
+     * @return Builder
+     */
+    public function scopeDead(Builder $query): Builder
+    {
+        return $query->where('seeders', '=', 0);
     }
 
     /**

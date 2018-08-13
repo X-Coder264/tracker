@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Hash;
 use Spatie\Permission\Traits\HasRoles;
 use Facades\App\Services\SizeFormatter;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Database\Eloquent\Builder;
 use Cviebrock\EloquentSluggable\Sluggable;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -119,6 +120,18 @@ class User extends Authenticatable
     public function getDownloadedAttribute($value): string
     {
         return SizeFormatter::getFormattedSize((int) $value);
+    }
+
+    /**
+     * Scope a query to only include banned users.
+     *
+     * @param Builder $query
+     *
+     * @return Builder
+     */
+    public function scopeBanned(Builder $query): Builder
+    {
+        return $query->where('banned', '=', true);
     }
 
     /**

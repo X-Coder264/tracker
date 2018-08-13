@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use Illuminate\Routing\Router;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Auth\Middleware\Authenticate;
 
 /*
 |--------------------------------------------------------------------------
@@ -20,7 +21,7 @@ use Illuminate\Support\Facades\Route;
 $router->auth();
 $router->get('announce', 'AnnounceController@store')->name('announce');
 
-Route::middleware(['auth'])->group(function () use ($router) {
+Route::middleware([Authenticate::class])->group(function () use ($router) {
     $router->get('/', 'HomeController@index')->name('home');
 
     $router->get('/cms', 'Admin\IndexController@index')->name('admin.index');

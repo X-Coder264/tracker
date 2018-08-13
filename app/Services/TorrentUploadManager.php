@@ -13,6 +13,7 @@ use Illuminate\Cache\CacheManager;
 use Illuminate\Filesystem\Filesystem;
 use App\Exceptions\FileNotWritableException;
 use Illuminate\Contracts\Routing\UrlGenerator;
+use Illuminate\Validation\ValidationException;
 use Illuminate\Contracts\Translation\Translator;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Contracts\Filesystem\Factory as FilesystemManager;
@@ -127,7 +128,12 @@ class TorrentUploadManager
         $torrentFilePath = $torrentFile->getRealPath();
 
         $torrentContent = $this->filesystem->get($torrentFilePath);
-        $decodedTorrent = $this->decoder->decode($torrentContent);
+
+        try {
+            $decodedTorrent = $this->decoder->decode($torrentContent);
+        } catch (Exception $exception) {
+            throw ValidationException::withMessages(['torrent' => $this->translator->trans('messages.validation.torrent-upload-invalid-torrent-file')]);
+        }
 
         // the torrent must be private
         $decodedTorrent['info']['private'] = 1;

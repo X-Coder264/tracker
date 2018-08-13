@@ -6,6 +6,7 @@ namespace App\Models;
 
 use Facades\App\Services\SizeFormatter;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
@@ -49,6 +50,30 @@ class Peer extends Model
     public function getDownloadedAttribute($value): string
     {
         return SizeFormatter::getFormattedSize((int) $value);
+    }
+
+    /**
+     * Scope a query to only include seeders.
+     *
+     * @param Builder $query
+     *
+     * @return Builder
+     */
+    public function scopeSeeders(Builder $query): Builder
+    {
+        return $query->where('seeder', '=', true);
+    }
+
+    /**
+     * Scope a query to only include leechers.
+     *
+     * @param Builder $query
+     *
+     * @return Builder
+     */
+    public function scopeLeechers(Builder $query): Builder
+    {
+        return $query->where('seeder', '=', false);
     }
 
     /**

@@ -32,7 +32,7 @@ class PasskeyGenerator
     /**
      * @param string $passkey
      *
-     * @return \App\Models\User|null
+     * @return User|null
      */
     protected function getUserWithTheSpecifiedPasskey(string $passkey): ?User
     {

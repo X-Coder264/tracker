@@ -32,6 +32,8 @@ class Bdecoder
     /**
      * @param string $data
      *
+     * @throws Exception
+     *
      * @return array|int|string
      */
     public function decode(string $data)
