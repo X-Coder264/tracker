@@ -59,6 +59,8 @@ class BencoderTest extends TestCase
     public function testDictionaryEncoding()
     {
         $this->assertSame('d3:cow3:moo4:spam4:eggse', $this->encoder->encode(['cow' => 'moo', 'spam' => 'eggs']));
+        $this->assertSame('d3:bar4:spam3:fooi42ee', $this->encoder->encode(['bar' => 'spam', 'foo' => 42]));
+        $this->assertSame('d3:bar4:spam3:fooi42ee', $this->encoder->encode(['foo' => 42, 'bar' => 'spam']));
     }
 
     public function testDictionaryWhichContainsAListEncoding()

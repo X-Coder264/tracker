@@ -17,7 +17,7 @@ class Bencoder
             return $this->encodeList($data);
         } elseif (is_array($data)) {
             return $this->encodeDictionary($data);
-        } elseif (is_int($data) || is_float($data)) {
+        } elseif (is_int($data)) {
             return $this->encodeInteger($data);
         } elseif (is_string($data)) {
             return $this->encodeString($data);
@@ -29,13 +29,13 @@ class Bencoder
     /**
      * Encode an integer.
      *
-     * @param int|float $data
+     * @param int $data
      *
      * @return string
      */
-    private function encodeInteger($data): string
+    private function encodeInteger(int $data): string
     {
-        return sprintf('i%.0fe', $data);
+        return sprintf('i%de', $data);
     }
 
     /**

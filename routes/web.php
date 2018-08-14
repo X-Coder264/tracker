@@ -20,6 +20,7 @@ use Illuminate\Auth\Middleware\Authenticate;
 /** @var Router $router */
 $router->auth();
 $router->get('announce', 'AnnounceController@store')->name('announce');
+$router->get('scrape', 'ScrapeController@show')->name('scrape');
 
 Route::middleware([Authenticate::class])->group(function () use ($router) {
     $router->get('/', 'HomeController@index')->name('home');

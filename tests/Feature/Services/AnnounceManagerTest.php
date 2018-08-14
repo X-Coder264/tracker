@@ -26,6 +26,9 @@ class AnnounceManagerTest extends TestCase
     {
         $this->withoutExceptionHandling();
 
+        config()->set('tracker.announce_interval', 50);
+        config()->set('tracker.min_announce_interval', 20);
+
         $infoHash = 'ccd285bd6d7fc749e9ed34d8b1e8a0f1b582d977';
         $peerId = '2d7142333345302d64354e334474384672517776';
         $IP = '98.165.38.50';
@@ -58,7 +61,7 @@ class AnnounceManagerTest extends TestCase
         $response->assertStatus(Response::HTTP_OK);
         $response->assertHeader('Content-Type', 'text/plain; charset=UTF-8');
         $this->assertSame(
-            'd8:completei0e10:incompletei0e8:intervali2400e12:min intervali60e5:peers0:6:peers60:e',
+            'd8:completei0e10:incompletei0e8:intervali3000e12:min intervali1200e5:peers0:6:peers60:e',
             $response->getContent()
         );
         $this->assertSame(1, Peer::count());
@@ -1931,7 +1934,7 @@ class AnnounceManagerTest extends TestCase
             ]))
         );
         $response->assertStatus(Response::HTTP_OK);
-        $expectedResponse = ['failure reason' => trans('messages.announce.invalid_passkey')];
+        $expectedResponse = ['failure reason' => trans('messages.announce.invalid_passkey'), 'retry in' => 'never'];
         $decoder = new Bdecoder();
         $actualResponse = $decoder->decode($response->getContent());
         $this->assertSame($expectedResponse, $actualResponse);
@@ -1948,7 +1951,7 @@ class AnnounceManagerTest extends TestCase
             ]))
         );
         $response->assertStatus(Response::HTTP_OK);
-        $expectedResponse = ['failure reason' => trans('messages.announce.banned_user')];
+        $expectedResponse = ['failure reason' => trans('messages.announce.banned_user'), 'retry in' => 'never'];
         $decoder = new Bdecoder();
         $actualResponse = $decoder->decode($response->getContent());
         $this->assertSame($expectedResponse, $actualResponse);

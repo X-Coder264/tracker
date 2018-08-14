@@ -10,6 +10,7 @@ use App\Services\Bencoder;
 use App\Services\AnnounceManager;
 use Illuminate\Cache\CacheManager;
 use Illuminate\Database\DatabaseManager;
+use Illuminate\Contracts\Config\Repository;
 use PHPUnit\Framework\MockObject\MockObject;
 use Illuminate\Contracts\Translation\Translator;
 use Illuminate\Contracts\Validation\Factory as ValidationFactory;
@@ -23,7 +24,8 @@ class AnnounceManagerTest extends TestCase
             $this->app->make(DatabaseManager::class),
             $this->app->make(CacheManager::class),
             $this->app->make(ValidationFactory::class),
-            $this->app->make(Translator::class)
+            $this->app->make(Translator::class),
+            $this->app->make(Repository::class)
         );
         $reflectionClass = new ReflectionClass(AnnounceManager::class);
         $method = $reflectionClass->getMethod('validateIPv4Address');
@@ -43,7 +45,8 @@ class AnnounceManagerTest extends TestCase
             $this->app->make(DatabaseManager::class),
             $this->app->make(CacheManager::class),
             $this->app->make(ValidationFactory::class),
-            $this->app->make(Translator::class)
+            $this->app->make(Translator::class),
+            $this->app->make(Repository::class)
         );
         $reflectionClass = new ReflectionClass(AnnounceManager::class);
         $method = $reflectionClass->getMethod('validateIPv6Address');
@@ -77,7 +80,8 @@ class AnnounceManagerTest extends TestCase
             $this->app->make(DatabaseManager::class),
             $this->app->make(CacheManager::class),
             $this->app->make(ValidationFactory::class),
-            $this->app->make(Translator::class)
+            $this->app->make(Translator::class),
+            $this->app->make(Repository::class)
         );
         $reflectionClass = new ReflectionClass(AnnounceManager::class);
         $method = $reflectionClass->getMethod('announceErrorResponse');
@@ -105,7 +109,8 @@ class AnnounceManagerTest extends TestCase
             $this->app->make(DatabaseManager::class),
             $this->app->make(CacheManager::class),
             $this->app->make(ValidationFactory::class),
-            $this->app->make(Translator::class)
+            $this->app->make(Translator::class),
+            $this->app->make(Repository::class)
         );
         $reflectionClass = new ReflectionClass(AnnounceManager::class);
         $method = $reflectionClass->getMethod('announceErrorResponse');

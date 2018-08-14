@@ -35,6 +35,8 @@
         <env name="SESSION_DRIVER" value="array"/>
         <env name="QUEUE_DRIVER" value="sync"/>
         <env name="MAIL_DRIVER" value="array"/>
+        <env name="ANNOUNCE_INTERVAL" value="40"/>
+        <env name="MIN_ANNOUNCE_INTERVAL" value="1"/>
     </php>
     <listeners>
         <listener class="NunoMaduro\Collision\Adapters\Phpunit\Listener" />

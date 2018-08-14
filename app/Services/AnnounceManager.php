@@ -11,6 +11,8 @@ use Illuminate\Cache\CacheManager;
 use Illuminate\Support\Collection;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Database\DatabaseManager;
+use Illuminate\Contracts\Config\Repository;
+use App\Exceptions\AnnounceValidationException;
 use Illuminate\Contracts\Translation\Translator;
 use Illuminate\Contracts\Validation\Factory as ValidationFactory;
 
@@ -48,6 +50,11 @@ class AnnounceManager
      * @var Translator
      */
     private $translator;
+
+    /**
+     * @var Repository
+     */
+    private $config;
 
     /**
      * @var stdClass
@@ -135,19 +142,22 @@ class AnnounceManager
      * @param CacheManager      $cacheManager
      * @param ValidationFactory $validationFactory
      * @param Translator        $translator
+     * @param Repository        $config
      */
     public function __construct(
         Bencoder $encoder,
         DatabaseManager $databaseManager,
         CacheManager $cacheManager,
         ValidationFactory $validationFactory,
-        Translator $translator
+        Translator $translator,
+        Repository $config
     ) {
         $this->encoder = $encoder;
         $this->databaseManager = $databaseManager;
         $this->cacheManager = $cacheManager;
         $this->validationFactory = $validationFactory;
         $this->translator = $translator;
+        $this->config = $config;
     }
 
     /**
@@ -161,50 +171,44 @@ class AnnounceManager
 
         $this->event = $this->request->input('event');
 
-        // info_hash and peer_id are validated separately because the Laravel validator uses
-        // mb_strlen to get the length of the (sometimes binary) string which returns a wrong number
-        // when used on those two properties so strlen must be used
-        // mb_strlen returns a "wrong" number because it counts code points instead of characters
-        $validationMessage = $this->validateInfoHashAndPeerID();
-        if (null !== $validationMessage) {
-            return $validationMessage;
-        }
+        try {
+            // info_hash and peer_id are validated separately because the Laravel validator uses
+            // mb_strlen to get the length of the (sometimes binary) string which returns a wrong number
+            // when used on those two properties so strlen must be used
+            // mb_strlen returns a "wrong" number because it counts code points instead of characters
+            $this->validateInfoHash();
+            $this->validatePeerID();
+            // validate the rest of the request (passkey, uploaded, downloaded, left, port)
+            $this->validateRequest();
+        } catch (AnnounceValidationException $exception) {
+            $validationData = $exception->getValidationMessages() ?: $exception->getMessage();
 
-        // validate the rest of the request (passkey, uploaded, downloaded, left, port)
-        $validationMessage = $this->validateRequest();
-        if (null !== $validationMessage) {
-            return $validationMessage;
+            return $this->announceErrorResponse($validationData);
         }
 
         // if we get the stopped event there is no need to validate the IP address,
         // since we are just going to delete the peer from the DB
         if ('stopped' !== $this->event) {
-            // in order to support IPv6 peers (BEP 7) a more complex IP validation logic is needed
-            $validationMessage = $this->validateAndSetIPAddress();
-            if (null !== $validationMessage) {
-                return $validationMessage;
+            try {
+                // in order to support IPv6 peers (BEP 7) a more complex IP validation logic is needed
+                $this->validateAndSetIPAddress();
+            } catch (AnnounceValidationException $exception) {
+                return $this->announceErrorResponse($exception->getMessage());
             }
         }
 
-        $this->peerID = bin2hex($this->request->input('peer_id'));
-
-        $this->user = $this->cacheManager->remember('user.' . $this->request->input('passkey'), 24 * 60, function () {
-            return $this->databaseManager->table('users')
-                ->where('passkey', '=', $this->request->input('passkey'))
-                ->select(['id', 'slug', 'uploaded', 'downloaded', 'banned'])
-                ->first();
-        });
+        $this->user = $this->getUser($this->request->input('passkey'));
 
         if (null === $this->user) {
-            return $this->announceErrorResponse($this->translator->trans('messages.announce.invalid_passkey'));
+            return $this->announceErrorResponse($this->translator->trans('messages.announce.invalid_passkey'), true);
         }
 
         if (true === (bool) $this->user->banned) {
-            return $this->announceErrorResponse($this->translator->trans('messages.announce.banned_user'));
+            return $this->announceErrorResponse($this->translator->trans('messages.announce.banned_user'), true);
         }
 
         $this->torrent = $this->databaseManager->table('torrents')
-                                               ->where('info_hash', bin2hex($this->request->input('info_hash')))
+                                               ->where('info_hash', '=', bin2hex($this->request->input('info_hash')))
                                                ->select(['id', 'seeders', 'leechers', 'slug'])
                                                ->first();
 
@@ -214,6 +218,8 @@ class AnnounceManager
 
         $left = (int) $this->request->input('left');
         $this->seeder = 0 === $left ? true : false;
+
+        $this->peerID = bin2hex($this->request->input('peer_id'));
 
         $this->peer = $this->databaseManager->table('peers')
             ->where('peer_id', '=', $this->peerID)
@@ -265,45 +271,100 @@ class AnnounceManager
     }
 
     /**
-     * Returns null if the validation is successful or a string if it is not.
+     * @param array $infoHashes
      *
-     * @return null|string
+     * @return string
      */
-    private function validateInfoHashAndPeerID(): ?string
+    public function scrape(array $infoHashes): string
+    {
+        $response = [];
+
+        foreach ($infoHashes as $infoHash) {
+            $torrent = $this->databaseManager
+                ->table('torrents')
+                ->where('info_hash', '=', bin2hex($infoHash))
+                ->select(['id', 'seeders', 'leechers'])
+                ->first();
+
+            if (null === $torrent) {
+                continue;
+            }
+
+            $snatchesCount = $this->databaseManager
+                ->table('snatches')
+                ->where('torrent_id', '=', $torrent->id)
+                ->where('left', '=', 0)
+                ->count();
+
+            $response['files'][$infoHash] = [
+                'complete' => (int) $torrent->seeders,
+                'incomplete' => (int) $torrent->leechers,
+                'downloaded' => $snatchesCount,
+            ];
+        }
+
+        if (empty($response['files'])) {
+            return $this->announceErrorResponse($this->translator->trans('messages.scrape.no_torrents'));
+        }
+
+        return $this->encoder->encode($response);
+    }
+
+    /**
+     * @param string $passkey
+     *
+     * @return null|stdClass
+     */
+    public function getUser(string $passkey): ?stdClass
+    {
+        return $this->cacheManager->remember('user.' . $passkey, 24 * 60, function () use ($passkey) {
+            return $this->databaseManager->table('users')
+                ->where('passkey', '=', $passkey)
+                ->select(['id', 'slug', 'uploaded', 'downloaded', 'banned'])
+                ->first();
+        });
+    }
+
+    /**
+     * @throws AnnounceValidationException
+     */
+    private function validateInfoHash(): void
     {
         if ($this->request->filled('info_hash')) {
             if (20 !== strlen($this->request->input('info_hash'))) {
                 $errorMessage = $this->translator->trans('messages.validation.variable.size', ['var' => 'info_hash']);
 
-                return $this->announceErrorResponse($errorMessage);
+                throw new AnnounceValidationException($errorMessage);
             }
         } else {
             $errorMessage = $this->translator->trans('messages.validation.variable.required', ['var' => 'info_hash']);
 
-            return $this->announceErrorResponse($errorMessage);
+            throw new AnnounceValidationException($errorMessage);
         }
+    }
 
-        if ($this->request->filled('peer_id')) {
+    /**
+     * @throws AnnounceValidationException
+     */
+    private function validatePeerID(): void
+    {
+        if (true === $this->request->filled('peer_id')) {
             if (20 !== strlen($this->request->input('peer_id'))) {
                 $errorMessage = $this->translator->trans('messages.validation.variable.size', ['var' => 'peer_id']);
 
-                return $this->announceErrorResponse($errorMessage);
+                throw new AnnounceValidationException($errorMessage);
             }
         } else {
             $errorMessage = $this->translator->trans('messages.validation.variable.required', ['var' => 'peer_id']);
 
-            return $this->announceErrorResponse($errorMessage);
+            throw new AnnounceValidationException($errorMessage);
         }
-
-        return null;
     }
 
     /**
-     * Returns null if the validation is successful or a string if it is not.
-     *
-     * @return null|string
+     * @throws AnnounceValidationException
      */
-    private function validateRequest(): ?string
+    private function validateRequest(): void
     {
         $validator = $this->validationFactory->make(
             $this->request->all(),
@@ -339,16 +400,14 @@ class AnnounceManager
         if ($validator->fails()) {
             $errors = $validator->errors();
 
-            return $this->announceErrorResponse($errors->all());
+            throw new AnnounceValidationException('', $errors->all());
         }
-
-        return null;
     }
 
     /**
-     * @return null|string
+     * @throws AnnounceValidationException
      */
-    private function validateAndSetIPAddress(): ?string
+    private function validateAndSetIPAddress(): void
     {
         $this->ipv4Port = $this->request->input('port');
         $this->ipv6Port = $this->request->input('port');
@@ -420,13 +479,11 @@ class AnnounceManager
             $this->ipv6Address = $IP;
         }
 
-        // return an error if there is not at least one IP address and port set
+        // throw the validation exception if there is not at least one IP address and port set
         if (false === ((null !== $this->ipv4Address && null !== $this->ipv4Port) ||
                 (null !== $this->ipv6Address && null !== $this->ipv6Port))) {
-            return $this->announceErrorResponse($this->translator->trans('messages.announce.invalid_ip_or_port'));
+            throw new AnnounceValidationException($this->translator->trans('messages.announce.invalid_ip_or_port'));
         }
-
-        return null;
     }
 
     /**
@@ -765,8 +822,8 @@ class AnnounceManager
      */
     private function getCommonResponsePart(): array
     {
-        $response['interval'] = 40 * 60; // 40 minutes
-        $response['min interval'] = 1 * 60; // 1 minute
+        $response['interval'] = $this->config->get('tracker.announce_interval') * 60;
+        $response['min interval'] = $this->config->get('tracker.min_announce_interval') * 60;
 
         $peersCount = $this->getSeedersAndLeechersCount();
         $response['complete'] = $peersCount[0];
@@ -784,7 +841,7 @@ class AnnounceManager
 
         $response['peers'] = '';
 
-        // BEP 7 -> IPv6 peers support
+        // BEP 7 -> IPv6 peers support -> http://www.bittorrent.org/beps/bep_0007.html
         $response['peers6'] = '';
 
         $peers = $this->getPeers();
@@ -827,10 +884,11 @@ class AnnounceManager
 
     /**
      * @param array|string $error
+     * @param bool         $neverRetry
      *
      * @return string
      */
-    private function announceErrorResponse($error): string
+    private function announceErrorResponse($error, $neverRetry = false): string
     {
         $response['failure reason'] = '';
         if (is_array($error)) {
@@ -846,6 +904,11 @@ class AnnounceManager
             }
         } else {
             $response['failure reason'] = $error;
+        }
+
+        // BEP 31 -> http://www.bittorrent.org/beps/bep_0031.html
+        if (true === $neverRetry) {
+            $response['retry in'] = 'never';
         }
 
         return $this->encoder->encode($response);

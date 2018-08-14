@@ -22,7 +22,7 @@ class CreateSnatchesTable extends Migration
             $table->unique(['torrent_id', 'user_id']);
             $table->unsignedBigInteger('uploaded')->default(0);
             $table->unsignedBigInteger('downloaded')->default(0);
-            $table->unsignedBigInteger('left');
+            $table->unsignedBigInteger('left')->index();
             $table->integer('seedTime')->unsigned()->default(0);
             $table->integer('leechTime')->unsigned()->default(0);
             $table->integer('timesAnnounced')->unsigned()->default(0);

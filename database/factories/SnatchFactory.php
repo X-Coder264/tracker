@@ -32,6 +32,4 @@ $factory->define(Snatch::class, function (Faker $faker) {
 $factory->state(Snatch::class, 'snatched', [
     'finished_at' => Carbon::now()->subMinutes(10),
     'left' => 0,
-    'leechTime' => 500,
-    'downloaded' => 800,
 ]);

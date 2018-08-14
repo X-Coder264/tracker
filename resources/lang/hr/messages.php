@@ -84,6 +84,7 @@ return [
     'announce.invalid_info_hash' => 'Neispravan info_hash.',
     'announce.invalid_peer_id' => 'Neispravan peer_id.',
     'announce.invalid_ip_or_port' => 'Nije poslana ispravna IP adresa ili port.',
+    'scrape.no_torrents' => 'Ne postoje torrenti s danim info_hashevima.',
     'common.torrent_table_username' => 'Korisničko ime',
     'common.uploaded' => 'Uploadao',
     'common.downloaded' => 'Downloadao',
