@@ -6,6 +6,7 @@ namespace App\Services;
 
 use stdClass;
 use Carbon\Carbon;
+use App\Enumerations\Cache;
 use Illuminate\Http\Request;
 use Illuminate\Cache\CacheManager;
 use Illuminate\Support\Collection;
@@ -317,7 +318,7 @@ class AnnounceManager
      */
     public function getUser(string $passkey): ?stdClass
     {
-        return $this->cacheManager->remember('user.' . $passkey, 24 * 60, function () use ($passkey) {
+        return $this->cacheManager->remember('user.' . $passkey, Cache::ONE_DAY, function () use ($passkey) {
             return $this->databaseManager->table('users')
                 ->where('passkey', '=', $passkey)
                 ->select(['id', 'slug', 'uploaded', 'downloaded', 'banned'])
@@ -330,14 +331,14 @@ class AnnounceManager
      */
     private function validateInfoHash(): void
     {
-        if ($this->request->filled('info_hash')) {
-            if (20 !== strlen($this->request->input('info_hash'))) {
-                $errorMessage = $this->translator->trans('messages.validation.variable.size', ['var' => 'info_hash']);
-
-                throw new AnnounceValidationException($errorMessage);
-            }
-        } else {
+        if (true !== $this->request->filled('info_hash')) {
             $errorMessage = $this->translator->trans('messages.validation.variable.required', ['var' => 'info_hash']);
+
+            throw new AnnounceValidationException($errorMessage);
+        }
+
+        if (20 !== strlen($this->request->input('info_hash'))) {
+            $errorMessage = $this->translator->trans('messages.validation.variable.size', ['var' => 'info_hash']);
 
             throw new AnnounceValidationException($errorMessage);
         }
@@ -348,14 +349,14 @@ class AnnounceManager
      */
     private function validatePeerID(): void
     {
-        if (true === $this->request->filled('peer_id')) {
-            if (20 !== strlen($this->request->input('peer_id'))) {
-                $errorMessage = $this->translator->trans('messages.validation.variable.size', ['var' => 'peer_id']);
-
-                throw new AnnounceValidationException($errorMessage);
-            }
-        } else {
+        if (true !== $this->request->filled('peer_id')) {
             $errorMessage = $this->translator->trans('messages.validation.variable.required', ['var' => 'peer_id']);
+
+            throw new AnnounceValidationException($errorMessage);
+        }
+
+        if (20 !== strlen($this->request->input('peer_id'))) {
+            $errorMessage = $this->translator->trans('messages.validation.variable.size', ['var' => 'peer_id']);
 
             throw new AnnounceValidationException($errorMessage);
         }
@@ -648,7 +649,7 @@ class AnnounceManager
                     'downloaded' => $this->user->downloaded,
                 ]
             );
-        $this->cacheManager->put('user.' . $this->request->input('passkey'), $this->user, 24 * 60);
+        $this->cacheManager->put('user.' . $this->request->input('passkey'), $this->user, Cache::ONE_DAY);
     }
 
     /**

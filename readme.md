@@ -17,6 +17,9 @@
 
 LaraTracker is a BitTorrent tracker TDD app written using Laravel.
 
+> Legacy code is any code without tests. Code without tests is bad code. It doesn't matter how well written it is; it doesn't matter how pretty or object-oriented or well-encapsulated it is. With tests, we can change the behavior of our code quickly and verifiably. Without them, we really don't know if our code is getting better or worse.
+> - Michael C. Feathers
+
 ## Project requirements
 
 PHP: `7.2+`

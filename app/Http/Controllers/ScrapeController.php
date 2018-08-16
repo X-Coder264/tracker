@@ -44,7 +44,7 @@ class ScrapeController extends Controller
     {
         $passkey = $request->input('passkey');
 
-        if (true !== $request->filled('passkey') || 64 !== strlen($passkey)) {
+        if (empty($passkey) || 64 !== strlen($passkey)) {
             return $this->getErrorResponse($translator->trans('messages.announce.invalid_passkey'));
         }
 
