@@ -209,8 +209,9 @@ class AnnounceManager
         }
 
         $this->torrent = $this->databaseManager->table('torrents')
+                                               ->join('torrent_info_hashes', 'torrents.id', '=', 'torrent_info_hashes.torrent_id')
                                                ->where('info_hash', '=', bin2hex($this->request->input('info_hash')))
-                                               ->select(['id', 'seeders', 'leechers', 'slug'])
+                                               ->select(['torrents.id', 'seeders', 'leechers', 'slug', 'version'])
                                                ->first();
 
         if (null === $this->torrent) {
@@ -223,9 +224,11 @@ class AnnounceManager
         $this->peerID = bin2hex($this->request->input('peer_id'));
 
         $this->peer = $this->databaseManager->table('peers')
+            ->join('peers_version', 'peers.id', '=', 'peers_version.peerID')
             ->where('peer_id', '=', $this->peerID)
             ->where('torrent_id', '=', $this->torrent->id)
             ->where('user_id', '=', $this->user->id)
+            ->select('peers.*', 'peers_version.version')
             ->first();
 
         if ('completed' === $this->event || 'stopped' === $this->event) {
@@ -283,8 +286,9 @@ class AnnounceManager
         foreach ($infoHashes as $infoHash) {
             $torrent = $this->databaseManager
                 ->table('torrents')
+                ->join('torrent_info_hashes', 'torrents.id', '=', 'torrent_info_hashes.torrent_id')
                 ->where('info_hash', '=', bin2hex($infoHash))
-                ->select(['id', 'seeders', 'leechers'])
+                ->select(['torrents.id', 'seeders', 'leechers'])
                 ->first();
 
             if (null === $torrent) {
@@ -516,16 +520,6 @@ class AnnounceManager
     }
 
     /**
-     * Get the format for database stored dates.
-     *
-     * @return string
-     */
-    private function getDateFormat(): string
-    {
-        return $this->databaseManager->getQueryGrammar()->getDateFormat();
-    }
-
-    /**
      * @param int $seeder
      * @param int $leecher
      */
@@ -557,8 +551,16 @@ class AnnounceManager
                 'downloaded' => $this->downloadedInThisAnnounceCycle,
                 'seeder'     => $this->seeder,
                 'userAgent'  => $this->request->userAgent(),
-                'created_at' => Carbon::now()->format($this->getDateFormat()),
-                'updated_at' => Carbon::now()->format($this->getDateFormat()),
+                'created_at' => Carbon::now(),
+                'updated_at' => Carbon::now(),
+            ]
+        );
+        $this->databaseManager->table('peers_version')->insert(
+            [
+                'peerID'     => $this->peer->id,
+                'version'    => $this->torrent->version,
+                'created_at' => Carbon::now(),
+                'updated_at' => Carbon::now(),
             ]
         );
     }
@@ -577,7 +579,15 @@ class AnnounceManager
                         'downloaded' => $this->peer->downloaded + $this->downloadedInThisAnnounceCycle,
                         'seeder'     => $this->seeder,
                         'userAgent'  => $this->request->userAgent(),
-                        'updated_at' => Carbon::now()->format($this->getDateFormat()),
+                        'updated_at' => Carbon::now(),
+                    ]
+                );
+            $this->databaseManager->table('peers_version')
+                ->where('id', '=', $this->peer->id)
+                ->where('version', '=', $this->torrent->version)
+                ->update(
+                    [
+                        'updated_at' => Carbon::now(),
                     ]
                 );
         }
@@ -598,8 +608,8 @@ class AnnounceManager
                 'left'           => $this->request->input('left'),
                 'timesAnnounced' => 1,
                 'userAgent'      => $this->request->userAgent(),
-                'created_at'     => Carbon::now()->format($this->getDateFormat()),
-                'updated_at'     => Carbon::now()->format($this->getDateFormat()),
+                'created_at'     => Carbon::now(),
+                'updated_at'     => Carbon::now(),
             ]
         );
     }
@@ -612,7 +622,7 @@ class AnnounceManager
         if (null !== $this->snatch) {
             $finishedAt = $this->snatch->finished_at;
             if (0 === (int) $this->request->input('left') && null === $this->snatch->finished_at) {
-                $finishedAt = Carbon::now()->format($this->getDateFormat());
+                $finishedAt = Carbon::now();
             }
 
             $this->databaseManager->table('snatches')
@@ -627,7 +637,7 @@ class AnnounceManager
                         'timesAnnounced' => $this->snatch->timesAnnounced + 1,
                         'finished_at'    => $finishedAt,
                         'userAgent'      => $this->request->userAgent(),
-                        'updated_at'     => Carbon::now()->format($this->getDateFormat()),
+                        'updated_at'     => Carbon::now(),
                     ]
                 );
         }
@@ -771,11 +781,13 @@ class AnnounceManager
     {
         return $this->databaseManager->table('peers')
             ->join('peers_ip', 'peers.id', '=', 'peers_ip.peerID')
+            ->join('peers_version', 'peers.id', '=', 'peers_version.peerID')
             ->when($this->seeder, function (Builder $query) {
                 return $query->where('seeder', '!=', true);
             })
             ->where('user_id', '!=', $this->user->id)
             ->where('torrent_id', '=', $this->torrent->id)
+            ->where('peers_version.version', '=', $this->torrent->version)
             ->limit($this->numberOfWantedPeers)
             ->inRandomOrder()
             ->select('peer_id', 'seeder', 'peers_ip.*')

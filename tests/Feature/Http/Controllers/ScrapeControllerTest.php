@@ -10,6 +10,7 @@ use App\Models\Snatch;
 use App\Models\Torrent;
 use App\Services\Bdecoder;
 use App\Services\Bencoder;
+use App\Models\TorrentInfoHash;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class ScrapeControllerTest extends TestCase
@@ -22,7 +23,8 @@ class ScrapeControllerTest extends TestCase
 
         $user = factory(User::class)->create();
         $infoHash = 'ccd285bd6d7fc749e9ed34d8b1e8a0f1b582d977';
-        $torrent = factory(Torrent::class)->create(['info_hash' => $infoHash, 'seeders' => 3, 'leechers' => 2]);
+        $torrent = factory(Torrent::class)->create(['seeders' => 3, 'leechers' => 2]);
+        factory(TorrentInfoHash::class)->create(['info_hash' => $infoHash, 'torrent_id' => $torrent->id]);
         factory(Snatch::class, 6)->states('snatched')->create(['torrent_id' => $torrent->id]);
         factory(Snatch::class, 2)->create(['torrent_id' => $torrent->id, 'left' => 1200]);
 
@@ -47,9 +49,11 @@ class ScrapeControllerTest extends TestCase
 
         $user = factory(User::class)->create();
         $infoHash = 'ccd285bd6d7fc749e9ed34d8b1e8a0f1b582d977';
-        $torrent = factory(Torrent::class)->create(['info_hash' => $infoHash, 'seeders' => 0, 'leechers' => 1]);
+        $torrent = factory(Torrent::class)->create(['seeders' => 0, 'leechers' => 1]);
+        factory(TorrentInfoHash::class)->create(['info_hash' => $infoHash, 'torrent_id' => $torrent->id]);
         $infoHashTwo = 'ccd285bd6d7fc749e9ed34d8b1e8a0f1b582d978';
-        $torrentTwo = factory(Torrent::class)->create(['info_hash' => $infoHashTwo, 'seeders' => 1, 'leechers' => 4]);
+        $torrentTwo = factory(Torrent::class)->create(['seeders' => 1, 'leechers' => 4]);
+        factory(TorrentInfoHash::class)->create(['info_hash' => $infoHashTwo, 'torrent_id' => $torrentTwo->id]);
         factory(Snatch::class, 1)->states('snatched')->create(['torrent_id' => $torrent->id]);
         factory(Snatch::class)->create(['torrent_id' => $torrent->id]);
         factory(Snatch::class, 2)->states('snatched')->create(['torrent_id' => $torrentTwo->id]);
@@ -89,7 +93,8 @@ class ScrapeControllerTest extends TestCase
         $user = factory(User::class)->create();
         $infoHash = 'ccd285bd6d7fc749e9ed34d8b1e8a0f1b582d977';
         $nonExistingHash = 'ccd285bd6d7fc749e9ed34d8b1e8a0f1b582d979';
-        factory(Torrent::class)->create(['info_hash' => $infoHash, 'seeders' => 3, 'leechers' => 2]);
+        $torrent = factory(Torrent::class)->create(['seeders' => 3, 'leechers' => 2]);
+        factory(TorrentInfoHash::class)->create(['info_hash' => $infoHash, 'torrent_id' => $torrent->id]);
 
         $response = $this->get(route('scrape', ['info_hash'  => hex2bin($nonExistingHash), 'passkey' => $user->passkey]));
         $response->assertStatus(200);

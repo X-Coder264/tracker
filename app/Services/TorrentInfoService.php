@@ -6,6 +6,8 @@ namespace App\Services;
 
 use Imdb\Title;
 use App\Models\Torrent;
+use RecursiveArrayIterator;
+use RecursiveIteratorIterator;
 use Illuminate\Cache\CacheManager;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Contracts\Filesystem\Factory as FilesystemManager;
@@ -65,6 +67,20 @@ class TorrentInfoService
      */
     public function getTorrentSize(array $torrentInfoDict): int
     {
+        if (false === $this->isV2Torrent($torrentInfoDict)) {
+            return $this->getV1TorrentSize($torrentInfoDict);
+        }
+
+        return $this->getV2TorrentSize($torrentInfoDict);
+    }
+
+    /**
+     * @param array $torrentInfoDict
+     *
+     * @return int
+     */
+    private function getV1TorrentSize(array $torrentInfoDict): int
+    {
         $size = 0;
         if (isset($torrentInfoDict['files'])) {
             // multiple file mode
@@ -82,9 +98,41 @@ class TorrentInfoService
     /**
      * @param array $torrentInfoDict
      *
+     * @return int
+     */
+    private function getV2TorrentSize(array $torrentInfoDict): int
+    {
+        $size = 0;
+        $iterator = new RecursiveIteratorIterator(new RecursiveArrayIterator($torrentInfoDict['file tree']));
+        foreach ($iterator as $key => $value) {
+            if ('length' === $key) {
+                $size += $value;
+            }
+        }
+
+        return $size;
+    }
+
+    /**
+     * @param array $torrentInfoDict
+     *
      * @return array
      */
     public function getTorrentFileNamesAndSizesFromTorrentInfoDict(array $torrentInfoDict): array
+    {
+        if (false === $this->isV2Torrent($torrentInfoDict)) {
+            return $this->getV1TorrentFileNamesAndSizesFromTorrentInfoDict($torrentInfoDict);
+        }
+
+        //return $this->getV2TorrentFileNamesAndSizesFromTorrentInfoDict($torrentInfoDict);
+    }
+
+    /**
+     * @param array $torrentInfoDict
+     *
+     * @return array
+     */
+    private function getV1TorrentFileNamesAndSizesFromTorrentInfoDict(array $torrentInfoDict): array
     {
         $fileNamesAndSizes = [];
 
@@ -128,6 +176,40 @@ class TorrentInfoService
                 return $this->getTorrentFileNamesAndSizesFromTorrentInfoDict($decodedTorrent['info']);
             }
         );
+    }
+
+    /**
+     * @param array $torrentInfoDict
+     *
+     * @return bool
+     */
+    public function isV1Torrent(array $torrentInfoDict): bool
+    {
+        return ! empty($torrentInfoDict['files']) || ! empty($torrentInfoDict['length']);
+    }
+
+    /**
+     * @param array $torrentInfoDict
+     *
+     * @return bool
+     */
+    public function isV2Torrent(array $torrentInfoDict): bool
+    {
+        if (! empty($torrentInfoDict['meta version']) && 2 === $torrentInfoDict['meta version']) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * @param array $torrentInfoDict
+     *
+     * @return bool
+     */
+    public function isHybridTorrent(array $torrentInfoDict): bool
+    {
+        return $this->isV2Torrent($torrentInfoDict) && (! empty($torrentInfoDict['files']) || ! empty($torrentInfoDict['length']));
     }
 
     /**

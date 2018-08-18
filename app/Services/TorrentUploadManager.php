@@ -8,6 +8,7 @@ use Exception;
 use App\Models\Torrent;
 use Illuminate\Http\Request;
 use App\Models\TorrentCategory;
+use App\Models\TorrentInfoHash;
 use Illuminate\Auth\AuthManager;
 use Illuminate\Cache\CacheManager;
 use Illuminate\Filesystem\Filesystem;
@@ -132,7 +133,7 @@ class TorrentUploadManager
         try {
             $decodedTorrent = $this->decoder->decode($torrentContent);
         } catch (Exception $exception) {
-            throw ValidationException::withMessages(['torrent' => $this->translator->trans('messages.validation.torrent-upload-invalid-torrent-file')]);
+            $this->throwInvalidTorrentFileException();
         }
 
         // the torrent must be private
@@ -144,20 +145,35 @@ class TorrentUploadManager
         $decodedTorrent['announce'] = $this->urlGenerator->route('announce');
 
         do {
+            $infoHashes = [];
+            $torrentInfoHashModels = [];
+
             // add entropy to randomize info_hash in order to prevent peer leaking attacks
             // we are recalculating the entropy until we get an unique info_hash
             $decodedTorrent['info']['entropy'] = bin2hex(random_bytes(64));
 
-            $infoHash = $this->getTorrentInfoHash($decodedTorrent['info']);
+            if (true === $this->torrentInfoService->isV1Torrent($decodedTorrent['info'])) {
+                $v1TorrentInfoHash = $this->getV1TorrentInfoHash($decodedTorrent['info']);
+                $infoHashes[] = $v1TorrentInfoHash;
+                $torrentInfoHashModels[] = new TorrentInfoHash(['info_hash' => $v1TorrentInfoHash, 'version' => 1]);
+            }
 
-            $torrent = Torrent::where('info_hash', '=', $infoHash)->select('info_hash')->first();
-        } while (null !== $torrent);
+            if (true === $this->torrentInfoService->isV2Torrent($decodedTorrent['info'])) {
+                $v2TorrentInfoHash = $this->getV2TruncatedTorrentInfoHash($decodedTorrent['info']);
+                $infoHashes[] = $v2TorrentInfoHash;
+                $torrentInfoHashModels[] = new TorrentInfoHash(['info_hash' => $v2TorrentInfoHash, 'version' => 2]);
+            }
+
+            if (empty($infoHashes)) {
+                $this->throwInvalidTorrentFileException();
+            }
+        } while (true !== $this->areHashesUnique($infoHashes));
 
         $category = TorrentCategory::where('id', '=', $request->input('category'))->firstOrFail();
 
         if (true === $request->filled('imdb_url') && true === $category->imdb) {
             try {
-                $imdbId = $this->IMDBManager->getIMDBIdFromFullURL($request->input('imdb_url', ''));
+                $imdbId = $this->IMDBManager->getIMDBIdFromFullURL($request->input('imdb_url'));
             } catch (Exception $exception) {
                 $imdbId = null;
             }
@@ -169,9 +185,9 @@ class TorrentUploadManager
         $torrent->description = $request->input('description');
         $torrent->uploader_id = $this->authManager->guard()->id();
         $torrent->category_id = $category->id;
-        $torrent->info_hash = $infoHash;
         $torrent->imdb_id = $imdbId ?? null;
         $torrent->save();
+        $torrent->infoHashes()->saveMany($torrentInfoHashModels);
 
         $stored = $this->filesystemManager->disk('torrents')->put(
             "{$torrent->id}.torrent",
@@ -196,8 +212,46 @@ class TorrentUploadManager
      *
      * @return string
      */
-    protected function getTorrentInfoHash(array $torrentInfoDictionary): string
+    protected function getV1TorrentInfoHash(array $torrentInfoDictionary): string
     {
         return sha1($this->encoder->encode($torrentInfoDictionary));
+    }
+
+    /**
+     * @param array $torrentInfoDictionary
+     *
+     * @return string
+     */
+    protected function getV2TruncatedTorrentInfoHash(array $torrentInfoDictionary): string
+    {
+        return substr(hash('sha256', $this->encoder->encode($torrentInfoDictionary)), 0, 40);
+    }
+
+    /**
+     * @param array $infoHashes
+     *
+     * @return bool
+     */
+    protected function areHashesUnique(array $infoHashes): bool
+    {
+        if (count(array_unique($infoHashes)) !== count($infoHashes)) {
+            return false;
+        }
+
+        $count = 0;
+        foreach ($infoHashes as $infoHash) {
+            $count += TorrentInfoHash::where('info_hash', '=', $infoHash)->count();
+        }
+
+        if (0 === $count) {
+            return true;
+        }
+
+        return false;
+    }
+
+    private function throwInvalidTorrentFileException(): void
+    {
+        throw ValidationException::withMessages(['torrent' => $this->translator->trans('messages.validation.torrent-upload-invalid-torrent-file')]);
     }
 }

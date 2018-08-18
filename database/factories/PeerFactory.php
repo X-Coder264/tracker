@@ -5,6 +5,7 @@ declare(strict_types=1);
 use App\Models\Peer;
 use App\Models\User;
 use App\Models\Torrent;
+use App\Models\PeerVersion;
 use Faker\Generator as Faker;
 use Illuminate\Database\Eloquent\Factory;
 
@@ -36,3 +37,23 @@ $factory->state(Peer::class, 'leecher', [
     'downloaded' => 100,
     'uploaded' => 20,
 ]);
+
+$factory->state(Peer::class, 'v1', [
+
+]);
+
+$factory->state(Peer::class, 'v2', [
+
+]);
+
+$factory->afterCreatingState(Peer::class, 'v1', function (Peer $peer, Faker $faker) {
+    $peer->timestamps = false;
+    $peer->versions()->save(new PeerVersion(['version' => 1]));
+    $peer->timestamps = true;
+});
+
+$factory->afterCreatingState(Peer::class, 'v2', function (Peer $peer, Faker $faker) {
+    $peer->timestamps = false;
+    $peer->versions()->save(new PeerVersion(['version' => 2]));
+    $peer->timestamps = true;
+});

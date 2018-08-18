@@ -16,7 +16,6 @@ class CreateTorrentsTable extends Migration
         Schema::create('torrents', function (Blueprint $table) {
             $table->increments('id');
             $table->string('name')->unique();
-            $table->string('info_hash', 40)->unique();
             $table->unsignedBigInteger('size')->default(0);
             $table->integer('uploader_id')->unsigned()->index();
             $table->foreign('uploader_id')->references('id')->on('users')->onUpdate('cascade')->onDelete('cascade');

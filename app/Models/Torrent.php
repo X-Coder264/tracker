@@ -81,6 +81,14 @@ class Torrent extends Model
     /**
      * @return HasMany
      */
+    public function infoHashes(): HasMany
+    {
+        return $this->hasMany(TorrentInfoHash::class);
+    }
+
+    /**
+     * @return HasMany
+     */
     public function peers(): HasMany
     {
         return $this->hasMany(Peer::class)->select(

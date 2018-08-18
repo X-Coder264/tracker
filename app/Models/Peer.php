@@ -99,4 +99,12 @@ class Peer extends Model
     {
         return $this->hasMany(PeerIP::class, 'peerID');
     }
+
+    /**
+     * @return HasMany
+     */
+    public function versions(): HasMany
+    {
+        return $this->hasMany(PeerVersion::class, 'peerID');
+    }
 }

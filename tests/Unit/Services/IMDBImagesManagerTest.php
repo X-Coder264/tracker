@@ -9,6 +9,7 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Middleware;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Psr7\Request;
+use Psr\Log\LoggerInterface;
 use App\Services\IMDBManager;
 use GuzzleHttp\Psr7\Response;
 use App\Services\IMDBImagesManager;
@@ -40,7 +41,12 @@ class IMDBImagesManagerTest extends TestCase
         $handler = HandlerStack::create($mock);
         $client = new Client(['handler' => $handler]);
 
-        $imdbImagesManager = new IMDBImagesManager($imdbManager, $client, $this->app->make(FilesystemManager::class));
+        $imdbImagesManager = new IMDBImagesManager(
+            $imdbManager,
+            $client,
+            $this->app->make(FilesystemManager::class),
+            $this->app->make(LoggerInterface::class)
+        );
         $imdbImagesManager->writePosterToDisk($imdbId);
     }
 
@@ -65,7 +71,12 @@ class IMDBImagesManagerTest extends TestCase
 
         $client = new Client(['handler' => $stack]);
 
-        $imdbImagesManager = new IMDBImagesManager($imdbManager, $client, $this->app->make(FilesystemManager::class));
+        $imdbImagesManager = new IMDBImagesManager(
+            $imdbManager,
+            $client,
+            $this->app->make(FilesystemManager::class),
+            $this->app->make(LoggerInterface::class)
+        );
         $imdbImagesManager->writePosterToDisk($imdbId);
 
         foreach ($container as $transaction) {
@@ -96,7 +107,12 @@ class IMDBImagesManagerTest extends TestCase
         $handler = HandlerStack::create($mock);
         $client = new Client(['handler' => $handler]);
 
-        $imdbImagesManager = new IMDBImagesManager($imdbManager, $client, $this->app->make(FilesystemManager::class));
+        $imdbImagesManager = new IMDBImagesManager(
+            $imdbManager,
+            $client,
+            $this->app->make(FilesystemManager::class),
+            $this->app->make(LoggerInterface::class)
+        );
         $imdbImagesManager->writePosterToDisk($imdbId);
     }
 
@@ -121,7 +137,12 @@ class IMDBImagesManagerTest extends TestCase
 
         $client = new Client(['handler' => $stack]);
 
-        $imdbImagesManager = new IMDBImagesManager($imdbManager, $client, $this->app->make(FilesystemManager::class));
+        $imdbImagesManager = new IMDBImagesManager(
+            $imdbManager,
+            $client,
+            $this->app->make(FilesystemManager::class),
+            $this->app->make(LoggerInterface::class)
+        );
         $imdbImagesManager->writePosterToDisk($imdbId);
 
         $this->assertSame([], $container);

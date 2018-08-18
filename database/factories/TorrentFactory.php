@@ -7,13 +7,13 @@ use App\Models\Torrent;
 use Illuminate\Support\Str;
 use Faker\Generator as Faker;
 use App\Models\TorrentCategory;
+use App\Models\TorrentInfoHash;
 use Illuminate\Database\Eloquent\Factory;
 
 /** @var Factory $factory */
 $factory->define(Torrent::class, function (Faker $faker) {
     return [
         'name' => $faker->unique()->firstName,
-        'info_hash' => sha1(Str::random(200)),
         'size' => $faker->numberBetween(500, 500000),
         'imdb_id' => null,
         'uploader_id' => function () {
@@ -39,3 +39,30 @@ $factory->state(Torrent::class, 'dead', [
 $factory->state(Torrent::class, 'hasIMDB', [
     'imdb_id' => '0468569',
 ]);
+
+$factory->state(Torrent::class, 'v1', [
+
+]);
+
+$factory->state(Torrent::class, 'v2', [
+
+]);
+
+$factory->state(Torrent::class, 'hybrid', [
+
+]);
+
+$factory->afterCreatingState(Torrent::class, 'v1', function (Torrent $torrent, Faker $faker) {
+    $torrent->infoHashes()->save(new TorrentInfoHash(['info_hash' => sha1(Str::random(200)), 'version' => 1]));
+});
+
+$factory->afterCreatingState(Torrent::class, 'v2', function (Torrent $torrent, Faker $faker) {
+    $torrent->infoHashes()->save(new TorrentInfoHash(['info_hash' => substr(hash('sha256', Str::random(200)), 0, 40), 'version' => 2]));
+});
+
+$factory->afterCreatingState(Torrent::class, 'hybrid', function (Torrent $torrent, Faker $faker) {
+    $torrent->infoHashes()->saveMany([
+        new TorrentInfoHash(['info_hash' => sha1(Str::random(200)), 'version' => 1]),
+        new TorrentInfoHash(['info_hash' => substr(hash('sha256', Str::random(200)), 0, 40), 'version' => 2]),
+    ]);
+});

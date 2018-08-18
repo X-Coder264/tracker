@@ -9,6 +9,7 @@ use App\Models\Peer;
 use App\Models\User;
 use App\Models\PeerIP;
 use App\Models\Torrent;
+use App\Models\PeerVersion;
 use Facades\App\Services\SizeFormatter;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -78,6 +79,17 @@ class PeerTest extends TestCase
         $this->assertSame($peer->IPs[0]->IP, $IP->IP);
         $this->assertSame($peer->IPs[0]->port, $IP->port);
         $this->assertSame($peer->IPs[0]->isIPv6, $IP->isIPv6);
-        $this->assertSame($peer->IPs[0]->connectable, $IP->connectable);
+    }
+
+    public function testVersionsRelationship(): void
+    {
+        factory(PeerVersion::class)->create();
+
+        $peerVersion = PeerVersion::firstOrFail();
+        $peer = Peer::firstOrFail();
+        $this->assertInstanceOf(HasMany::class, $peer->versions());
+        $this->assertInstanceOf(Collection::class, $peer->versions);
+        $this->assertSame($peerVersion->id, $peer->versions[0]->id);
+        $this->assertSame($peerVersion->peerID, $peer->versions[0]->peerID);
     }
 }

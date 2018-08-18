@@ -8,6 +8,7 @@ use App\Models\User;
 use App\Models\Torrent;
 use App\Services\Bdecoder;
 use App\Services\Bencoder;
+use App\Enumerations\Cache;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -56,11 +57,15 @@ class TorrentController extends Controller
         $user = $authManager->guard()->user();
         $torrentPerPage = $user->torrents_per_page;
 
-        $torrents = $cacheManager->tags('torrents')->remember('torrents.page.' . $page . '.perPage.' . $torrentPerPage, 10, function () use ($authManager, $torrentPerPage) {
-            return Torrent::with(['uploader'])->where('seeders', '>', 0)
+        $torrents = $cacheManager->tags('torrents')->remember(
+            'torrents.page.' . $page . '.perPage.' . $torrentPerPage,
+            Cache::TEN_MINUTES,
+            function () use ($authManager, $torrentPerPage) {
+                return Torrent::with(['uploader'])->where('seeders', '>', 0)
                                               ->orderBy('id', 'desc')
                                               ->paginate($torrentPerPage);
-        });
+            }
+        );
 
         return $responseFactory->view('torrents.index', compact('torrents'));
     }
@@ -73,7 +78,7 @@ class TorrentController extends Controller
      */
     public function create(CacheManager $cacheManager, ResponseFactory $responseFactory): Response
     {
-        $categories = $cacheManager->remember('torrentCategories', 30, function () {
+        $categories = $cacheManager->remember('torrentCategories', Cache::THIRTY_MINUTES, function () {
             return TorrentCategory::all();
         });
 

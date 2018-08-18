@@ -12,8 +12,11 @@ use App\Models\PeerIP;
 use App\Models\Snatch;
 use App\Models\Torrent;
 use App\Services\Bdecoder;
+use App\Models\PeerVersion;
 use Illuminate\Http\Response;
 use Illuminate\Support\Carbon;
+use App\Models\TorrentInfoHash;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
 use Tests\Traits\EnableForeignKeyConstraints;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -22,7 +25,7 @@ class AnnounceManagerTest extends TestCase
 {
     use RefreshDatabase, EnableForeignKeyConstraints;
 
-    public function testStartLeechingWithNoOtherPeersPresentOnTheTorrent()
+    public function testV1PeerStartsLeechingWithNoOtherPeersPresentOnTheTorrent()
     {
         $this->withoutExceptionHandling();
 
@@ -34,7 +37,8 @@ class AnnounceManagerTest extends TestCase
         $IP = '98.165.38.50';
         $port = 60000;
         $userAgent = 'my test user agent';
-        $torrent = factory(Torrent::class)->create(['info_hash' => $infoHash, 'seeders' => 0, 'leechers' => 0]);
+        $torrent = factory(Torrent::class)->create(['seeders' => 0, 'leechers' => 0]);
+        factory(TorrentInfoHash::class)->create(['info_hash' => $infoHash, 'torrent_id' => $torrent->id]);
         $user = factory(User::class)->create();
 
         $response = $this->get(
@@ -71,6 +75,8 @@ class AnnounceManagerTest extends TestCase
         $this->assertSame($torrent->id, (int) $peer->torrent_id);
         $this->assertSame(0, (int) $peer->getOriginal('uploaded'));
         $this->assertSame(0, (int) $peer->getOriginal('downloaded'));
+        $this->assertSame($peer->created_at->format('Y-m-d H:is'), $peer->updated_at->format('Y-m-d H:is'));
+        $this->assertLessThanOrEqual(2, Carbon::now()->diffInSeconds($peer->updated_at));
         $this->assertFalse((bool) $peer->seeder);
         $this->assertSame($userAgent, $peer->userAgent);
         $this->assertInstanceOf(Carbon::class, $peer->created_at);
@@ -80,6 +86,12 @@ class AnnounceManagerTest extends TestCase
         $this->assertSame($IP, $peerIP->IP);
         $this->assertSame($port, (int) $peerIP->port);
         $this->assertFalse((bool) $peerIP->isIPv6);
+        $this->assertSame(1, PeerVersion::count());
+        $peerVersion = PeerVersion::firstOrFail();
+        $this->assertSame(1, $peerVersion->version);
+        $this->assertSame($peer->id, $peerVersion->peerID);
+        $this->assertSame($peerVersion->created_at->format('Y-m-d H:is'), $peerVersion->updated_at->format('Y-m-d H:is'));
+        $this->assertLessThanOrEqual(2, Carbon::now()->diffInSeconds($peerVersion->updated_at));
         $this->assertSame(1, Snatch::count());
         $snatch = Snatch::firstOrFail();
         $this->assertSame($user->id, (int) $snatch->user_id);
@@ -103,29 +115,314 @@ class AnnounceManagerTest extends TestCase
         $this->assertSame((int) $freshUser->getOriginal('downloaded'), Cache::get('user.' . $freshUser->passkey)->downloaded);
     }
 
-    public function testStartLeechingWithOtherPeersPresentOnTheTorrent()
+    public function testV2PeerStartsLeechingWithNoOtherPeersPresentOnTheTorrent(): void
     {
         $this->withoutExceptionHandling();
 
+        config()->set('tracker.announce_interval', 50);
+        config()->set('tracker.min_announce_interval', 20);
+
         $infoHash = 'ccd285bd6d7fc749e9ed34d8b1e8a0f1b582d977';
         $peerId = '2d7142333345302d64354e334474384672517776';
-        $peerIdOne = '2d7142333345302d64354e334474384672517777';
-        $peerIdTwo = '2d7142333345302d64354e334474384672517778';
         $IP = '98.165.38.50';
         $port = 60000;
         $userAgent = 'my test user agent';
-        $torrent = factory(Torrent::class)->create(['info_hash' => $infoHash, 'seeders' => 1, 'leechers' => 1]);
+        $torrent = factory(Torrent::class)->create(['seeders' => 0, 'leechers' => 0]);
+        factory(TorrentInfoHash::class)->create(['info_hash' => $infoHash, 'torrent_id' => $torrent->id, 'version' => 2]);
         $user = factory(User::class)->create();
-        $peerOne = factory(Peer::class)->create(['torrent_id' => $torrent->id, 'seeder' => true, 'peer_id' => $peerIdOne]);
-        $peerOneIP = factory(PeerIP::class)->create(['peerID' => $peerOne->id, 'IP' => '98.165.38.51', 'port' => 55555]);
-        $peerTwo = factory(Peer::class)->create(['torrent_id' => $torrent->id, 'seeder' => false, 'peer_id' => $peerIdTwo]);
-        $peerTwoIP = factory(PeerIP::class)->create(['peerID' => $peerTwo->id, 'IP' => '98.165.38.52', 'port' => 55556]);
 
         $response = $this->get(
             route(
                 'announce',
                 [
                     'info_hash'  => hex2bin($infoHash),
+                    'passkey'    => $user->passkey,
+                    'peer_id'    => hex2bin($peerId),
+                    'event'      => 'started',
+                    'ip'         => $IP,
+                    'port'       => $port,
+                    'downloaded' => 0,
+                    'uploaded'   => 0,
+                    'left'       => $torrent->getOriginal('size'),
+                ]
+            ),
+            [
+                'REMOTE_ADDR'     => $IP,
+                'HTTP_USER_AGENT' => $userAgent,
+            ]
+        );
+
+        $response->assertStatus(Response::HTTP_OK);
+        $response->assertHeader('Content-Type', 'text/plain; charset=UTF-8');
+        $this->assertSame(
+            'd8:completei0e10:incompletei0e8:intervali3000e12:min intervali1200e5:peers0:6:peers60:e',
+            $response->getContent()
+        );
+        $this->assertSame(1, Peer::count());
+        $peer = Peer::firstOrFail();
+        $this->assertSame($peerId, $peer->peer_id);
+        $this->assertSame($user->id, (int) $peer->user_id);
+        $this->assertSame($torrent->id, (int) $peer->torrent_id);
+        $this->assertSame(0, (int) $peer->getOriginal('uploaded'));
+        $this->assertSame(0, (int) $peer->getOriginal('downloaded'));
+        $this->assertSame($peer->created_at->format('Y-m-d H:is'), $peer->updated_at->format('Y-m-d H:is'));
+        $this->assertLessThanOrEqual(2, Carbon::now()->diffInSeconds($peer->updated_at));
+        $this->assertFalse((bool) $peer->seeder);
+        $this->assertSame($userAgent, $peer->userAgent);
+        $this->assertInstanceOf(Carbon::class, $peer->created_at);
+        $this->assertInstanceOf(Carbon::class, $peer->updated_at);
+        $this->assertSame(1, PeerIP::count());
+        $peerIP = PeerIP::firstOrFail();
+        $this->assertSame($IP, $peerIP->IP);
+        $this->assertSame($port, (int) $peerIP->port);
+        $this->assertFalse((bool) $peerIP->isIPv6);
+        $this->assertSame(1, PeerVersion::count());
+        $peerVersion = PeerVersion::firstOrFail();
+        $this->assertSame(2, $peerVersion->version);
+        $this->assertSame($peer->id, $peerVersion->peerID);
+        $this->assertSame($peerVersion->created_at->format('Y-m-d H:is'), $peerVersion->updated_at->format('Y-m-d H:is'));
+        $this->assertLessThanOrEqual(2, Carbon::now()->diffInSeconds($peerVersion->updated_at));
+        $this->assertSame(1, Snatch::count());
+        $snatch = Snatch::firstOrFail();
+        $this->assertSame($user->id, (int) $snatch->user_id);
+        $this->assertSame($torrent->id, (int) $snatch->torrent_id);
+        $this->assertSame(0, (int) $snatch->getOriginal('uploaded'));
+        $this->assertSame(0, (int) $snatch->getOriginal('downloaded'));
+        $this->assertSame($torrent->getOriginal('size'), (int) $snatch->getOriginal('left'));
+        $this->assertSame(0, (int) $snatch->seedTime);
+        $this->assertSame(0, (int) $snatch->leechTime);
+        $this->assertSame(1, (int) $snatch->timesAnnounced);
+        $this->assertNull($snatch->finished_at);
+        $this->assertSame($userAgent, $snatch->userAgent);
+        $torrent = $torrent->fresh();
+        $this->assertSame(1, (int) $torrent->leechers);
+        $this->assertSame(0, (int) $torrent->seeders);
+        $freshUser = $user->fresh();
+        $this->assertSame($user->getOriginal('uploaded'), (int) $freshUser->getOriginal('uploaded'));
+        $this->assertSame($user->getOriginal('downloaded'), (int) $freshUser->getOriginal('downloaded'));
+        $this->assertInstanceOf(stdClass::class, Cache::get('user.' . $freshUser->passkey));
+        $this->assertSame((int) $freshUser->getOriginal('uploaded'), Cache::get('user.' . $freshUser->passkey)->uploaded);
+        $this->assertSame((int) $freshUser->getOriginal('downloaded'), Cache::get('user.' . $freshUser->passkey)->downloaded);
+    }
+
+    public function testV2PeerStartsLeechingWithNoOtherV2PeersPresentOnTheTorrent(): void
+    {
+        $this->withoutExceptionHandling();
+
+        config()->set('tracker.announce_interval', 50);
+        config()->set('tracker.min_announce_interval', 20);
+
+        $v1InfoHash = 'ccd285bd6d7fc749e9ed34d8b1e8a0f1b582d976';
+        $v2InfoHash = 'ccd285bd6d7fc749e9ed34d8b1e8a0f1b582d977';
+        $peerId = '2d7142333345302d64354e334474384672517776';
+        $IP = '98.165.38.50';
+        $port = 60000;
+        $userAgent = 'my test user agent';
+        $torrent = factory(Torrent::class)->create(['seeders' => 1, 'leechers' => 0]);
+        factory(TorrentInfoHash::class)->create(['info_hash' => $v1InfoHash, 'torrent_id' => $torrent->id, 'version' => 1]);
+        factory(TorrentInfoHash::class)->create(['info_hash' => $v2InfoHash, 'torrent_id' => $torrent->id, 'version' => 2]);
+        $user = factory(User::class)->create();
+        $peer = factory(Peer::class)->states('seeder')->create(['torrent_id' => $torrent->id]);
+        factory(PeerIP::class)->create(['peerID' => $peer->id, 'IP' => '98.165.38.51', 'port' => 55555]);
+        $peer->versions()->save(new PeerVersion(['version' => 1]));
+
+        $response = $this->get(
+            route(
+                'announce',
+                [
+                    'info_hash'  => hex2bin($v2InfoHash),
+                    'passkey'    => $user->passkey,
+                    'peer_id'    => hex2bin($peerId),
+                    'event'      => 'started',
+                    'ip'         => $IP,
+                    'port'       => $port,
+                    'downloaded' => 0,
+                    'uploaded'   => 0,
+                    'left'       => $torrent->getOriginal('size'),
+                ]
+            ),
+            [
+                'REMOTE_ADDR'     => $IP,
+                'HTTP_USER_AGENT' => $userAgent,
+            ]
+        );
+
+        $response->assertStatus(Response::HTTP_OK);
+        $response->assertHeader('Content-Type', 'text/plain; charset=UTF-8');
+        $this->assertSame(
+            'd8:completei1e10:incompletei0e8:intervali3000e12:min intervali1200e5:peers0:6:peers60:e',
+            $response->getContent()
+        );
+        $this->assertSame(2, Peer::count());
+        $peer = Peer::latest('id')->firstOrFail();
+        $this->assertSame($peerId, $peer->peer_id);
+        $this->assertSame($user->id, (int) $peer->user_id);
+        $this->assertSame($torrent->id, (int) $peer->torrent_id);
+        $this->assertSame(0, (int) $peer->getOriginal('uploaded'));
+        $this->assertSame(0, (int) $peer->getOriginal('downloaded'));
+        $this->assertSame($peer->created_at->format('Y-m-d H:is'), $peer->updated_at->format('Y-m-d H:is'));
+        $this->assertLessThanOrEqual(2, Carbon::now()->diffInSeconds($peer->updated_at));
+        $this->assertFalse((bool) $peer->seeder);
+        $this->assertSame($userAgent, $peer->userAgent);
+        $this->assertInstanceOf(Carbon::class, $peer->created_at);
+        $this->assertInstanceOf(Carbon::class, $peer->updated_at);
+        $this->assertSame(2, PeerIP::count());
+        $peerIP = PeerIP::latest('id')->firstOrFail();
+        $this->assertSame($IP, $peerIP->IP);
+        $this->assertSame($port, (int) $peerIP->port);
+        $this->assertFalse((bool) $peerIP->isIPv6);
+        $this->assertSame(2, PeerVersion::count());
+        $peerVersion = PeerVersion::latest('id')->firstOrFail();
+        $this->assertSame(2, $peerVersion->version);
+        $this->assertSame($peer->id, $peerVersion->peerID);
+        $this->assertSame($peerVersion->created_at->format('Y-m-d H:is'), $peerVersion->updated_at->format('Y-m-d H:is'));
+        $this->assertLessThanOrEqual(2, Carbon::now()->diffInSeconds($peerVersion->updated_at));
+        $this->assertSame(1, Snatch::count());
+        $snatch = Snatch::firstOrFail();
+        $this->assertSame($user->id, (int) $snatch->user_id);
+        $this->assertSame($torrent->id, (int) $snatch->torrent_id);
+        $this->assertSame(0, (int) $snatch->getOriginal('uploaded'));
+        $this->assertSame(0, (int) $snatch->getOriginal('downloaded'));
+        $this->assertSame($torrent->getOriginal('size'), (int) $snatch->getOriginal('left'));
+        $this->assertSame(0, (int) $snatch->seedTime);
+        $this->assertSame(0, (int) $snatch->leechTime);
+        $this->assertSame(1, (int) $snatch->timesAnnounced);
+        $this->assertNull($snatch->finished_at);
+        $this->assertSame($userAgent, $snatch->userAgent);
+        $torrent = $torrent->fresh();
+        $this->assertSame(1, (int) $torrent->leechers);
+        $this->assertSame(1, (int) $torrent->seeders);
+        $freshUser = $user->fresh();
+        $this->assertSame($user->getOriginal('uploaded'), (int) $freshUser->getOriginal('uploaded'));
+        $this->assertSame($user->getOriginal('downloaded'), (int) $freshUser->getOriginal('downloaded'));
+        $this->assertInstanceOf(stdClass::class, Cache::get('user.' . $freshUser->passkey));
+        $this->assertSame((int) $freshUser->getOriginal('uploaded'), Cache::get('user.' . $freshUser->passkey)->uploaded);
+        $this->assertSame((int) $freshUser->getOriginal('downloaded'), Cache::get('user.' . $freshUser->passkey)->downloaded);
+    }
+
+    public function testV1PeerStartsLeechingWithNoOtherV1PeersPresentOnTheTorrent(): void
+    {
+        $this->withoutExceptionHandling();
+
+        config()->set('tracker.announce_interval', 50);
+        config()->set('tracker.min_announce_interval', 20);
+
+        $v1InfoHash = 'ccd285bd6d7fc749e9ed34d8b1e8a0f1b582d976';
+        $v2InfoHash = 'ccd285bd6d7fc749e9ed34d8b1e8a0f1b582d977';
+        $peerId = '2d7142333345302d64354e334474384672517776';
+        $IP = '98.165.38.50';
+        $port = 60000;
+        $userAgent = 'my test user agent';
+        $torrent = factory(Torrent::class)->create(['seeders' => 1, 'leechers' => 0]);
+        factory(TorrentInfoHash::class)->create(['info_hash' => $v1InfoHash, 'torrent_id' => $torrent->id, 'version' => 1]);
+        factory(TorrentInfoHash::class)->create(['info_hash' => $v2InfoHash, 'torrent_id' => $torrent->id, 'version' => 2]);
+        $user = factory(User::class)->create();
+        $peer = factory(Peer::class)->states('seeder')->create(['torrent_id' => $torrent->id]);
+        factory(PeerIP::class)->create(['peerID' => $peer->id, 'IP' => '98.165.38.51', 'port' => 55555]);
+        $peer->versions()->save(new PeerVersion(['version' => 2]));
+
+        $response = $this->get(
+            route(
+                'announce',
+                [
+                    'info_hash'  => hex2bin($v1InfoHash),
+                    'passkey'    => $user->passkey,
+                    'peer_id'    => hex2bin($peerId),
+                    'event'      => 'started',
+                    'ip'         => $IP,
+                    'port'       => $port,
+                    'downloaded' => 0,
+                    'uploaded'   => 0,
+                    'left'       => $torrent->getOriginal('size'),
+                ]
+            ),
+            [
+                'REMOTE_ADDR'     => $IP,
+                'HTTP_USER_AGENT' => $userAgent,
+            ]
+        );
+
+        $response->assertStatus(Response::HTTP_OK);
+        $response->assertHeader('Content-Type', 'text/plain; charset=UTF-8');
+        $this->assertSame(
+            'd8:completei1e10:incompletei0e8:intervali3000e12:min intervali1200e5:peers0:6:peers60:e',
+            $response->getContent()
+        );
+        $this->assertSame(2, Peer::count());
+        $peer = Peer::latest('id')->firstOrFail();
+        $this->assertSame($peerId, $peer->peer_id);
+        $this->assertSame($user->id, (int) $peer->user_id);
+        $this->assertSame($torrent->id, (int) $peer->torrent_id);
+        $this->assertSame(0, (int) $peer->getOriginal('uploaded'));
+        $this->assertSame(0, (int) $peer->getOriginal('downloaded'));
+        $this->assertSame($peer->created_at->format('Y-m-d H:is'), $peer->updated_at->format('Y-m-d H:is'));
+        $this->assertLessThanOrEqual(2, Carbon::now()->diffInSeconds($peer->updated_at));
+        $this->assertFalse((bool) $peer->seeder);
+        $this->assertSame($userAgent, $peer->userAgent);
+        $this->assertInstanceOf(Carbon::class, $peer->created_at);
+        $this->assertInstanceOf(Carbon::class, $peer->updated_at);
+        $this->assertSame(2, PeerIP::count());
+        $peerIP = PeerIP::latest('id')->firstOrFail();
+        $this->assertSame($IP, $peerIP->IP);
+        $this->assertSame($port, (int) $peerIP->port);
+        $this->assertFalse((bool) $peerIP->isIPv6);
+        $this->assertSame(2, PeerVersion::count());
+        $peerVersion = PeerVersion::latest('id')->firstOrFail();
+        $this->assertSame(1, $peerVersion->version);
+        $this->assertSame($peer->id, $peerVersion->peerID);
+        $this->assertSame($peerVersion->created_at->format('Y-m-d H:is'), $peerVersion->updated_at->format('Y-m-d H:is'));
+        $this->assertLessThanOrEqual(2, Carbon::now()->diffInSeconds($peerVersion->updated_at));
+        $this->assertSame(1, Snatch::count());
+        $snatch = Snatch::firstOrFail();
+        $this->assertSame($user->id, (int) $snatch->user_id);
+        $this->assertSame($torrent->id, (int) $snatch->torrent_id);
+        $this->assertSame(0, (int) $snatch->getOriginal('uploaded'));
+        $this->assertSame(0, (int) $snatch->getOriginal('downloaded'));
+        $this->assertSame($torrent->getOriginal('size'), (int) $snatch->getOriginal('left'));
+        $this->assertSame(0, (int) $snatch->seedTime);
+        $this->assertSame(0, (int) $snatch->leechTime);
+        $this->assertSame(1, (int) $snatch->timesAnnounced);
+        $this->assertNull($snatch->finished_at);
+        $this->assertSame($userAgent, $snatch->userAgent);
+        $torrent = $torrent->fresh();
+        $this->assertSame(1, (int) $torrent->leechers);
+        $this->assertSame(1, (int) $torrent->seeders);
+        $freshUser = $user->fresh();
+        $this->assertSame($user->getOriginal('uploaded'), (int) $freshUser->getOriginal('uploaded'));
+        $this->assertSame($user->getOriginal('downloaded'), (int) $freshUser->getOriginal('downloaded'));
+        $this->assertInstanceOf(stdClass::class, Cache::get('user.' . $freshUser->passkey));
+        $this->assertSame((int) $freshUser->getOriginal('uploaded'), Cache::get('user.' . $freshUser->passkey)->uploaded);
+        $this->assertSame((int) $freshUser->getOriginal('downloaded'), Cache::get('user.' . $freshUser->passkey)->downloaded);
+    }
+
+    public function testV1PeerStartsLeechingWithOtherPeersPresentOnTheTorrent(): void
+    {
+        $this->withoutExceptionHandling();
+
+        $v1InfoHash = 'ccd285bd6d7fc749e9ed34d8b1e8a0f1b582d976';
+        $v2InfoHash = 'ccd285bd6d7fc749e9ed34d8b1e8a0f1b582d977';
+        $peerId = '2d7142333345302d64354e334474384672517776';
+        $peerIdOne = '2d7142333345302d64354e334474384672517777';
+        $peerIdTwo = '2d7142333345302d64354e334474384672517778';
+        $IP = '98.165.38.50';
+        $port = 60000;
+        $userAgent = 'my test user agent';
+        $torrent = factory(Torrent::class)->create(['seeders' => 1, 'leechers' => 1]);
+        factory(TorrentInfoHash::class)->create(['info_hash' => $v1InfoHash, 'torrent_id' => $torrent->id]);
+        factory(TorrentInfoHash::class)->create(['info_hash' => $v2InfoHash, 'torrent_id' => $torrent->id, 'version' => 2]);
+        $user = factory(User::class)->create();
+        $peerOne = factory(Peer::class)->states('v1')->create(['torrent_id' => $torrent->id, 'seeder' => true, 'peer_id' => $peerIdOne]);
+        factory(PeerVersion::class)->create(['peerID' => $peerOne->id, 'version' => 2]);
+        $peerOneIP = factory(PeerIP::class)->create(['peerID' => $peerOne->id, 'IP' => '98.165.38.51', 'port' => 55555]);
+        $peerTwo = factory(Peer::class)->states('v1')->create(['torrent_id' => $torrent->id, 'seeder' => false, 'peer_id' => $peerIdTwo]);
+        factory(PeerVersion::class)->create(['peerID' => $peerTwo->id, 'version' => 2]);
+        $peerTwoIP = factory(PeerIP::class)->create(['peerID' => $peerTwo->id, 'IP' => '98.165.38.52', 'port' => 55556]);
+
+        $response = $this->get(
+            route(
+                'announce',
+                [
+                    'info_hash'  => hex2bin($v1InfoHash),
                     'passkey'    => $user->passkey,
                     'peer_id'    => hex2bin($peerId),
                     'event'      => 'started',
@@ -193,6 +490,10 @@ class AnnounceManagerTest extends TestCase
         $this->assertSame($port, (int) $peerIP->port);
         $this->assertFalse((bool) $peerIP->isIPv6);
         $this->assertSame(1, Snatch::count());
+        $this->assertSame(5, PeerVersion::count());
+        $peerVersion = PeerVersion::latest('id')->firstOrFail();
+        $this->assertSame(1, $peerVersion->version);
+        $this->assertSame($peer->id, $peerVersion->peerID);
         $snatch = Snatch::firstOrFail();
         $this->assertSame($user->id, (int) $snatch->user_id);
         $this->assertSame($torrent->id, (int) $snatch->torrent_id);
@@ -224,7 +525,8 @@ class AnnounceManagerTest extends TestCase
         $IP = '98.165.38.50';
         $port = 60000;
         $userAgent = 'my test user agent';
-        $torrent = factory(Torrent::class)->create(['info_hash' => $infoHash, 'seeders' => 0, 'leechers' => 0]);
+        $torrent = factory(Torrent::class)->create(['seeders' => 0, 'leechers' => 0]);
+        factory(TorrentInfoHash::class)->create(['info_hash' => $infoHash, 'torrent_id' => $torrent->id]);
         $user = factory(User::class)->create();
 
         $response = $this->get(
@@ -270,6 +572,10 @@ class AnnounceManagerTest extends TestCase
         $this->assertSame($IP, $peerIP->IP);
         $this->assertSame($port, (int) $peerIP->port);
         $this->assertFalse((bool) $peerIP->isIPv6);
+        $this->assertSame(1, PeerVersion::count());
+        $peerVersion = PeerVersion::firstOrFail();
+        $this->assertSame(1, $peerVersion->version);
+        $this->assertSame($peer->id, $peerVersion->peerID);
         $this->assertSame(0, Snatch::count());
         $torrent = $torrent->fresh();
         $this->assertSame(0, (int) $torrent->leechers);
@@ -291,9 +597,10 @@ class AnnounceManagerTest extends TestCase
         $IP = '98.165.38.50';
         $port = 60000;
         $userAgent = 'my test user agent';
-        $torrent = factory(Torrent::class)->create(['info_hash' => $infoHash, 'seeders' => 1, 'leechers' => 0]);
+        $torrent = factory(Torrent::class)->create(['seeders' => 1, 'leechers' => 0]);
+        factory(TorrentInfoHash::class)->create(['info_hash' => $infoHash, 'torrent_id' => $torrent->id]);
         $user = factory(User::class)->create();
-        $peer = factory(Peer::class)->create(
+        $peer = factory(Peer::class)->states('v1')->create(
             [
                 'torrent_id' => $torrent->id,
                 'seeder'     => true,
@@ -348,6 +655,7 @@ class AnnounceManagerTest extends TestCase
             $response->getContent()
         );
         $this->assertSame(0, Peer::count());
+        $this->assertSame(0, PeerVersion::count());
         $this->assertSame(0, PeerIP::count());
         $this->assertSame(1, Snatch::count());
         $freshSnatch = $snatch->fresh();
@@ -383,14 +691,14 @@ class AnnounceManagerTest extends TestCase
         $userAgent = 'my test user agent';
         $torrent = factory(Torrent::class)->create(
             [
-                'info_hash' => $infoHash,
                 'seeders'  => 0,
                 'leechers' => 1,
                 'size'     => 3000,
             ]
         );
+        factory(TorrentInfoHash::class)->create(['info_hash' => $infoHash, 'torrent_id' => $torrent->id]);
         $user = factory(User::class)->create();
-        $peer = factory(Peer::class)->create(
+        $peer = factory(Peer::class)->states('v1')->create(
             [
                 'torrent_id' => $torrent->id,
                 'seeder'     => false,
@@ -445,6 +753,7 @@ class AnnounceManagerTest extends TestCase
         );
         $this->assertSame(0, Peer::count());
         $this->assertSame(0, PeerIP::count());
+        $this->assertSame(0, PeerVersion::count());
         $this->assertSame(1, Snatch::count());
         $freshSnatch = $snatch->fresh();
         $this->assertSame($user->id, (int) $freshSnatch->user_id);
@@ -481,19 +790,19 @@ class AnnounceManagerTest extends TestCase
         $userAgent = 'my test user agent';
         $torrent = factory(Torrent::class)->create(
             [
-                'info_hash' => $infoHash,
                 'seeders'  => 1,
                 'leechers' => 2,
                 'size'     => 5000,
             ]
         );
+        factory(TorrentInfoHash::class)->create(['info_hash' => $infoHash, 'torrent_id' => $torrent->id]);
         $user = factory(User::class)->create();
-        $peerOne = factory(Peer::class)->create(['torrent_id' => $torrent->id, 'seeder' => true, 'peer_id' => $peerIdOne]);
+        $peerOne = factory(Peer::class)->states('v1')->create(['torrent_id' => $torrent->id, 'seeder' => true, 'peer_id' => $peerIdOne]);
         factory(PeerIP::class)->create(['peerID' => $peerOne->id, 'IP' => '98.165.38.51', 'port' => 55555]);
-        $peerTwo = factory(Peer::class)->create(['torrent_id' => $torrent->id, 'seeder' => false, 'peer_id' => $peerIdTwo]);
+        $peerTwo = factory(Peer::class)->states('v1')->create(['torrent_id' => $torrent->id, 'seeder' => false, 'peer_id' => $peerIdTwo]);
         $peerTwoIP = factory(PeerIP::class)->create(['peerID' => $peerTwo->id, 'IP' => '98.165.38.52', 'port' => 55556]);
 
-        $leecher = factory(Peer::class)->create(
+        $leecher = factory(Peer::class)->states('v1')->create(
             [
                 'torrent_id' => $torrent->id,
                 'user_id'    => $user->id,
@@ -575,6 +884,10 @@ class AnnounceManagerTest extends TestCase
         $this->assertSame($IP, $peerIP->IP);
         $this->assertSame($port, (int) $peerIP->port);
         $this->assertFalse((bool) $peerIP->isIPv6);
+        $this->assertSame(3, PeerVersion::count());
+        $peerVersion = PeerVersion::latest('id')->firstOrFail();
+        $this->assertSame(1, $peerVersion->version);
+        $this->assertSame($peer->id, $peerVersion->peerID);
         $this->assertSame(1, Snatch::count());
         $snatch = $snatch->fresh();
         $this->assertSame($user->id, (int) $snatch->user_id);
@@ -610,14 +923,14 @@ class AnnounceManagerTest extends TestCase
         $userAgent = 'my test user agent';
         $torrent = factory(Torrent::class)->create(
             [
-                'info_hash' => $infoHash,
                 'seeders'  => 1,
                 'leechers' => 0,
                 'size'     => 1000,
             ]
         );
+        factory(TorrentInfoHash::class)->create(['info_hash' => $infoHash, 'torrent_id' => $torrent->id]);
         $user = factory(User::class)->create();
-        $seeder = factory(Peer::class)->create(
+        $seeder = factory(Peer::class)->states('v1')->create(
             [
                 'torrent_id' => $torrent->id,
                 'user_id'    => $user->id,
@@ -686,6 +999,10 @@ class AnnounceManagerTest extends TestCase
         $this->assertSame($IP, $peerIP->IP);
         $this->assertSame($port, (int) $peerIP->port);
         $this->assertFalse((bool) $peerIP->isIPv6);
+        $this->assertSame(1, PeerVersion::count());
+        $peerVersion = PeerVersion::firstOrFail();
+        $this->assertSame(1, $peerVersion->version);
+        $this->assertSame($peer->id, $peerVersion->peerID);
         $this->assertSame(1, Snatch::count());
         $freshSnatch = $snatch->fresh();
         $this->assertSame($user->id, (int) $freshSnatch->user_id);
@@ -721,14 +1038,14 @@ class AnnounceManagerTest extends TestCase
         $userAgent = 'my test user agent';
         $torrent = factory(Torrent::class)->create(
             [
-                'info_hash' => $infoHash,
                 'seeders'  => 0,
                 'leechers' => 1,
                 'size'     => 5000,
             ]
         );
+        factory(TorrentInfoHash::class)->create(['info_hash' => $infoHash, 'torrent_id' => $torrent->id]);
         $user = factory(User::class)->create();
-        $leecher = factory(Peer::class)->create(
+        $leecher = factory(Peer::class)->states('v1')->create(
             [
                 'torrent_id' => $torrent->id,
                 'user_id'    => $user->id,
@@ -796,6 +1113,10 @@ class AnnounceManagerTest extends TestCase
         $this->assertSame($IP, $peerIP->IP);
         $this->assertSame($port, (int) $peerIP->port);
         $this->assertFalse((bool) $peerIP->isIPv6);
+        $this->assertSame(1, PeerVersion::count());
+        $peerVersion = PeerVersion::firstOrFail();
+        $this->assertSame(1, $peerVersion->version);
+        $this->assertSame($peer->id, $peerVersion->peerID);
         $this->assertSame(1, Snatch::count());
         $freshSnatch = $snatch->fresh();
         $this->assertSame($user->id, (int) $freshSnatch->user_id);
@@ -819,6 +1140,129 @@ class AnnounceManagerTest extends TestCase
         $this->assertSame((int) $freshUser->getOriginal('downloaded'), Cache::get('user.' . $freshUser->passkey)->downloaded);
     }
 
+    public function testRecordingOfTheTrafficWhenAnnouncingOnTheV2HashImmediatelyAfterTheV1HashAnnounce(): void
+    {
+        $this->withoutExceptionHandling();
+
+        $v1InfoHash = 'ccd285bd6d7fc749e9ed34d8b1e8a0f1b582d976';
+        $v2InfoHash = 'ccd285bd6d7fc749e9ed34d8b1e8a0f1b582d977';
+        $peerId = '2d7142333345302d64354e334474384672517776';
+        $IP = '98.165.38.50';
+        $port = 60000;
+        $userAgent = 'my test user agent';
+        $torrent = factory(Torrent::class)->create(
+            [
+                'seeders'  => 1,
+                'leechers' => 0,
+                'size'     => 1000,
+            ]
+        );
+        factory(TorrentInfoHash::class)->create(['info_hash' => $v1InfoHash, 'torrent_id' => $torrent->id]);
+        factory(TorrentInfoHash::class)->create(['info_hash' => $v2InfoHash, 'torrent_id' => $torrent->id, 'version' => 2]);
+        $user = factory(User::class)->create();
+        $seeder = factory(Peer::class)->states('v1')->create(
+            [
+                'torrent_id' => $torrent->id,
+                'user_id'    => $user->id,
+                'seeder'     => true,
+                'peer_id'    => $peerId,
+                'uploaded'   => 2000,
+                'downloaded' => 1000,
+                'created_at' => Carbon::now()->subMinutes(300),
+                'updated_at' => Carbon::now()->subMinutes(1),
+            ]
+        );
+        DB::table('peers_version')
+            ->where('peerID', '=', $seeder->id)
+            ->where('version', '=', 1)
+            ->update(['updated_at' => Carbon::now()->subMinutes(1)]);
+        factory(PeerVersion::class)->states('v2')->create(['peerID' => $seeder->id, 'updated_at' => Carbon::now()->subMinutes(40)]);
+        factory(PeerIP::class)->create(['peerID' => $seeder->id, 'IP' => $IP, 'port' => $port]);
+        $snatch = factory(Snatch::class)->create(
+            [
+                'torrent_id'     => $torrent->id,
+                'user_id'        => $user->id,
+                'left'           => 0,
+                'seedTime'       => 3000,
+                'leechTime'      => 1000,
+                'timesAnnounced' => 5,
+                'uploaded'       => 2000,
+                'downloaded'     => 1000,
+                'finished_at'    => Carbon::now()->subMinutes(200),
+            ]
+        );
+
+        $response = $this->get(
+            route(
+                'announce',
+                [
+                    'info_hash'  => hex2bin($v2InfoHash),
+                    'passkey'    => $user->passkey,
+                    'peer_id'    => hex2bin($peerId),
+                    'ip'         => $IP,
+                    'port'       => $port,
+                    'uploaded'   => 2010,
+                    'downloaded' => 0,
+                    'left'       => 0,
+                ]
+            ),
+            [
+                'REMOTE_ADDR'     => $IP,
+                'HTTP_USER_AGENT' => $userAgent,
+            ]
+        );
+
+        $response->assertStatus(Response::HTTP_OK);
+        $response->assertHeader('Content-Type', 'text/plain; charset=UTF-8');
+        $this->assertSame(
+            'd8:completei0e10:incompletei0e8:intervali2400e12:min intervali60e5:peers0:6:peers60:e',
+            $response->getContent()
+        );
+        $this->assertSame(1, Peer::count());
+        $peer = Peer::firstOrFail();
+        $this->assertSame($peerId, $peer->peer_id);
+        $this->assertSame($user->id, (int) $peer->user_id);
+        $this->assertSame($torrent->id, (int) $peer->torrent_id);
+        $this->assertSame(2010, (int) $peer->getOriginal('uploaded'));
+        $this->assertSame(1000, (int) $peer->getOriginal('downloaded'));
+        $this->assertTrue((bool) $peer->seeder);
+        $this->assertSame($userAgent, $peer->userAgent);
+        $this->assertInstanceOf(Carbon::class, $peer->created_at);
+        $this->assertInstanceOf(Carbon::class, $peer->updated_at);
+        $this->assertSame(1, PeerIP::count());
+        $peerIP = PeerIP::firstOrFail();
+        $this->assertSame($IP, $peerIP->IP);
+        $this->assertSame($port, (int) $peerIP->port);
+        $this->assertFalse((bool) $peerIP->isIPv6);
+        $this->assertSame(2, PeerVersion::count());
+        $peerVersion = PeerVersion::latest('id')->firstOrFail();
+        $this->assertSame(2, $peerVersion->version);
+        $this->assertSame($peer->id, $peerVersion->peerID);
+        $this->assertSame(1, Snatch::count());
+        $freshSnatch = $snatch->fresh();
+        $this->assertSame($user->id, (int) $freshSnatch->user_id);
+        $this->assertSame($torrent->id, (int) $freshSnatch->torrent_id);
+        $this->assertSame(2010, (int) $freshSnatch->getOriginal('uploaded'));
+        $this->assertSame(1000, (int) $freshSnatch->getOriginal('downloaded'));
+        $this->assertSame(0, (int) $freshSnatch->getOriginal('left'));
+        $this->assertGreaterThanOrEqual(3060, (int) $freshSnatch->seedTime);
+        $this->assertLessThanOrEqual(3065, (int) $freshSnatch->seedTime);
+        $this->assertSame($snatch->leechTime, (int) $freshSnatch->leechTime);
+        $this->assertSame(6, (int) $freshSnatch->timesAnnounced);
+        $this->assertNotNull($freshSnatch->finished_at);
+        $this->assertSame($snatch->finished_at->toDateTimeString(), $freshSnatch->finished_at->toDateTimeString());
+        $this->assertSame($userAgent, $freshSnatch->userAgent);
+        $torrent = $torrent->fresh();
+        $this->assertSame(0, (int) $torrent->leechers);
+        $this->assertSame(1, (int) $torrent->seeders);
+        $freshUser = $user->fresh();
+        $this->assertSame($user->getOriginal('uploaded') + 10, (int) $freshUser->getOriginal('uploaded'));
+        $this->assertSame($user->getOriginal('downloaded'), (int) $freshUser->getOriginal('downloaded'));
+        $this->assertInstanceOf(stdClass::class, Cache::get('user.' . $freshUser->passkey));
+        $this->assertSame((int) $freshUser->getOriginal('uploaded'), Cache::get('user.' . $freshUser->passkey)->uploaded);
+        $this->assertSame((int) $freshUser->getOriginal('downloaded'), Cache::get('user.' . $freshUser->passkey)->downloaded);
+    }
+
     public function testEventStartedWithThePeerAlreadyInTheDB()
     {
         $this->withoutExceptionHandling();
@@ -830,14 +1274,14 @@ class AnnounceManagerTest extends TestCase
         $userAgent = 'my test user agent';
         $torrent = factory(Torrent::class)->create(
             [
-                'info_hash' => $infoHash,
                 'seeders'  => 0,
                 'leechers' => 1,
                 'size'     => 5000,
             ]
         );
+        factory(TorrentInfoHash::class)->create(['info_hash' => $infoHash, 'torrent_id' => $torrent->id]);
         $user = factory(User::class)->create();
-        $leecher = factory(Peer::class)->create(
+        $leecher = factory(Peer::class)->states('v1')->create(
             [
                 'torrent_id' => $torrent->id,
                 'user_id'    => $user->id,
@@ -894,6 +1338,10 @@ class AnnounceManagerTest extends TestCase
         $this->assertSame($IP, $peerIP->IP);
         $this->assertSame($port, (int) $peerIP->port);
         $this->assertFalse((bool) $peerIP->isIPv6);
+        $this->assertSame(1, PeerVersion::count());
+        $peerVersion = PeerVersion::firstOrFail();
+        $this->assertSame(1, $peerVersion->version);
+        $this->assertSame($peer->id, $peerVersion->peerID);
         $this->assertSame(0, Snatch::count());
         $torrent = $torrent->fresh();
         $this->assertSame(1, (int) $torrent->leechers);
@@ -917,12 +1365,12 @@ class AnnounceManagerTest extends TestCase
         $userAgent = 'my test user agent';
         $torrent = factory(Torrent::class)->create(
             [
-                'info_hash' => $infoHash,
                 'seeders'  => 0,
                 'leechers' => 0,
                 'size'     => 5000,
             ]
         );
+        factory(TorrentInfoHash::class)->create(['info_hash' => $infoHash, 'torrent_id' => $torrent->id]);
         $user = factory(User::class)->create();
         $snatch = factory(Snatch::class)->create(
             [
@@ -980,6 +1428,10 @@ class AnnounceManagerTest extends TestCase
         $this->assertSame($IP, $peerIP->IP);
         $this->assertSame($port, (int) $peerIP->port);
         $this->assertFalse((bool) $peerIP->isIPv6);
+        $this->assertSame(1, PeerVersion::count());
+        $peerVersion = PeerVersion::firstOrFail();
+        $this->assertSame(1, $peerVersion->version);
+        $this->assertSame($peer->id, $peerVersion->peerID);
         $this->assertSame(1, Snatch::count());
         $freshSnatch = $snatch->fresh();
         $this->assertSame($user->id, (int) $freshSnatch->user_id);
@@ -1014,12 +1466,12 @@ class AnnounceManagerTest extends TestCase
         $userAgent = 'my test user agent';
         $torrent = factory(Torrent::class)->create(
             [
-                'info_hash' => $infoHash,
                 'seeders'  => 0,
                 'leechers' => 0,
                 'size'     => 5000,
             ]
         );
+        factory(TorrentInfoHash::class)->create(['info_hash' => $infoHash, 'torrent_id' => $torrent->id]);
         $user = factory(User::class)->create();
 
         $response = $this->get(
@@ -1064,6 +1516,10 @@ class AnnounceManagerTest extends TestCase
         $this->assertSame($IP, $peerIP->IP);
         $this->assertSame($port, (int) $peerIP->port);
         $this->assertFalse((bool) $peerIP->isIPv6);
+        $this->assertSame(1, PeerVersion::count());
+        $peerVersion = PeerVersion::firstOrFail();
+        $this->assertSame(1, $peerVersion->version);
+        $this->assertSame($peer->id, $peerVersion->peerID);
         $this->assertSame(0, Snatch::count());
         $torrent = $torrent->fresh();
         $this->assertSame(1, (int) $torrent->leechers);
@@ -1087,12 +1543,12 @@ class AnnounceManagerTest extends TestCase
         $userAgent = 'my test user agent';
         $torrent = factory(Torrent::class)->create(
             [
-                'info_hash' => $infoHash,
                 'seeders'  => 0,
                 'leechers' => 0,
                 'size'     => 5000,
             ]
         );
+        factory(TorrentInfoHash::class)->create(['info_hash' => $infoHash, 'torrent_id' => $torrent->id]);
         $user = factory(User::class)->create();
 
         $response = $this->get(
@@ -1137,6 +1593,10 @@ class AnnounceManagerTest extends TestCase
         $this->assertSame($IP, $peerIP->IP);
         $this->assertSame($port, (int) $peerIP->port);
         $this->assertFalse((bool) $peerIP->isIPv6);
+        $this->assertSame(1, PeerVersion::count());
+        $peerVersion = PeerVersion::firstOrFail();
+        $this->assertSame(1, $peerVersion->version);
+        $this->assertSame($peer->id, $peerVersion->peerID);
         $this->assertSame(0, Snatch::count());
         $torrent = $torrent->fresh();
         $this->assertSame(0, (int) $torrent->leechers);
@@ -1159,11 +1619,12 @@ class AnnounceManagerTest extends TestCase
         $IPv6 = '2001::53aa:64c:0:7f83:bc43:dec9';
         $port = 60000;
         $userAgent = 'my test user agent';
-        $torrent = factory(Torrent::class)->create(['info_hash' => $infoHash, 'seeders' => 2, 'leechers' => 0]);
+        $torrent = factory(Torrent::class)->create(['seeders' => 2, 'leechers' => 0]);
+        factory(TorrentInfoHash::class)->create(['info_hash' => $infoHash, 'torrent_id' => $torrent->id]);
         $user = factory(User::class)->create();
-        $peerOne = factory(Peer::class)->create(['torrent_id' => $torrent->id, 'seeder' => true]);
+        $peerOne = factory(Peer::class)->states('v1')->create(['torrent_id' => $torrent->id, 'seeder' => true]);
         $peerOneIP = factory(PeerIP::class)->create(['peerID' => $peerOne->id, 'IP' => '98.165.38.51', 'port' => 55555]);
-        $peerTwo = factory(Peer::class)->create(['torrent_id' => $torrent->id, 'seeder' => true]);
+        $peerTwo = factory(Peer::class)->states('v1')->create(['torrent_id' => $torrent->id, 'seeder' => true]);
         $peerTwoIP = factory(PeerIP::class)->create(
             [
                 'peerID' => $peerTwo->id,
@@ -1237,6 +1698,10 @@ class AnnounceManagerTest extends TestCase
         $this->assertSame($IPv6, $peerIP->IP);
         $this->assertSame($port, (int) $peerIP->port);
         $this->assertTrue((bool) $peerIP->isIPv6);
+        $this->assertSame(3, PeerVersion::count());
+        $peerVersion = PeerVersion::where('peerID', '=', $peer->id)->firstOrFail();
+        $this->assertSame(1, $peerVersion->version);
+        $this->assertSame($peer->id, $peerVersion->peerID);
         $this->assertSame(1, Snatch::count());
         $snatch = Snatch::firstOrFail();
         $this->assertSame($user->id, (int) $snatch->user_id);
@@ -1269,11 +1734,12 @@ class AnnounceManagerTest extends TestCase
         $IPv6 = '2001::53aa:64c:0:7f83:bc43:dec9';
         $port = 60000;
         $userAgent = 'my test user agent';
-        $torrent = factory(Torrent::class)->create(['info_hash' => $infoHash, 'seeders' => 2, 'leechers' => 0]);
+        $torrent = factory(Torrent::class)->create(['seeders' => 2, 'leechers' => 0]);
+        factory(TorrentInfoHash::class)->create(['info_hash' => $infoHash, 'torrent_id' => $torrent->id]);
         $user = factory(User::class)->create();
-        $peerOne = factory(Peer::class)->create(['torrent_id' => $torrent->id, 'seeder' => true]);
+        $peerOne = factory(Peer::class)->states('v1')->create(['torrent_id' => $torrent->id, 'seeder' => true]);
         $peerOneIP = factory(PeerIP::class)->create(['peerID' => $peerOne->id, 'IP' => '98.165.38.51', 'port' => 55555]);
-        $peerTwo = factory(Peer::class)->create(['torrent_id' => $torrent->id, 'seeder' => true]);
+        $peerTwo = factory(Peer::class)->states('v1')->create(['torrent_id' => $torrent->id, 'seeder' => true]);
         $peerTwoIP = factory(PeerIP::class)->create(
             [
                 'peerID' => $peerTwo->id,
@@ -1342,6 +1808,10 @@ class AnnounceManagerTest extends TestCase
         $this->assertSame($IPv6, $peerIP->IP);
         $this->assertSame($port, (int) $peerIP->port);
         $this->assertTrue((bool) $peerIP->isIPv6);
+        $this->assertSame(3, PeerVersion::count());
+        $peerVersion = PeerVersion::where('peerID', '=', $peer->id)->firstOrFail();
+        $this->assertSame(1, $peerVersion->version);
+        $this->assertSame($peer->id, $peerVersion->peerID);
         $this->assertSame(1, Snatch::count());
         $snatch = Snatch::firstOrFail();
         $this->assertSame($user->id, (int) $snatch->user_id);
@@ -1374,11 +1844,12 @@ class AnnounceManagerTest extends TestCase
         $IPv6 = '2001::53aa:64c:0:7f83:bc43:dec9';
         $port = 60000;
         $userAgent = 'my test user agent';
-        $torrent = factory(Torrent::class)->create(['info_hash' => $infoHash, 'seeders' => 2, 'leechers' => 0]);
+        $torrent = factory(Torrent::class)->create(['seeders' => 2, 'leechers' => 0]);
+        factory(TorrentInfoHash::class)->create(['info_hash' => $infoHash, 'torrent_id' => $torrent->id]);
         $user = factory(User::class)->create();
-        $peerOne = factory(Peer::class)->create(['torrent_id' => $torrent->id, 'seeder' => true]);
+        $peerOne = factory(Peer::class)->states('v1')->create(['torrent_id' => $torrent->id, 'seeder' => true]);
         $peerOneIP = factory(PeerIP::class)->create(['peerID' => $peerOne->id, 'IP' => '98.165.38.51', 'port' => 55555]);
-        $peerTwo = factory(Peer::class)->create(['torrent_id' => $torrent->id, 'seeder' => true]);
+        $peerTwo = factory(Peer::class)->states('v1')->create(['torrent_id' => $torrent->id, 'seeder' => true]);
         $peerTwoIP = factory(PeerIP::class)->create(
             [
                 'peerID' => $peerTwo->id,
@@ -1448,6 +1919,10 @@ class AnnounceManagerTest extends TestCase
         $this->assertSame($port, (int) $peerIP->port);
         $this->assertTrue((bool) $peerIP->isIPv6);
         $this->assertSame(1, Snatch::count());
+        $this->assertSame(3, PeerVersion::count());
+        $peerVersion = PeerVersion::where('peerID', '=', $peer->id)->firstOrFail();
+        $this->assertSame(1, $peerVersion->version);
+        $this->assertSame($peer->id, $peerVersion->peerID);
         $snatch = Snatch::firstOrFail();
         $this->assertSame($user->id, (int) $snatch->user_id);
         $this->assertSame($torrent->id, (int) $snatch->torrent_id);
@@ -1481,11 +1956,12 @@ class AnnounceManagerTest extends TestCase
         $port = 60000;
         $IPv6Endpoint = '[' . $IPv6 . ']:' . $IPv6Port;
         $userAgent = 'my test user agent';
-        $torrent = factory(Torrent::class)->create(['info_hash' => $infoHash, 'seeders' => 2, 'leechers' => 0]);
+        $torrent = factory(Torrent::class)->create(['seeders' => 2, 'leechers' => 0]);
+        factory(TorrentInfoHash::class)->create(['info_hash' => $infoHash, 'torrent_id' => $torrent->id]);
         $user = factory(User::class)->create();
-        $peerOne = factory(Peer::class)->create(['torrent_id' => $torrent->id, 'seeder' => true]);
+        $peerOne = factory(Peer::class)->states('v1')->create(['torrent_id' => $torrent->id, 'seeder' => true]);
         $peerOneIP = factory(PeerIP::class)->create(['peerID' => $peerOne->id, 'IP' => '98.165.38.51', 'port' => 55555]);
-        $peerTwo = factory(Peer::class)->create(['torrent_id' => $torrent->id, 'seeder' => true]);
+        $peerTwo = factory(Peer::class)->states('v1')->create(['torrent_id' => $torrent->id, 'seeder' => true]);
         $peerTwoIP = factory(PeerIP::class)->create(
             [
                 'peerID' => $peerTwo->id,
@@ -1554,6 +2030,10 @@ class AnnounceManagerTest extends TestCase
         $this->assertSame($IPv6, $peerIP->IP);
         $this->assertSame($IPv6Port, (int) $peerIP->port);
         $this->assertTrue((bool) $peerIP->isIPv6);
+        $this->assertSame(3, PeerVersion::count());
+        $peerVersion = PeerVersion::where('peerID', '=', $peer->id)->firstOrFail();
+        $this->assertSame(1, $peerVersion->version);
+        $this->assertSame($peer->id, $peerVersion->peerID);
         $this->assertSame(1, Snatch::count());
         $snatch = Snatch::firstOrFail();
         $this->assertSame($user->id, (int) $snatch->user_id);
@@ -1588,11 +2068,12 @@ class AnnounceManagerTest extends TestCase
         $port = 60000;
         $IPv4Endpoint = $IPv4 . ':' . $IPv4Port;
         $userAgent = 'my test user agent';
-        $torrent = factory(Torrent::class)->create(['info_hash' => $infoHash, 'seeders' => 2, 'leechers' => 0]);
+        $torrent = factory(Torrent::class)->create(['seeders' => 2, 'leechers' => 0]);
+        factory(TorrentInfoHash::class)->create(['info_hash' => $infoHash, 'torrent_id' => $torrent->id]);
         $user = factory(User::class)->create();
-        $peerOne = factory(Peer::class)->create(['torrent_id' => $torrent->id, 'seeder' => true]);
+        $peerOne = factory(Peer::class)->states('v1')->create(['torrent_id' => $torrent->id, 'seeder' => true]);
         $peerOneIP = factory(PeerIP::class)->create(['peerID' => $peerOne->id, 'IP' => '98.165.38.51', 'port' => 55555]);
-        $peerTwo = factory(Peer::class)->create(['torrent_id' => $torrent->id, 'seeder' => true]);
+        $peerTwo = factory(Peer::class)->states('v1')->create(['torrent_id' => $torrent->id, 'seeder' => true]);
         $peerTwoIP = factory(PeerIP::class)->create(
             [
                 'peerID' => $peerTwo->id,
@@ -1661,6 +2142,10 @@ class AnnounceManagerTest extends TestCase
         $this->assertSame($IPv4, $peerIP->IP);
         $this->assertSame($IPv4Port, (int) $peerIP->port);
         $this->assertFalse((bool) $peerIP->isIPv6);
+        $this->assertSame(3, PeerVersion::count());
+        $peerVersion = PeerVersion::where('peerID', '=', $peer->id)->firstOrFail();
+        $this->assertSame(1, $peerVersion->version);
+        $this->assertSame($peer->id, $peerVersion->peerID);
         $this->assertSame(1, Snatch::count());
         $snatch = Snatch::firstOrFail();
         $this->assertSame($user->id, (int) $snatch->user_id);
@@ -1694,9 +2179,10 @@ class AnnounceManagerTest extends TestCase
         $IP = '98.165.38.50';
         $port = 60000;
         $userAgent = 'my test user agent';
-        $torrent = factory(Torrent::class)->create(['info_hash' => $infoHash, 'seeders' => 1, 'leechers' => 1]);
+        $torrent = factory(Torrent::class)->create(['seeders' => 1, 'leechers' => 1]);
+        factory(TorrentInfoHash::class)->create(['info_hash' => $infoHash, 'torrent_id' => $torrent->id]);
         $user = factory(User::class)->create();
-        $peerOne = factory(Peer::class)->create(['torrent_id' => $torrent->id, 'seeder' => true, 'peer_id' => $peerIdOne]);
+        $peerOne = factory(Peer::class)->states('v1')->create(['torrent_id' => $torrent->id, 'seeder' => true, 'peer_id' => $peerIdOne]);
         $peerOneIP = factory(PeerIP::class)->create(['peerID' => $peerOne->id, 'IP' => '98.165.38.51', 'port' => 55555]);
 
         $response = $this->get(
@@ -1758,6 +2244,10 @@ class AnnounceManagerTest extends TestCase
         $this->assertSame($IP, $peerIP->IP);
         $this->assertSame($port, (int) $peerIP->port);
         $this->assertFalse((bool) $peerIP->isIPv6);
+        $this->assertSame(2, PeerVersion::count());
+        $peerVersion = PeerVersion::where('peerID', '=', $peer->id)->firstOrFail();
+        $this->assertSame(1, $peerVersion->version);
+        $this->assertSame($peer->id, $peerVersion->peerID);
         $this->assertSame(1, Snatch::count());
         $snatch = Snatch::firstOrFail();
         $this->assertSame($user->id, (int) $snatch->user_id);
@@ -1792,11 +2282,12 @@ class AnnounceManagerTest extends TestCase
         $IP = '98.165.38.50';
         $port = 60000;
         $userAgent = 'my test user agent';
-        $torrent = factory(Torrent::class)->create(['info_hash' => $infoHash, 'seeders' => 1, 'leechers' => 1]);
+        $torrent = factory(Torrent::class)->create(['seeders' => 1, 'leechers' => 1]);
+        factory(TorrentInfoHash::class)->create(['info_hash' => $infoHash, 'torrent_id' => $torrent->id]);
         $user = factory(User::class)->create();
-        $peerOne = factory(Peer::class)->create(['torrent_id' => $torrent->id, 'seeder' => true, 'peer_id' => $peerIdOne]);
+        $peerOne = factory(Peer::class)->states('v1')->create(['torrent_id' => $torrent->id, 'seeder' => true, 'peer_id' => $peerIdOne]);
         $peerOneIP = factory(PeerIP::class)->create(['peerID' => $peerOne->id, 'IP' => '98.165.38.51', 'port' => 55555]);
-        $peerTwo = factory(Peer::class)->create(['torrent_id' => $torrent->id, 'seeder' => false, 'peer_id' => $peerIdTwo]);
+        $peerTwo = factory(Peer::class)->states('v1')->create(['torrent_id' => $torrent->id, 'seeder' => false, 'peer_id' => $peerIdTwo]);
         $peerTwoIP = factory(PeerIP::class)->create(['peerID' => $peerTwo->id, 'IP' => '98.165.38.52', 'port' => 55556]);
 
         $response = $this->get(
@@ -1871,6 +2362,10 @@ class AnnounceManagerTest extends TestCase
         $this->assertSame($IP, $peerIP->IP);
         $this->assertSame($port, (int) $peerIP->port);
         $this->assertFalse((bool) $peerIP->isIPv6);
+        $this->assertSame(3, PeerVersion::count());
+        $peerVersion = PeerVersion::where('peerID', '=', $peer->id)->firstOrFail();
+        $this->assertSame(1, $peerVersion->version);
+        $this->assertSame($peer->id, $peerVersion->peerID);
         $this->assertSame(1, Snatch::count());
         $snatch = Snatch::firstOrFail();
         $this->assertSame($user->id, (int) $snatch->user_id);
@@ -2318,7 +2813,8 @@ class AnnounceManagerTest extends TestCase
         $infoHash = 'ccd285bd6d7fc749e9ed34d8b1e8a0f1b582d977';
         $peerId = '2d7142333345302d64354e334474384672517776';
         $user = factory(User::class)->create();
-        $torrent = factory(Torrent::class)->create(['uploader_id' => $user->id, 'info_hash' => $infoHash]);
+        $torrent = factory(Torrent::class)->create(['uploader_id' => $user->id]);
+        factory(TorrentInfoHash::class)->create(['info_hash' => $infoHash, 'torrent_id' => $torrent->id]);
 
         return array_merge([
             'info_hash'  => hex2bin($infoHash),

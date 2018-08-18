@@ -10,6 +10,7 @@ use App\Models\User;
 use App\Models\Torrent;
 use App\Models\TorrentComment;
 use App\Models\TorrentCategory;
+use App\Models\TorrentInfoHash;
 use Facades\App\Services\SizeFormatter;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -34,7 +35,6 @@ class TorrentTest extends TestCase
         $user = factory(User::class)->create();
         $torrent = new Torrent();
         $torrent->name = 'test name';
-        $torrent->info_hash = 'fefsrgererw';
         $torrent->size = 34356212;
         $torrent->uploader_id = $user->id;
         $torrent->category_id = factory(TorrentCategory::class)->create()->id;
@@ -73,6 +73,22 @@ class TorrentTest extends TestCase
         $this->assertSame($torrent->peers[0]->userAgent, $peer->userAgent);
         $this->assertSame($torrent->peers[0]->seeder, $peer->seeder);
         $this->assertSame($torrent->peers[0]->updated_at->format('Y-m-d H:i:s'), $peer->updated_at->format('Y-m-d H:i:s'));
+    }
+
+    public function testInfoHashesRelationship(): void
+    {
+        $torrent = factory(Torrent::class)->create();
+        $v1InfoHash = factory(TorrentInfoHash::class)->create(['torrent_id' => $torrent->id]);
+        $v2InfoHash = factory(TorrentInfoHash::class)->states('v2')->create(['torrent_id' => $torrent->id]);
+        $torrent = Torrent::firstOrFail();
+        $this->assertInstanceOf(HasMany::class, $torrent->infoHashes());
+        $this->assertInstanceOf(Collection::class, $torrent->infoHashes);
+        $this->assertSame($v1InfoHash->id, $torrent->infoHashes[0]->id);
+        $this->assertSame($v1InfoHash->version, $torrent->infoHashes[0]->version);
+        $this->assertSame($v1InfoHash->info_hash, $torrent->infoHashes[0]->info_hash);
+        $this->assertSame($v2InfoHash->id, $torrent->infoHashes[1]->id);
+        $this->assertSame($v2InfoHash->version, $torrent->infoHashes[1]->version);
+        $this->assertSame($v2InfoHash->info_hash, $torrent->infoHashes[1]->info_hash);
     }
 
     public function testCommentsRelationship()

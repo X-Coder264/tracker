@@ -6,6 +6,7 @@ namespace App\Http\ViewComposers;
 
 use App\Models\User;
 use Illuminate\View\View;
+use App\Enumerations\Cache;
 use Illuminate\Auth\AuthManager;
 use Illuminate\Cache\CacheManager;
 
@@ -38,7 +39,7 @@ class TimezoneComposer
      */
     public function compose(View $view): void
     {
-        $user = $this->cacheManager->remember('user.' . $this->authManager->guard()->id(), 24 * 60, function () {
+        $user = $this->cacheManager->remember('user.' . $this->authManager->guard()->id(), Cache::ONE_DAY, function () {
             return User::with(['language', 'torrents'])->findOrFail($this->authManager->guard()->id());
         });
 
