@@ -7,6 +7,7 @@ namespace App\Console\Commands;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
 use Illuminate\Database\DatabaseManager;
+use Illuminate\Contracts\Config\Repository;
 
 class DeletePeers extends Command
 {
@@ -26,12 +27,13 @@ class DeletePeers extends Command
 
     /**
      * @param DatabaseManager $databaseManager
+     * @param Repository      $config
      */
-    public function handle(DatabaseManager $databaseManager): void
+    public function handle(DatabaseManager $databaseManager, Repository $config): void
     {
         $obsoletePeerIds = $databaseManager
             ->table('peers')
-            ->where('updated_at', '<', Carbon::now()->subMinutes(45))
+            ->where('updated_at', '<', Carbon::now()->subMinutes($config->get('tracker.announce_interval') + 5))
             ->select('id')
             ->get()
             ->pluck('id');

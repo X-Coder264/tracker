@@ -869,16 +869,16 @@
         },
         {
             "name": "imdbphp/imdbphp",
-            "version": "v6.0.2",
+            "version": "v6.0.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/tboothman/imdbphp.git",
-                "reference": "0bf5142b8f4b11326f57fbf25e9a7e79ea899d19"
+                "reference": "ce0cd847eaff39594f01f1f2ce28c4fea7b31f92"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/tboothman/imdbphp/zipball/0bf5142b8f4b11326f57fbf25e9a7e79ea899d19",
-                "reference": "0bf5142b8f4b11326f57fbf25e9a7e79ea899d19",
+                "url": "https://api.github.com/repos/tboothman/imdbphp/zipball/ce0cd847eaff39594f01f1f2ce28c4fea7b31f92",
+                "reference": "ce0cd847eaff39594f01f1f2ce28c4fea7b31f92",
                 "shasum": ""
             },
             "require": {
@@ -905,7 +905,7 @@
                 "GPL-2.0-or-later"
             ],
             "description": "Library for retrieving film and tv information from IMDb",
-            "time": "2018-08-12T13:22:01+00:00"
+            "time": "2018-08-18T22:29:04+00:00"
         },
         {
             "name": "jakub-onderka/php-console-color",
