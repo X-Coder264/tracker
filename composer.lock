@@ -996,16 +996,16 @@
         },
         {
             "name": "laravel/framework",
-            "version": "v5.6.33",
+            "version": "v5.6.34",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/framework.git",
-                "reference": "8a708b989adc320c451ee639d812af81f884666b"
+                "reference": "66c9cf8119b422b71273271db1f12e20d74ad49b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/framework/zipball/8a708b989adc320c451ee639d812af81f884666b",
-                "reference": "8a708b989adc320c451ee639d812af81f884666b",
+                "url": "https://api.github.com/repos/laravel/framework/zipball/66c9cf8119b422b71273271db1f12e20d74ad49b",
+                "reference": "66c9cf8119b422b71273271db1f12e20d74ad49b",
                 "shasum": ""
             },
             "require": {
@@ -1131,7 +1131,7 @@
                 "framework",
                 "laravel"
             ],
-            "time": "2018-08-09T20:36:39+00:00"
+            "time": "2018-08-21T13:44:37+00:00"
         },
         {
             "name": "laravel/tinker",
@@ -1964,16 +1964,16 @@
         },
         {
             "name": "spatie/laravel-permission",
-            "version": "2.15.0",
+            "version": "2.16.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/spatie/laravel-permission.git",
-                "reference": "40cd73d227da96fa31bb4905f1f37444dee6d74a"
+                "reference": "364b48d59eba89700bc413a71ad3763ce3140d40"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/spatie/laravel-permission/zipball/40cd73d227da96fa31bb4905f1f37444dee6d74a",
-                "reference": "40cd73d227da96fa31bb4905f1f37444dee6d74a",
+                "url": "https://api.github.com/repos/spatie/laravel-permission/zipball/364b48d59eba89700bc413a71ad3763ce3140d40",
+                "reference": "364b48d59eba89700bc413a71ad3763ce3140d40",
                 "shasum": ""
             },
             "require": {
@@ -2024,7 +2024,7 @@
                 "security",
                 "spatie"
             ],
-            "time": "2018-08-16T00:21:46+00:00"
+            "time": "2018-08-20T18:54:54+00:00"
         },
         {
             "name": "swiftmailer/swiftmailer",
@@ -3599,21 +3599,21 @@
         },
         {
             "name": "friendsofphp/php-cs-fixer",
-            "version": "v2.12.2",
+            "version": "v2.12.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/FriendsOfPHP/PHP-CS-Fixer.git",
-                "reference": "dcc87d5414e9d0bd316fce81a5bedb9ce720b183"
+                "reference": "b23d49981cfc95497d03081aeb6df6575196a0d3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/FriendsOfPHP/PHP-CS-Fixer/zipball/dcc87d5414e9d0bd316fce81a5bedb9ce720b183",
-                "reference": "dcc87d5414e9d0bd316fce81a5bedb9ce720b183",
+                "url": "https://api.github.com/repos/FriendsOfPHP/PHP-CS-Fixer/zipball/b23d49981cfc95497d03081aeb6df6575196a0d3",
+                "reference": "b23d49981cfc95497d03081aeb6df6575196a0d3",
                 "shasum": ""
             },
             "require": {
                 "composer/semver": "^1.4",
-                "composer/xdebug-handler": "^1.0",
+                "composer/xdebug-handler": "^1.2",
                 "doctrine/annotations": "^1.2",
                 "ext-json": "*",
                 "ext-tokenizer": "*",
@@ -3686,7 +3686,7 @@
                 }
             ],
             "description": "A tool to automatically fix PHP code style",
-            "time": "2018-07-06T10:37:40+00:00"
+            "time": "2018-08-19T22:33:38+00:00"
         },
         {
             "name": "fzaninotto/faker",
