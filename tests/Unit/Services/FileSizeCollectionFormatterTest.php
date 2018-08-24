@@ -34,7 +34,7 @@ class FileSizeCollectionFormatterTest extends TestCase
         $formatter = $this->app->make(FileSizeCollectionFormatter::class);
 
         $index = 0;
-        foreach($formatter->format($testData) as $file => $formattedSize){
+        foreach ($formatter->format($testData) as $file => $formattedSize) {
             $this->assertSame(array_keys($expected)[$index], $file);
             $this->assertSame(array_values($expected)[$index], $formattedSize);
             ++$index;
