@@ -147,10 +147,10 @@
                                     </tr>
                                     </thead>
                                     <tbody>
-                                    @foreach ($torrentFileNamesAndSizes as $file)
+                                    @foreach ($torrentFileNamesAndSizes as $file => $size)
                                         <tr>
-                                            <td>{{ $file[0] }}</td>
-                                            <td>{{ $file[1] }}</td>
+                                            <td>{{ $file }}</td>
+                                            <td>{{ $size }}</td>
                                         </tr>
                                     @endforeach
                                     </tbody>

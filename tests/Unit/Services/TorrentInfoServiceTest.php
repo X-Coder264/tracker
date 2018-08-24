@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Unit\Services;
 
+use Generator;
 use Tests\TestCase;
 use App\Models\Torrent;
 use App\Services\Bdecoder;
@@ -18,199 +19,35 @@ use Illuminate\Contracts\Filesystem\Factory as FilesystemManager;
 
 class TorrentInfoServiceTest extends TestCase
 {
-    public function testGettingTorrentSizeForV1Torrents(): void
+    /**
+     * @dataProvider torrentSizeV1TorrentDataProvider
+     * @dataProvider torrentSizeV2TorrentDataProvider
+     *
+     * @param array $testDict
+     * @param int $expectedSize
+     */
+    public function testGettingTorrentSize(array $testDict, int $expectedSize): void
     {
+        /** @var TorrentInfoService $torrentInfoService */
         $torrentInfoService = $this->app->make(TorrentInfoService::class);
-        // multiple file mode
-        $torrentInfoDict['files'] = [
-            ['length' => 10],
-            ['length' => 25],
-        ];
-        $this->assertSame(35, $torrentInfoService->getTorrentSize($torrentInfoDict));
 
-        // single file mode
-        $torrentInfoDict2['length'] = 500;
-        $this->assertSame($torrentInfoDict2['length'], $torrentInfoService->getTorrentSize($torrentInfoDict2));
+        $this->assertSame($expectedSize, $torrentInfoService->getTorrentSize($testDict));
     }
 
-    public function testGettingTorrentSizeForV2Torrents(): void
-    {
-        $torrentInfoService = $this->app->make(TorrentInfoService::class);
-        // single file torrent
-        $torrentInfoDict['meta version'] = 2;
-        $torrentInfoDict['file tree'] = [
-            'fileA.txt' => [
-                '' => [
-                    'length' => 500,
-                ],
-            ],
-        ];
-
-        $this->assertSame(500, $torrentInfoService->getTorrentSize($torrentInfoDict));
-
-        // multiple files rooted in a single directory
-        $torrentInfoDict['meta version'] = 2;
-        $torrentInfoDict['file tree'] = [
-            'dir1' => [
-                'fileA.txt' => [
-                    '' => [
-                        'length' => 100,
-                    ],
-                ],
-                'fileB.txt' => [
-                    '' => [
-                        'length' => 200,
-                    ],
-                ],
-            ],
-        ];
-
-        $this->assertSame(300, $torrentInfoService->getTorrentSize($torrentInfoDict));
-
-        // multiple nesting
-        $torrentInfoDict['meta version'] = 2;
-        $torrentInfoDict['file tree'] = [
-            'dir1' => [
-                'dir2' => [
-                    'fileA.txt' => [
-                        '' => [
-                            'length' => 500,
-                        ],
-                    ],
-                    'fileB.txt' => [
-                        '' => [
-                            'length' => 1000,
-                        ],
-                    ],
-                    'dir3' => [
-                        'dir4' => [
-                            'fileC.txt' => [
-                                '' => [
-                                    'length' => 100,
-                                ],
-                            ],
-                        ],
-                        'fileX.txt' => [
-                            '' => [
-                                'length' => 1200,
-                            ],
-                        ],
-                    ],
-                ],
-            ],
-        ];
-        $this->assertSame(2800, $torrentInfoService->getTorrentSize($torrentInfoDict));
-    }
-
-    public function testGettingTorrentFileNamesAndSizesFromTorrentInfoDictForV1Torrents(): void
+    /**
+     * @dataProvider torrentInfoDictV1TorrentDataProvider
+     * @dataProvider torrentInfoDictV2TorrentDataProvider
+     *
+     * @param array $testDict
+     * @param array $expected
+     */
+    public function testGettingTorrentFileNamesAndSizesFromTorrentInfoDict(array $testDict, array $expected): void
     {
         $torrentInfoService = $this->app->make(TorrentInfoService::class);
 
-        // multiple file mode
-        $torrentInfoDict['files'] = [
-            [
-                'length' => 10,
-                'path' => ['folder', 'filename.txt'],
-            ],
-            [
-                'length' => 25,
-                'path' => ['folder2', 'filename2.txt'],
-            ],
-        ];
-        $expectedResult = [
-            ['filename.txt', '10.00 B'],
-            ['filename2.txt', '25.00 B'],
-        ];
+        $testData = iterator_to_array($torrentInfoService->getTorrentFileNamesAndSizesFromTorrentInfoDict($testDict));
 
-        $this->assertSame(
-            $expectedResult,
-            $torrentInfoService->getTorrentFileNamesAndSizesFromTorrentInfoDict($torrentInfoDict)
-        );
-
-        // single file mode
-        $torrentInfoDict2 = ['name' => 'filename.txt', 'length' => 500];
-        $expectedResult2 = [
-            ['filename.txt', '500.00 B'],
-        ];
-        $this->assertSame(
-            $expectedResult2,
-            $torrentInfoService->getTorrentFileNamesAndSizesFromTorrentInfoDict($torrentInfoDict2)
-        );
-    }
-
-    public function testGettingTorrentFileNamesAndSizesFromTorrentInfoDictForV2Torrents(): void
-    {
-        $this->markTestSkipped('This feature is not implemented yet');
-
-        $torrentInfoService = $this->app->make(TorrentInfoService::class);
-
-        // single file torrent
-        $torrentInfoDict['meta version'] = 2;
-        $torrentInfoDict['file tree'] = [
-            'fileA.txt' => [
-                '' => [
-                    'length' => 500,
-                ],
-            ],
-        ];
-
-        $this->assertSame([['fileA.txt', '500.00 B']], $torrentInfoService->getTorrentFileNamesAndSizesFromTorrentInfoDict($torrentInfoDict));
-
-        // multiple files rooted in a single directory
-        $torrentInfoDict['meta version'] = 2;
-        $torrentInfoDict['file tree'] = [
-            'dir1' => [
-                'fileA.txt' => [
-                    '' => [
-                        'length' => 100,
-                    ],
-                ],
-                'fileB.txt' => [
-                    '' => [
-                        'length' => 200,
-                    ],
-                ],
-            ],
-        ];
-
-        $this->assertSame([['fileA.txt', '100.00 B'], ['fileB.txt', '200.00 B']], $torrentInfoService->getTorrentFileNamesAndSizesFromTorrentInfoDict($torrentInfoDict));
-
-        // multiple nesting
-        $torrentInfoDict['meta version'] = 2;
-        $torrentInfoDict['file tree'] = [
-            'dir1' => [
-                'dir2' => [
-                    'fileA.txt' => [
-                        '' => [
-                            'length' => 500,
-                        ],
-                    ],
-                    'fileX.txt' => [
-                        '' => [
-                            'length' => 1000,
-                        ],
-                    ],
-                    'dir3' => [
-                        'dir4' => [
-                            'fileC.txt' => [
-                                '' => [
-                                    'length' => 100,
-                                ],
-                            ],
-                        ],
-                        'fileB.txt' => [
-                            '' => [
-                                'length' => 750,
-                            ],
-                        ],
-                    ],
-                ],
-            ],
-        ];
-        $this->assertSame(
-            [['fileA.txt', '500.00 B'], ['fileX.txt', '1000.00 B'], ['fileC.txt', '100.00 B'], ['fileB.txt', '750.00 B']],
-            $torrentInfoService->getTorrentFileNamesAndSizesFromTorrentInfoDict($torrentInfoDict)
-        );
+        $this->assertSame($expected, $testData);
     }
 
     public function testGetTorrentFileNamesAndSizes()
@@ -288,5 +125,223 @@ class TorrentInfoServiceTest extends TestCase
         $this->assertFalse($torrentInfoService->isHybridTorrent($decodedV1OnlyTorrent['info']));
         $this->assertFalse($torrentInfoService->isHybridTorrent($decodedV2OnlyTorrent['info']));
         $this->assertTrue($torrentInfoService->isHybridTorrent($decodedHybridTorrent['info']));
+    }
+
+    public function torrentInfoDictV1TorrentDataProvider(): Generator
+    {
+        // multiple file mode
+        yield [
+            [
+                'files' => [
+                    [
+                        'length' => 10,
+                        'path' => ['folder', 'filename.txt'],
+                    ],
+                    [
+                        'length' => 25,
+                        'path' => ['folder2', 'filename2.txt'],
+                    ],
+                ],
+            ],
+            [
+                'folder/filename.txt' => 10,
+                'folder2/filename2.txt' => 25,
+            ]
+        ];
+
+        // single file mode
+        yield [
+            ['name' => 'filename.txt', 'length' => 320],
+            ['filename.txt' => 320]
+        ];
+    }
+
+    public function torrentInfoDictV2TorrentDataProvider(): Generator
+    {
+        // one file in root
+        yield [
+            [
+                'meta version' => 2,
+                'file tree' => [
+                    'fileA.txt' => [
+                        '' => [
+                            'length' => 555,
+                        ],
+                    ],
+                ]
+            ],
+            [
+                'fileA.txt' => 555,
+            ],
+        ];
+
+        // multiple files in a single directory
+        yield [
+            [
+                'meta version' => 2,
+                'file tree' => [
+                    'dir1' => [
+                        'fileA.txt' => [
+                            '' => [
+                                'length' => 100,
+                            ],
+                        ],
+                        'fileB.txt' => [
+                            '' => [
+                                'length' => 200,
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+            [
+                'dir1/fileA.txt' => 100,
+                'dir1/fileB.txt' => 200,
+            ]
+        ];
+
+        // complex directory/file structure
+        yield [
+            [
+                'meta version' => 2,
+                'file tree' => [
+                    'dir1' => [
+                        'dir2' => [
+                            'fileA.txt' => [
+                                '' => [
+                                    'length' => 500,
+                                ],
+                            ],
+                            'fileX.txt' => [
+                                '' => [
+                                    'length' => 1000,
+                                ],
+                            ],
+                            'dir3' => [
+                                'dir4' => [
+                                    'fileC.txt' => [
+                                        '' => [
+                                            'length' => 100,
+                                        ],
+                                    ],
+                                ],
+                                'fileB.txt' => [
+                                    '' => [
+                                        'length' => 750,
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+            [
+                'dir1/dir2/fileA.txt' => 500,
+                'dir1/dir2/fileX.txt' => 1000,
+                'dir1/dir2/dir3/dir4/fileC.txt' => 100,
+                'dir1/dir2/dir3/fileB.txt' => 750,
+            ]
+        ];
+    }
+
+    public function torrentSizeV1TorrentDataProvider(): Generator
+    {
+        // multiple file mode
+        yield [
+            [
+                'files' => [
+                    ['length' => 10, 'path' => ['testA.txt']],
+                    ['length' => 25, 'path' => ['testB.txt']],
+                ],
+            ],
+            35,
+        ];
+
+        // single file mode
+        yield [
+            [
+                'name' => 'testC.txt',
+                'length' => 500,
+            ],
+            500,
+        ];
+    }
+
+    public function torrentSizeV2TorrentDataProvider(): Generator
+    {
+        // single file torrent
+        yield [
+            [
+                'meta version' => 2,
+                'file tree' => [
+                    'fileA.txt' => [
+                        '' => [
+                            'length' => 500,
+                        ],
+                    ],
+                ],
+            ],
+            500,
+        ];
+
+        // multiple files rooted in a single directory
+        yield [
+            [
+                'meta version' => 2,
+                'file tree' => [
+                    'dir1' => [
+                        'fileA.txt' => [
+                            '' => [
+                                'length' => 100,
+                            ],
+                        ],
+                        'fileB.txt' => [
+                            '' => [
+                                'length' => 200,
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+            300,
+        ];
+
+        // multiple nesting
+        yield [
+            [
+                'meta version' => 2,
+                'file tree' => [
+                    'dir1' => [
+                        'dir2' => [
+                            'fileA.txt' => [
+                                '' => [
+                                    'length' => 500,
+                                ],
+                            ],
+                            'fileB.txt' => [
+                                '' => [
+                                    'length' => 1000,
+                                ],
+                            ],
+                            'dir3' => [
+                                'dir4' => [
+                                    'fileC.txt' => [
+                                        '' => [
+                                            'length' => 100,
+                                        ],
+                                    ],
+                                ],
+                                'fileX.txt' => [
+                                    '' => [
+                                        'length' => 1200,
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+            2800,
+        ];
     }
 }

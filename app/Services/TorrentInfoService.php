@@ -4,10 +4,9 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use Generator;
 use Imdb\Title;
 use App\Models\Torrent;
-use RecursiveArrayIterator;
-use RecursiveIteratorIterator;
 use Illuminate\Cache\CacheManager;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Contracts\Filesystem\Factory as FilesystemManager;
@@ -67,47 +66,9 @@ class TorrentInfoService
      */
     public function getTorrentSize(array $torrentInfoDict): int
     {
-        if (false === $this->isV2Torrent($torrentInfoDict)) {
-            return $this->getV1TorrentSize($torrentInfoDict);
-        }
-
-        return $this->getV2TorrentSize($torrentInfoDict);
-    }
-
-    /**
-     * @param array $torrentInfoDict
-     *
-     * @return int
-     */
-    private function getV1TorrentSize(array $torrentInfoDict): int
-    {
         $size = 0;
-        if (isset($torrentInfoDict['files'])) {
-            // multiple file mode
-            foreach ($torrentInfoDict['files'] as $file) {
-                $size += $file['length'];
-            }
-        } else {
-            // single file mode
-            $size = $torrentInfoDict['length'];
-        }
-
-        return $size;
-    }
-
-    /**
-     * @param array $torrentInfoDict
-     *
-     * @return int
-     */
-    private function getV2TorrentSize(array $torrentInfoDict): int
-    {
-        $size = 0;
-        $iterator = new RecursiveIteratorIterator(new RecursiveArrayIterator($torrentInfoDict['file tree']));
-        foreach ($iterator as $key => $value) {
-            if ('length' === $key) {
-                $size += $value;
-            }
+        foreach($this->getTorrentFileNamesAndSizesFromTorrentInfoDict($torrentInfoDict) as $path => $fileSize){
+            $size += $fileSize;
         }
 
         return $size;
@@ -121,41 +82,67 @@ class TorrentInfoService
     public function getTorrentFileNamesAndSizesFromTorrentInfoDict(array $torrentInfoDict): array
     {
         if (false === $this->isV2Torrent($torrentInfoDict)) {
-            return $this->getV1TorrentFileNamesAndSizesFromTorrentInfoDict($torrentInfoDict);
+            $data = $this->getV1TorrentFileNamesAndSizesFromTorrentInfoDict($torrentInfoDict);
+        }else{
+            $data = $this->getV2TorrentFileNamesAndSizesFromTorrentInfoDict($torrentInfoDict);
         }
 
-        //return $this->getV2TorrentFileNamesAndSizesFromTorrentInfoDict($torrentInfoDict);
+        return iterator_to_array($data);
     }
 
     /**
      * @param array $torrentInfoDict
      *
-     * @return array
+     * @return Generator
      */
-    private function getV1TorrentFileNamesAndSizesFromTorrentInfoDict(array $torrentInfoDict): array
+    private function getV1TorrentFileNamesAndSizesFromTorrentInfoDict(array $torrentInfoDict): Generator
     {
-        $fileNamesAndSizes = [];
-
         if (isset($torrentInfoDict['files'])) {
             // multiple file mode
             foreach ($torrentInfoDict['files'] as $file) {
-                $size = $this->sizeFormatter->getFormattedSize($file['length']);
-                $fileName = '';
-                foreach ($file['path'] as $path) {
-                    $fileName .= $path . '/';
-                }
-
-                $fileName = pathinfo($fileName, PATHINFO_BASENAME);
-                $fileNamesAndSizes[] = [$fileName, $size];
+                yield implode('/', $file['path']) => $file['length'];
             }
-        } else {
-            // single file mode
-            $size = $this->sizeFormatter->getFormattedSize($torrentInfoDict['length']);
-            $fileName = $torrentInfoDict['name'];
-            $fileNamesAndSizes[] = [$fileName, $size];
+
+            return;
         }
 
-        return $fileNamesAndSizes;
+        // single file mode
+        yield $torrentInfoDict['name'] => $torrentInfoDict['length'];
+    }
+
+    /**
+     * @param array $torrentInfoDict
+     *
+     * @return Generator
+     */
+    private function getV2TorrentFileNamesAndSizesFromTorrentInfoDict(array $torrentInfoDict): Generator
+    {
+        yield from $this->v2FileSizeExtract($torrentInfoDict['file tree']);
+    }
+
+    /**
+     * @param array $files
+     * @param string|null $path
+     *
+     * @return Generator
+     */
+    private function v2FileSizeExtract(array $files, string $path = null): Generator
+    {
+        foreach($files as $name => $file){
+            if(!is_array($file)){
+                return;
+            }
+
+            if(null !== $path){
+                $name = $path . '/' . $name;
+            }
+
+            if(isset($file['']) && isset($file['']['length'])){
+                yield $name => $file['']['length'];
+            }
+
+            yield from $this->v2FileSizeExtract($file, $name);
+        }
     }
 
     /**
@@ -167,9 +154,11 @@ class TorrentInfoService
      */
     public function getTorrentFileNamesAndSizes(Torrent $torrent): array
     {
+        $key = sprintf('torrent.%d.files', $torrent->id);
+
         return $this->cacheManager->rememberForever(
-            'torrent.' . $torrent->id . '.files',
-            function () use ($torrent) {
+            $key,
+            function () use ($torrent): array {
                 $torrentFile = $this->filesystemManager->disk('torrents')->get("{$torrent->id}.torrent");
                 $decodedTorrent = $this->bdecoder->decode($torrentFile);
 
