@@ -67,7 +67,7 @@ class TorrentInfoService
     public function getTorrentSize(array $torrentInfoDict): int
     {
         $size = 0;
-        foreach($this->getTorrentFileNamesAndSizesFromTorrentInfoDict($torrentInfoDict) as $path => $fileSize){
+        foreach ($this->getTorrentFileNamesAndSizesFromTorrentInfoDict($torrentInfoDict) as $path => $fileSize) {
             $size += $fileSize;
         }
 
@@ -83,7 +83,7 @@ class TorrentInfoService
     {
         if (false === $this->isV2Torrent($torrentInfoDict)) {
             $data = $this->getV1TorrentFileNamesAndSizesFromTorrentInfoDict($torrentInfoDict);
-        }else{
+        } else {
             $data = $this->getV2TorrentFileNamesAndSizesFromTorrentInfoDict($torrentInfoDict);
         }
 
@@ -121,23 +121,23 @@ class TorrentInfoService
     }
 
     /**
-     * @param array $files
+     * @param array       $files
      * @param string|null $path
      *
      * @return Generator
      */
     private function v2FileSizeExtract(array $files, string $path = null): Generator
     {
-        foreach($files as $name => $file){
-            if(!is_array($file)){
+        foreach ($files as $name => $file) {
+            if (!is_array($file)) {
                 return;
             }
 
-            if(null !== $path){
+            if (null !== $path) {
                 $name = $path . '/' . $name;
             }
 
-            if(isset($file['']) && isset($file['']['length'])){
+            if (isset($file['']) && isset($file['']['length'])) {
                 yield $name => $file['']['length'];
             }
 

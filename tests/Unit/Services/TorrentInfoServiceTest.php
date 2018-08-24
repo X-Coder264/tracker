@@ -24,7 +24,7 @@ class TorrentInfoServiceTest extends TestCase
      * @dataProvider torrentSizeV2TorrentDataProvider
      *
      * @param array $testDict
-     * @param int $expectedSize
+     * @param int   $expectedSize
      */
     public function testGettingTorrentSize(array $testDict, int $expectedSize): void
     {
@@ -146,13 +146,13 @@ class TorrentInfoServiceTest extends TestCase
             [
                 'folder/filename.txt' => 10,
                 'folder2/filename2.txt' => 25,
-            ]
+            ],
         ];
 
         // single file mode
         yield [
             ['name' => 'filename.txt', 'length' => 320],
-            ['filename.txt' => 320]
+            ['filename.txt' => 320],
         ];
     }
 
@@ -168,7 +168,7 @@ class TorrentInfoServiceTest extends TestCase
                             'length' => 555,
                         ],
                     ],
-                ]
+                ],
             ],
             [
                 'fileA.txt' => 555,
@@ -197,7 +197,7 @@ class TorrentInfoServiceTest extends TestCase
             [
                 'dir1/fileA.txt' => 100,
                 'dir1/fileB.txt' => 200,
-            ]
+            ],
         ];
 
         // complex directory/file structure
@@ -240,7 +240,7 @@ class TorrentInfoServiceTest extends TestCase
                 'dir1/dir2/fileX.txt' => 1000,
                 'dir1/dir2/dir3/dir4/fileC.txt' => 100,
                 'dir1/dir2/dir3/fileB.txt' => 750,
-            ]
+            ],
         ];
     }
 

@@ -37,7 +37,6 @@
         <env name="MAIL_DRIVER" value="array"/>
         <env name="ANNOUNCE_INTERVAL" value="40"/>
         <env name="MIN_ANNOUNCE_INTERVAL" value="1"/>
-        <env name="REDIS_HOST" value="redis" />
     </php>
     <listeners>
         <listener class="NunoMaduro\Collision\Adapters\Phpunit\Listener" />
