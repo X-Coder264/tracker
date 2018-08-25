@@ -45,9 +45,7 @@ class TorrentInfoServiceTest extends TestCase
     {
         $torrentInfoService = $this->app->make(TorrentInfoService::class);
 
-        $testData = iterator_to_array($torrentInfoService->getTorrentFileNamesAndSizesFromTorrentInfoDict($testDict));
-
-        $this->assertSame($expected, $testData);
+        $this->assertSame($expected, $torrentInfoService->getTorrentFileNamesAndSizesFromTorrentInfoDict($testDict));
     }
 
     public function testGetTorrentFileNamesAndSizes()

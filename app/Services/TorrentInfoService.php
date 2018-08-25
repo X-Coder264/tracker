@@ -129,7 +129,7 @@ class TorrentInfoService
     private function v2FileSizeExtract(array $files, string $path = null): Generator
     {
         foreach ($files as $name => $file) {
-            if (!is_array($file)) {
+            if (false === is_array($file)) {
                 return;
             }
 
@@ -154,7 +154,7 @@ class TorrentInfoService
      */
     public function getTorrentFileNamesAndSizes(Torrent $torrent): array
     {
-        $key = sprintf('torrent.%d.files', $torrent->id);
+        $key = sprintf('torrent.%s.files', $torrent->id);
 
         return $this->cacheManager->rememberForever(
             $key,

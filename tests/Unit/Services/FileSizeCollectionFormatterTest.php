@@ -37,7 +37,7 @@ class FileSizeCollectionFormatterTest extends TestCase
         foreach ($formatter->format($testData) as $file => $formattedSize) {
             $this->assertSame(array_keys($expected)[$index], $file);
             $this->assertSame(array_values($expected)[$index], $formattedSize);
-            ++$index;
+            $index++;
         }
     }
 }
