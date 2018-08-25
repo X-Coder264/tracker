@@ -48,6 +48,15 @@
         }
     },
     "scripts": {
+        "lint": [
+            "php-cs-fixer fix --diff --ansi --dry-run"
+        ],
+        "lint:fix": [
+            "php-cs-fixer fix --diff --ansi"
+        ],
+        "test": [
+            "phpunit"
+        ],
         "post-root-package-install": [
             "@php -r \"file_exists('.env') || copy('.env.example', '.env');\""
         ],
@@ -58,6 +67,11 @@
             "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",
             "@php artisan package:discover"
         ]
+    },
+    "scripts-descriptions": {
+        "lint": "Check if source syntax needs to be linted",
+        "lint:fix": "Fix source syntax with linter",
+        "test": "Run all tests"
     },
     "config": {
         "preferred-install": "dist",

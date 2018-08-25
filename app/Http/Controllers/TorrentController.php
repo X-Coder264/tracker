@@ -23,6 +23,7 @@ use App\Services\TorrentUploadManager;
 use App\Http\Requests\TorrentUploadRequest;
 use App\Exceptions\FileNotWritableException;
 use Illuminate\Contracts\Filesystem\Factory;
+use App\Services\FileSizeCollectionFormatter;
 use Illuminate\Contracts\Routing\UrlGenerator;
 use Illuminate\Contracts\Translation\Translator;
 use Illuminate\Contracts\Routing\ResponseFactory;
@@ -86,13 +87,12 @@ class TorrentController extends Controller
     }
 
     /**
-     * @param Torrent            $torrent
-     * @param TorrentInfoService $torrentInfoService
-     * @param ResponseFactory    $responseFactory
-     * @param Translator         $translator
-     * @param FilesystemManager  $filesystemManager
-     *
-     * @throws NotFoundHttpException
+     * @param Torrent                     $torrent
+     * @param TorrentInfoService          $torrentInfoService
+     * @param ResponseFactory             $responseFactory
+     * @param Translator                  $translator
+     * @param FilesystemManager           $filesystemManager
+     * @param FileSizeCollectionFormatter $fileSizeCollectionFormatter
      *
      * @return Response
      */
@@ -101,7 +101,8 @@ class TorrentController extends Controller
         TorrentInfoService $torrentInfoService,
         ResponseFactory $responseFactory,
         Translator $translator,
-        FilesystemManager $filesystemManager
+        FilesystemManager $filesystemManager,
+        FileSizeCollectionFormatter $fileSizeCollectionFormatter
     ): Response {
         try {
             $torrentFileNamesAndSizes = $torrentInfoService->getTorrentFileNamesAndSizes($torrent);
@@ -110,6 +111,8 @@ class TorrentController extends Controller
         }
 
         $filesCount = count($torrentFileNamesAndSizes);
+
+        $torrentFileNamesAndSizes = $fileSizeCollectionFormatter->format($torrentFileNamesAndSizes);
 
         $torrent->load(['uploader', 'peers.user']);
         $numberOfPeers = $torrent->peers->count();

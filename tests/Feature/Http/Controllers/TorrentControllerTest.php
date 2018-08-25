@@ -22,6 +22,7 @@ use Illuminate\Cache\CacheManager;
 use App\Services\TorrentInfoService;
 use Illuminate\Support\Facades\Storage;
 use PHPUnit\Framework\MockObject\MockObject;
+use App\Services\FileSizeCollectionFormatter;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
@@ -150,16 +151,22 @@ class TorrentControllerTest extends TestCase
             ->setMethods(['getTorrentFileNamesAndSizes'])
             ->getMock();
 
-        $returnValue = [['Test.txt', '55.55 MiB']];
+        $returnValue = [
+            'Test.txt' => 999999999,
+        ];
+
+        /** @var FileSizeCollectionFormatter $formatter */
+        $formatter = $this->app->make(FileSizeCollectionFormatter::class);
+
         $torrentInfo->method('getTorrentFileNamesAndSizes')->willReturn($returnValue);
         $this->app->instance(TorrentInfoService::class, $torrentInfo);
 
         $response = $this->get(route('torrents.show', $torrent));
-        $response->assertStatus(Response::HTTP_OK);
+        $response->assertOk();
         $response->assertViewIs('torrents.show');
         $response->assertViewHas('torrent');
         $response->assertViewHas('numberOfPeers', 1);
-        $response->assertViewHas('torrentFileNamesAndSizes', $returnValue);
+        $response->assertViewHas('torrentFileNamesAndSizes', $formatter->format($returnValue));
         $response->assertViewHas('filesCount', 1);
         $response->assertViewHas('torrentComments');
         $response->assertViewHas('imdbData');
@@ -189,7 +196,7 @@ class TorrentControllerTest extends TestCase
         // peer ratio
         $response->assertSee('3.00');
         $response->assertSee($peer->userAgent);
-        $response->assertSee('55.55 MiB');
+        $response->assertSee('953.67 MiB');
         $response->assertSee('Test.txt');
         $this->assertTrue($torrent->is($response->original->torrent));
     }
