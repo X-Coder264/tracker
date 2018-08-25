@@ -13,6 +13,6 @@ npm-debug.log
 yarn-error.log
 .env
 .phpunit.result.cache
-phpunit.xml
+/phpunit.xml
 .php_cs.cache
 /public/admin

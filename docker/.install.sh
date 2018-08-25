@@ -10,6 +10,7 @@ function dokmanInstall
     dokmanValidateHosts "${hosts[@]}"
 
     dokmanRunCommand "rm -f ./.env" "Removing .env file (if it exists)"
+    dokmanRunCommand "rm -f ./phpunit.xml" "Removing phpunit.xml file (if it exists)"
 
     if isOsX; then
         title "OSX specifics..."
