@@ -4,12 +4,16 @@ declare(strict_types=1);
 
 namespace Tests\Unit\Services;
 
+use Generator;
 use Tests\TestCase;
 use App\Services\FileSizeCollectionFormatter;
 
 class FileSizeCollectionFormatterTest extends TestCase
 {
-    public function dataProvider(): \Generator
+    /**
+     * @return Generator
+     */
+    public function dataProvider(): Generator
     {
         yield [
             ['testA' => 20, 'testB' => 44],

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Unit\Services;
 
+use Exception;
 use Generator;
 use Tests\TestCase;
 use App\Models\Torrent;
@@ -48,6 +49,9 @@ class TorrentInfoServiceTest extends TestCase
         $this->assertSame($expected, $torrentInfoService->getTorrentFileNamesAndSizesFromTorrentInfoDict($testDict));
     }
 
+    /**
+     * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
+     */
     public function testGetTorrentFileNamesAndSizes()
     {
         /** @var Bdecoder|MockObject $decoder */
@@ -89,6 +93,9 @@ class TorrentInfoServiceTest extends TestCase
         $this->assertSame($returnValue, Cache::get('torrent.' . $torrent->id . '.files'));
     }
 
+    /**
+     * @throws Exception
+     */
     public function testIsV1Torrent(): void
     {
         $decoder = new Bdecoder();
@@ -101,6 +108,9 @@ class TorrentInfoServiceTest extends TestCase
         $this->assertTrue($torrentInfoService->isV1Torrent($decodedHybridTorrent['info']));
     }
 
+    /**
+     * @throws Exception
+     */
     public function testIsV2Torrent(): void
     {
         $decoder = new Bdecoder();
@@ -113,6 +123,9 @@ class TorrentInfoServiceTest extends TestCase
         $this->assertTrue($torrentInfoService->isV2Torrent($decodedHybridTorrent['info']));
     }
 
+    /**
+     * @throws Exception
+     */
     public function testIsHybridTorrent(): void
     {
         $decoder = new Bdecoder();
@@ -125,6 +138,9 @@ class TorrentInfoServiceTest extends TestCase
         $this->assertTrue($torrentInfoService->isHybridTorrent($decodedHybridTorrent['info']));
     }
 
+    /**
+     * @return Generator
+     */
     public function torrentInfoDictV1TorrentDataProvider(): Generator
     {
         // multiple file mode
@@ -154,6 +170,9 @@ class TorrentInfoServiceTest extends TestCase
         ];
     }
 
+    /**
+     * @return Generator
+     */
     public function torrentInfoDictV2TorrentDataProvider(): Generator
     {
         // one file in root
@@ -242,6 +261,9 @@ class TorrentInfoServiceTest extends TestCase
         ];
     }
 
+    /**
+     * @return Generator
+     */
     public function torrentSizeV1TorrentDataProvider(): Generator
     {
         // multiple file mode
@@ -265,6 +287,9 @@ class TorrentInfoServiceTest extends TestCase
         ];
     }
 
+    /**
+     * @return Generator
+     */
     public function torrentSizeV2TorrentDataProvider(): Generator
     {
         // single file torrent
