@@ -87,11 +87,11 @@ class TorrentController extends Controller
     }
 
     /**
-     * @param Torrent $torrent
-     * @param TorrentInfoService $torrentInfoService
-     * @param ResponseFactory $responseFactory
-     * @param Translator $translator
-     * @param FilesystemManager $filesystemManager
+     * @param Torrent                     $torrent
+     * @param TorrentInfoService          $torrentInfoService
+     * @param ResponseFactory             $responseFactory
+     * @param Translator                  $translator
+     * @param FilesystemManager           $filesystemManager
      * @param FileSizeCollectionFormatter $fileSizeCollectionFormatter
      *
      * @return Response
