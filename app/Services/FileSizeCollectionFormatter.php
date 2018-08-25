@@ -23,6 +23,7 @@ class FileSizeCollectionFormatter
 
     /**
      * @param iterable $fileList
+     *
      * @return Generator
      */
     public function format(iterable $fileList): Generator
