@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Unit\Services;
 
+use Exception;
 use Tests\TestCase;
 use App\Services\Bencoder;
 
@@ -68,8 +69,15 @@ class BencoderTest extends TestCase
         $this->assertSame('d4:spaml1:a1:bee', $this->encoder->encode(['spam' => ['a', 'b']]));
     }
 
-    public function testInvalidDataEncoding()
+    public function testBooleanDataEncoding(): void
     {
-        $this->assertNull($this->encoder->encode(true));
+        $this->expectException(Exception::class);
+        $this->encoder->encode(true);
+    }
+
+    public function testFloatDataEncoding(): void
+    {
+        $this->expectException(Exception::class);
+        $this->encoder->encode(1.0);
     }
 }

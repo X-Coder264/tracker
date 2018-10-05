@@ -13,4 +13,6 @@ class Cache
     const ONE_HOUR = 60;
 
     const ONE_DAY = 1440;
+
+    const ONE_MONTH = 43200;
 }

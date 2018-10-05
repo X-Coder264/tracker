@@ -38,6 +38,8 @@ return [
     'common.category' => 'Kategorija',
     'common.uploader' => 'Uploader',
     'common.size' => 'Veličina',
+    'torrents.show.v1-info_hash' => 'Info hash (v1)',
+    'torrents.show.v2-info_hash' => 'Info hash (v2) - okrnjen',
     'torrents.show.peers' => 'Peerovi',
     'torrents.show.files' => 'Datoteke',
     'torrents.show.file_name' => 'Naziv datoteke',

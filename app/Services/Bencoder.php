@@ -4,14 +4,16 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use Exception;
+
 class Bencoder
 {
     /**
      * @param mixed $data
      *
-     * @return string|null
+     * @return string
      */
-    public function encode($data): ?string
+    public function encode($data): string
     {
         if (is_array($data) && (isset($data[0]) || empty($data))) {
             return $this->encodeList($data);
@@ -23,7 +25,7 @@ class Bencoder
             return $this->encodeString($data);
         }
 
-        return null;
+        throw new Exception('Invalid data given for encoding.');
     }
 
     /**

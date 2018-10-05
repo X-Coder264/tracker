@@ -231,10 +231,8 @@ class AnnounceManager
             ->select('peers.*', 'peers_version.version')
             ->first();
 
-        if ('completed' === $this->event || 'stopped' === $this->event) {
-            if (null === $this->peer) {
-                return $this->announceErrorResponse($this->translator->trans('messages.announce.invalid_peer_id'));
-            }
+        if (null === $this->peer && ('completed' === $this->event || 'stopped' === $this->event)) {
+            return $this->announceErrorResponse($this->translator->trans('messages.announce.invalid_peer_id'));
         }
 
         $timeNow = Carbon::now();
@@ -534,6 +532,7 @@ class AnnounceManager
                     'leechers' => $this->torrent->leechers,
                 ]
             );
+        $this->cacheManager->delete('torrent.' . $this->torrent->id);
     }
 
     /**

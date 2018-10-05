@@ -121,11 +121,19 @@ class TorrentControllerTest extends TestCase
         $response->assertViewIs('torrents.create');
     }
 
-    public function testShow()
+    public function testShow(): void
     {
         $this->withoutExceptionHandling();
 
-        $torrent = factory(Torrent::class)->create(['uploader_id' => $this->user->id, 'seeders' => 501, 'leechers' => 333, 'imdb_id' => '0468569']);
+        $torrent = factory(Torrent::class)->states('hybrid')
+            ->create(
+                [
+                    'uploader_id' => $this->user->id,
+                    'seeders' => 501,
+                    'leechers' => 333,
+                    'imdb_id' => '0468569',
+                ]
+            );
         $torrentComment = factory(TorrentComment::class)->create(
             ['torrent_id' => $torrent->id, 'user_id' => $torrent->uploader_id]
         );
@@ -181,6 +189,8 @@ class TorrentControllerTest extends TestCase
         $response->assertSee($torrent->size);
         $response->assertSee($torrent->seeders);
         $response->assertSee($torrent->leechers);
+        $response->assertSee($torrent->infoHashes[0]->info_hash);
+        $response->assertSee($torrent->infoHashes[1]->info_hash);
         $response->assertSee($torrent->uploader->name);
         $response->assertSee($torrent->category->name);
         $response->assertSee($torrentComment->comment);
@@ -201,7 +211,7 @@ class TorrentControllerTest extends TestCase
         $this->assertTrue($torrent->is($response->original->torrent));
     }
 
-    public function testShowWhenTorrentInfoServiceThrowsAnException()
+    public function testShowWhenTorrentInfoServiceThrowsAnException(): void
     {
         $torrent = factory(Torrent::class)->create(['uploader_id' => $this->user->id]);
 

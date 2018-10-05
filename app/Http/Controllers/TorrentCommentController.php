@@ -8,6 +8,7 @@ use App\Models\Torrent;
 use Illuminate\Http\Response;
 use App\Models\TorrentComment;
 use Illuminate\Auth\AuthManager;
+use Illuminate\Cache\CacheManager;
 use Illuminate\Routing\Redirector;
 use Illuminate\Http\RedirectResponse;
 use App\Http\Requests\TorrentCommentRequest;
@@ -35,6 +36,7 @@ class TorrentCommentController extends Controller
      * @param AuthManager           $authManager
      * @param Redirector            $redirector
      * @param Translator            $translator
+     * @param CacheManager          $cacheManager
      *
      * @return RedirectResponse
      */
@@ -43,13 +45,16 @@ class TorrentCommentController extends Controller
         Torrent $torrent,
         AuthManager $authManager,
         Redirector $redirector,
-        Translator $translator
+        Translator $translator,
+        CacheManager $cacheManager
     ): RedirectResponse {
         $torrentComment = new TorrentComment();
         $torrentComment->user_id = $authManager->guard()->id();
         $torrentComment->comment = $request->input('comment');
 
         $torrent->comments()->save($torrentComment);
+
+        $cacheManager->delete('torrent.' . $torrent->id . '.comments');
 
         return $redirector->route('torrents.show', $torrent)
             ->with('torrentCommentSuccess', $translator->trans('messages.torrent-comments.create-success-message'));
@@ -71,6 +76,7 @@ class TorrentCommentController extends Controller
      * @param TorrentComment        $torrentComment
      * @param Redirector            $redirector
      * @param Translator            $translator
+     * @param CacheManager          $cacheManager
      *
      * @return RedirectResponse
      */
@@ -78,9 +84,12 @@ class TorrentCommentController extends Controller
         TorrentCommentRequest $request,
         TorrentComment $torrentComment,
         Redirector $redirector,
-        Translator $translator
+        Translator $translator,
+        CacheManager $cacheManager
     ): RedirectResponse {
         $torrentComment->update(['comment' => $request->input('comment')]);
+
+        $cacheManager->delete('torrent.' . $torrentComment->torrent_id . '.comments');
 
         return $redirector->route('torrents.show', $torrentComment->torrent)
             ->with('torrentCommentSuccess', $translator->trans('messages.torrent-comments.update-success-message'));

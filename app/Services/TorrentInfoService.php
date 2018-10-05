@@ -7,6 +7,7 @@ namespace App\Services;
 use Generator;
 use Imdb\Title;
 use App\Models\Torrent;
+use App\Enumerations\Cache;
 use Illuminate\Cache\CacheManager;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Contracts\Filesystem\Factory as FilesystemManager;
@@ -156,8 +157,9 @@ class TorrentInfoService
     {
         $key = sprintf('torrent.%s.files', $torrent->id);
 
-        return $this->cacheManager->rememberForever(
+        return $this->cacheManager->remember(
             $key,
+            Cache::ONE_MONTH,
             function () use ($torrent): array {
                 $torrentFile = $this->filesystemManager->disk('torrents')->get("{$torrent->id}.torrent");
                 $decodedTorrent = $this->bdecoder->decode($torrentFile);

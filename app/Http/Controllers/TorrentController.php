@@ -28,6 +28,7 @@ use Illuminate\Contracts\Routing\UrlGenerator;
 use Illuminate\Contracts\Translation\Translator;
 use Illuminate\Contracts\Routing\ResponseFactory;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Contracts\Filesystem\Factory as FilesystemManager;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -61,7 +62,7 @@ class TorrentController extends Controller
         $torrents = $cacheManager->tags('torrents')->remember(
             'torrents.page.' . $page . '.perPage.' . $torrentPerPage,
             Cache::TEN_MINUTES,
-            function () use ($authManager, $torrentPerPage) {
+            function () use ($authManager, $torrentPerPage): LengthAwarePaginator {
                 return Torrent::with(['uploader'])->where('seeders', '>', 0)
                                               ->orderBy('id', 'desc')
                                               ->paginate($torrentPerPage);
@@ -89,20 +90,22 @@ class TorrentController extends Controller
     /**
      * @param Torrent                     $torrent
      * @param TorrentInfoService          $torrentInfoService
-     * @param ResponseFactory             $responseFactory
      * @param Translator                  $translator
      * @param FilesystemManager           $filesystemManager
      * @param FileSizeCollectionFormatter $fileSizeCollectionFormatter
+     * @param CacheManager                $cacheManager
+     * @param ResponseFactory             $responseFactory
      *
      * @return Response
      */
     public function show(
         Torrent $torrent,
         TorrentInfoService $torrentInfoService,
-        ResponseFactory $responseFactory,
         Translator $translator,
         FilesystemManager $filesystemManager,
-        FileSizeCollectionFormatter $fileSizeCollectionFormatter
+        FileSizeCollectionFormatter $fileSizeCollectionFormatter,
+        CacheManager $cacheManager,
+        ResponseFactory $responseFactory
     ): Response {
         try {
             $torrentFileNamesAndSizes = $torrentInfoService->getTorrentFileNamesAndSizes($torrent);
@@ -114,17 +117,32 @@ class TorrentController extends Controller
 
         $torrentFileNamesAndSizes = $fileSizeCollectionFormatter->format($torrentFileNamesAndSizes);
 
-        $torrent->load(['uploader', 'peers.user']);
+        /** @var Torrent $torrent */
+        $torrent = $cacheManager->remember('torrent.' . $torrent->id, Cache::ONE_DAY, function () use ($torrent): Torrent {
+            return $torrent->load(['uploader', 'peers.user', 'category', 'infoHashes']);
+        });
+
         $numberOfPeers = $torrent->peers->count();
 
-        $torrentComments = $torrent->comments()->with('user')->paginate(10);
+        /** @var LengthAwarePaginator $torrentComments */
+        $torrentComments = $cacheManager->remember('torrent.' . $torrent->id . '.comments', Cache::ONE_DAY, function () use ($torrent): LengthAwarePaginator {
+            return $torrent->comments()->with('user')->paginate(10);
+        });
 
         $imdbData = $torrentInfoService->getTorrentIMDBData($torrent);
         $posterExists = $imdbData ? $filesystemManager->disk('imdb-images')->exists("{$imdbData->imdbid()}.jpg") : false;
 
         return $responseFactory->view(
             'torrents.show',
-            compact('torrent', 'numberOfPeers', 'torrentFileNamesAndSizes', 'torrentComments', 'filesCount', 'imdbData', 'posterExists')
+            compact(
+                'torrent',
+                'numberOfPeers',
+                'torrentFileNamesAndSizes',
+                'torrentComments',
+                'filesCount',
+                'imdbData',
+                'posterExists'
+            )
         );
     }
 

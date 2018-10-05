@@ -33,7 +33,7 @@
         <env name="DB_PASSWORD" value="test"/>
         <env name="CACHE_DRIVER" value="redis"/>
         <env name="SESSION_DRIVER" value="array"/>
-        <env name="QUEUE_DRIVER" value="sync"/>
+        <env name="QUEUE_CONNECTION" value="sync"/>
         <env name="MAIL_DRIVER" value="array"/>
         <env name="ANNOUNCE_INTERVAL" value="40"/>
         <env name="MIN_ANNOUNCE_INTERVAL" value="1"/>

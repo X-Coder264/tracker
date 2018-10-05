@@ -38,6 +38,8 @@ return [
     'common.category' => 'Category',
     'common.uploader' => 'Uploader',
     'common.size' => 'Size',
+    'torrents.show.v1-info_hash' => 'Info hash (v1)',
+    'torrents.show.v2-info_hash' => 'Info hash (v2) - truncated',
     'torrents.show.peers' => 'Peers',
     'torrents.show.files' => 'Files',
     'torrents.show.file_name' => 'File name',
