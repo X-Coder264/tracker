@@ -30,6 +30,10 @@ Caching: `Redis (recommended)` or `Memcached`
 
 ## Docker setup for local development
 
+Docker 18.06.0+
+
+Docker-Compose 1.22.0+
+
 0. Clone the project (note the `--recursive` flag)
     ```bash
     git clone --recursive git@github.com:X-Coder264/tracker.git
