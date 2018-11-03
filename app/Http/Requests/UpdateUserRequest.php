@@ -14,10 +14,6 @@ class UpdateUserRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
-     *
-     * @param AuthManager $authManager
-     *
-     * @return bool
      */
     public function authorize(AuthManager $authManager): bool
     {
@@ -26,8 +22,6 @@ class UpdateUserRequest extends FormRequest
 
     /**
      * Get the validation rules that apply to the request.
-     *
-     * @return array
      */
     public function rules(): array
     {

@@ -212,8 +212,6 @@ class LoginControllerTest extends TestCase
 
     /**
      * @param array $overrides
-     *
-     * @return array
      */
     private function validParams($overrides = []): array
     {

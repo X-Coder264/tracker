@@ -23,9 +23,6 @@ class TorrentCategory extends Model
         'imdb' => 'bool',
     ];
 
-    /**
-     * @return array
-     */
     public function sluggable(): array
     {
         return [
@@ -35,9 +32,6 @@ class TorrentCategory extends Model
         ];
     }
 
-    /**
-     * @return HasMany
-     */
     public function torrents(): HasMany
     {
         return $this->hasMany(Torrent::class, 'category_id');

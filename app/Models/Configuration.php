@@ -18,11 +18,6 @@ class Configuration extends Model
 
     /**
      * Scope a query to only include the wanted configuration value.
-     *
-     * @param Builder $query
-     * @param string  $name
-     *
-     * @return Builder
      */
     public function scopeGetConfigurationValue(Builder $query, string $name): Builder
     {

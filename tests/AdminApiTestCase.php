@@ -9,14 +9,6 @@ use Neomerx\JsonApi\Contracts\Http\Headers\MediaTypeInterface;
 
 class AdminApiTestCase extends TestCase
 {
-    /**
-     * @param string $method
-     * @param string $uri
-     * @param array  $data
-     * @param array  $headers
-     *
-     * @return JsonApiResponse|null
-     */
     protected function makeRequest(string $method, string $uri, array $data = [], array $headers = []): ?JsonApiResponse
     {
         $content = $data ? json_encode($data) : null;

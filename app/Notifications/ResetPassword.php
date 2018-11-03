@@ -16,22 +16,13 @@ class ResetPassword extends Notification
      */
     public $token;
 
-    /**
-     * Create a notification instance.
-     *
-     * @param string $token
-     */
-    public function __construct($token)
+    public function __construct(string $token)
     {
         $this->token = $token;
     }
 
     /**
      * Get the notification's channels.
-     *
-     * @param mixed $notifiable
-     *
-     * @return array
      */
     public function via($notifiable): array
     {
@@ -40,10 +31,6 @@ class ResetPassword extends Notification
 
     /**
      * Build the mail representation of the notification.
-     *
-     * @param mixed $notifiable
-     *
-     * @return MailMessage
      */
     public function toMail($notifiable): MailMessage
     {

@@ -19,9 +19,6 @@ class Adapter extends EloquentAdapter
         'offset' => 0,
     ];
 
-    /**
-     * @param OffsetStrategy $paging
-     */
     public function __construct(OffsetStrategy $paging)
     {
         $paging->withMetaKey(null);
@@ -30,9 +27,6 @@ class Adapter extends EloquentAdapter
 
     /**
      * Apply the supplied filters to the builder instance.
-     *
-     * @param Builder    $builder
-     * @param Collection $filters
      */
     protected function filter(Builder $builder, Collection $filters)
     {
@@ -60,7 +54,6 @@ class Adapter extends EloquentAdapter
     /**
      * Is this a search for a singleton resource?
      *
-     * @param Collection $filters
      *
      * @return bool
      */

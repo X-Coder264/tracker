@@ -17,11 +17,6 @@ class SizeFormatter
         4 => 'TiB',
     ];
 
-    /**
-     * @param int $sizeInBytes
-     *
-     * @return string
-     */
     public function getFormattedSize(int $sizeInBytes): string
     {
         $count = 0;

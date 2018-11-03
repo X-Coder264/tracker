@@ -10,12 +10,6 @@ use Illuminate\Contracts\Routing\ResponseFactory;
 
 class HomeController extends Controller
 {
-    /**
-     * @param StatisticsManager $statisticsManager
-     * @param ResponseFactory   $responseFactory
-     *
-     * @return Response
-     */
     public function index(StatisticsManager $statisticsManager, ResponseFactory $responseFactory): Response
     {
         return $responseFactory->view(

@@ -12,6 +12,7 @@ use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Contracts\Auth\CanResetPassword;
 use Illuminate\Foundation\Auth\ResetsPasswords;
+use App\Http\Middleware\RedirectIfAuthenticated;
 
 class ResetPasswordController extends Controller
 {
@@ -40,20 +41,12 @@ class ResetPasswordController extends Controller
      */
     private $dispatcher;
 
-    /**
-     * @param Dispatcher $dispatcher
-     */
     public function __construct(Dispatcher $dispatcher)
     {
-        $this->middleware('guest');
+        $this->middleware(RedirectIfAuthenticated::class);
         $this->dispatcher = $dispatcher;
     }
 
-    /**
-     * Get the password reset validation rules.
-     *
-     * @return array
-     */
     protected function rules(): array
     {
         return [

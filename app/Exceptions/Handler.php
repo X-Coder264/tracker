@@ -37,7 +37,6 @@ class Handler extends ExceptionHandler
     /**
      * Report or log an exception.
      *
-     * @param Exception $exception
      *
      * @return mixed|void
      */
@@ -49,8 +48,7 @@ class Handler extends ExceptionHandler
     /**
      * Render an exception into an HTTP response.
      *
-     * @param Request   $request
-     * @param Exception $exception
+     * @param Request $request
      *
      * @return Response
      */

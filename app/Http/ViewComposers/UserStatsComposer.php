@@ -5,51 +5,45 @@ declare(strict_types=1);
 namespace App\Http\ViewComposers;
 
 use App\Models\Peer;
-use Illuminate\View\View;
-use Illuminate\Auth\AuthManager;
-use Illuminate\Cache\CacheManager;
+use Illuminate\Contracts\View\View;
+use Illuminate\Contracts\Auth\Guard;
+use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Database\Eloquent\Collection;
 
 class UserStatsComposer
 {
     /**
-     * @var AuthManager
+     * @var Guard
      */
-    private $authManager;
+    private $guard;
 
     /**
-     * @var CacheManager
+     * @var Repository
      */
-    private $cacheManager;
+    private $cache;
 
-    /**
-     * @param AuthManager  $authManager
-     * @param CacheManager $cacheManager
-     */
-    public function __construct(AuthManager $authManager, CacheManager $cacheManager)
+    public function __construct(Guard $guard, Repository $cache)
     {
-        $this->authManager = $authManager;
-        $this->cacheManager = $cacheManager;
+        $this->guard = $guard;
+        $this->cache = $cache;
     }
 
     /**
      * Bind data to the view.
-     *
-     * @param View $view
      */
     public function compose(View $view): void
     {
-        if (true === $this->authManager->guard()->check()) {
+        if (true === $this->guard->check()) {
             /** @var Collection $peers */
-            $peers = $this->cacheManager->remember('user.' . $this->authManager->guard()->id() . '.peers', 30, function () {
-                return Peer::where('user_id', '=', $this->authManager->guard()->id())->get();
+            $peers = $this->cache->remember('user.' . $this->guard->id() . '.peers', 30, function (): Collection {
+                return Peer::where('user_id', '=', $this->guard->id())->get();
             });
 
             if (true === $peers->isEmpty()) {
                 $numberOfSeedingTorrents = 0;
                 $numberOfLeechingTorrents = 0;
             } else {
-                $numberOfSeedingTorrents = $peers->filter(function (Peer $peer) {
+                $numberOfSeedingTorrents = $peers->filter(function (Peer $peer): bool {
                     return true === $peer->seeder;
                 })->count();
 

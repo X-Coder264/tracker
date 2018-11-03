@@ -39,13 +39,6 @@ class TorrentInfoService
      */
     private $IMDBManager;
 
-    /**
-     * @param SizeFormatter     $sizeFormatter
-     * @param Bdecoder          $bdecoder
-     * @param CacheManager      $cacheManager
-     * @param FilesystemManager $filesystemManager
-     * @param IMDBManager       $IMDBManager
-     */
     public function __construct(
         SizeFormatter $sizeFormatter,
         Bdecoder $bdecoder,
@@ -60,11 +53,6 @@ class TorrentInfoService
         $this->IMDBManager = $IMDBManager;
     }
 
-    /**
-     * @param array $torrentInfoDict
-     *
-     * @return int
-     */
     public function getTorrentSize(array $torrentInfoDict): int
     {
         $size = 0;
@@ -75,11 +63,6 @@ class TorrentInfoService
         return $size;
     }
 
-    /**
-     * @param array $torrentInfoDict
-     *
-     * @return array
-     */
     public function getTorrentFileNamesAndSizesFromTorrentInfoDict(array $torrentInfoDict): array
     {
         if (false === $this->isV2Torrent($torrentInfoDict)) {
@@ -91,11 +74,6 @@ class TorrentInfoService
         return iterator_to_array($data);
     }
 
-    /**
-     * @param array $torrentInfoDict
-     *
-     * @return Generator
-     */
     private function getV1TorrentFileNamesAndSizesFromTorrentInfoDict(array $torrentInfoDict): Generator
     {
         if (isset($torrentInfoDict['files'])) {
@@ -111,22 +89,11 @@ class TorrentInfoService
         yield $torrentInfoDict['name'] => $torrentInfoDict['length'];
     }
 
-    /**
-     * @param array $torrentInfoDict
-     *
-     * @return Generator
-     */
     private function getV2TorrentFileNamesAndSizesFromTorrentInfoDict(array $torrentInfoDict): Generator
     {
         yield from $this->v2FileSizeExtract($torrentInfoDict['file tree']);
     }
 
-    /**
-     * @param array       $files
-     * @param string|null $path
-     *
-     * @return Generator
-     */
     private function v2FileSizeExtract(array $files, string $path = null): Generator
     {
         foreach ($files as $name => $file) {
@@ -147,11 +114,7 @@ class TorrentInfoService
     }
 
     /**
-     * @param Torrent $torrent
-     *
      * @throws FileNotFoundException
-     *
-     * @return array
      */
     public function getTorrentFileNamesAndSizes(Torrent $torrent): array
     {
@@ -169,21 +132,11 @@ class TorrentInfoService
         );
     }
 
-    /**
-     * @param array $torrentInfoDict
-     *
-     * @return bool
-     */
     public function isV1Torrent(array $torrentInfoDict): bool
     {
         return ! empty($torrentInfoDict['files']) || ! empty($torrentInfoDict['length']);
     }
 
-    /**
-     * @param array $torrentInfoDict
-     *
-     * @return bool
-     */
     public function isV2Torrent(array $torrentInfoDict): bool
     {
         if (! empty($torrentInfoDict['meta version']) && 2 === $torrentInfoDict['meta version']) {
@@ -193,21 +146,11 @@ class TorrentInfoService
         return false;
     }
 
-    /**
-     * @param array $torrentInfoDict
-     *
-     * @return bool
-     */
     public function isHybridTorrent(array $torrentInfoDict): bool
     {
         return $this->isV2Torrent($torrentInfoDict) && (! empty($torrentInfoDict['files']) || ! empty($torrentInfoDict['length']));
     }
 
-    /**
-     * @param Torrent $torrent
-     *
-     * @return Title|null
-     */
     public function getTorrentIMDBData(Torrent $torrent): ?Title
     {
         $imdbData = null;

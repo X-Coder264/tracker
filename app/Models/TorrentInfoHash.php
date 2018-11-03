@@ -23,9 +23,6 @@ class TorrentInfoHash extends Model
      */
     protected $guarded = [];
 
-    /**
-     * @return BelongsTo
-     */
     public function torrent(): BelongsTo
     {
         return $this->belongsTo(Torrent::class);

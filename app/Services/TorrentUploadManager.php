@@ -76,19 +76,6 @@ class TorrentUploadManager
      */
     private $IMDBImagesManager;
 
-    /**
-     * @param Bencoder           $encoder
-     * @param Bdecoder           $decoder
-     * @param TorrentInfoService $torrentInfoService
-     * @param AuthManager        $authManager
-     * @param Filesystem         $filesystem
-     * @param FilesystemManager  $filesystemManager
-     * @param UrlGenerator       $urlGenerator
-     * @param Translator         $translator
-     * @param CacheManager       $cacheManager
-     * @param IMDBManager        $IMDBManager
-     * @param IMDBImagesManager  $IMDBImagesManager
-     */
     public function __construct(
         Bencoder $encoder,
         Bdecoder $decoder,
@@ -116,12 +103,8 @@ class TorrentUploadManager
     }
 
     /**
-     * @param Request $request
-     *
      * @throws FileNotWritableException
      * @throws FileNotFoundException
-     *
-     * @return Torrent
      */
     public function upload(Request $request): Torrent
     {
@@ -207,31 +190,16 @@ class TorrentUploadManager
         throw new FileNotWritableException($this->translator->trans('messages.file-not-writable-exception.error-message'));
     }
 
-    /**
-     * @param array $torrentInfoDictionary
-     *
-     * @return string
-     */
     protected function getV1TorrentInfoHash(array $torrentInfoDictionary): string
     {
         return sha1($this->encoder->encode($torrentInfoDictionary));
     }
 
-    /**
-     * @param array $torrentInfoDictionary
-     *
-     * @return string
-     */
     protected function getV2TruncatedTorrentInfoHash(array $torrentInfoDictionary): string
     {
         return substr(hash('sha256', $this->encoder->encode($torrentInfoDictionary)), 0, 40);
     }
 
-    /**
-     * @param array $infoHashes
-     *
-     * @return bool
-     */
     protected function areHashesUnique(array $infoHashes): bool
     {
         if (count(array_unique($infoHashes)) !== count($infoHashes)) {

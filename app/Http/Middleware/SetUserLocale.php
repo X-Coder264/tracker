@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Http\Middleware;
 
-use Closure;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
@@ -29,11 +28,6 @@ class SetUserLocale
      */
     private $application;
 
-    /**
-     * @param AuthManager  $authManager
-     * @param CacheManager $cacheManager
-     * @param Application  $application
-     */
     public function __construct(AuthManager $authManager, CacheManager $cacheManager, Application $application)
     {
         $this->authManager = $authManager;
@@ -41,20 +35,12 @@ class SetUserLocale
         $this->application = $application;
     }
 
-    /**
-     * Handle an incoming request.
-     *
-     * @param Request $request
-     * @param Closure $next
-     *
-     * @return mixed
-     */
-    public function handle($request, $next)
+    public function handle(Request $request, $next)
     {
         if (true === $this->authManager->check()) {
             /** @var User $user */
             $user = $this->authManager->user();
-            $locale = $this->cacheManager->rememberForever('user.' . $user->slug . '.locale', function () use ($user) {
+            $locale = $this->cacheManager->rememberForever('user.' . $user->slug . '.locale', function () use ($user): string {
                 return $user->language->localeShort;
             });
             $this->application->setLocale($locale);

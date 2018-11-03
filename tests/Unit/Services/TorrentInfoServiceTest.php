@@ -23,9 +23,6 @@ class TorrentInfoServiceTest extends TestCase
     /**
      * @dataProvider torrentSizeV1TorrentDataProvider
      * @dataProvider torrentSizeV2TorrentDataProvider
-     *
-     * @param array $testDict
-     * @param int   $expectedSize
      */
     public function testGettingTorrentSize(array $testDict, int $expectedSize): void
     {
@@ -38,9 +35,6 @@ class TorrentInfoServiceTest extends TestCase
     /**
      * @dataProvider torrentInfoDictV1TorrentDataProvider
      * @dataProvider torrentInfoDictV2TorrentDataProvider
-     *
-     * @param array $testDict
-     * @param array $expected
      */
     public function testGettingTorrentFileNamesAndSizesFromTorrentInfoDict(array $testDict, array $expected): void
     {
@@ -138,9 +132,6 @@ class TorrentInfoServiceTest extends TestCase
         $this->assertTrue($torrentInfoService->isHybridTorrent($decodedHybridTorrent['info']));
     }
 
-    /**
-     * @return Generator
-     */
     public function torrentInfoDictV1TorrentDataProvider(): Generator
     {
         // multiple file mode
@@ -170,9 +161,6 @@ class TorrentInfoServiceTest extends TestCase
         ];
     }
 
-    /**
-     * @return Generator
-     */
     public function torrentInfoDictV2TorrentDataProvider(): Generator
     {
         // one file in root
@@ -261,9 +249,6 @@ class TorrentInfoServiceTest extends TestCase
         ];
     }
 
-    /**
-     * @return Generator
-     */
     public function torrentSizeV1TorrentDataProvider(): Generator
     {
         // multiple file mode
@@ -287,9 +272,6 @@ class TorrentInfoServiceTest extends TestCase
         ];
     }
 
-    /**
-     * @return Generator
-     */
     public function torrentSizeV2TorrentDataProvider(): Generator
     {
         // single file torrent

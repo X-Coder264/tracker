@@ -24,7 +24,6 @@ class HashFake implements HasherContract
      * Hash the given value.
      *
      * @param string $value
-     * @param array  $options
      *
      * @return string
      */
@@ -38,7 +37,6 @@ class HashFake implements HasherContract
      *
      * @param string $value
      * @param string $hashedValue
-     * @param array  $options
      *
      * @return bool
      */
@@ -51,7 +49,6 @@ class HashFake implements HasherContract
      * Check if the given hash has been hashed using the given options.
      *
      * @param string $hashedValue
-     * @param array  $options
      *
      * @return bool
      */

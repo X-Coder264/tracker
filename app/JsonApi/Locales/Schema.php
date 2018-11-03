@@ -26,7 +26,6 @@ class Schema extends EloquentSchema
     /**
      * @param Locale $resource
      * @param bool   $isPrimary
-     * @param array  $includeRelationships
      *
      * @return array
      */

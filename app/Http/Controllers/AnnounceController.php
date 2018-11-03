@@ -12,14 +12,25 @@ use Illuminate\Contracts\Routing\ResponseFactory;
 class AnnounceController extends Controller
 {
     /**
-     * @param Request         $request
-     * @param AnnounceManager $announceManager
-     * @param ResponseFactory $responseFactory
-     *
-     * @return Response
+     * @var AnnounceManager
      */
-    public function store(Request $request, AnnounceManager $announceManager, ResponseFactory $responseFactory): Response
+    private $announceManager;
+
+    /**
+     * @var ResponseFactory
+     */
+    private $responseFactory;
+
+    public function __construct(AnnounceManager $announceManager, ResponseFactory $responseFactory)
     {
-        return $responseFactory->make($announceManager->announce($request))->header('Content-Type', 'text/plain');
+        $this->announceManager = $announceManager;
+        $this->responseFactory = $responseFactory;
+    }
+
+    public function store(Request $request): Response
+    {
+        return $this->responseFactory->make(
+            $this->announceManager->announce($request)
+        )->header('Content-Type', 'text/plain');
     }
 }

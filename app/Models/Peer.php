@@ -32,8 +32,6 @@ class Peer extends Model
      * Get the peer's uploaded attribute.
      *
      * @param $value
-     *
-     * @return string
      */
     public function getUploadedAttribute($value): string
     {
@@ -44,8 +42,6 @@ class Peer extends Model
      * Get the peer's downloaded attribute.
      *
      * @param $value
-     *
-     * @return string
      */
     public function getDownloadedAttribute($value): string
     {
@@ -54,10 +50,6 @@ class Peer extends Model
 
     /**
      * Scope a query to only include seeders.
-     *
-     * @param Builder $query
-     *
-     * @return Builder
      */
     public function scopeSeeders(Builder $query): Builder
     {
@@ -66,43 +58,27 @@ class Peer extends Model
 
     /**
      * Scope a query to only include leechers.
-     *
-     * @param Builder $query
-     *
-     * @return Builder
      */
     public function scopeLeechers(Builder $query): Builder
     {
         return $query->where('seeder', '=', false);
     }
 
-    /**
-     * @return BelongsTo
-     */
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }
 
-    /**
-     * @return BelongsTo
-     */
     public function torrent(): BelongsTo
     {
         return $this->belongsTo(Torrent::class);
     }
 
-    /**
-     * @return HasMany
-     */
     public function IPs(): HasMany
     {
         return $this->hasMany(PeerIP::class, 'peerID');
     }
 
-    /**
-     * @return HasMany
-     */
     public function versions(): HasMany
     {
         return $this->hasMany(PeerVersion::class, 'peerID');

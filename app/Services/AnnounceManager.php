@@ -8,13 +8,13 @@ use stdClass;
 use Carbon\Carbon;
 use App\Enumerations\Cache;
 use Illuminate\Http\Request;
-use Illuminate\Cache\CacheManager;
 use Illuminate\Support\Collection;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Database\DatabaseManager;
 use Illuminate\Contracts\Config\Repository;
 use App\Exceptions\AnnounceValidationException;
 use Illuminate\Contracts\Translation\Translator;
+use Illuminate\Contracts\Cache\Repository as CacheRepository;
 use Illuminate\Contracts\Validation\Factory as ValidationFactory;
 
 /**
@@ -38,9 +38,9 @@ class AnnounceManager
     private $databaseManager;
 
     /**
-     * @var CacheManager
+     * @var CacheRepository
      */
-    private $cacheManager;
+    private $cache;
 
     /**
      * @var ValidationFactory
@@ -137,35 +137,22 @@ class AnnounceManager
      */
     private $uploadedInThisAnnounceCycle = 0;
 
-    /**
-     * @param Bencoder          $encoder
-     * @param DatabaseManager   $databaseManager
-     * @param CacheManager      $cacheManager
-     * @param ValidationFactory $validationFactory
-     * @param Translator        $translator
-     * @param Repository        $config
-     */
     public function __construct(
         Bencoder $encoder,
         DatabaseManager $databaseManager,
-        CacheManager $cacheManager,
+        CacheRepository $cache,
         ValidationFactory $validationFactory,
         Translator $translator,
         Repository $config
     ) {
         $this->encoder = $encoder;
         $this->databaseManager = $databaseManager;
-        $this->cacheManager = $cacheManager;
+        $this->cache = $cache;
         $this->validationFactory = $validationFactory;
         $this->translator = $translator;
         $this->config = $config;
     }
 
-    /**
-     * @param Request $request
-     *
-     * @return string
-     */
     public function announce(Request $request): string
     {
         $this->request = $request;
@@ -272,11 +259,6 @@ class AnnounceManager
         return $this->noEventAnnounceResponse();
     }
 
-    /**
-     * @param array $infoHashes
-     *
-     * @return string
-     */
     public function scrape(array $infoHashes): string
     {
         $response = [];
@@ -313,14 +295,9 @@ class AnnounceManager
         return $this->encoder->encode($response);
     }
 
-    /**
-     * @param string $passkey
-     *
-     * @return null|stdClass
-     */
     public function getUser(string $passkey): ?stdClass
     {
-        return $this->cacheManager->remember('user.' . $passkey, Cache::ONE_DAY, function () use ($passkey) {
+        return $this->cache->remember('user.' . $passkey, Cache::ONE_DAY, function () use ($passkey) {
             return $this->databaseManager->table('users')
                 ->where('passkey', '=', $passkey)
                 ->select(['id', 'slug', 'uploaded', 'downloaded', 'banned'])
@@ -489,11 +466,6 @@ class AnnounceManager
         }
     }
 
-    /**
-     * @param string $IP
-     *
-     * @return bool
-     */
     private function validateIPv4Address(string $IP): bool
     {
         if (filter_var($IP, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
@@ -503,11 +475,6 @@ class AnnounceManager
         return false;
     }
 
-    /**
-     * @param string $IP
-     *
-     * @return bool
-     */
     private function validateIPv6Address(string $IP): bool
     {
         if (filter_var($IP, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6)) {
@@ -517,10 +484,6 @@ class AnnounceManager
         return false;
     }
 
-    /**
-     * @param int $seeder
-     * @param int $leecher
-     */
     private function adjustTorrentPeers(int $seeder, int $leecher): void
     {
         $this->torrent->seeders = $this->torrent->seeders + $seeder;
@@ -532,7 +495,7 @@ class AnnounceManager
                     'leechers' => $this->torrent->leechers,
                 ]
             );
-        $this->cacheManager->delete('torrent.' . $this->torrent->id);
+        $this->cache->delete('torrent.' . $this->torrent->id);
     }
 
     /**
@@ -658,7 +621,7 @@ class AnnounceManager
                     'downloaded' => $this->user->downloaded,
                 ]
             );
-        $this->cacheManager->put('user.' . $this->request->input('passkey'), $this->user, Cache::ONE_DAY);
+        $this->cache->put('user.' . $this->request->input('passkey'), $this->user, Cache::ONE_DAY);
     }
 
     /**
@@ -691,9 +654,6 @@ class AnnounceManager
         }
     }
 
-    /**
-     * @return string
-     */
     private function startedEventAnnounceResponse(): string
     {
         if (null !== $this->peer) {
@@ -720,9 +680,6 @@ class AnnounceManager
         return $this->announceSuccessResponse();
     }
 
-    /**
-     * @return string
-     */
     private function stoppedEventAnnounceResponse(): string
     {
         $this->databaseManager->table('peers')->where('id', '=', $this->peer->id)->delete();
@@ -738,9 +695,6 @@ class AnnounceManager
         return $this->announceSuccessResponse();
     }
 
-    /**
-     * @return string
-     */
     private function completedEventAnnounceResponse(): string
     {
         $this->updatePeerIfItExists();
@@ -751,9 +705,6 @@ class AnnounceManager
         return $this->announceSuccessResponse();
     }
 
-    /**
-     * @return string
-     */
     private function noEventAnnounceResponse(): string
     {
         if (null !== $this->peer) {
@@ -773,9 +724,6 @@ class AnnounceManager
         return $this->announceSuccessResponse();
     }
 
-    /**
-     * @return Collection
-     */
     protected function getPeers(): Collection
     {
         return $this->databaseManager->table('peers')
@@ -793,9 +741,6 @@ class AnnounceManager
             ->get();
     }
 
-    /**
-     * @return string
-     */
     private function announceSuccessResponse(): string
     {
         $this->updateUser();
@@ -810,9 +755,6 @@ class AnnounceManager
         return $this->nonCompactResponse();
     }
 
-    /**
-     * @return array
-     */
     private function getSeedersAndLeechersCount(): array
     {
         $seedersCount = (int) $this->torrent->seeders;
@@ -829,9 +771,6 @@ class AnnounceManager
         return [$seedersCount, $leechersCount];
     }
 
-    /**
-     * @return array
-     */
     private function getCommonResponsePart(): array
     {
         $response['interval'] = $this->config->get('tracker.announce_interval') * 60;
@@ -844,9 +783,6 @@ class AnnounceManager
         return $response;
     }
 
-    /**
-     * @return string
-     */
     private function compactResponse(): string
     {
         $response = $this->getCommonResponsePart();
@@ -872,9 +808,6 @@ class AnnounceManager
         return $this->encoder->encode($response);
     }
 
-    /**
-     * @return string
-     */
     private function nonCompactResponse(): string
     {
         $response = $this->getCommonResponsePart();
@@ -896,11 +829,8 @@ class AnnounceManager
 
     /**
      * @param array|string $error
-     * @param bool         $neverRetry
-     *
-     * @return string
      */
-    private function announceErrorResponse($error, $neverRetry = false): string
+    private function announceErrorResponse($error, bool $neverRetry = false): string
     {
         $response['failure reason'] = '';
         if (is_array($error)) {

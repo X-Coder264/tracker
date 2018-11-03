@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Providers;
 
-use Illuminate\Support\Facades\Route;
+use Illuminate\Contracts\Routing\Registrar;
 use Illuminate\Foundation\Support\Providers\RouteServiceProvider as ServiceProvider;
 
 class RouteServiceProvider extends ServiceProvider
@@ -29,11 +29,11 @@ class RouteServiceProvider extends ServiceProvider
     /**
      * Define the routes for the application.
      */
-    public function map()
+    public function map(Registrar $registrar): void
     {
-        $this->mapApiRoutes();
+        $this->mapApiRoutes($registrar);
 
-        $this->mapWebRoutes();
+        $this->mapWebRoutes($registrar);
     }
 
     /**
@@ -41,11 +41,9 @@ class RouteServiceProvider extends ServiceProvider
      *
      * These routes all receive session state, CSRF protection, etc.
      */
-    protected function mapWebRoutes()
+    protected function mapWebRoutes(Registrar $registrar): void
     {
-        Route::middleware('web')
-             ->namespace($this->namespace)
-             ->group(base_path('routes/web.php'));
+        $registrar->group(['middleware' => ['web'], 'namespace' => $this->namespace], base_path('routes/web.php'));
     }
 
     /**
@@ -53,10 +51,8 @@ class RouteServiceProvider extends ServiceProvider
      *
      * These routes are typically stateless.
      */
-    protected function mapApiRoutes()
+    protected function mapApiRoutes(Registrar $registrar): void
     {
-        Route::middleware('api')
-             ->namespace($this->namespace)
-             ->group(base_path('routes/api.php'));
+        $registrar->group(['middleware' => ['api'], 'namespace' => $this->namespace], base_path('routes/api.php'));
     }
 }

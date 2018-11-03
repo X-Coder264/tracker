@@ -13,6 +13,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Contracts\Routing\UrlGenerator;
 use Illuminate\Validation\ValidationException;
+use App\Http\Middleware\RedirectIfAuthenticated;
 use Illuminate\Contracts\Translation\Translator;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Symfony\Component\HttpFoundation\Response as BaseResponse;
@@ -26,18 +27,12 @@ class LoginController extends Controller
      */
     private $urlGenerator;
 
-    /**
-     * @param UrlGenerator $urlGenerator
-     */
     public function __construct(UrlGenerator $urlGenerator)
     {
-        $this->middleware('guest')->except('logout');
+        $this->middleware(RedirectIfAuthenticated::class)->except('logout');
         $this->urlGenerator = $urlGenerator;
     }
 
-    /**
-     * @return string
-     */
     public function redirectTo(): string
     {
         return $this->urlGenerator->route('home');
@@ -46,10 +41,6 @@ class LoginController extends Controller
     /**
      * Handle a login request to the application.
      *
-     * @param Request     $request
-     * @param AuthManager $authManager
-     * @param Redirector  $redirector
-     * @param Translator  $translator
      *
      * @throws ValidationException
      *

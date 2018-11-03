@@ -7,9 +7,9 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use App\Models\Locale;
 use Illuminate\Http\Response;
-use Illuminate\Auth\AuthManager;
 use Illuminate\Cache\CacheManager;
 use Illuminate\Routing\Redirector;
+use Illuminate\Contracts\Auth\Guard;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Foundation\Application;
 use App\Http\Requests\UpdateUserRequest;
@@ -20,50 +20,48 @@ use Symfony\Component\HttpFoundation\Response as BaseResponse;
 class UserController extends Controller
 {
     /**
-     * @param User            $user
-     * @param ResponseFactory $responseFactory
-     *
-     * @return Response
+     * @var Guard
      */
-    public function show(User $user, ResponseFactory $responseFactory): Response
+    private $guard;
+
+    /**
+     * @var ResponseFactory
+     */
+    private $responseFactory;
+
+    public function __construct(Guard $guard, ResponseFactory $responseFactory)
     {
-        return $responseFactory->view('users.show', compact('user'));
+        $this->guard = $guard;
+        $this->responseFactory = $responseFactory;
+    }
+
+    public function show(User $user): Response
+    {
+        return $this->responseFactory->view('users.show', compact('user'));
     }
 
     /**
-     * @param User            $user
-     * @param AuthManager     $authManager
-     * @param ResponseFactory $responseFactory
-     *
      * @return Response|RedirectResponse
      */
-    public function edit(User $user, AuthManager $authManager, ResponseFactory $responseFactory): BaseResponse
+    public function edit(User $user): BaseResponse
     {
-        if (false === $user->is($authManager->guard()->user())) {
-            return $responseFactory->redirectToRoute('users.edit', $authManager->guard()->user());
+        /** @var User $loggedInUser */
+        $loggedInUser = $this->guard->user();
+        if (false === $user->is($loggedInUser)) {
+            return $this->responseFactory->redirectToRoute('users.edit', $loggedInUser);
         }
 
         $locales = Locale::all();
 
-        return $responseFactory->view('users.edit', compact('user', 'locales'));
+        return $this->responseFactory->view('users.edit', compact('user', 'locales'));
     }
 
-    /**
-     * @param UpdateUserRequest $request
-     * @param User              $user
-     * @param Translator        $translator
-     * @param Application       $application
-     * @param CacheManager      $cacheManager
-     * @param Redirector        $redirector
-     *
-     * @return RedirectResponse
-     */
     public function update(
         UpdateUserRequest $request,
         User $user,
         Translator $translator,
         Application $application,
-        CacheManager $cacheManager,
+        CacheManager $cache,
         Redirector $redirector
     ): RedirectResponse {
         $user->update([
@@ -75,9 +73,9 @@ class UserController extends Controller
 
         $application->setLocale($user->language->localeShort);
 
-        $cacheManager->forget('user.' . $user->id);
-        $cacheManager->forget('user.' . $user->slug . '.locale');
-        $cacheManager->forget('user.' . $user->passkey);
+        $cache->forget('user.' . $user->id);
+        $cache->forget('user.' . $user->slug . '.locale');
+        $cache->forget('user.' . $user->passkey);
 
         return $redirector->back()->with('success', $translator->trans('messages.common.save_changes_successful'));
     }

@@ -30,8 +30,6 @@ class Bdecoder
     private $position;
 
     /**
-     * @param string $data
-     *
      * @throws Exception
      *
      * @return array|int|string
@@ -74,11 +72,6 @@ class Bdecoder
         throw new Exception("Unknown type found at position $this->position");
     }
 
-    /**
-     * @param int|null $position
-     *
-     * @return null|string
-     */
     private function getCharacterAtPosition(?int $position = null): ?string
     {
         if (null === $position) {
@@ -94,8 +87,6 @@ class Bdecoder
 
     /**
      * @throws Exception
-     *
-     * @return int
      */
     private function decodeInteger(): int
     {
@@ -138,8 +129,6 @@ class Bdecoder
 
     /**
      * @throws Exception
-     *
-     * @return string
      */
     private function decodeString(): string
     {
@@ -165,8 +154,6 @@ class Bdecoder
 
     /**
      * @throws Exception
-     *
-     * @return array
      */
     private function decodeList(): array
     {
@@ -194,8 +181,6 @@ class Bdecoder
 
     /**
      * @throws Exception
-     *
-     * @return array
      */
     private function decodeDictionary(): array
     {

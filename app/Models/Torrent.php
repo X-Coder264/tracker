@@ -24,9 +24,6 @@ class Torrent extends Model
      */
     protected $guarded = [];
 
-    /**
-     * @return array
-     */
     public function sluggable(): array
     {
         return [
@@ -50,8 +47,6 @@ class Torrent extends Model
      * Get the torrent's size.
      *
      * @param $value
-     *
-     * @return string
      */
     public function getSizeAttribute($value): string
     {
@@ -60,35 +55,22 @@ class Torrent extends Model
 
     /**
      * Scope a query to only include dead torrents.
-     *
-     * @param Builder $query
-     *
-     * @return Builder
      */
     public function scopeDead(Builder $query): Builder
     {
         return $query->where('seeders', '=', 0);
     }
 
-    /**
-     * @return BelongsTo
-     */
     public function uploader(): BelongsTo
     {
         return $this->belongsTo(User::class)->select(['id', 'name', 'slug']);
     }
 
-    /**
-     * @return HasMany
-     */
     public function infoHashes(): HasMany
     {
         return $this->hasMany(TorrentInfoHash::class);
     }
 
-    /**
-     * @return HasMany
-     */
     public function peers(): HasMany
     {
         return $this->hasMany(Peer::class)->select(
@@ -96,17 +78,11 @@ class Torrent extends Model
         );
     }
 
-    /**
-     * @return HasMany
-     */
     public function comments(): HasMany
     {
         return $this->hasMany(TorrentComment::class);
     }
 
-    /**
-     * @return BelongsTo
-     */
     public function category(): BelongsTo
     {
         return $this->belongsTo(TorrentCategory::class);

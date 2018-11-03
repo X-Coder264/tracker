@@ -39,11 +39,14 @@ class OffsetStrategy implements PagingStrategyInterface
     protected $metaKey;
 
     /**
-     * OffsetStrategy constructor.
+     * @var FactoryInterface
      */
-    public function __construct()
+    private $factory;
+
+    public function __construct(FactoryInterface $factory)
     {
         $this->metaKey = QueryParametersParserInterface::PARAM_PAGE;
+        $this->factory = $factory;
     }
 
     /**
@@ -53,8 +56,6 @@ class OffsetStrategy implements PagingStrategyInterface
      * A string sets the key to use for nesting. Use `null` to indicate no nesting.
      *
      * @param string|null $key
-     *
-     * @return self
      */
     public function withMetaKey($key): self
     {
@@ -74,15 +75,9 @@ class OffsetStrategy implements PagingStrategyInterface
         return $this->createPage($paginator, $parameters);
     }
 
-    /**
-     * @param Paginator                   $paginator
-     * @param EncodingParametersInterface $parameters
-     *
-     * @return PageInterface
-     */
     protected function createPage(Paginator $paginator, EncodingParametersInterface $parameters): PageInterface
     {
-        return app(FactoryInterface::class)->createPage(
+        return $this->factory->createPage(
             $paginator,
             null,
             null,
@@ -93,9 +88,6 @@ class OffsetStrategy implements PagingStrategyInterface
         );
     }
 
-    /**
-     * @return string
-     */
     protected function getPageKey(): string
     {
         $key = property_exists($this, 'pageKey') ? $this->pageKey : null;
@@ -103,9 +95,6 @@ class OffsetStrategy implements PagingStrategyInterface
         return $key ?: 'offset';
     }
 
-    /**
-     * @return string
-     */
     protected function getPerPageKey(): string
     {
         $key = property_exists($this, 'perPageKey') ? $this->perPageKey : null;
@@ -113,11 +102,6 @@ class OffsetStrategy implements PagingStrategyInterface
         return $key ?: 'limit';
     }
 
-    /**
-     * @param Collection $collection
-     *
-     * @return int
-     */
     protected function getPerPage(Collection $collection): int
     {
         return (int) $collection->get($this->getPerPageKey());
@@ -131,29 +115,18 @@ class OffsetStrategy implements PagingStrategyInterface
      * standard default is 15.
      *
      * @param $query
-     *
-     * @return int|null
      */
     protected function getDefaultPerPage($query): ?int
     {
         return $query instanceof EloquentBuilder ? null : 15;
     }
 
-    /**
-     * @return array
-     */
     protected function getColumns(): array
     {
         return $this->columns ?: ['*'];
     }
 
-    /**
-     * @param mixed      $query
-     * @param Collection $pagingParameters
-     *
-     * @return mixed
-     */
-    protected function query($query, Collection $pagingParameters)
+    protected function query($query, Collection $pagingParameters): Paginator
     {
         $pageName = $this->getPageKey();
         $size = $this->getPerPage($pagingParameters) ?: $this->getDefaultPerPage($query);

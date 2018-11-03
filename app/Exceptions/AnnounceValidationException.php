@@ -14,12 +14,6 @@ class AnnounceValidationException extends Exception
      */
     private $validationMessages;
 
-    /**
-     * @param string         $message
-     * @param array          $validationMessages
-     * @param int            $code
-     * @param Throwable|null $previous
-     */
     public function __construct(string $message = '', array $validationMessages = [], int $code = 0, Throwable $previous = null)
     {
         $this->validationMessages = $validationMessages;
@@ -27,9 +21,6 @@ class AnnounceValidationException extends Exception
         parent::__construct($message, $code, $previous);
     }
 
-    /**
-     * @return array
-     */
     public function getValidationMessages(): array
     {
         return $this->validationMessages;

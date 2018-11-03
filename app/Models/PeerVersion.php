@@ -23,9 +23,6 @@ class PeerVersion extends Model
      */
     protected $guarded = [];
 
-    /**
-     * @return BelongsTo
-     */
     public function peer(): BelongsTo
     {
         return $this->belongsTo(Peer::class, 'peerID');

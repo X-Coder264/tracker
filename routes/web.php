@@ -2,8 +2,8 @@
 
 declare(strict_types=1);
 
+use App\Http\Middleware\Authenticate;
 use Illuminate\Contracts\Routing\Registrar;
-use Illuminate\Auth\Middleware\Authenticate;
 
 /*
 |--------------------------------------------------------------------------

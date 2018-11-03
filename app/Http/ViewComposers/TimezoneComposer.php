@@ -5,42 +5,36 @@ declare(strict_types=1);
 namespace App\Http\ViewComposers;
 
 use App\Models\User;
-use Illuminate\View\View;
 use App\Enumerations\Cache;
-use Illuminate\Auth\AuthManager;
-use Illuminate\Cache\CacheManager;
+use Illuminate\Contracts\View\View;
+use Illuminate\Contracts\Auth\Guard;
+use Illuminate\Contracts\Cache\Repository;
 
 class TimezoneComposer
 {
     /**
-     * @var AuthManager
+     * @var Guard
      */
-    private $authManager;
+    private $guard;
 
     /**
-     * @var CacheManager
+     * @var Repository
      */
-    private $cacheManager;
+    private $cache;
 
-    /**
-     * @param AuthManager  $authManager
-     * @param CacheManager $cacheManager
-     */
-    public function __construct(AuthManager $authManager, CacheManager $cacheManager)
+    public function __construct(Guard $guard, Repository $cache)
     {
-        $this->authManager = $authManager;
-        $this->cacheManager = $cacheManager;
+        $this->guard = $guard;
+        $this->cache = $cache;
     }
 
     /**
      * Bind data to the view.
-     *
-     * @param View $view
      */
     public function compose(View $view): void
     {
-        $user = $this->cacheManager->remember('user.' . $this->authManager->guard()->id(), Cache::ONE_DAY, function () {
-            return User::with(['language', 'torrents'])->findOrFail($this->authManager->guard()->id());
+        $user = $this->cache->remember('user.' . $this->guard->id(), Cache::ONE_DAY, function (): User {
+            return User::with(['language', 'torrents'])->findOrFail($this->guard->id());
         });
 
         $view->with('timezone', $user->timezone);

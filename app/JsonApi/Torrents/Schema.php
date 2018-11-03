@@ -28,7 +28,6 @@ class Schema extends EloquentSchema
     /**
      * @param Torrent $resource
      * @param bool    $isPrimary
-     * @param array   $includeRelationships
      *
      * @return array
      */

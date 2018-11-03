@@ -24,38 +24,43 @@ class ScrapeController extends Controller
     private $responseFactory;
 
     /**
-     * @param Bencoder        $encoder
-     * @param ResponseFactory $responseFactory
+     * @var Translator
      */
-    public function __construct(Bencoder $encoder, ResponseFactory $responseFactory)
-    {
-        $this->encoder = $encoder;
-        $this->responseFactory = $responseFactory;
-    }
+    private $translator;
 
     /**
-     * @param Request         $request
-     * @param Translator      $translator
-     * @param AnnounceManager $announceManager
-     *
-     * @return Response
+     * @var AnnounceManager
      */
-    public function show(Request $request, Translator $translator, AnnounceManager $announceManager): Response
+    private $announceManager;
+
+    public function __construct(
+        Bencoder $encoder,
+        ResponseFactory $responseFactory,
+        Translator $translator,
+        AnnounceManager $announceManager
+    ) {
+        $this->encoder = $encoder;
+        $this->responseFactory = $responseFactory;
+        $this->translator = $translator;
+        $this->announceManager = $announceManager;
+    }
+
+    public function show(Request $request): Response
     {
         $passkey = $request->input('passkey');
 
         if (empty($passkey) || 64 !== strlen($passkey)) {
-            return $this->getErrorResponse($translator->trans('messages.announce.invalid_passkey'));
+            return $this->getErrorResponse($this->translator->trans('messages.announce.invalid_passkey'));
         }
 
-        $user = $announceManager->getUser($passkey);
+        $user = $this->announceManager->getUser($passkey);
 
         if (null === $user) {
-            return $this->getErrorResponse($translator->trans('messages.announce.invalid_passkey'));
+            return $this->getErrorResponse($this->translator->trans('messages.announce.invalid_passkey'));
         }
 
         if (true === (bool) $user->banned) {
-            return $this->getErrorResponse($translator->trans('messages.announce.banned_user'));
+            return $this->getErrorResponse($this->translator->trans('messages.announce.banned_user'));
         }
 
         $queryParameters = explode('&', $request->server->get('QUERY_STRING'));
@@ -73,15 +78,10 @@ class ScrapeController extends Controller
         }
 
         return $this->responseFactory->make(
-            $announceManager->scrape($infoHashes)
+            $this->announceManager->scrape($infoHashes)
         )->header('Content-Type', 'text/plain');
     }
 
-    /**
-     * @param string $message
-     *
-     * @return Response
-     */
     private function getErrorResponse(string $message): Response
     {
         return $this->responseFactory->make(

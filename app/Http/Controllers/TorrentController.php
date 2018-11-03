@@ -13,16 +13,15 @@ use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use App\Models\TorrentCategory;
-use Illuminate\Auth\AuthManager;
 use App\Services\PasskeyGenerator;
 use Illuminate\Cache\CacheManager;
 use Illuminate\Routing\Redirector;
 use App\Services\TorrentInfoService;
+use Illuminate\Contracts\Auth\Guard;
 use Illuminate\Http\RedirectResponse;
 use App\Services\TorrentUploadManager;
 use App\Http\Requests\TorrentUploadRequest;
 use App\Exceptions\FileNotWritableException;
-use Illuminate\Contracts\Filesystem\Factory;
 use App\Services\FileSizeCollectionFormatter;
 use Illuminate\Contracts\Routing\UrlGenerator;
 use Illuminate\Contracts\Translation\Translator;
@@ -36,19 +35,46 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 class TorrentController extends Controller
 {
     /**
-     * @param Request         $request
-     * @param AuthManager     $authManager
-     * @param CacheManager    $cacheManager
-     * @param ResponseFactory $responseFactory
-     *
-     * @return Response
+     * @var CacheManager
      */
-    public function index(
-        Request $request,
+    private $cacheManager;
+
+    /**
+     * @var Guard
+     */
+    private $guard;
+
+    /**
+     * @var ResponseFactory
+     */
+    private $responseFactory;
+
+    /**
+     * @var Translator
+     */
+    private $translator;
+
+    /**
+     * @var FilesystemManager
+     */
+    private $filesystemManager;
+
+    public function __construct(
         CacheManager $cacheManager,
-        AuthManager $authManager,
-        ResponseFactory $responseFactory
-    ): Response {
+        Guard $guard,
+        ResponseFactory $responseFactory,
+        Translator $translator,
+        FilesystemManager $filesystemManager
+    ) {
+        $this->cacheManager = $cacheManager;
+        $this->guard = $guard;
+        $this->responseFactory = $responseFactory;
+        $this->translator = $translator;
+        $this->filesystemManager = $filesystemManager;
+    }
+
+    public function index(Request $request): Response
+    {
         $page = (int) $request->input('page', 1);
 
         if (0 === $page) {
@@ -56,61 +82,40 @@ class TorrentController extends Controller
         }
 
         /** @var User $user */
-        $user = $authManager->guard()->user();
+        $user = $this->guard->user();
         $torrentPerPage = $user->torrents_per_page;
 
-        $torrents = $cacheManager->tags('torrents')->remember(
+        $torrents = $this->cacheManager->tags('torrents')->remember(
             'torrents.page.' . $page . '.perPage.' . $torrentPerPage,
             Cache::TEN_MINUTES,
-            function () use ($authManager, $torrentPerPage): LengthAwarePaginator {
+            function () use ($torrentPerPage): LengthAwarePaginator {
                 return Torrent::with(['uploader'])->where('seeders', '>', 0)
                                               ->orderBy('id', 'desc')
                                               ->paginate($torrentPerPage);
             }
         );
 
-        return $responseFactory->view('torrents.index', compact('torrents'));
+        return $this->responseFactory->view('torrents.index', compact('torrents'));
     }
 
-    /**
-     * @param CacheManager    $cacheManager
-     * @param ResponseFactory $responseFactory
-     *
-     * @return Response
-     */
-    public function create(CacheManager $cacheManager, ResponseFactory $responseFactory): Response
+    public function create(): Response
     {
-        $categories = $cacheManager->remember('torrentCategories', Cache::THIRTY_MINUTES, function () {
+        $categories = $this->cacheManager->remember('torrentCategories', Cache::THIRTY_MINUTES, function () {
             return TorrentCategory::all();
         });
 
-        return $responseFactory->view('torrents.create', compact('categories'));
+        return $this->responseFactory->view('torrents.create', compact('categories'));
     }
 
-    /**
-     * @param Torrent                     $torrent
-     * @param TorrentInfoService          $torrentInfoService
-     * @param Translator                  $translator
-     * @param FilesystemManager           $filesystemManager
-     * @param FileSizeCollectionFormatter $fileSizeCollectionFormatter
-     * @param CacheManager                $cacheManager
-     * @param ResponseFactory             $responseFactory
-     *
-     * @return Response
-     */
     public function show(
         Torrent $torrent,
         TorrentInfoService $torrentInfoService,
-        Translator $translator,
-        FilesystemManager $filesystemManager,
-        FileSizeCollectionFormatter $fileSizeCollectionFormatter,
-        CacheManager $cacheManager,
-        ResponseFactory $responseFactory
+        FileSizeCollectionFormatter $fileSizeCollectionFormatter
     ): Response {
         try {
             $torrentFileNamesAndSizes = $torrentInfoService->getTorrentFileNamesAndSizes($torrent);
         } catch (FileNotFoundException $e) {
-            throw new NotFoundHttpException($translator->trans('messages.torrent-file-missing.error-message'));
+            throw new NotFoundHttpException($this->translator->trans('messages.torrent-file-missing.error-message'));
         }
 
         $filesCount = count($torrentFileNamesAndSizes);
@@ -118,21 +123,21 @@ class TorrentController extends Controller
         $torrentFileNamesAndSizes = $fileSizeCollectionFormatter->format($torrentFileNamesAndSizes);
 
         /** @var Torrent $torrent */
-        $torrent = $cacheManager->remember('torrent.' . $torrent->id, Cache::ONE_DAY, function () use ($torrent): Torrent {
+        $torrent = $this->cacheManager->remember('torrent.' . $torrent->id, Cache::ONE_DAY, function () use ($torrent): Torrent {
             return $torrent->load(['uploader', 'peers.user', 'category', 'infoHashes']);
         });
 
         $numberOfPeers = $torrent->peers->count();
 
         /** @var LengthAwarePaginator $torrentComments */
-        $torrentComments = $cacheManager->remember('torrent.' . $torrent->id . '.comments', Cache::ONE_DAY, function () use ($torrent): LengthAwarePaginator {
+        $torrentComments = $this->cacheManager->remember('torrent.' . $torrent->id . '.comments', Cache::ONE_DAY, function () use ($torrent): LengthAwarePaginator {
             return $torrent->comments()->with('user')->paginate(10);
         });
 
         $imdbData = $torrentInfoService->getTorrentIMDBData($torrent);
-        $posterExists = $imdbData ? $filesystemManager->disk('imdb-images')->exists("{$imdbData->imdbid()}.jpg") : false;
+        $posterExists = $imdbData ? $this->filesystemManager->disk('imdb-images')->exists("{$imdbData->imdbid()}.jpg") : false;
 
-        return $responseFactory->view(
+        return $this->responseFactory->view(
             'torrents.show',
             compact(
                 'torrent',
@@ -147,67 +152,42 @@ class TorrentController extends Controller
     }
 
     /**
-     * @param TorrentUploadRequest $request
-     * @param TorrentUploadManager $torrentUploadManager
-     * @param CacheManager         $cacheManager
-     * @param Redirector           $redirector
-     * @param Translator           $translator
-     *
      * @throws FileNotWritableException
      * @throws FileNotFoundException
-     *
-     * @return RedirectResponse
      */
     public function store(
         TorrentUploadRequest $request,
         TorrentUploadManager $torrentUploadManager,
-        CacheManager $cacheManager,
-        Redirector $redirector,
-        Translator $translator
+        Redirector $redirector
     ): RedirectResponse {
         $torrent = $torrentUploadManager->upload($request);
 
-        $cacheManager->tags('torrents')->flush();
+        $this->cacheManager->tags('torrents')->flush();
 
         return $redirector->route('torrents.show', $torrent)
-                         ->with('success', $translator->trans('messages.torrents.store-successfully-uploaded-torrent.message'));
+                         ->with('success', $this->translator->trans('messages.torrents.store-successfully-uploaded-torrent.message'));
     }
 
-    /**
-     * @param Torrent          $torrent
-     * @param Bencoder         $encoder
-     * @param Bdecoder         $decoder
-     * @param PasskeyGenerator $passkeyGenerator
-     * @param AuthManager      $authManager
-     * @param UrlGenerator     $urlGenerator
-     * @param Factory          $filesystem
-     * @param Translator       $translator
-     *
-     * @return Response
-     */
     public function download(
         Torrent $torrent,
         Bencoder $encoder,
         Bdecoder $decoder,
         PasskeyGenerator $passkeyGenerator,
-        AuthManager $authManager,
-        UrlGenerator $urlGenerator,
-        Factory $filesystem,
-        Translator $translator
+        UrlGenerator $urlGenerator
     ): Response {
         try {
-            $torrentFile = $filesystem->disk('torrents')->get("{$torrent->id}.torrent");
+            $torrentFile = $this->filesystemManager->disk('torrents')->get("{$torrent->id}.torrent");
         } catch (FileNotFoundException $e) {
-            throw new NotFoundHttpException($translator->trans('messages.torrent-file-missing.error-message'));
+            throw new NotFoundHttpException($this->translator->trans('messages.torrent-file-missing.error-message'));
         }
 
         $decodedTorrent = $decoder->decode($torrentFile);
 
-        $passkey = $authManager->guard()->user()->passkey;
+        $passkey = $this->guard->user()->passkey;
 
         if (empty($passkey)) {
             $passkey = $passkeyGenerator->generateUniquePasskey();
-            User::where('id', '=', $authManager->guard()->id())->update(['passkey' => $passkey]);
+            User::where('id', '=', $this->guard->id())->update(['passkey' => $passkey]);
         }
 
         $decodedTorrent['announce'] = $urlGenerator->route('announce', ['passkey' => $passkey]);

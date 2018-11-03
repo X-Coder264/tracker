@@ -9,11 +9,7 @@ use InvalidArgumentException;
 class IMDBLinkParser
 {
     /**
-     * @param string $imdbUrl
-     *
      * @throws InvalidArgumentException
-     *
-     * @return string
      */
     public function getId(string $imdbUrl): string
     {
@@ -32,8 +28,6 @@ class IMDBLinkParser
     }
 
     /**
-     * @param string $imdbUrl
-     *
      * @throws InvalidArgumentException
      */
     private function throwInvalidArgumentException(string $imdbUrl): void

@@ -8,11 +8,6 @@ use Exception;
 
 class Bencoder
 {
-    /**
-     * @param mixed $data
-     *
-     * @return string
-     */
     public function encode($data): string
     {
         if (is_array($data) && (isset($data[0]) || empty($data))) {
@@ -28,37 +23,16 @@ class Bencoder
         throw new Exception('Invalid data given for encoding.');
     }
 
-    /**
-     * Encode an integer.
-     *
-     * @param int $data
-     *
-     * @return string
-     */
     private function encodeInteger(int $data): string
     {
         return sprintf('i%de', $data);
     }
 
-    /**
-     * Encode a string.
-     *
-     * @param  string
-     *
-     * @return string
-     */
     private function encodeString(string $data): string
     {
         return sprintf('%d:%s', strlen($data), $data);
     }
 
-    /**
-     * Encode a list.
-     *
-     * @param  array
-     *
-     * @return string
-     */
     private function encodeList(array $data = []): string
     {
         $list = '';
@@ -69,13 +43,6 @@ class Bencoder
         return sprintf('l%se', $list);
     }
 
-    /**
-     * Encode a dictionary.
-     *
-     * @param array $info
-     *
-     * @return string
-     */
     private function encodeDictionary(array $info = []): string
     {
         // keys must be strings and appear in sorted order (sorted as raw strings, not alphanumerics)

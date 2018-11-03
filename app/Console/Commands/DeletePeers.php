@@ -25,10 +25,6 @@ class DeletePeers extends Command
      */
     protected $description = 'Deletes all obsolete peers';
 
-    /**
-     * @param DatabaseManager $databaseManager
-     * @param Repository      $config
-     */
     public function handle(DatabaseManager $databaseManager, Repository $config): void
     {
         $obsoletePeerIds = $databaseManager

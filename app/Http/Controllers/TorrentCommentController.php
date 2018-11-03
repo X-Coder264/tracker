@@ -7,10 +7,10 @@ namespace App\Http\Controllers;
 use App\Models\Torrent;
 use Illuminate\Http\Response;
 use App\Models\TorrentComment;
-use Illuminate\Auth\AuthManager;
-use Illuminate\Cache\CacheManager;
 use Illuminate\Routing\Redirector;
+use Illuminate\Contracts\Auth\Guard;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Contracts\Cache\Repository;
 use App\Http\Requests\TorrentCommentRequest;
 use Illuminate\Contracts\Translation\Translator;
 use Illuminate\Contracts\Routing\ResponseFactory;
@@ -18,80 +18,77 @@ use Illuminate\Contracts\Routing\ResponseFactory;
 class TorrentCommentController extends Controller
 {
     /**
-     * @param Torrent         $torrent
-     * @param ResponseFactory $responseFactory
-     *
-     * @return Response
+     * @var ResponseFactory
      */
-    public function create(Torrent $torrent, ResponseFactory $responseFactory): Response
+    private $responseFactory;
+
+    /**
+     * @var Redirector
+     */
+    private $redirector;
+
+    /**
+     * @var Translator
+     */
+    private $translator;
+
+    /**
+     * @var Repository
+     */
+    private $cache;
+
+    /**
+     * @var Guard
+     */
+    private $guard;
+
+    public function __construct(
+        ResponseFactory $responseFactory,
+        Redirector $redirector,
+        Translator $translator,
+        Repository $cache,
+        Guard $guard
+    ) {
+        $this->responseFactory = $responseFactory;
+        $this->redirector = $redirector;
+        $this->translator = $translator;
+        $this->cache = $cache;
+        $this->guard = $guard;
+    }
+
+    public function create(Torrent $torrent): Response
     {
         $torrentComment = new TorrentComment();
 
-        return $responseFactory->view('torrent-comments.create', compact('torrent', 'torrentComment'));
+        return $this->responseFactory->view('torrent-comments.create', compact('torrent', 'torrentComment'));
     }
 
-    /**
-     * @param TorrentCommentRequest $request
-     * @param Torrent               $torrent
-     * @param AuthManager           $authManager
-     * @param Redirector            $redirector
-     * @param Translator            $translator
-     * @param CacheManager          $cacheManager
-     *
-     * @return RedirectResponse
-     */
-    public function store(
-        TorrentCommentRequest $request,
-        Torrent $torrent,
-        AuthManager $authManager,
-        Redirector $redirector,
-        Translator $translator,
-        CacheManager $cacheManager
-    ): RedirectResponse {
+    public function store(TorrentCommentRequest $request, Torrent $torrent): RedirectResponse
+    {
         $torrentComment = new TorrentComment();
-        $torrentComment->user_id = $authManager->guard()->id();
+        $torrentComment->user_id = $this->guard->id();
         $torrentComment->comment = $request->input('comment');
 
         $torrent->comments()->save($torrentComment);
 
-        $cacheManager->delete('torrent.' . $torrent->id . '.comments');
+        $this->cache->delete('torrent.' . $torrent->id . '.comments');
 
-        return $redirector->route('torrents.show', $torrent)
-            ->with('torrentCommentSuccess', $translator->trans('messages.torrent-comments.create-success-message'));
+        return $this->redirector->route('torrents.show', $torrent)
+            ->with('torrentCommentSuccess', $this->translator->trans('messages.torrent-comments.create-success-message'));
     }
 
-    /**
-     * @param TorrentComment  $torrentComment
-     * @param ResponseFactory $responseFactory
-     *
-     * @return Response
-     */
-    public function edit(TorrentComment $torrentComment, ResponseFactory $responseFactory): Response
+    public function edit(TorrentComment $torrentComment): Response
     {
-        return $responseFactory->view('torrent-comments.edit', compact('torrentComment'));
+        return $this->responseFactory->view('torrent-comments.edit', compact('torrentComment'));
     }
 
-    /**
-     * @param TorrentCommentRequest $request
-     * @param TorrentComment        $torrentComment
-     * @param Redirector            $redirector
-     * @param Translator            $translator
-     * @param CacheManager          $cacheManager
-     *
-     * @return RedirectResponse
-     */
-    public function update(
-        TorrentCommentRequest $request,
-        TorrentComment $torrentComment,
-        Redirector $redirector,
-        Translator $translator,
-        CacheManager $cacheManager
-    ): RedirectResponse {
+    public function update(TorrentCommentRequest $request, TorrentComment $torrentComment): RedirectResponse
+    {
         $torrentComment->update(['comment' => $request->input('comment')]);
 
-        $cacheManager->delete('torrent.' . $torrentComment->torrent_id . '.comments');
+        $this->cache->delete('torrent.' . $torrentComment->torrent_id . '.comments');
 
-        return $redirector->route('torrents.show', $torrentComment->torrent)
-            ->with('torrentCommentSuccess', $translator->trans('messages.torrent-comments.update-success-message'));
+        return $this->redirector->route('torrents.show', $torrentComment->torrent)
+            ->with('torrentCommentSuccess', $this->translator->trans('messages.torrent-comments.update-success-message'));
     }
 }

@@ -18,9 +18,6 @@ final class JsonApiResponse
      */
     private $jsonResponse;
 
-    /**
-     * @param TestResponse $response
-     */
     public function __construct(TestResponse $response)
     {
         $jsonResponse = json_decode($response->getContent(), true);
@@ -29,17 +26,11 @@ final class JsonApiResponse
         $this->jsonResponse = is_array($jsonResponse) ? $jsonResponse : null;
     }
 
-    /**
-     * @return TestResponse
-     */
     public function getResponse(): TestResponse
     {
         return $this->response;
     }
 
-    /**
-     * @return array|null
-     */
     public function getJsonResponse(): ?array
     {
         return $this->jsonResponse;

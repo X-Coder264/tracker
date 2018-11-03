@@ -31,12 +31,6 @@ class IMDBImagesManager
      */
     private $logger;
 
-    /**
-     * @param IMDBManager       $IMDBManager
-     * @param Client            $client
-     * @param FilesystemManager $filesystemManager
-     * @param LoggerInterface   $logger
-     */
     public function __construct(IMDBManager $IMDBManager, Client $client, FilesystemManager $filesystemManager, LoggerInterface $logger)
     {
         $this->IMDBManager = $IMDBManager;
@@ -45,9 +39,6 @@ class IMDBImagesManager
         $this->logger = $logger;
     }
 
-    /**
-     * @param string $imdbId
-     */
     public function writePosterToDisk(string $imdbId): void
     {
         $url = $this->IMDBManager->getPosterURLFromIMDBId($imdbId);

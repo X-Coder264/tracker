@@ -10,9 +10,6 @@ use App\Services\FileSizeCollectionFormatter;
 
 class FileSizeCollectionFormatterTest extends TestCase
 {
-    /**
-     * @return Generator
-     */
     public function dataProvider(): Generator
     {
         yield [
@@ -28,9 +25,6 @@ class FileSizeCollectionFormatterTest extends TestCase
 
     /**
      * @dataProvider dataProvider
-     *
-     * @param array $testData
-     * @param array $expected
      */
     public function testFormatting(array $testData, array $expected)
     {

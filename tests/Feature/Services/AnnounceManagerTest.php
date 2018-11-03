@@ -18,12 +18,11 @@ use Illuminate\Support\Carbon;
 use App\Models\TorrentInfoHash;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
-use Tests\Traits\EnableForeignKeyConstraints;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class AnnounceManagerTest extends TestCase
 {
-    use RefreshDatabase, EnableForeignKeyConstraints;
+    use RefreshDatabase;
 
     public function testV1PeerStartsLeechingWithNoOtherPeersPresentOnTheTorrent()
     {
@@ -2805,8 +2804,6 @@ class AnnounceManagerTest extends TestCase
 
     /**
      * @param array $overrides
-     *
-     * @return array
      */
     private function validParams($overrides = []): array
     {

@@ -12,6 +12,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Contracts\Routing\UrlGenerator;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Auth\RegistersUsers;
+use App\Http\Middleware\RedirectIfAuthenticated;
 use Illuminate\Contracts\Routing\ResponseFactory;
 use Illuminate\Contracts\Validation\Factory as ValidatorFactory;
 
@@ -40,24 +41,13 @@ class RegisterController extends Controller
      */
     private $urlGenerator;
 
-    /**
-     * @param ValidatorFactory $validatorFactory
-     * @param UrlGenerator     $urlGenerator
-     */
     public function __construct(ValidatorFactory $validatorFactory, UrlGenerator $urlGenerator)
     {
-        $this->middleware('guest');
+        $this->middleware(RedirectIfAuthenticated::class);
         $this->validatorFactory = $validatorFactory;
         $this->urlGenerator = $urlGenerator;
     }
 
-    /**
-     * Show the application registration form.
-     *
-     * @param ResponseFactory $responseFactory
-     *
-     * @return Response
-     */
     public function showRegistrationForm(ResponseFactory $responseFactory): Response
     {
         $locales = Locale::all();
@@ -65,13 +55,6 @@ class RegisterController extends Controller
         return $responseFactory->view('auth.register', compact('locales'));
     }
 
-    /**
-     * Get a validator for an incoming registration request.
-     *
-     * @param array $data
-     *
-     * @return Validator
-     */
     protected function validator(array $data): Validator
     {
         $locales = Locale::select('id')->get();
@@ -89,13 +72,6 @@ class RegisterController extends Controller
         ]);
     }
 
-    /**
-     * Create a new user instance after a valid registration.
-     *
-     * @param array $data
-     *
-     * @return User
-     */
     protected function create(array $data): User
     {
         return User::create([
@@ -107,9 +83,6 @@ class RegisterController extends Controller
         ]);
     }
 
-    /**
-     * @return string
-     */
     public function redirectTo(): string
     {
         return $this->urlGenerator->route('home');

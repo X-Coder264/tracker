@@ -45,7 +45,7 @@ class SetUserLocaleTest extends TestCase
         $next = new class() {
             public $called = false;
 
-            public function __invoke($request)
+            public function __invoke(Request $request)
             {
                 $this->called = true;
 
@@ -80,7 +80,7 @@ class SetUserLocaleTest extends TestCase
         $next = new class() {
             public $called = false;
 
-            public function __invoke($request)
+            public function __invoke(Request $request)
             {
                 $this->called = true;
 

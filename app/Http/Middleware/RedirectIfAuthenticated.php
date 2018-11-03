@@ -8,6 +8,7 @@ use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Auth\AuthManager;
 use Illuminate\Routing\Redirector;
+use Symfony\Component\HttpFoundation\Response;
 
 class RedirectIfAuthenticated
 {
@@ -21,26 +22,13 @@ class RedirectIfAuthenticated
      */
     private $redirector;
 
-    /**
-     * @param AuthManager $authManager
-     * @param Redirector  $redirector
-     */
     public function __construct(AuthManager $authManager, Redirector $redirector)
     {
         $this->authManager = $authManager;
         $this->redirector = $redirector;
     }
 
-    /**
-     * Handle an incoming request.
-     *
-     * @param Request     $request
-     * @param \Closure    $next
-     * @param string|null $guard
-     *
-     * @return mixed
-     */
-    public function handle(Request $request, Closure $next, $guard = null)
+    public function handle(Request $request, Closure $next, ?string $guard = null): Response
     {
         if ($this->authManager->guard($guard)->check()) {
             return $this->redirector->route('home');

@@ -123,11 +123,6 @@ class ResetPasswordControllerTest extends TestCase
         $this->assertGuest();
     }
 
-    /**
-     * @param User $user
-     *
-     * @return string
-     */
     private function getValidToken(User $user): string
     {
         return Password::broker()->createToken($user);

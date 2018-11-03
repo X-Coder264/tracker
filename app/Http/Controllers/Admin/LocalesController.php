@@ -10,9 +10,6 @@ use CloudCreativity\LaravelJsonApi\Http\Controllers\EloquentController;
 
 class LocalesController extends EloquentController
 {
-    /**
-     * @param Hydrator $hydrator
-     */
     public function __construct(Hydrator $hydrator)
     {
         parent::__construct(new Locale(), $hydrator);

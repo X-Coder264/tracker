@@ -55,6 +55,7 @@ return PhpCsFixer\Config::create()
         'no_unneeded_control_parentheses' => true,
         'no_whitespace_before_comma_in_array' => true,
         'no_whitespace_in_blank_line' => true,
+        'no_superfluous_phpdoc_tags' => true,
         'normalize_index_brace' => true,
         'object_operator_without_whitespace' => true,
         'ordered_imports' => ['sortAlgorithm' => 'length'],

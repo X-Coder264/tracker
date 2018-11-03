@@ -20,21 +20,12 @@ class IMDBManager
      */
     private $cacheManager;
 
-    /**
-     * @param IMDBLinkParser $IMDBLinkParser
-     * @param CacheManager   $cacheManager
-     */
     public function __construct(IMDBLinkParser $IMDBLinkParser, CacheManager $cacheManager)
     {
         $this->IMDBLinkParser = $IMDBLinkParser;
         $this->cacheManager = $cacheManager;
     }
 
-    /**
-     * @param string $imdbUrl
-     *
-     * @return Title
-     */
     public function getTitleFromFullURL(string $imdbUrl): Title
     {
         $imdbId = $this->IMDBLinkParser->getId($imdbUrl);
@@ -42,31 +33,16 @@ class IMDBManager
         return new Title($imdbId, $this->getIMDBConfig(), null, $this->cacheManager->store());
     }
 
-    /**
-     * @param string $imdbId
-     *
-     * @return Title
-     */
     public function getTitleFromIMDBId(string $imdbId): Title
     {
         return new Title($imdbId, $this->getIMDBConfig(), null, $this->cacheManager->store());
     }
 
-    /**
-     * @param string $imdbUrl
-     *
-     * @return string
-     */
     public function getIMDBIdFromFullURL(string $imdbUrl): string
     {
         return $this->IMDBLinkParser->getId($imdbUrl);
     }
 
-    /**
-     * @param string $imdbId
-     *
-     * @return null|string
-     */
     public function getPosterURLFromIMDBId(string $imdbId): ?string
     {
         $title = $this->getTitleFromIMDBId($imdbId);
@@ -79,9 +55,6 @@ class IMDBManager
         return $posterURL;
     }
 
-    /**
-     * @return Config
-     */
     private function getIMDBConfig(): Config
     {
         $config = new Config();

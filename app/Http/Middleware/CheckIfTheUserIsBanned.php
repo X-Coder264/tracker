@@ -29,11 +29,6 @@ class CheckIfTheUserIsBanned
      */
     private $translator;
 
-    /**
-     * @param AuthManager $authManager
-     * @param Redirector  $redirector
-     * @param Translator  $translator
-     */
     public function __construct(AuthManager $authManager, Redirector $redirector, Translator $translator)
     {
         $this->authManager = $authManager;
@@ -44,7 +39,6 @@ class CheckIfTheUserIsBanned
     /**
      * Handle an incoming request.
      *
-     * @param Request $request
      * @param Closure $next
      *
      * @return RedirectResponse|Response

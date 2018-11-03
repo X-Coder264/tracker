@@ -10,14 +10,7 @@ use Illuminate\Http\RedirectResponse;
 
 class FileNotWritableException extends Exception
 {
-    /**
-     * Render the exception into an HTTP response.
-     *
-     * @param Request $request
-     *
-     * @return RedirectResponse
-     */
-    public function render($request): RedirectResponse
+    public function render(Request $request): RedirectResponse
     {
         return back()->withInput()->with('error', $this->getMessage());
     }

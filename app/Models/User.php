@@ -56,9 +56,6 @@ class User extends Authenticatable
         'last_seen_at',
     ];
 
-    /**
-     * @return array
-     */
     public function sluggable(): array
     {
         return [
@@ -80,8 +77,6 @@ class User extends Authenticatable
 
     /**
      * Set the user's password.
-     *
-     * @param string $password
      */
     public function setPasswordAttribute(string $password): void
     {
@@ -102,8 +97,6 @@ class User extends Authenticatable
      * Get the user's uploaded amount.
      *
      * @param $value
-     *
-     * @return string
      */
     public function getUploadedAttribute($value): string
     {
@@ -114,8 +107,6 @@ class User extends Authenticatable
      * Get the user's downloaded amount.
      *
      * @param $value
-     *
-     * @return string
      */
     public function getDownloadedAttribute($value): string
     {
@@ -124,27 +115,17 @@ class User extends Authenticatable
 
     /**
      * Scope a query to only include banned users.
-     *
-     * @param Builder $query
-     *
-     * @return Builder
      */
     public function scopeBanned(Builder $query): Builder
     {
         return $query->where('banned', '=', true);
     }
 
-    /**
-     * @return HasMany
-     */
     public function torrents(): HasMany
     {
         return $this->hasMany(Torrent::class, 'uploader_id');
     }
 
-    /**
-     * @return BelongsTo
-     */
     public function language(): BelongsTo
     {
         return $this->belongsTo(Locale::class, 'locale_id');

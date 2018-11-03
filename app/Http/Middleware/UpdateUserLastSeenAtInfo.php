@@ -8,49 +8,36 @@ use Closure;
 use Carbon\Carbon;
 use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Auth\AuthManager;
-use Illuminate\Database\DatabaseManager;
+use Illuminate\Contracts\Auth\Guard;
+use Symfony\Component\HttpFoundation\Response;
 
 class UpdateUserLastSeenAtInfo
 {
     /**
-     * @var AuthManager
+     * @var Guard
      */
-    private $authManager;
-
-    /**
-     * @var DatabaseManager
-     */
-    private $databaseManager;
+    private $guard;
 
     /**
      * @var int
      */
     const FIVE_MINUTES_IN_SECONDS = 300;
 
-    /**
-     * @param AuthManager     $authManager
-     * @param DatabaseManager $databaseManager
-     */
-    public function __construct(AuthManager $authManager, DatabaseManager $databaseManager)
+    public function __construct(Guard $guard)
     {
-        $this->authManager = $authManager;
-        $this->databaseManager = $databaseManager;
+        $this->guard = $guard;
     }
 
     /**
      * Handle an incoming request.
      *
-     * @param Request $request
      * @param Closure $next
-     *
-     * @return mixed
      */
-    public function handle(Request $request, $next)
+    public function handle(Request $request, $next): Response
     {
-        if (true === $this->authManager->guard()->check()) {
+        if (true === $this->guard->check()) {
             /** @var User $user */
-            $user = $this->authManager->guard()->user();
+            $user = $this->guard->user();
             $lastSeenAt = $user->last_seen_at;
             if (null === $lastSeenAt || Carbon::now()->diffInSeconds($lastSeenAt) > self::FIVE_MINUTES_IN_SECONDS) {
                 $user->timestamps = false;

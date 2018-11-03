@@ -23,9 +23,6 @@ class TorrentComment extends Model
         'comment', 'torrent_id', 'user_id',
     ];
 
-    /**
-     * @return array
-     */
     public function sluggable(): array
     {
         return [
@@ -35,17 +32,11 @@ class TorrentComment extends Model
         ];
     }
 
-    /**
-     * @return BelongsTo
-     */
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class)->select(['id', 'name', 'slug']);
     }
 
-    /**
-     * @return BelongsTo
-     */
     public function torrent(): BelongsTo
     {
         return $this->belongsTo(Torrent::class)->select(['id', 'name', 'slug']);
