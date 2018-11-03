@@ -2,8 +2,7 @@
 
 declare(strict_types=1);
 
-use Illuminate\Routing\Router;
-use Illuminate\Support\Facades\Route;
+use Illuminate\Contracts\Routing\Registrar;
 use Illuminate\Auth\Middleware\Authenticate;
 
 /*
@@ -17,12 +16,27 @@ use Illuminate\Auth\Middleware\Authenticate;
 |
 */
 
-/** @var Router $router */
-$router->auth();
+/** @var Registrar $router */
+
+// Authentication Routes...
+$this->get('login', 'Auth\LoginController@showLoginForm')->name('login');
+$this->post('login', 'Auth\LoginController@login');
+$this->post('logout', 'Auth\LoginController@logout')->name('logout');
+
+// Registration Routes...
+$this->get('register', 'Auth\RegisterController@showRegistrationForm')->name('register');
+$this->post('register', 'Auth\RegisterController@register');
+
+// Password Reset Routes...
+$this->get('password/reset', 'Auth\ForgotPasswordController@showLinkRequestForm')->name('password.request');
+$this->post('password/email', 'Auth\ForgotPasswordController@sendResetLinkEmail')->name('password.email');
+$this->get('password/reset/{token}', 'Auth\ResetPasswordController@showResetForm')->name('password.reset');
+$this->post('password/reset', 'Auth\ResetPasswordController@reset')->name('password.update');
+
 $router->get('announce', 'AnnounceController@store')->name('announce');
 $router->get('scrape', 'ScrapeController@show')->name('scrape');
 
-Route::middleware([Authenticate::class])->group(function () use ($router) {
+$router->group(['middleware' => [Authenticate::class]], function (Registrar $router) {
     $router->get('/', 'HomeController@index')->name('home');
 
     $router->get('/cms', 'Admin\IndexController@index')->name('admin.index');
