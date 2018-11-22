@@ -28,6 +28,17 @@ SQL database: `MySQL (5.7+)`, `PostgreSQL` or `SQL Server`
 
 Caching: `Redis (recommended)` or `Memcached`
 
+## Supported BEPs
+
+| BEP | Name | Link |
+| --- | --- | --- |
+| 3  | `The BitTorrent Protocol Specification`    | http://www.bittorrent.org/beps/bep_0003.html |
+| 7  | `IPv6 Tracker Extension`                   | http://www.bittorrent.org/beps/bep_0007.html |
+| 23 | `Tracker Returns Compact Peer Lists`       | http://www.bittorrent.org/beps/bep_0023.html |
+| 31 | `Failure Retry Extension`                  | http://www.bittorrent.org/beps/bep_0031.html |
+| 48 | `Tracker Protocol Extension: Scrape`       | http://www.bittorrent.org/beps/bep_0048.html |
+| 52 | `The BitTorrent Protocol Specification v2` | http://www.bittorrent.org/beps/bep_0052.html |
+
 ## Docker setup for local development
 
 Docker 18.06.0+
