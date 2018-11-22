@@ -9,7 +9,7 @@
     <div class="card-body">
         <div class="row">
             <div class="col-2 d-none d-sm-block">
-                <img src="https://i.imgur.com/eJhRU6c.jpg" class="img-fluid">
+                <img src="https://i.imgur.com/eJhRU6c.jpg" class="img-fluid" alt="">
             </div>
             <div class="col-10">
                 <p class="card-text">{{ $torrentComment->comment }}</p>

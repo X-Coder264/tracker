@@ -17,7 +17,7 @@ use Illuminate\Contracts\Translation\Translator;
 use Illuminate\Contracts\Routing\ResponseFactory;
 use Symfony\Component\HttpFoundation\Response as BaseResponse;
 
-class UserController extends Controller
+class UserController
 {
     /**
      * @var Guard

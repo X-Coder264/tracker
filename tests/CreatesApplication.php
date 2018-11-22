@@ -6,6 +6,7 @@ namespace Tests;
 
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Contracts\Console\Kernel;
+use Illuminate\Contracts\Cache\Repository;
 
 trait CreatesApplication
 {
@@ -17,8 +18,10 @@ trait CreatesApplication
 
         Hash::swap(new HashFake());
 
+        /** @var Repository $cacheRepository */
+        $cacheRepository = $app->make(Repository::class);
         // delete all cache before each test
-        $app->make('cache')->flush();
+        $cacheRepository->getStore()->flush();
 
         return $app;
     }

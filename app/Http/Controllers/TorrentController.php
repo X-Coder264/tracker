@@ -32,7 +32,7 @@ use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Contracts\Filesystem\Factory as FilesystemManager;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
-class TorrentController extends Controller
+class TorrentController
 {
     /**
      * @var CacheManager

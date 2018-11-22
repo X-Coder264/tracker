@@ -9,7 +9,7 @@ use Illuminate\Http\Response;
 use App\Services\AnnounceManager;
 use Illuminate\Contracts\Routing\ResponseFactory;
 
-class AnnounceController extends Controller
+class AnnounceController
 {
     /**
      * @var AnnounceManager

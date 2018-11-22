@@ -28,9 +28,6 @@ class UserStatsComposer
         $this->cache = $cache;
     }
 
-    /**
-     * Bind data to the view.
-     */
     public function compose(View $view): void
     {
         if (true === $this->guard->check()) {

@@ -59,7 +59,7 @@
                         </tr>
                         @foreach ($torrent->infoHashes as $infoHash)
                             <tr>
-                                @if(1 === $infoHash->version)
+                                @if (1 === $infoHash->version)
                                     <th>{{ trans('messages.torrents.show.v1-info_hash') }}</th>
                                 @else
                                     <th>{{ trans('messages.torrents.show.v2-info_hash') }}</th>
@@ -109,30 +109,30 @@
                                     <div class="table-responsive-lg">
                                         <table class="table table-hover table-bordered">
                                             <thead>
-                                            <tr>
-                                                <th>{{ trans('messages.common.torrent_table_username') }}</th>
-                                                <th>{{ trans('messages.common.uploaded') }}</th>
-                                                <th>{{ trans('messages.common.downloaded') }}</th>
-                                                <th>{{ trans('messages.common.torrent_table_ratio') }}</th>
-                                                <th>{{ trans('messages.common.torrent_table_last_announce') }}</th>
-                                                <th>{{ trans('messages.common.torrent_table_torrent_client') }}</th>
-                                            </tr>
+                                                <tr>
+                                                    <th>{{ trans('messages.common.torrent_table_username') }}</th>
+                                                    <th>{{ trans('messages.common.uploaded') }}</th>
+                                                    <th>{{ trans('messages.common.downloaded') }}</th>
+                                                    <th>{{ trans('messages.common.torrent_table_ratio') }}</th>
+                                                    <th>{{ trans('messages.common.torrent_table_last_announce') }}</th>
+                                                    <th>{{ trans('messages.common.torrent_table_torrent_client') }}</th>
+                                                </tr>
                                             </thead>
                                             <tbody>
-                                            @foreach ($torrent->peers as $peer)
-                                                <tr>
-                                                    <td>{{ $peer->user->name }}</td>
-                                                    <td>{{ $peer->uploaded }}</td>
-                                                    <td>{{ $peer->downloaded }}</td>
-                                                    @if (0 === (int) $peer->getOriginal('downloaded'))
-                                                        <td>Inf.</td>
-                                                    @else
-                                                        <td>{{ number_format((int) $peer->getOriginal('uploaded') / (int) $peer->getOriginal('downloaded'), 2) }}</td>
-                                                    @endif
-                                                    <td>{{ $peer->updated_at->diffForHumans() }}</td>
-                                                    <td>{{ $peer->userAgent }}</td>
-                                                </tr>
-                                            @endforeach
+                                                @foreach ($torrent->peers as $peer)
+                                                    <tr>
+                                                        <td>{{ $peer->user->name }}</td>
+                                                        <td>{{ $peer->uploaded }}</td>
+                                                        <td>{{ $peer->downloaded }}</td>
+                                                        @if (0 === (int) $peer->getOriginal('downloaded'))
+                                                            <td>Inf.</td>
+                                                        @else
+                                                            <td>{{ number_format((int) $peer->getOriginal('uploaded') / (int) $peer->getOriginal('downloaded'), 2) }}</td>
+                                                        @endif
+                                                        <td>{{ $peer->updated_at->diffForHumans() }}</td>
+                                                        <td>{{ $peer->userAgent }}</td>
+                                                    </tr>
+                                                @endforeach
                                             </tbody>
                                         </table>
                                     </div>
@@ -154,18 +154,18 @@
                                     <div class="table-responsive-lg">
                                         <table class="table table-hover table-bordered">
                                             <thead>
-                                            <tr>
-                                                <th>{{ trans('messages.torrents.show.file_name') }}</th>
-                                                <th>{{ trans('messages.common.size') }}</th>
-                                            </tr>
+                                                <tr>
+                                                    <th>{{ trans('messages.torrents.show.file_name') }}</th>
+                                                    <th>{{ trans('messages.common.size') }}</th>
+                                                </tr>
                                             </thead>
                                             <tbody>
-                                            @foreach ($torrentFileNamesAndSizes as $file => $size)
-                                                <tr>
-                                                    <td>{{ $file }}</td>
-                                                    <td>{{ $size }}</td>
-                                                </tr>
-                                            @endforeach
+                                                @foreach ($torrentFileNamesAndSizes as $file => $size)
+                                                    <tr>
+                                                        <td>{{ $file }}</td>
+                                                        <td>{{ $size }}</td>
+                                                    </tr>
+                                                @endforeach
                                             </tbody>
                                         </table>
                                     </div>

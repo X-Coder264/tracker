@@ -12,7 +12,7 @@
                 @if ($torrents->isEmpty())
                     <div class="card text-dark bg-warning">
                         <div class="card-body">
-                            <h4 class="card-title">{{ trans('messages.torrent.index.notice_no_active_torrents_title') }}</h4>
+                            <h4 class="card-title">{{ trans('messages.common.notice') }}</h4>
                             <p class="card-text">{{ trans('messages.torrent.index.notice_no_active_torrents_text') }}</p>
                         </div>
                     </div>

@@ -11,7 +11,7 @@ use App\Services\AnnounceManager;
 use Illuminate\Contracts\Translation\Translator;
 use Illuminate\Contracts\Routing\ResponseFactory;
 
-class ScrapeController extends Controller
+class ScrapeController
 {
     /**
      * @var Bencoder

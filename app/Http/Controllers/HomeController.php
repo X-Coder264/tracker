@@ -8,7 +8,7 @@ use Illuminate\Http\Response;
 use App\Services\StatisticsManager;
 use Illuminate\Contracts\Routing\ResponseFactory;
 
-class HomeController extends Controller
+class HomeController
 {
     public function index(StatisticsManager $statisticsManager, ResponseFactory $responseFactory): Response
     {

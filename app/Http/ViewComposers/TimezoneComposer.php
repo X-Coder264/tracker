@@ -28,9 +28,6 @@ class TimezoneComposer
         $this->cache = $cache;
     }
 
-    /**
-     * Bind data to the view.
-     */
     public function compose(View $view): void
     {
         $user = $this->cache->remember('user.' . $this->guard->id(), Cache::ONE_DAY, function (): User {

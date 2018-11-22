@@ -87,4 +87,9 @@ class Torrent extends Model
     {
         return $this->belongsTo(TorrentCategory::class);
     }
+
+    public function snatches(): HasMany
+    {
+        return $this->hasMany(Snatch::class);
+    }
 }

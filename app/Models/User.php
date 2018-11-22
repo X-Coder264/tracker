@@ -130,4 +130,9 @@ class User extends Authenticatable
     {
         return $this->belongsTo(Locale::class, 'locale_id');
     }
+
+    public function snatches(): HasMany
+    {
+        return $this->hasMany(Snatch::class);
+    }
 }

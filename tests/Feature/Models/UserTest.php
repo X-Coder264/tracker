@@ -7,6 +7,7 @@ namespace Tests\Feature\Models;
 use Tests\TestCase;
 use App\Models\User;
 use App\Models\Locale;
+use App\Models\Snatch;
 use App\Models\Torrent;
 use Illuminate\Support\Facades\Hash;
 use Facades\App\Services\SizeFormatter;
@@ -19,7 +20,7 @@ class UserTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function testPasswordMutator()
+    public function testPasswordMutator(): void
     {
         $password = 'test password 123';
 
@@ -35,7 +36,7 @@ class UserTest extends TestCase
         $this->assertTrue(Hash::check($password, $user->password));
     }
 
-    public function testUserHasSlug()
+    public function testUserHasSlug(): void
     {
         $locale = factory(Locale::class)->create();
         $user = new User();
@@ -67,7 +68,7 @@ class UserTest extends TestCase
         $this->assertSame($returnValue, $user->downloaded);
     }
 
-    public function testTorrentRelationship()
+    public function testTorrentRelationship(): void
     {
         factory(Torrent::class)->create();
 
@@ -81,7 +82,7 @@ class UserTest extends TestCase
         $this->assertSame($user->torrents[0]->info_hash, $torrent->info_hash);
     }
 
-    public function testLanguageRelationship()
+    public function testLanguageRelationship(): void
     {
         $user = factory(User::class)->create();
 
@@ -89,5 +90,28 @@ class UserTest extends TestCase
         $this->assertInstanceOf(BelongsTo::class, $freshUser->language());
         $this->assertInstanceOf(Locale::class, $freshUser->language);
         $this->assertSame($user->language->id, $freshUser->language->id);
+    }
+
+    public function testSnatchesRelationship(): void
+    {
+        factory(Snatch::class)->states('snatched')->create();
+
+        $user = User::latest('id')->firstOrFail();
+        $snatch = Snatch::firstOrFail();
+        $this->assertInstanceOf(HasMany::class, $user->snatches());
+        $this->assertInstanceOf(Collection::class, $user->snatches);
+        $this->assertSame($user->snatches[0]->id, $snatch->id);
+        $this->assertSame($user->snatches[0]->torrent_id, $snatch->torrent_id);
+        $this->assertSame($user->snatches[0]->uploaded, $snatch->uploaded);
+        $this->assertSame($user->snatches[0]->downloaded, $snatch->downloaded);
+        $this->assertSame($user->snatches[0]->left, $snatch->left);
+        $this->assertSame($user->snatches[0]->seedTime, $snatch->seedTime);
+        $this->assertSame($user->snatches[0]->leechTime, $snatch->leechTime);
+        $this->assertSame($user->snatches[0]->timesAnnounced, $snatch->timesAnnounced);
+        $this->assertSame($user->snatches[0]->userAgent, $snatch->userAgent);
+        $this->assertSame($user->snatches[0]->seeder, $snatch->seeder);
+        $this->assertSame($user->snatches[0]->created_at->format('Y-m-d H:i:s'), $snatch->created_at->format('Y-m-d H:i:s'));
+        $this->assertSame($user->snatches[0]->updated_at->format('Y-m-d H:i:s'), $snatch->updated_at->format('Y-m-d H:i:s'));
+        $this->assertSame($user->snatches[0]->finished_at->format('Y-m-d H:i:s'), $snatch->finished_at->format('Y-m-d H:i:s'));
     }
 }

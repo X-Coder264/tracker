@@ -15,7 +15,7 @@ use App\Http\Requests\TorrentCommentRequest;
 use Illuminate\Contracts\Translation\Translator;
 use Illuminate\Contracts\Routing\ResponseFactory;
 
-class TorrentCommentController extends Controller
+class TorrentCommentController
 {
     /**
      * @var ResponseFactory

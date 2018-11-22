@@ -663,8 +663,8 @@ class AnnounceManagerTest extends TestCase
         $this->assertSame(3000, (int) $freshSnatch->getOriginal('uploaded'));
         $this->assertSame($torrent->getOriginal('size'), (int) $freshSnatch->getOriginal('downloaded'));
         $this->assertSame(0, (int) $freshSnatch->getOriginal('left'));
-        $this->assertGreaterThanOrEqual(2900, (int) $freshSnatch->seedTime);
-        $this->assertSame(1200, (int) $freshSnatch->leechTime);
+        $this->assertGreaterThanOrEqual(2900, (int) $freshSnatch->getOriginal('seedTime'));
+        $this->assertSame(1200, (int) $freshSnatch->getOriginal('leechTime'));
         $this->assertSame(3, (int) $freshSnatch->timesAnnounced);
         $this->assertSame($snatch->finished_at->toDateTimeString(), $freshSnatch->finished_at->toDateTimeString());
         $this->assertSame($userAgent, $freshSnatch->userAgent);
@@ -760,8 +760,8 @@ class AnnounceManagerTest extends TestCase
         $this->assertSame(3000, (int) $freshSnatch->getOriginal('uploaded'));
         $this->assertSame(2200, (int) $freshSnatch->getOriginal('downloaded'));
         $this->assertSame(800, (int) $freshSnatch->getOriginal('left'));
-        $this->assertSame(0, (int) $freshSnatch->seedTime);
-        $this->assertGreaterThanOrEqual(3600, (int) $freshSnatch->leechTime);
+        $this->assertSame(0, (int) $freshSnatch->getOriginal('seedTime'));
+        $this->assertGreaterThanOrEqual(3600, (int) $freshSnatch->getOriginal('leechTime'));
         $this->assertSame(3, (int) $freshSnatch->timesAnnounced);
         $this->assertNull($freshSnatch->finished_at);
         $this->assertSame($userAgent, $freshSnatch->userAgent);
@@ -894,8 +894,8 @@ class AnnounceManagerTest extends TestCase
         $this->assertSame(2000, (int) $snatch->getOriginal('uploaded'));
         $this->assertSame(5000, (int) $snatch->getOriginal('downloaded'));
         $this->assertSame(0, (int) $snatch->getOriginal('left'));
-        $this->assertSame(0, (int) $snatch->seedTime);
-        $this->assertGreaterThanOrEqual(3400, (int) $snatch->leechTime);
+        $this->assertSame(0, (int) $snatch->getOriginal('seedTime'));
+        $this->assertGreaterThanOrEqual(3400, (int) $snatch->getOriginal('leechTime'));
         $this->assertSame(3, (int) $snatch->timesAnnounced);
         $this->assertNotNull($snatch->finished_at);
         $this->assertLessThanOrEqual(10, Carbon::now()->diffInSeconds($snatch->finished_at));
@@ -1009,8 +1009,8 @@ class AnnounceManagerTest extends TestCase
         $this->assertSame(3000, (int) $freshSnatch->getOriginal('uploaded'));
         $this->assertSame(1000, (int) $freshSnatch->getOriginal('downloaded'));
         $this->assertSame(0, (int) $freshSnatch->getOriginal('left'));
-        $this->assertGreaterThanOrEqual(3400, (int) $freshSnatch->seedTime);
-        $this->assertSame($snatch->leechTime, (int) $freshSnatch->leechTime);
+        $this->assertGreaterThanOrEqual(3400, (int) $freshSnatch->getOriginal('seedTime'));
+        $this->assertSame($snatch->getOriginal('leechTime'), (int) $freshSnatch->getOriginal('leechTime'));
         $this->assertSame(6, (int) $freshSnatch->timesAnnounced);
         $this->assertNotNull($freshSnatch->finished_at);
         $this->assertSame($snatch->finished_at->toDateTimeString(), $freshSnatch->finished_at->toDateTimeString());
@@ -1123,8 +1123,8 @@ class AnnounceManagerTest extends TestCase
         $this->assertSame(2500, (int) $freshSnatch->getOriginal('uploaded'));
         $this->assertSame(1800, (int) $freshSnatch->getOriginal('downloaded'));
         $this->assertSame(3200, (int) $freshSnatch->getOriginal('left'));
-        $this->assertSame(0, (int) $freshSnatch->seedTime);
-        $this->assertGreaterThanOrEqual(3400, (int) $freshSnatch->leechTime);
+        $this->assertSame(0, (int) $freshSnatch->getOriginal('seedTime'));
+        $this->assertGreaterThanOrEqual(3400, (int) $freshSnatch->getOriginal('leechTime'));
         $this->assertSame(6, (int) $freshSnatch->timesAnnounced);
         $this->assertNull($freshSnatch->finished_at);
         $this->assertSame($userAgent, $freshSnatch->userAgent);
@@ -1244,9 +1244,9 @@ class AnnounceManagerTest extends TestCase
         $this->assertSame(2010, (int) $freshSnatch->getOriginal('uploaded'));
         $this->assertSame(1000, (int) $freshSnatch->getOriginal('downloaded'));
         $this->assertSame(0, (int) $freshSnatch->getOriginal('left'));
-        $this->assertGreaterThanOrEqual(3060, (int) $freshSnatch->seedTime);
-        $this->assertLessThanOrEqual(3065, (int) $freshSnatch->seedTime);
-        $this->assertSame($snatch->leechTime, (int) $freshSnatch->leechTime);
+        $this->assertGreaterThanOrEqual(3060, (int) $freshSnatch->getOriginal('seedTime'));
+        $this->assertLessThanOrEqual(3065, (int) $freshSnatch->getOriginal('seedTime'));
+        $this->assertSame($snatch->getOriginal('leechTime'), (int) $freshSnatch->getOriginal('leechTime'));
         $this->assertSame(6, (int) $freshSnatch->timesAnnounced);
         $this->assertNotNull($freshSnatch->finished_at);
         $this->assertSame($snatch->finished_at->toDateTimeString(), $freshSnatch->finished_at->toDateTimeString());
@@ -1438,8 +1438,8 @@ class AnnounceManagerTest extends TestCase
         $this->assertSame(4500, (int) $freshSnatch->getOriginal('uploaded'));
         $this->assertSame(6800, (int) $freshSnatch->getOriginal('downloaded'));
         $this->assertSame(3200, (int) $freshSnatch->getOriginal('left'));
-        $this->assertSame(0, (int) $freshSnatch->seedTime);
-        $this->assertSame(1000, (int) $freshSnatch->leechTime);
+        $this->assertSame(0, (int) $freshSnatch->getOriginal('seedTime'));
+        $this->assertSame(1000, (int) $freshSnatch->getOriginal('leechTime'));
         $this->assertSame(6, (int) $freshSnatch->timesAnnounced);
         $this->assertNull($freshSnatch->finished_at);
         $this->assertSame($userAgent, $freshSnatch->userAgent);
