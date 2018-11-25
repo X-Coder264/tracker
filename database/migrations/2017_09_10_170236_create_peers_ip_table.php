@@ -14,7 +14,7 @@ class CreatePeersIpTable extends Migration
     public function up()
     {
         Schema::create('peers_ip', function (Blueprint $table) {
-            $table->increments('id');
+            $table->bigIncrements('id');
             $table->integer('peerID')->unsigned()->index();
             $table->foreign('peerID')->references('id')->on('peers')->onUpdate('cascade')->onDelete('cascade');
             $table->string('IP', 39);

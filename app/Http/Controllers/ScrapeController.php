@@ -68,9 +68,9 @@ class ScrapeController
 
         foreach ($queryParameters as $parameter) {
             [$name, $value] = explode('=', $parameter);
-            $decodedName = urldecode($name);
+            $decodedName = rawurldecode($name);
             if ('info_hash' === $decodedName) {
-                $infoHash = urldecode(trim($value));
+                $infoHash = rawurldecode(trim($value));
                 if (20 === strlen($infoHash)) {
                     $infoHashes[] = $infoHash;
                 }

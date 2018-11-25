@@ -6,6 +6,8 @@ namespace App\Enumerations;
 
 class Cache
 {
+    const TWO_MINUTES = 2;
+
     const TEN_MINUTES = 10;
 
     const THIRTY_MINUTES = 30;

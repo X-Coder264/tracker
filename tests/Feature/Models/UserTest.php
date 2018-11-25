@@ -50,6 +50,21 @@ class UserTest extends TestCase
         $this->assertNotEmpty($user->slug);
     }
 
+    public function testUserHasPasskey(): void
+    {
+        $locale = factory(Locale::class)->create();
+        $user = new User();
+        $user->email = 'test@gmail.com';
+        $user->name = 'test name';
+        $user->password = 'test test';
+        $user->locale_id = $locale->id;
+        $user->timezone = 'Europe/Zagreb';
+        $user->save();
+
+        $this->assertNotEmpty($user->passkey);
+        $this->assertSame(64, strlen($user->passkey));
+    }
+
     public function testUploadedAccessor(): void
     {
         factory(User::class)->create();

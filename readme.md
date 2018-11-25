@@ -36,6 +36,7 @@ Caching: `Redis (recommended)` or `Memcached`
 | 7  | `IPv6 Tracker Extension`                   | http://www.bittorrent.org/beps/bep_0007.html |
 | 23 | `Tracker Returns Compact Peer Lists`       | http://www.bittorrent.org/beps/bep_0023.html |
 | 31 | `Failure Retry Extension`                  | http://www.bittorrent.org/beps/bep_0031.html |
+| 36 | `Torrent RSS feeds`                        | http://www.bittorrent.org/beps/bep_0036.html |
 | 48 | `Tracker Protocol Extension: Scrape`       | http://www.bittorrent.org/beps/bep_0048.html |
 | 52 | `The BitTorrent Protocol Specification v2` | http://www.bittorrent.org/beps/bep_0052.html |
 

@@ -631,7 +631,7 @@ class AnnounceManager
     {
         $this->databaseManager->table('peers_ip')->where('peerID', '=', $this->peer->id)->delete();
 
-        if (false !== isset($this->ipv4Address) && false !== isset($this->ipv4Port)) {
+        if (! empty($this->ipv4Address) && ! empty($this->ipv4Port)) {
             $this->databaseManager->table('peers_ip')->insert(
                 [
                     'peerID' => $this->peer->id,
@@ -642,7 +642,7 @@ class AnnounceManager
             );
         }
 
-        if (false !== isset($this->ipv6Address) && false !== isset($this->ipv6Port)) {
+        if (! empty($this->ipv6Address) && ! empty($this->ipv6Port)) {
             $this->databaseManager->table('peers_ip')->insert(
                 [
                     'peerID' => $this->peer->id,

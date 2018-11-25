@@ -17,7 +17,6 @@ use App\Models\TorrentComment;
 use App\Models\TorrentCategory;
 use App\Services\SizeFormatter;
 use Illuminate\Http\Testing\File;
-use App\Services\PasskeyGenerator;
 use Illuminate\Cache\CacheManager;
 use App\Services\TorrentInfoService;
 use Illuminate\Support\Facades\Storage;
@@ -307,20 +306,28 @@ class TorrentControllerTest extends TestCase
         $response->assertHeader('Content-Disposition', $dispositionHeader);
     }
 
-    public function testUserGetsAPasskeyIfHeDidNotHaveItBefore()
+    public function testDownloadWhenStorageThrowsAnException()
+    {
+        $torrent = factory(Torrent::class)->create(['uploader_id' => $this->user->id]);
+        Storage::shouldReceive('disk->get')->once()->with("{$torrent->id}.torrent")->andThrow(new FileNotFoundException());
+        $response = $this->get(route('torrents.download', $torrent));
+        $response->assertStatus(Response::HTTP_NOT_FOUND);
+        $response->assertSee(trans('messages.torrent-file-missing.error-message'));
+        $response->assertDontSee($torrent->name);
+    }
+
+    public function testGuestDownloadWithProvidedPasskey(): void
     {
         $this->withoutExceptionHandling();
 
-        $this->user->forceFill(['passkey' => null])->save();
+        $this->app->make('auth')->guard()->logout();
 
         /** @var Bdecoder|MockObject $decoder */
         $decoder = $this->createMock(Bdecoder::class);
         /** @var Bencoder|MockObject $encoder */
         $encoder = $this->createMock(Bencoder::class);
-        /** @var PasskeyGenerator|MockObject $passkeyGenerator */
-        $passkeyGenerator = $this->createMock(PasskeyGenerator::class);
 
-        $torrent = factory(Torrent::class)->create(['uploader_id' => $this->user->id]);
+        $torrent = factory(Torrent::class)->create(['uploader_id' => $this->user->id, 'name' => 'xyz']);
 
         $storageReturnValue = 'something x264';
         Storage::shouldReceive('disk->get')->once()->with("{$torrent->id}.torrent")->andReturn($storageReturnValue);
@@ -333,35 +340,30 @@ class TorrentControllerTest extends TestCase
 
         $this->app->instance(Bdecoder::class, $decoder);
 
-        $passkey = 'test passkey';
-        $passkeyGenerator->expects($this->once())->method('generateUniquePasskey')->willReturn($passkey);
-        $this->app->instance(PasskeyGenerator::class, $passkeyGenerator);
-
         $encoderReturnValue = 'something xyz';
         $encoder->expects($this->once())
             ->method('encode')
-            ->with($this->equalTo(array_merge($decoderReturnValue, ['announce' => route('announce', ['passkey' => $passkey])])))
+            ->with($this->equalTo(array_merge($decoderReturnValue, ['announce' => route('announce', ['passkey' => $this->user->passkey])])))
             ->willReturn($encoderReturnValue);
 
         $this->app->instance(Bencoder::class, $encoder);
 
-        $response = $this->get(route('torrents.download', $torrent));
+        $response = $this->get(route('torrents.download', ['torrent' => $torrent, 'passkey' => $this->user->passkey]));
         $response->assertStatus(Response::HTTP_OK);
         $this->assertSame($encoderReturnValue, $response->getContent());
         $response->assertHeader('Content-Type', 'application/x-bittorrent');
         $response->assertHeader('Content-Disposition', 'attachment; filename=' . $torrent->name . '.torrent');
-        $user = $this->user->fresh();
-        $this->assertSame($passkey, $user->passkey);
     }
 
-    public function testDownloadWhenStorageThrowsAnException()
+    public function testGuestsCannotDownloadWithAnInvalidPasskey(): void
     {
-        $torrent = factory(Torrent::class)->create(['uploader_id' => $this->user->id]);
-        Storage::shouldReceive('disk->get')->once()->with("{$torrent->id}.torrent")->andThrow(new FileNotFoundException());
-        $response = $this->get(route('torrents.download', $torrent));
-        $response->assertStatus(Response::HTTP_NOT_FOUND);
-        $response->assertSee(trans('messages.torrent-file-missing.error-message'));
-        $response->assertDontSee($torrent->name);
+        $this->app->make('auth')->guard()->logout();
+
+        $torrent = factory(Torrent::class)->create(['uploader_id' => $this->user->id, 'name' => 'xyz']);
+
+        $response = $this->get(route('torrents.download', ['torrent' => $torrent, 'passkey' => 'does-not-exist']));
+        $response->assertStatus(302);
+        $response->assertRedirect(route('login'));
     }
 
     public function testGuestsCannotSeeTheTorrentsIndexPage()
@@ -381,7 +383,7 @@ class TorrentControllerTest extends TestCase
         $response->assertRedirect(route('login'));
     }
 
-    public function testGuestsCannotDownloadTorrents()
+    public function testGuestsCannotDownloadTorrentsIfPasskeyIsNotProvided(): void
     {
         $this->app->make('auth')->guard()->logout();
         $torrent = factory(Torrent::class)->create(['uploader_id' => $this->user->id]);

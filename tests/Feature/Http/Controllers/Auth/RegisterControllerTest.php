@@ -69,7 +69,8 @@ class RegisterControllerTest extends TestCase
         $this->assertTrue(Hash::check($password, $user->password));
         $this->assertSame($user->timezone, $timezone);
         $this->assertTrue($user->language->is($locale));
-        $this->assertNull($user->passkey);
+        $this->assertNotEmpty($user->passkey);
+        $this->assertSame(64, strlen($user->passkey));
         $this->assertNotNull($user->slug);
         $this->assertAuthenticatedAs($user);
         Event::assertDispatched(Registered::class, function (Registered $event) use ($user) {

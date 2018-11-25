@@ -107,7 +107,8 @@ class UsersControllerTest extends AdminApiTestCase
         $this->assertSame($email, $user->email);
         $this->assertSame($timezone, $user->timezone);
         $this->assertTrue(Hash::check($password, $user->password));
-        $this->assertNull($user->passkey);
+        $this->assertNotEmpty($user->passkey);
+        $this->assertSame(64, strlen($user->passkey));
         $this->assertNotNull($user->slug);
         $this->assertTrue($user->language->is($locale));
     }

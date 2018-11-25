@@ -36,6 +36,10 @@ $this->post('password/reset', 'Auth\ResetPasswordController@reset')->name('passw
 $router->get('announce', 'AnnounceController@store')->name('announce');
 $router->get('scrape', 'ScrapeController@show')->name('scrape');
 
+$router->get('torrents/download/{torrent}', 'TorrentController@download')->name('torrents.download');
+
+$router->get('rss/{passkey}/torrents', 'RSS\TorrentFeedController@show')->name('torrents.rss');
+
 $router->group(['middleware' => [Authenticate::class]], function (Registrar $router) {
     $router->get('/', 'HomeController@index')->name('home');
 
@@ -45,7 +49,6 @@ $router->group(['middleware' => [Authenticate::class]], function (Registrar $rou
 
     $router->get('torrents', 'TorrentController@index')->name('torrents.index');
     $router->get('torrents/create', 'TorrentController@create')->name('torrents.create');
-    $router->get('torrents/download/{torrent}', 'TorrentController@download')->name('torrents.download');
     $router->get('torrents/{torrent}', 'TorrentController@show')->name('torrents.show');
     $router->post('torrents', 'TorrentController@store')->name('torrents.store');
 

@@ -13,7 +13,6 @@ use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use App\Models\TorrentCategory;
-use App\Services\PasskeyGenerator;
 use Illuminate\Cache\CacheManager;
 use Illuminate\Routing\Redirector;
 use App\Services\TorrentInfoService;
@@ -22,6 +21,7 @@ use Illuminate\Http\RedirectResponse;
 use App\Services\TorrentUploadManager;
 use App\Http\Requests\TorrentUploadRequest;
 use App\Exceptions\FileNotWritableException;
+use Illuminate\Auth\AuthenticationException;
 use App\Services\FileSizeCollectionFormatter;
 use Illuminate\Contracts\Routing\UrlGenerator;
 use Illuminate\Contracts\Translation\Translator;
@@ -169,12 +169,28 @@ class TorrentController
     }
 
     public function download(
+        Request $request,
         Torrent $torrent,
         Bencoder $encoder,
         Bdecoder $decoder,
-        PasskeyGenerator $passkeyGenerator,
         UrlGenerator $urlGenerator
     ): Response {
+        $user = $this->guard->user();
+
+        if (null === $user) {
+            if (! $request->filled('passkey')) {
+                throw new AuthenticationException();
+            }
+
+            $passkey = $request->input('passkey');
+
+            $user = User::where('passkey', '=', $passkey)->first();
+
+            if (null === $user) {
+                throw new AuthenticationException();
+            }
+        }
+
         try {
             $torrentFile = $this->filesystemManager->disk('torrents')->get("{$torrent->id}.torrent");
         } catch (FileNotFoundException $e) {
@@ -183,12 +199,7 @@ class TorrentController
 
         $decodedTorrent = $decoder->decode($torrentFile);
 
-        $passkey = $this->guard->user()->passkey;
-
-        if (empty($passkey)) {
-            $passkey = $passkeyGenerator->generateUniquePasskey();
-            User::where('id', '=', $this->guard->id())->update(['passkey' => $passkey]);
-        }
+        $passkey = $user->passkey;
 
         $decodedTorrent['announce'] = $urlGenerator->route('announce', ['passkey' => $passkey]);
 
