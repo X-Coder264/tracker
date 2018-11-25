@@ -10,30 +10,18 @@ use Illuminate\Contracts\View\Factory;
 class Feed
 {
     /**
-     * @var string
-     */
-    private $title;
-
-    /**
-     * @var string
-     */
-    private $url;
-
-    /**
-     * @var string
-     */
-    private $description;
-
-    /**
      * @var array
      */
     private $items = [];
 
-    public function __construct(string $title, string $url, string $description)
+    /**
+     * @var Factory
+     */
+    private $viewFactory;
+
+    public function __construct(Factory $viewFactory)
     {
-        $this->title = $title;
-        $this->url = $url;
-        $this->description = $description;
+        $this->viewFactory = $viewFactory;
     }
 
     public function addItem(FeedItem $feedItem): self
@@ -43,11 +31,11 @@ class Feed
         return $this;
     }
 
-    public function render(Factory $viewFactory): string
+    public function render(string $title, string $url, string $description): string
     {
-        return $viewFactory->make(
+        return $this->viewFactory->make(
             'rss.rss20',
-            ['title' => $this->title, 'url' => $this->url, 'description' => $this->description, 'items' => $this->items]
+            ['title' => $title, 'url' => $url, 'description' => $description, 'items' => $this->items]
         )->render();
     }
 }

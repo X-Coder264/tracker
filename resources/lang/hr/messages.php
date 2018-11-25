@@ -123,4 +123,7 @@ return [
     'common.seed_time' => 'Vrijeme seedanja',
     'common.leech_time' => 'Vrijeme leechanja',
     'common.total' => 'Ukupno',
+    'rss.feed' => 'RSS feed',
+    'rss.link' => 'RSS link',
+    'rss.get-link' => 'Dohvati link za RSS',
 ];

@@ -43,6 +43,11 @@ class TorrentFeedController
     private $torrentRepository;
 
     /**
+     * @var Feed
+     */
+    private $feed;
+
+    /**
      * @var Repository
      */
     private $cache;
@@ -58,6 +63,7 @@ class TorrentFeedController
         Factory $viewFactory,
         TorrentRepository $torrentRepository,
         Repository $cache,
+        Feed $feed,
         ResponseFactory $responseFactory
     ) {
         $this->torrentFeedItemFactory = $torrentFeedItemFactory;
@@ -65,6 +71,7 @@ class TorrentFeedController
         $this->viewFactory = $viewFactory;
         $this->torrentRepository = $torrentRepository;
         $this->cache = $cache;
+        $this->feed = $feed;
         $this->responseFactory = $responseFactory;
     }
 
@@ -91,13 +98,11 @@ class TorrentFeedController
                 $url .= sprintf('?categories=%s', rawurlencode($request->input('categories')));
             }
 
-            $feed = new Feed('RSS feed', $url, 'Latest torrents');
-
-            $torrents->each(function (Torrent $torrent) use ($feed, $user) {
-                $feed->addItem($this->torrentFeedItemFactory->make($torrent, $user->passkey));
+            $torrents->each(function (Torrent $torrent) use ($user) {
+                $this->feed->addItem($this->torrentFeedItemFactory->make($torrent, $user->passkey));
             });
 
-            return $feed->render($this->viewFactory);
+            return $this->feed->render('RSS feed', $url, 'Latest torrents');
         });
 
         return $this->responseFactory->make($feedContent)->header('Content-Type', 'application/rss+xml; charset=UTF-8');

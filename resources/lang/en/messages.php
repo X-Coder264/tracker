@@ -123,4 +123,7 @@ return [
     'common.seed_time' => 'Seed time',
     'common.leech_time' => 'Leech time',
     'common.total' => 'Total',
+    'rss.feed' => 'RSS feed',
+    'rss.link' => 'RSS link',
+    'rss.get-link' => 'Get the RSS feed link',
 ];
