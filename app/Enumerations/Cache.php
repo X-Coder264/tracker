@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Enumerations;
 
-class Cache
+final class Cache
 {
     const TWO_MINUTES = 2;
 
