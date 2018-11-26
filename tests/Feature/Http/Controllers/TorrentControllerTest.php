@@ -22,9 +22,9 @@ use App\Services\TorrentInfoService;
 use Illuminate\Support\Facades\Storage;
 use PHPUnit\Framework\MockObject\MockObject;
 use App\Services\FileSizeCollectionFormatter;
-use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Contracts\Filesystem\Factory as FilesystemManager;
 
@@ -64,8 +64,9 @@ class TorrentControllerTest extends TestCase
         $response->assertStatus(Response::HTTP_OK);
         $response->assertViewIs('torrents.index');
         $response->assertViewHas(['torrents', 'timezone']);
-        $this->assertInstanceOf(LengthAwarePaginator::class, $response->original->torrents);
-        $this->assertSame(1, $response->original->torrents->count());
+        $this->assertInstanceOf(LengthAwarePaginator::class, $response->viewData('torrents'));
+        $this->assertSame(1, $response->viewData('torrents')->count());
+        $this->assertSame($this->user->torrents_per_page, $response->viewData('torrents')->perPage());
         $this->assertTrue($response->original->torrents[0]->is($visibleTorrent));
         $response->assertSee($visibleTorrent->name);
         $response->assertSee($visibleTorrent->uploader->name);
@@ -77,6 +78,7 @@ class TorrentControllerTest extends TestCase
 
         $this->assertInstanceOf(LengthAwarePaginator::class, $cachedTorrents);
         $this->assertSame(1, $cachedTorrents->count());
+        $this->assertSame($this->user->torrents_per_page, $response->viewData('torrents')->perPage());
         $this->assertTrue($cachedTorrents[0]->is($visibleTorrent));
 
         $cacheManager->tags('torrents')->flush();
@@ -94,7 +96,8 @@ class TorrentControllerTest extends TestCase
         $response->assertViewIs('torrents.index');
         $response->assertViewHas(['torrents', 'timezone']);
         $this->assertInstanceOf(LengthAwarePaginator::class, $response->original->torrents);
-        $this->assertSame(1, $response->original->torrents->count());
+        $this->assertSame(1, $response->viewData('torrents')->count());
+        $this->assertSame($this->user->torrents_per_page, $response->viewData('torrents')->perPage());
         $this->assertTrue($response->original->torrents[0]->is($visibleTorrent));
         $response->assertSee($visibleTorrent->name);
         $response->assertSee($visibleTorrent->uploader->name);
@@ -105,6 +108,7 @@ class TorrentControllerTest extends TestCase
 
         $this->assertInstanceOf(LengthAwarePaginator::class, $cachedTorrents);
         $this->assertSame(1, $cachedTorrents->count());
+        $this->assertSame($this->user->torrents_per_page, $response->viewData('torrents')->perPage());
         $this->assertTrue($cachedTorrents[0]->is($visibleTorrent));
 
         $cacheManager->tags('torrents')->flush();
@@ -179,7 +183,8 @@ class TorrentControllerTest extends TestCase
         $response->assertViewHas('imdbData');
         $response->assertViewHas('posterExists', false);
         $response->assertViewHas('timezone', $this->user->timezone);
-        $this->assertInstanceOf(LengthAwarePaginator::class, $response->original->torrentComments);
+        $this->assertInstanceOf(LengthAwarePaginator::class, $response->viewData('torrentComments'));
+        $this->assertSame(10, $response->viewData('torrentComments')->perPage());
         $this->assertTrue($torrentComment->is($response->original->torrentComments[0]));
         $this->assertInstanceOf(Title::class, $response->original->imdbData);
         $this->assertSame('0468569', $response->original->imdbData->imdbid());

@@ -52,6 +52,7 @@
                                 <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuLink">
                                     <a class="dropdown-item" href="{{ route('users.edit', auth()->user()) }}">{{ trans('messages.navigation.users.edit_page') }}</a>
                                     <a class="dropdown-item" href="{{ route('users.show', auth()->user()) }}">{{ trans('messages.navigation.users.profile') }}</a>
+                                    <a class="dropdown-item" href="{{ route('user-torrents.show') }}">{{ trans('messages.navigation.my-torrents') }}</a>
                                     <a class="dropdown-item" href="{{ route('logout') }}" onclick="event.preventDefault();
                                                  document.getElementById('logout-form').submit();">{{ trans('messages.navigation.logout') }}</a>
                                     <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">

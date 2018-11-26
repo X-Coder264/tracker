@@ -20,5 +20,7 @@ class SizeFormatterTest extends TestCase
         $this->assertSame('1.00 GiB', $formatter->getFormattedSize(1073741824));
         $this->assertSame('1.09 GiB', $formatter->getFormattedSize(1170378588));
         $this->assertSame('50.84 GiB', $formatter->getFormattedSize(54591057225));
+        $this->assertSame('50.84 TiB', $formatter->getFormattedSize(55899171157352));
+        $this->assertSame('4.96 PiB', $formatter->getFormattedSize(5589917115735200));
     }
 }

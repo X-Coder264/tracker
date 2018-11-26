@@ -5,7 +5,7 @@
     <div class="col-md-10 mx-auto">
         <div class="card">
             <div class="card-header">
-                {{ trans('messages.torrent.index.page_title') }}
+                {{ trans('messages.torrent.user.page_title') }}
             </div>
 
             <div class="card-body">
@@ -13,7 +13,7 @@
                     <div class="card text-dark bg-warning">
                         <div class="card-body">
                             <h4 class="card-title">{{ trans('messages.common.notice') }}</h4>
-                            <p class="card-text">{{ trans('messages.torrent.index.notice_no_active_torrents_text') }}</p>
+                            <p class="card-text">{{ trans('messages.torrent.user.page_no_torrents') }}</p>
                         </div>
                     </div>
                 @else

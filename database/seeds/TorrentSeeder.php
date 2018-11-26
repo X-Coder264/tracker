@@ -19,7 +19,7 @@ class TorrentSeeder extends Seeder
         $torrent->name = 'test';
         $torrent->uploader_id = User::firstOrFail()->id;
         $torrent->category_id = TorrentCategory::firstOrFail()->id;
-        $torrent->size = 515151514;
+        $torrent->size = rand(1, 5151515140);
         $torrent->description = 'Description';
         $torrent->save();
         $torrent->infoHashes()->save(new TorrentInfoHash(['info_hash' => bin2hex(random_bytes(20)), 'version' => 1]));

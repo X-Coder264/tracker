@@ -8,8 +8,8 @@ use Tests\TestCase;
 use ReflectionClass;
 use App\Services\Bencoder;
 use App\Services\AnnounceManager;
-use Illuminate\Database\DatabaseManager;
 use Illuminate\Contracts\Config\Repository;
+use Illuminate\Database\ConnectionInterface;
 use PHPUnit\Framework\MockObject\MockObject;
 use Illuminate\Contracts\Translation\Translator;
 use Illuminate\Cache\Repository as CacheRepository;
@@ -21,7 +21,7 @@ class AnnounceManagerTest extends TestCase
     {
         $announceManager = new AnnounceManager(
             new Bencoder(),
-            $this->app->make(DatabaseManager::class),
+            $this->app->make(ConnectionInterface::class),
             $this->app->make(CacheRepository::class),
             $this->app->make(ValidationFactory::class),
             $this->app->make(Translator::class),
@@ -42,7 +42,7 @@ class AnnounceManagerTest extends TestCase
     {
         $announceManager = new AnnounceManager(
             new Bencoder(),
-            $this->app->make(DatabaseManager::class),
+            $this->app->make(ConnectionInterface::class),
             $this->app->make(CacheRepository::class),
             $this->app->make(ValidationFactory::class),
             $this->app->make(Translator::class),
@@ -77,7 +77,7 @@ class AnnounceManagerTest extends TestCase
 
         $announceManager = new AnnounceManager(
             $encoder,
-            $this->app->make(DatabaseManager::class),
+            $this->app->make(ConnectionInterface::class),
             $this->app->make(CacheRepository::class),
             $this->app->make(ValidationFactory::class),
             $this->app->make(Translator::class),
@@ -106,7 +106,7 @@ class AnnounceManagerTest extends TestCase
 
         $announceManager = new AnnounceManager(
             $encoder,
-            $this->app->make(DatabaseManager::class),
+            $this->app->make(ConnectionInterface::class),
             $this->app->make(CacheRepository::class),
             $this->app->make(ValidationFactory::class),
             $this->app->make(Translator::class),

@@ -70,4 +70,11 @@ class StatisticsManager
             return Torrent::dead()->count();
         });
     }
+
+    public function getTotalTorrentSize(): int
+    {
+        return (int) $this->cache->remember('torrents_size', Cache::ONE_HOUR, function (): int {
+            return (int) Torrent::sum('size');
+        });
+    }
 }

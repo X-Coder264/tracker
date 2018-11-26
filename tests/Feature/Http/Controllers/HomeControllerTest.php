@@ -9,6 +9,7 @@ use App\Models\Peer;
 use App\Models\User;
 use App\Models\Torrent;
 use Illuminate\Http\Response;
+use App\Services\SizeFormatter;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class HomeControllerTest extends TestCase
@@ -42,6 +43,7 @@ class HomeControllerTest extends TestCase
             'leechersCount' => 2,
             'torrentsCount' => 4,
             'deadTorrentsCount' => 3,
+            'totalTorrentSize' => $this->app->make(SizeFormatter::class)->getFormattedSize((int) Torrent::sum('size')),
         ]);
     }
 

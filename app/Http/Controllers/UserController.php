@@ -7,8 +7,10 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use App\Models\Locale;
 use Illuminate\Http\Response;
+use App\Services\SizeFormatter;
 use Illuminate\Cache\CacheManager;
 use Illuminate\Routing\Redirector;
+use App\Repositories\UserRepository;
 use Illuminate\Contracts\Auth\Guard;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Foundation\Application;
@@ -25,19 +27,33 @@ class UserController
     private $guard;
 
     /**
+     * @var UserRepository
+     */
+    private $userRepository;
+
+    /**
+     * @var SizeFormatter
+     */
+    private $sizeFormatter;
+
+    /**
      * @var ResponseFactory
      */
     private $responseFactory;
 
-    public function __construct(Guard $guard, ResponseFactory $responseFactory)
+    public function __construct(Guard $guard, UserRepository $userRepository, SizeFormatter $sizeFormatter, ResponseFactory $responseFactory)
     {
         $this->guard = $guard;
+        $this->userRepository = $userRepository;
+        $this->sizeFormatter = $sizeFormatter;
         $this->responseFactory = $responseFactory;
     }
 
     public function show(User $user): Response
     {
-        return $this->responseFactory->view('users.show', compact('user'));
+        $totalSeedingSize = $this->sizeFormatter->getFormattedSize($this->userRepository->getTotalSeedingSize($user->id));
+
+        return $this->responseFactory->view('users.show', compact('user', 'totalSeedingSize'));
     }
 
     /**

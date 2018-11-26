@@ -59,6 +59,8 @@ $router->group(['middleware' => [Authenticate::class]], function (Registrar $rou
 
     $router->get('torrents/{torrent}/snatches', 'SnatchController@show')->name('snatches.show');
 
+    $router->get('my-torrents', 'UserTorrentsController@show')->name('user-torrents.show');
+
     $router->get('users/{user}/edit', 'UserController@edit')->name('users.edit');
     $router->get('users/rss', 'RSS\UserTorrentFeedController@show')->name('users.rss.show');
     $router->post('users/rss', 'RSS\UserTorrentFeedController@store')->name('users.rss.store');

@@ -15,6 +15,7 @@ class SizeFormatter
         2 => 'MiB',
         3 => 'GiB',
         4 => 'TiB',
+        5 => 'PiB',
     ];
 
     public function getFormattedSize(int $sizeInBytes): string

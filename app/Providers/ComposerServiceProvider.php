@@ -14,7 +14,7 @@ class ComposerServiceProvider extends ServiceProvider
     /**
      * @var array
      */
-    private $viewsThatNeedTimezoneInfo = ['torrents.index', 'torrents.show', 'users.show', 'snatches.show'];
+    private $viewsThatNeedTimezoneInfo = ['torrents.index', 'torrents.show', 'users.show', 'snatches.show', 'partials.torrent'];
 
     public function boot(ViewFactory $viewFactory)
     {

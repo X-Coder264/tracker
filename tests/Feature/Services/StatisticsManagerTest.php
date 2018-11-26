@@ -26,9 +26,6 @@ class StatisticsManagerTest extends TestCase
      */
     private $connection;
 
-    /**
-     * Setup the test environment.
-     */
     protected function setUp()
     {
         parent::setUp();
@@ -110,6 +107,17 @@ class StatisticsManagerTest extends TestCase
         $this->assertSame(2, $this->statisticsManager->getDeadTorrentsCount());
         $beforeQueryLog = $this->connection->getQueryLog();
         $this->assertSame(2, $this->statisticsManager->getDeadTorrentsCount());
+        $afterQueryLog = $this->connection->getQueryLog();
+        $this->assertSame(count($beforeQueryLog), count($afterQueryLog));
+    }
+
+    public function testGetTotalTorrentSize(): void
+    {
+        factory(Torrent::class)->create(['size' => 400]);
+        factory(Torrent::class)->create(['size' => 650]);
+        $this->assertSame(1050, $this->statisticsManager->getTotalTorrentSize());
+        $beforeQueryLog = $this->connection->getQueryLog();
+        $this->assertSame(1050, $this->statisticsManager->getTotalTorrentSize());
         $afterQueryLog = $this->connection->getQueryLog();
         $this->assertSame(count($beforeQueryLog), count($afterQueryLog));
     }

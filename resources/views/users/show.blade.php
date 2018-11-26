@@ -23,6 +23,10 @@
                                 <td>{{ $user->created_at->timezone($timezone)->format('d.m.Y. H:i') }} ({{ $user->created_at->diffForHumans() }})</td>
                             </tr>
                             <tr>
+                                <th>{{ trans('messages.common.total_seeding_size') }}</th>
+                                <td>{{ $totalSeedingSize }}</td>
+                            </tr>
+                            <tr>
                                 <th>{{ trans('messages.common.uploaded') }}</th>
                                 <td>{{ $user->uploaded }}</td>
                             </tr>

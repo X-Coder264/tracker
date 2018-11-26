@@ -18,6 +18,9 @@ class PeerSeeder extends Seeder
         $peer->peer_id = '1234';
         $peer->torrent_id = Torrent::firstOrFail()->id;
         $peer->userAgent = 'qBittorrent/3.3.16';
+        $peer->seeder = true;
+        $peer->uploaded = rand(1, 500000);
+        $peer->downloaded = rand(1, 500000);
         $peer->save();
 
         $peer->IPs()->create(
@@ -33,6 +36,9 @@ class PeerSeeder extends Seeder
         $peer->peer_id = '12345';
         $peer->torrent_id = Torrent::firstOrFail()->id;
         $peer->userAgent = 'qBittorrent/3.3.16';
+        $peer->seeder = false;
+        $peer->uploaded = rand(1, 500000);
+        $peer->downloaded = rand(1, 500000);
         $peer->save();
 
         $peer->IPs()->createMany(

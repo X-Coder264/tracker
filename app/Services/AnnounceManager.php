@@ -10,8 +10,8 @@ use App\Enumerations\Cache;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Illuminate\Database\Query\Builder;
-use Illuminate\Database\DatabaseManager;
 use Illuminate\Contracts\Config\Repository;
+use Illuminate\Database\ConnectionInterface;
 use App\Exceptions\AnnounceValidationException;
 use Illuminate\Contracts\Translation\Translator;
 use Illuminate\Contracts\Cache\Repository as CacheRepository;
@@ -33,9 +33,9 @@ class AnnounceManager
     private $encoder;
 
     /**
-     * @var DatabaseManager
+     * @var ConnectionInterface
      */
-    private $databaseManager;
+    private $connection;
 
     /**
      * @var CacheRepository
@@ -139,14 +139,14 @@ class AnnounceManager
 
     public function __construct(
         Bencoder $encoder,
-        DatabaseManager $databaseManager,
+        ConnectionInterface $connection,
         CacheRepository $cache,
         ValidationFactory $validationFactory,
         Translator $translator,
         Repository $config
     ) {
         $this->encoder = $encoder;
-        $this->databaseManager = $databaseManager;
+        $this->connection = $connection;
         $this->cache = $cache;
         $this->validationFactory = $validationFactory;
         $this->translator = $translator;
@@ -195,7 +195,7 @@ class AnnounceManager
             return $this->announceErrorResponse($this->translator->trans('messages.announce.banned_user'), true);
         }
 
-        $this->torrent = $this->databaseManager->table('torrents')
+        $this->torrent = $this->connection->table('torrents')
                                                ->join('torrent_info_hashes', 'torrents.id', '=', 'torrent_info_hashes.torrent_id')
                                                ->where('info_hash', '=', bin2hex($this->request->input('info_hash')))
                                                ->select(['torrents.id', 'seeders', 'leechers', 'slug', 'version'])
@@ -210,7 +210,7 @@ class AnnounceManager
 
         $this->peerID = bin2hex($this->request->input('peer_id'));
 
-        $this->peer = $this->databaseManager->table('peers')
+        $this->peer = $this->connection->table('peers')
             ->join('peers_version', 'peers.id', '=', 'peers_version.peerID')
             ->where('peer_id', '=', $this->peerID)
             ->where('torrent_id', '=', $this->torrent->id)
@@ -239,7 +239,7 @@ class AnnounceManager
             }
         }
 
-        $this->snatch = $this->databaseManager->table('snatches')
+        $this->snatch = $this->connection->table('snatches')
                                 ->where('torrent_id', '=', $this->torrent->id)
                                 ->where('user_id', '=', $this->user->id)
                                 ->first();
@@ -264,7 +264,7 @@ class AnnounceManager
         $response = [];
 
         foreach ($infoHashes as $infoHash) {
-            $torrent = $this->databaseManager
+            $torrent = $this->connection
                 ->table('torrents')
                 ->join('torrent_info_hashes', 'torrents.id', '=', 'torrent_info_hashes.torrent_id')
                 ->where('info_hash', '=', bin2hex($infoHash))
@@ -275,7 +275,7 @@ class AnnounceManager
                 continue;
             }
 
-            $snatchesCount = $this->databaseManager
+            $snatchesCount = $this->connection
                 ->table('snatches')
                 ->where('torrent_id', '=', $torrent->id)
                 ->where('left', '=', 0)
@@ -298,7 +298,7 @@ class AnnounceManager
     public function getUser(string $passkey): ?stdClass
     {
         return $this->cache->remember('user.' . $passkey, Cache::ONE_DAY, function () use ($passkey) {
-            return $this->databaseManager->table('users')
+            return $this->connection->table('users')
                 ->where('passkey', '=', $passkey)
                 ->select(['id', 'slug', 'uploaded', 'downloaded', 'banned'])
                 ->first();
@@ -488,7 +488,7 @@ class AnnounceManager
     {
         $this->torrent->seeders = $this->torrent->seeders + $seeder;
         $this->torrent->leechers = $this->torrent->leechers + $leecher;
-        $this->databaseManager->table('torrents')->where('id', '=', $this->torrent->id)
+        $this->connection->table('torrents')->where('id', '=', $this->torrent->id)
             ->update(
                 [
                     'seeders'  => $this->torrent->seeders,
@@ -504,7 +504,7 @@ class AnnounceManager
     private function insertPeer(): void
     {
         $this->peer = new stdClass();
-        $this->peer->id = $this->databaseManager->table('peers')->insertGetId(
+        $this->peer->id = $this->connection->table('peers')->insertGetId(
             [
                 'peer_id'    => $this->peerID,
                 'torrent_id' => $this->torrent->id,
@@ -517,7 +517,7 @@ class AnnounceManager
                 'updated_at' => Carbon::now(),
             ]
         );
-        $this->databaseManager->table('peers_version')->insert(
+        $this->connection->table('peers_version')->insert(
             [
                 'peerID'     => $this->peer->id,
                 'version'    => $this->torrent->version,
@@ -533,7 +533,7 @@ class AnnounceManager
     private function updatePeerIfItExists(): void
     {
         if (null !== $this->peer) {
-            $this->databaseManager->table('peers')
+            $this->connection->table('peers')
                 ->where('id', '=', $this->peer->id)
                 ->update(
                     [
@@ -544,7 +544,7 @@ class AnnounceManager
                         'updated_at' => Carbon::now(),
                     ]
                 );
-            $this->databaseManager->table('peers_version')
+            $this->connection->table('peers_version')
                 ->where('id', '=', $this->peer->id)
                 ->where('version', '=', $this->torrent->version)
                 ->update(
@@ -561,7 +561,7 @@ class AnnounceManager
     private function insertSnatch(): void
     {
         $this->snatch = new stdClass();
-        $this->snatch->id = $this->databaseManager->table('snatches')->insertGetId(
+        $this->snatch->id = $this->connection->table('snatches')->insertGetId(
             [
                 'torrent_id'     => $this->torrent->id,
                 'user_id'        => $this->user->id,
@@ -587,7 +587,7 @@ class AnnounceManager
                 $finishedAt = Carbon::now();
             }
 
-            $this->databaseManager->table('snatches')
+            $this->connection->table('snatches')
                 ->where('id', '=', $this->snatch->id)
                 ->update(
                     [
@@ -613,7 +613,7 @@ class AnnounceManager
         $this->user->uploaded = $this->user->uploaded + $this->uploadedInThisAnnounceCycle;
         $this->user->downloaded = $this->user->downloaded + $this->downloadedInThisAnnounceCycle;
 
-        $this->databaseManager->table('users')
+        $this->connection->table('users')
             ->where('id', '=', $this->user->id)
             ->update(
                 [
@@ -629,10 +629,10 @@ class AnnounceManager
      */
     private function insertPeerIPs(): void
     {
-        $this->databaseManager->table('peers_ip')->where('peerID', '=', $this->peer->id)->delete();
+        $this->connection->table('peers_ip')->where('peerID', '=', $this->peer->id)->delete();
 
         if (! empty($this->ipv4Address) && ! empty($this->ipv4Port)) {
-            $this->databaseManager->table('peers_ip')->insert(
+            $this->connection->table('peers_ip')->insert(
                 [
                     'peerID' => $this->peer->id,
                     'IP'     => $this->ipv4Address,
@@ -643,7 +643,7 @@ class AnnounceManager
         }
 
         if (! empty($this->ipv6Address) && ! empty($this->ipv6Port)) {
-            $this->databaseManager->table('peers_ip')->insert(
+            $this->connection->table('peers_ip')->insert(
                 [
                     'peerID' => $this->peer->id,
                     'IP'     => $this->ipv6Address,
@@ -682,7 +682,7 @@ class AnnounceManager
 
     private function stoppedEventAnnounceResponse(): string
     {
-        $this->databaseManager->table('peers')->where('id', '=', $this->peer->id)->delete();
+        $this->connection->table('peers')->where('id', '=', $this->peer->id)->delete();
 
         if (true === $this->seeder) {
             $this->adjustTorrentPeers(-1, 0);
@@ -726,7 +726,7 @@ class AnnounceManager
 
     protected function getPeers(): Collection
     {
-        return $this->databaseManager->table('peers')
+        return $this->connection->table('peers')
             ->join('peers_ip', 'peers.id', '=', 'peers_ip.peerID')
             ->join('peers_version', 'peers.id', '=', 'peers_version.peerID')
             ->when($this->seeder, function (Builder $query) {

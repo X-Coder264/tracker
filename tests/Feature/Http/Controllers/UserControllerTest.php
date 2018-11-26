@@ -5,9 +5,12 @@ declare(strict_types=1);
 namespace Tests\Feature\Http\Controllers;
 
 use Tests\TestCase;
+use App\Models\Peer;
 use App\Models\User;
 use App\Models\Locale;
+use App\Models\Torrent;
 use Illuminate\Http\Response;
+use App\Services\SizeFormatter;
 use Illuminate\Support\Facades\Cache;
 use App\Http\Middleware\SetUserLocale;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -54,13 +57,29 @@ class UserControllerTest extends TestCase
         $this->withoutExceptionHandling();
 
         $user = factory(User::class)->create(['timezone' => 'Europe/Zagreb']);
+
+        $torrentOne = factory(Torrent::class)->create(['size' => 500]);
+        $torrentTwo = factory(Torrent::class)->create(['size' => 2500]);
+        $torrentThree = factory(Torrent::class)->create(['size' => 1200]);
+
+        factory(Peer::class)->states('seeder')->create(['user_id' => $user->id, 'torrent_id' => $torrentOne->id]);
+        factory(Peer::class)->states('seeder')->create(['user_id' => $user->id, 'torrent_id' => $torrentThree->id]);
+        factory(Peer::class)->states('leecher')->create(['user_id' => $user->id, 'torrent_id' => $torrentTwo->id]);
+
+        factory(Peer::class)->states('seeder')->create();
+        factory(Peer::class)->states('leecher')->create();
+
         $this->actingAs($user);
         $response = $this->get(route('users.show', $user));
 
-        $response->assertStatus(Response::HTTP_OK);
+        $response->assertStatus(200);
         $response->assertViewIs('users.show');
-        $response->assertViewHas(['user', 'timezone']);
-        $this->assertTrue($user->is($response->original->user));
+        $response->assertViewHas(['user', 'timezone', 'totalSeedingSize']);
+        $this->assertTrue($user->is($response->viewData('user')));
+        $this->assertSame(
+            $this->app->make(SizeFormatter::class)->getFormattedSize(1700),
+            $response->viewData('totalSeedingSize')
+        );
         $response->assertSee($user->uploaded);
         $response->assertSee($user->downloaded);
         $response->assertSee($user->last_seen_at->timezone('Europe/Zagreb')->format('d.m.Y. H:i'));
