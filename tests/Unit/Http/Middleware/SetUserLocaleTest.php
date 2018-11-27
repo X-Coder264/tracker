@@ -8,17 +8,18 @@ use Carbon\Carbon;
 use Tests\TestCase;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Router;
-use Illuminate\Auth\AuthManager;
-use Illuminate\Cache\CacheManager;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Cache;
+use Illuminate\Contracts\Auth\Guard;
 use App\Http\Middleware\SetUserLocale;
+use Illuminate\Contracts\Cache\Repository;
+use PHPUnit\Framework\MockObject\MockObject;
 
 class SetUserLocaleTest extends TestCase
 {
     public function testForALoggedInUserItSetsHisLocale(): void
     {
-        Auth::shouldReceive('check')->andReturn(true);
+        /** @var Guard|MockObject $guardMock */
+        $guardMock = $this->createMock(Guard::class);
+        $guardMock->expects($this->once())->method('check')->willReturn(true);
 
         $user = new class() {
             public $language;
@@ -33,11 +34,15 @@ class SetUserLocaleTest extends TestCase
             }
         };
 
-        Auth::shouldReceive('user')->andReturn($user);
+        $guardMock->expects($this->once())->method('user')->willReturn($user);
+
+        /** @var Repository|MockObject $cache */
+        $cache = $this->createMock(Repository::class);
+        $cache->expects($this->once())->method('rememberForever')->willReturn('hr');
 
         $middleware = new SetUserLocale(
-            $this->app->make(AuthManager::class),
-            $this->app->make(CacheManager::class),
+            $guardMock,
+            $cache,
             $this->app
         );
 
@@ -58,21 +63,26 @@ class SetUserLocaleTest extends TestCase
         $this->assertTrue($next->called);
         $this->assertSame('hr', $this->app->getLocale());
         $this->assertSame('hr', Carbon::getLocale());
-        $this->assertSame('hr', Cache::get('user.test_slug.locale'));
         $this->assertSame($request, $result);
     }
 
     public function testIfTheUserIsNotLoggedInJustCallTheNextMiddlewareInThePipe(): void
     {
-        Auth::shouldReceive('check')->andReturn(false);
+        /** @var Guard|MockObject $guardMock */
+        $guardMock = $this->createMock(Guard::class);
+        $guardMock->expects($this->once())->method('check')->willReturn(false);
 
         $localeBefore = 'en';
         $this->app->setLocale($localeBefore);
         Carbon::setLocale($localeBefore);
 
+        /** @var Repository|MockObject $cache */
+        $cache = $this->createMock(Repository::class);
+        $cache->expects($this->never())->method('rememberForever');
+
         $middleware = new SetUserLocale(
-            $this->app->make(AuthManager::class),
-            $this->app->make(CacheManager::class),
+            $guardMock,
+            $cache,
             $this->app
         );
 

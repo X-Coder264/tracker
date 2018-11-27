@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Services;
+namespace App\Services\IMDb;
 
 use GuzzleHttp\Client;
 use Psr\Log\LoggerInterface;

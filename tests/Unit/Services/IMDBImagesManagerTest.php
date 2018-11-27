@@ -10,11 +10,11 @@ use GuzzleHttp\Middleware;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Psr7\Request;
 use Psr\Log\LoggerInterface;
-use App\Services\IMDBManager;
 use GuzzleHttp\Psr7\Response;
-use App\Services\IMDBImagesManager;
+use App\Services\IMDb\IMDBManager;
 use GuzzleHttp\Handler\MockHandler;
 use Illuminate\Support\Facades\Storage;
+use App\Services\IMDb\IMDBImagesManager;
 use PHPUnit\Framework\MockObject\MockObject;
 use Illuminate\Contracts\Filesystem\Factory as FilesystemManager;
 

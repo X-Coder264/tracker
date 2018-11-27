@@ -9,12 +9,13 @@ use Generator;
 use Tests\TestCase;
 use App\Models\Torrent;
 use App\Services\Bdecoder;
-use App\Services\IMDBManager;
 use App\Services\SizeFormatter;
-use Illuminate\Cache\CacheManager;
+use App\Services\IMDb\IMDBManager;
+use App\Services\IMDb\TitleFactory;
 use App\Services\TorrentInfoService;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Contracts\Cache\Repository;
 use PHPUnit\Framework\MockObject\MockObject;
 use Illuminate\Contracts\Filesystem\Factory as FilesystemManager;
 
@@ -71,9 +72,10 @@ class TorrentInfoServiceTest extends TestCase
                 [
                     $formatter,
                     $decoder,
-                    $this->app->make(CacheManager::class),
+                    $this->app->make(Repository::class),
                     $this->app->make(FilesystemManager::class),
                     $this->app->make(IMDBManager::class),
+                    $this->app->make(TitleFactory::class),
                 ]
             )
             ->setMethods(['getTorrentFileNamesAndSizesFromTorrentInfoDict'])

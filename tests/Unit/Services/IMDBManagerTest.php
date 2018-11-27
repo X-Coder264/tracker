@@ -6,7 +6,7 @@ namespace Tests\Unit\Services;
 
 use Imdb\Title;
 use Tests\TestCase;
-use App\Services\IMDBManager;
+use App\Services\IMDb\IMDBManager;
 
 class IMDBManagerTest extends TestCase
 {

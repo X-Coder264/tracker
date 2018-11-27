@@ -25,6 +25,7 @@ class CheckIfTheUserIsBannedTest extends TestCase
         $this->assertGuest();
         $response->assertStatus(302);
         $response->assertRedirect(route('login'));
+        $response->assertSessionHas('error', trans('messages.user.banned'));
     }
 
     public function testMiddlewareIsAppliedOnAllWebRoutes(): void

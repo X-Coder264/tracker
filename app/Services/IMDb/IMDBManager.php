@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace App\Services;
+namespace App\Services\IMDb;
 
 use Imdb\Title;
 use Imdb\Config;
-use Illuminate\Cache\CacheManager;
+use Illuminate\Contracts\Cache\Repository;
 
 class IMDBManager
 {
@@ -16,26 +16,26 @@ class IMDBManager
     private $IMDBLinkParser;
 
     /**
-     * @var CacheManager
+     * @var Repository
      */
-    private $cacheManager;
+    private $cache;
 
-    public function __construct(IMDBLinkParser $IMDBLinkParser, CacheManager $cacheManager)
+    public function __construct(IMDBLinkParser $IMDBLinkParser, Repository $cache)
     {
         $this->IMDBLinkParser = $IMDBLinkParser;
-        $this->cacheManager = $cacheManager;
+        $this->cache = $cache;
     }
 
     public function getTitleFromFullURL(string $imdbUrl): Title
     {
         $imdbId = $this->IMDBLinkParser->getId($imdbUrl);
 
-        return new Title($imdbId, $this->getIMDBConfig(), null, $this->cacheManager->store());
+        return new Title($imdbId, $this->getIMDBConfig(), null, $this->cache);
     }
 
     public function getTitleFromIMDBId(string $imdbId): Title
     {
-        return new Title($imdbId, $this->getIMDBConfig(), null, $this->cacheManager->store());
+        return new Title($imdbId, $this->getIMDBConfig(), null, $this->cache);
     }
 
     public function getIMDBIdFromFullURL(string $imdbUrl): string

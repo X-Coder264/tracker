@@ -7,40 +7,40 @@ namespace App\Http\Middleware;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
-use Illuminate\Auth\AuthManager;
-use Illuminate\Cache\CacheManager;
+use Illuminate\Contracts\Auth\Guard;
 use Illuminate\Foundation\Application;
+use Illuminate\Contracts\Cache\Repository;
 
 class SetUserLocale
 {
     /**
-     * @var AuthManager
+     * @var Guard
      */
-    private $authManager;
+    private $guard;
 
     /**
-     * @var CacheManager
+     * @var Repository
      */
-    private $cacheManager;
+    private $cache;
 
     /**
      * @var Application
      */
     private $application;
 
-    public function __construct(AuthManager $authManager, CacheManager $cacheManager, Application $application)
+    public function __construct(Guard $guard, Repository $cache, Application $application)
     {
-        $this->authManager = $authManager;
-        $this->cacheManager = $cacheManager;
+        $this->guard = $guard;
+        $this->cache = $cache;
         $this->application = $application;
     }
 
     public function handle(Request $request, $next)
     {
-        if (true === $this->authManager->check()) {
+        if (true === $this->guard->check()) {
             /** @var User $user */
-            $user = $this->authManager->user();
-            $locale = $this->cacheManager->rememberForever('user.' . $user->slug . '.locale', function () use ($user): string {
+            $user = $this->guard->user();
+            $locale = $this->cache->rememberForever('user.' . $user->slug . '.locale', function () use ($user): string {
                 return $user->language->localeShort;
             });
             $this->application->setLocale($locale);

@@ -135,7 +135,7 @@ class TorrentController
         });
 
         $imdbData = $torrentInfoService->getTorrentIMDBData($torrent);
-        $posterExists = $imdbData ? $this->filesystemManager->disk('imdb-images')->exists("{$imdbData->imdbid()}.jpg") : false;
+        $posterExists = $imdbData ? $this->filesystemManager->disk('imdb-images')->exists("{$imdbData->getId()}.jpg") : false;
 
         return $this->responseFactory->view(
             'torrents.show',

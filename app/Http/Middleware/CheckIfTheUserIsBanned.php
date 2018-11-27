@@ -7,17 +7,18 @@ namespace App\Http\Middleware;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use Illuminate\Auth\AuthManager;
 use Illuminate\Routing\Redirector;
+use Illuminate\Contracts\Auth\Guard;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Contracts\Auth\StatefulGuard;
 use Illuminate\Contracts\Translation\Translator;
 
 class CheckIfTheUserIsBanned
 {
     /**
-     * @var AuthManager
+     * @var StatefulGuard
      */
-    private $authManager;
+    private $guard;
 
     /**
      * @var Redirector
@@ -29,9 +30,9 @@ class CheckIfTheUserIsBanned
      */
     private $translator;
 
-    public function __construct(AuthManager $authManager, Redirector $redirector, Translator $translator)
+    public function __construct(Guard $guard, Redirector $redirector, Translator $translator)
     {
-        $this->authManager = $authManager;
+        $this->guard = $guard;
         $this->redirector = $redirector;
         $this->translator = $translator;
     }
@@ -45,8 +46,8 @@ class CheckIfTheUserIsBanned
      */
     public function handle(Request $request, $next)
     {
-        if ($this->authManager->guard()->check() && true === $this->authManager->guard()->user()->banned) {
-            $this->authManager->guard()->logout();
+        if ($this->guard->check() && true === $this->guard->user()->banned) {
+            $this->guard->logout();
 
             return $this->redirector->route('login')->with('error', $this->translator->trans('messages.user.banned'));
         }

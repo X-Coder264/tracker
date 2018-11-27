@@ -6,6 +6,7 @@ namespace Tests\Feature\Services;
 
 use Tests\TestCase;
 use App\Models\Torrent;
+use App\Presenters\IMDb\Title;
 use App\Services\TorrentInfoService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
@@ -20,8 +21,8 @@ class TorrentInfoServiceTest extends TestCase
         $torrentInfoService = $this->app->make(TorrentInfoService::class);
 
         $title = $torrentInfoService->getTorrentIMDBData($torrent);
-        $this->assertSame('0468569', $title->imdbid());
-        $this->assertSame(60 * 24, $title->cache_expire);
+        $this->assertInstanceOf(Title::class, $title);
+        $this->assertSame('0468569', $title->getId());
     }
 
     public function testGetIMDBDataWhenThereIsNoIMDBId(): void

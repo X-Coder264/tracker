@@ -11,27 +11,27 @@
                         <tbody>
                             <tr>
                                 <th>{{ trans('messages.common.imdb-title') }}</th>
-                                <td>{{ $imdbData->title() }}</td>
+                                <td>{{ $imdbData->getName() }}</td>
                             </tr>
                             <tr>
                                 <th>{{ trans('messages.common.imdb-rating') }}</th>
-                                <td>{{ $imdbData->rating() }}</td>
+                                <td>{{ $imdbData->getRating() }}</td>
                             </tr>
                             <tr>
                                 <th>{{ trans('messages.common.imdb-genres') }}</th>
-                                <td>{{ implode(', ', $imdbData->genres()) }}</td>
+                                <td>{{ implode(', ', $imdbData->getGenres()) }}</td>
                             </tr>
                             @if (true === $posterExists)
                                 <tr>
                                     <th>{{ trans('messages.common.imdb-poster') }}</th>
                                     <td>
-                                        <img src="{{ Storage::disk('imdb-images')->url("{$imdbData->imdbid()}.jpg") }}">
+                                        <img src="{{ Storage::disk('imdb-images')->url("{$imdbData->getId()}.jpg") }}">
                                     </td>
                                 </tr>
                             @endif
                             <tr>
                                 <th>{{ trans('messages.common.imdb-plot') }}</th>
-                                <td>{{ $imdbData->plotoutline(true) }}</td>
+                                <td>{{ $imdbData->getPlotOutline(true) }}</td>
                             </tr>
                         </tbody>
                     </table>

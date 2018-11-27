@@ -4,22 +4,24 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Http\Controllers;
 
-use Imdb\Title;
 use Tests\TestCase;
 use App\Models\Peer;
 use App\Models\User;
 use App\Models\Torrent;
 use App\Services\Bdecoder;
 use App\Services\Bencoder;
-use App\Services\IMDBManager;
 use Illuminate\Http\Response;
 use App\Models\TorrentComment;
+use App\Presenters\IMDb\Title;
 use App\Models\TorrentCategory;
 use App\Services\SizeFormatter;
 use Illuminate\Http\Testing\File;
+use App\Services\IMDb\IMDBManager;
 use Illuminate\Cache\CacheManager;
+use App\Services\IMDb\TitleFactory;
 use App\Services\TorrentInfoService;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Contracts\Cache\Repository;
 use PHPUnit\Framework\MockObject\MockObject;
 use App\Services\FileSizeCollectionFormatter;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -67,7 +69,7 @@ class TorrentControllerTest extends TestCase
         $this->assertInstanceOf(LengthAwarePaginator::class, $response->viewData('torrents'));
         $this->assertSame(1, $response->viewData('torrents')->count());
         $this->assertSame($this->user->torrents_per_page, $response->viewData('torrents')->perPage());
-        $this->assertTrue($response->original->torrents[0]->is($visibleTorrent));
+        $this->assertTrue($response->viewData('torrents')[0]->is($visibleTorrent));
         $response->assertSee($visibleTorrent->name);
         $response->assertSee($visibleTorrent->uploader->name);
         $response->assertSee($visibleTorrent->category->name);
@@ -154,9 +156,10 @@ class TorrentControllerTest extends TestCase
                 [
                     $this->app->make(SizeFormatter::class),
                     $this->app->make(Bdecoder::class),
-                    $this->app->make(CacheManager::class),
+                    $this->app->make(Repository::class),
                     $this->app->make(FilesystemManager::class),
                     $this->app->make(IMDBManager::class),
+                    $this->app->make(TitleFactory::class),
                 ]
             )
             ->setMethods(['getTorrentFileNamesAndSizes'])
@@ -186,8 +189,8 @@ class TorrentControllerTest extends TestCase
         $this->assertInstanceOf(LengthAwarePaginator::class, $response->viewData('torrentComments'));
         $this->assertSame(10, $response->viewData('torrentComments')->perPage());
         $this->assertTrue($torrentComment->is($response->original->torrentComments[0]));
-        $this->assertInstanceOf(Title::class, $response->original->imdbData);
-        $this->assertSame('0468569', $response->original->imdbData->imdbid());
+        $this->assertInstanceOf(Title::class, $response->viewData('imdbData'));
+        $this->assertSame('0468569', $response->viewData('imdbData')->getId());
         $response->assertSee($torrent->name);
         $response->assertSee($torrent->description);
         $response->assertSee($torrent->size);
@@ -200,9 +203,10 @@ class TorrentControllerTest extends TestCase
         $response->assertSee($torrentComment->comment);
         $response->assertSee($peer->user->name);
         $response->assertSee($peer->updated_at->diffForHumans());
-        $response->assertSee($response->original->imdbData->title());
-        $response->assertSee($response->original->imdbData->rating());
-        $response->assertSee(implode(', ', $response->original->imdbData->genres()));
+        $response->assertSee($response->viewData('imdbData')->getName());
+        $response->assertSee($response->viewData('imdbData')->getRating());
+        $response->assertSee($response->viewData('imdbData')->getPlotOutline());
+        $response->assertSee(implode(', ', $response->viewData('imdbData')->getGenres()));
         // peer downloaded stats
         $response->assertSee('2.00 KiB');
         // peer uploaded stats

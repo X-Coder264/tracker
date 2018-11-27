@@ -5,10 +5,12 @@ declare(strict_types=1);
 namespace App\Services;
 
 use Generator;
-use Imdb\Title;
 use App\Models\Torrent;
 use App\Enumerations\Cache;
-use Illuminate\Cache\CacheManager;
+use App\Presenters\IMDb\Title;
+use App\Services\IMDb\IMDBManager;
+use App\Services\IMDb\TitleFactory;
+use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Contracts\Filesystem\Factory as FilesystemManager;
 
@@ -25,9 +27,9 @@ class TorrentInfoService
     private $bdecoder;
 
     /**
-     * @var CacheManager
+     * @var Repository
      */
-    private $cacheManager;
+    private $cache;
 
     /**
      * @var FilesystemManager
@@ -39,18 +41,25 @@ class TorrentInfoService
      */
     private $IMDBManager;
 
+    /**
+     * @var TitleFactory
+     */
+    private $IMDbTitleFactory;
+
     public function __construct(
         SizeFormatter $sizeFormatter,
         Bdecoder $bdecoder,
-        CacheManager $cacheManager,
+        Repository $cache,
         FilesystemManager $filesystemManager,
-        IMDBManager $IMDBManager
+        IMDBManager $IMDBManager,
+        TitleFactory $IMDbTitleFactory
     ) {
         $this->sizeFormatter = $sizeFormatter;
         $this->bdecoder = $bdecoder;
-        $this->cacheManager = $cacheManager;
+        $this->cache = $cache;
         $this->filesystemManager = $filesystemManager;
         $this->IMDBManager = $IMDBManager;
+        $this->IMDbTitleFactory = $IMDbTitleFactory;
     }
 
     public function getTorrentSize(array $torrentInfoDict): int
@@ -120,7 +129,7 @@ class TorrentInfoService
     {
         $key = sprintf('torrent.%s.files', $torrent->id);
 
-        return $this->cacheManager->remember(
+        return $this->cache->remember(
             $key,
             Cache::ONE_MONTH,
             function () use ($torrent): array {
@@ -156,7 +165,7 @@ class TorrentInfoService
         $imdbData = null;
 
         if (! empty($torrent->imdb_id)) {
-            $imdbData = $this->IMDBManager->getTitleFromIMDBId($torrent->imdb_id);
+            $imdbData = $this->IMDbTitleFactory->make($this->IMDBManager->getTitleFromIMDBId($torrent->imdb_id));
         }
 
         return $imdbData;
