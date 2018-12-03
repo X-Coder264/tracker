@@ -5,15 +5,15 @@
     <div class="col-md-10 mx-auto">
         <div class="card">
             <div class="card-header">
-                {{ trans('messages.torrent.index.page_title') }}
+                {{ $title }} - <a href="{{ route('users.show', $user) }}">{{ $user->name }}</a>
             </div>
 
             <div class="card-body">
-                @if ($torrents->isEmpty())
+                @if ($peers->isEmpty())
                     <div class="card text-dark bg-warning">
                         <div class="card-body">
                             <h4 class="card-title">{{ trans('messages.common.notice') }}</h4>
-                            <p class="card-text">{{ trans('messages.torrent.index.notice_no_active_torrents_text') }}</p>
+                            <p class="card-text">{{ $noTorrentsMessage }}</p>
                         </div>
                     </div>
                 @else
@@ -26,17 +26,21 @@
                                     <th>{{ trans('messages.common.size') }}</th>
                                     <th>{{ trans('messages.common.torrent_seeders') }}</th>
                                     <th>{{ trans('messages.common.torrent_leechers') }}</th>
-                                    <th>{{ trans('messages.common.uploader') }}</th>
+                                    <th>{{ trans('messages.common.uploaded') }}</th>
+                                    <th>{{ trans('messages.common.downloaded') }}</th>
+                                    <th>{{ trans('messages.common.torrent_table_ratio') }}</th>
+                                    <th>{{ trans('messages.common.torrent_table_last_announce') }}</th>
+                                    <th>{{ trans('messages.common.torrent_table_torrent_client') }}</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                @foreach ($torrents as $torrent)
-                                    @include('partials.torrent', ['torrent' => $torrent])
+                                @foreach ($peers as $peer)
+                                    @include('partials.peer', ['peer' => $peer])
                                 @endforeach
                             </tbody>
                         </table>
                     </div>
-                    {{ $torrents->render() }}
+                    {{ $peers->render() }}
                 @endif
             </div>
         </div>

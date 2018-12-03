@@ -8,13 +8,13 @@ use App\Models\User;
 use App\Models\Locale;
 use Illuminate\Http\Response;
 use App\Services\SizeFormatter;
-use Illuminate\Cache\CacheManager;
 use Illuminate\Routing\Redirector;
 use App\Repositories\UserRepository;
 use Illuminate\Contracts\Auth\Guard;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Foundation\Application;
 use App\Http\Requests\UpdateUserRequest;
+use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Contracts\Translation\Translator;
 use Illuminate\Contracts\Routing\ResponseFactory;
 use Symfony\Component\HttpFoundation\Response as BaseResponse;
@@ -37,15 +37,26 @@ class UserController
     private $sizeFormatter;
 
     /**
+     * @var Repository
+     */
+    private $cache;
+
+    /**
      * @var ResponseFactory
      */
     private $responseFactory;
 
-    public function __construct(Guard $guard, UserRepository $userRepository, SizeFormatter $sizeFormatter, ResponseFactory $responseFactory)
-    {
+    public function __construct(
+        Guard $guard,
+        UserRepository $userRepository,
+        SizeFormatter $sizeFormatter,
+        Repository $cache,
+        ResponseFactory $responseFactory
+    ) {
         $this->guard = $guard;
         $this->userRepository = $userRepository;
         $this->sizeFormatter = $sizeFormatter;
+        $this->cache = $cache;
         $this->responseFactory = $responseFactory;
     }
 
@@ -53,7 +64,22 @@ class UserController
     {
         $totalSeedingSize = $this->sizeFormatter->getFormattedSize($this->userRepository->getTotalSeedingSize($user->id));
 
-        return $this->responseFactory->view('users.show', compact('user', 'totalSeedingSize'));
+        $uploadedTorrentsCount = $this->userRepository->getUploadedTorrentsCount($user->id);
+        $seedingTorrentPeersCount = $this->userRepository->getSeedingTorrentPeersCount($user->id);
+        $leechingTorrentPeersCount = $this->userRepository->getLeechingTorrentPeersCount($user->id);
+        $snatchesCount = $this->userRepository->getUserSnatchesCount($user->id);
+
+        return $this->responseFactory->view(
+            'users.show',
+            compact(
+                'user',
+                'totalSeedingSize',
+                'uploadedTorrentsCount',
+                'seedingTorrentPeersCount',
+                'leechingTorrentPeersCount',
+                'snatchesCount'
+            )
+        );
     }
 
     /**
@@ -77,7 +103,6 @@ class UserController
         User $user,
         Translator $translator,
         Application $application,
-        CacheManager $cache,
         Redirector $redirector
     ): RedirectResponse {
         $user->update([
@@ -89,9 +114,9 @@ class UserController
 
         $application->setLocale($user->language->localeShort);
 
-        $cache->forget('user.' . $user->id);
-        $cache->forget('user.' . $user->slug . '.locale');
-        $cache->forget('user.' . $user->passkey);
+        $this->cache->forget('user.' . $user->id);
+        $this->cache->forget('user.' . $user->slug . '.locale');
+        $this->cache->forget('user.' . $user->passkey);
 
         return $redirector->back()->with('success', $translator->trans('messages.common.save_changes_successful'));
     }

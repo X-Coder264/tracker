@@ -34,6 +34,46 @@
                                 <th>{{ trans('messages.common.downloaded') }}</th>
                                 <td>{{ $user->downloaded }}</td>
                             </tr>
+                            <tr>
+                                <th>{{ trans('messages.user.profile_count_of_uploaded_torrents') }}</th>
+                                <td>
+                                    @if (0 === $uploadedTorrentsCount)
+                                        0
+                                    @else
+                                        <a href="{{ route('user-torrents.show-uploaded-torrents', $user) }}">{{ $uploadedTorrentsCount }}</a>
+                                    @endif
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>{{ trans('messages.common.seeding') }}</th>
+                                <td>
+                                    @if (0 === $seedingTorrentPeersCount)
+                                        0
+                                    @else
+                                        <a href="{{ route('user-torrents.show-seeding-torrents', $user) }}">{{ $seedingTorrentPeersCount }}</a>
+                                    @endif
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>{{ trans('messages.common.leeching') }}</th>
+                                <td>
+                                    @if (0 === $leechingTorrentPeersCount)
+                                        0
+                                    @else
+                                        <a href="{{ route('user-torrents.show-leeching-torrents', $user) }}">{{ $leechingTorrentPeersCount }}</a>
+                                    @endif
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>{{ trans('messages.user.profile_snatches') }}</th>
+                                <td>
+                                    @if (0 === $snatchesCount)
+                                        0
+                                    @else
+                                        <a href="{{ route('user-snatches.show', $user) }}">{{ $snatchesCount }}</a>
+                                    @endif
+                                </td>
+                            </tr>
                         </tbody>
                     </table>
                 </div>

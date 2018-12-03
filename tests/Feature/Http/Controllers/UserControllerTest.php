@@ -8,11 +8,14 @@ use Tests\TestCase;
 use App\Models\Peer;
 use App\Models\User;
 use App\Models\Locale;
+use App\Models\Snatch;
 use App\Models\Torrent;
 use Illuminate\Http\Response;
 use App\Services\SizeFormatter;
 use Illuminate\Support\Facades\Cache;
 use App\Http\Middleware\SetUserLocale;
+use Illuminate\Contracts\Cache\Repository;
+use Illuminate\Contracts\Translation\Translator;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class UserControllerTest extends TestCase
@@ -58,9 +61,10 @@ class UserControllerTest extends TestCase
 
         $user = factory(User::class)->create(['timezone' => 'Europe/Zagreb']);
 
-        $torrentOne = factory(Torrent::class)->create(['size' => 500]);
+        $torrentOne = factory(Torrent::class)->create(['size' => 500, 'uploader_id' => $user->id]);
         $torrentTwo = factory(Torrent::class)->create(['size' => 2500]);
-        $torrentThree = factory(Torrent::class)->create(['size' => 1200]);
+        $torrentThree = factory(Torrent::class)->create(['size' => 1200, 'uploader_id' => $user->id]);
+        $torrentFour = factory(Torrent::class)->create(['size' => 1800]);
 
         factory(Peer::class)->states('seeder')->create(['user_id' => $user->id, 'torrent_id' => $torrentOne->id]);
         factory(Peer::class)->states('seeder')->create(['user_id' => $user->id, 'torrent_id' => $torrentThree->id]);
@@ -69,21 +73,37 @@ class UserControllerTest extends TestCase
         factory(Peer::class)->states('seeder')->create();
         factory(Peer::class)->states('leecher')->create();
 
+        factory(Snatch::class)->states('snatched')->create(['user_id' => $user->id, 'torrent_id' => $torrentOne->id]);
+        factory(Snatch::class)->create(['user_id' => $user->id, 'torrent_id' => $torrentTwo->id, 'left' => 5]);
+        factory(Snatch::class)->states('snatched')->create(['user_id' => $user->id, 'torrent_id' => $torrentThree->id]);
+        factory(Snatch::class)->states('snatched')->create(['user_id' => $user->id, 'torrent_id' => $torrentFour->id]);
+
+        factory(Snatch::class)->states('snatched')->create(['torrent_id' => $torrentFour->id]);
+        factory(Snatch::class)->create(['torrent_id' => $torrentFour->id, 'left' => 10005]);
+
         $this->actingAs($user);
         $response = $this->get(route('users.show', $user));
 
         $response->assertStatus(200);
         $response->assertViewIs('users.show');
-        $response->assertViewHas(['user', 'timezone', 'totalSeedingSize']);
+        $response->assertViewHas(['user', 'timezone', 'totalSeedingSize', 'uploadedTorrentsCount', 'seedingTorrentPeersCount', 'leechingTorrentPeersCount', 'snatchesCount']);
         $this->assertTrue($user->is($response->viewData('user')));
         $this->assertSame(
             $this->app->make(SizeFormatter::class)->getFormattedSize(1700),
             $response->viewData('totalSeedingSize')
         );
+        $this->assertSame(2, $response->viewData('uploadedTorrentsCount'));
+        $this->assertSame(2, $response->viewData('seedingTorrentPeersCount'));
+        $this->assertSame(1, $response->viewData('leechingTorrentPeersCount'));
+        $this->assertSame(3, $response->viewData('snatchesCount'));
         $response->assertSee($user->uploaded);
         $response->assertSee($user->downloaded);
         $response->assertSee($user->last_seen_at->timezone('Europe/Zagreb')->format('d.m.Y. H:i'));
         $response->assertSee($user->created_at->timezone('Europe/Zagreb')->format('d.m.Y. H:i'));
+        $response->assertSee(route('user-torrents.show-uploaded-torrents', $user));
+        $response->assertSee(route('user-torrents.show-seeding-torrents', $user));
+        $response->assertSee(route('user-torrents.show-leeching-torrents', $user));
+        $response->assertSee(route('user-snatches.show', $user));
     }
 
     public function testLoggedInUsersCanSeeProfilePagesOfOtherUsers(): void
@@ -118,8 +138,6 @@ class UserControllerTest extends TestCase
     {
         $this->withoutExceptionHandling();
 
-        $this->withoutMiddleware(SetUserLocale::class);
-
         $user = factory(User::class)->create(['torrents_per_page' => 20]);
         $locale = factory(Locale::class)->create();
         $this->actingAs($user);
@@ -127,9 +145,11 @@ class UserControllerTest extends TestCase
         $timezone = 'Europe/Paris';
         $torrentsPerPage = 40;
 
-        Cache::shouldReceive('forget')->once()->with('user.' . $user->id);
-        Cache::shouldReceive('forget')->once()->with('user.' . $user->slug . '.locale');
-        Cache::shouldReceive('forget')->once()->with('user.' . $user->passkey);
+        /** @var Repository $cache */
+        $cache = $this->app->make(Repository::class);
+        $cache->put('user.' . $user->id, 'test', 5);
+        $cache->put('user.' . $user->slug . '.locale', 'test', 5);
+        $cache->put('user.' . $user->passkey, 'test', 5);
 
         $response = $this->from(route('users.edit', $user))->put(
             route('users.update', $user),
@@ -154,7 +174,11 @@ class UserControllerTest extends TestCase
         $this->assertSame($user->remember_token, $updatedUser->remember_token);
         $this->assertSame($user->slug, $updatedUser->slug);
         $this->assertSame($locale->localeShort, $this->app->getLocale());
-        $this->assertSame($locale->localeShort, $this->app->make('translator')->getLocale());
+        $this->assertSame($locale->localeShort, $this->app->make(Translator::class)->getLocale());
+
+        $this->assertFalse($cache->has('user.' . $user->id));
+        $this->assertFalse($cache->has('user.' . $user->slug . '.locale'));
+        $this->assertFalse($cache->has('user.' . $user->passkey));
     }
 
     public function testNonLoggedInUserCannotUpdateAnything(): void

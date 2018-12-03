@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Http\ViewComposers;
 
 use App\Models\Peer;
+use App\Enumerations\Cache;
 use Illuminate\Contracts\View\View;
 use Illuminate\Contracts\Auth\Guard;
 use Illuminate\Contracts\Cache\Repository;
@@ -32,7 +33,7 @@ class UserStatsComposer
     {
         if (true === $this->guard->check()) {
             /** @var Collection $peers */
-            $peers = $this->cache->remember('user.' . $this->guard->id() . '.peers', 30, function (): Collection {
+            $peers = $this->cache->remember('user.' . $this->guard->id() . '.peers', Cache::THIRTY_MINUTES, function (): Collection {
                 return Peer::where('user_id', '=', $this->guard->id())->get();
             });
 

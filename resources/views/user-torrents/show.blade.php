@@ -5,7 +5,7 @@
     <div class="col-md-10 mx-auto">
         <div class="card">
             <div class="card-header">
-                {{ trans('messages.torrent.user.page_title') }}
+                {{ $title }} - <a href="{{ route('users.show', $user) }}">{{ $user->name }}</a>
             </div>
 
             <div class="card-body">
@@ -22,7 +22,7 @@
                             <thead>
                                 <tr>
                                     <th>{{ trans('messages.common.category') }}</th>
-                                    <th>{{ trans('messages.torrent.index.table_torrent_name') }}</th>
+                                    <th>{{ trans('messages.common.torrent') }}</th>
                                     <th>{{ trans('messages.common.size') }}</th>
                                     <th>{{ trans('messages.common.torrent_seeders') }}</th>
                                     <th>{{ trans('messages.common.torrent_leechers') }}</th>

@@ -495,7 +495,7 @@ class AnnounceManager
                     'leechers' => $this->torrent->leechers,
                 ]
             );
-        $this->cache->delete('torrent.' . $this->torrent->id);
+        $this->cache->forget('torrent.' . $this->torrent->id);
     }
 
     /**
@@ -525,6 +525,8 @@ class AnnounceManager
                 'updated_at' => Carbon::now(),
             ]
         );
+
+        $this->cache->forget('user.' . $this->user->id . '.peers');
     }
 
     /**
@@ -684,6 +686,8 @@ class AnnounceManager
     {
         $this->connection->table('peers')->where('id', '=', $this->peer->id)->delete();
 
+        $this->cache->forget('user.' . $this->user->id . '.peers');
+
         if (true === $this->seeder) {
             $this->adjustTorrentPeers(-1, 0);
         } else {
@@ -699,6 +703,7 @@ class AnnounceManager
     {
         $this->updatePeerIfItExists();
         $this->insertPeerIPs();
+        $this->cache->forget('user.' . $this->user->id . '.peers');
         $this->adjustTorrentPeers(1, -1);
         $this->updateSnatchIfItExists();
 

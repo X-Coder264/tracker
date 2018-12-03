@@ -18,6 +18,7 @@ use Illuminate\Support\Carbon;
 use App\Models\TorrentInfoHash;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class AnnounceManagerTest extends TestCase
@@ -39,6 +40,9 @@ class AnnounceManagerTest extends TestCase
         $torrent = factory(Torrent::class)->create(['seeders' => 0, 'leechers' => 0]);
         factory(TorrentInfoHash::class)->create(['info_hash' => $infoHash, 'torrent_id' => $torrent->id]);
         $user = factory(User::class)->create();
+
+        $cache = $this->app->make(Repository::class);
+        $cache->put('user.' . $user->id . '.peers', 'test', 10);
 
         $response = $this->get(
             route(
@@ -112,6 +116,8 @@ class AnnounceManagerTest extends TestCase
         $this->assertInstanceOf(stdClass::class, Cache::get('user.' . $freshUser->passkey));
         $this->assertSame((int) $freshUser->getOriginal('uploaded'), Cache::get('user.' . $freshUser->passkey)->uploaded);
         $this->assertSame((int) $freshUser->getOriginal('downloaded'), Cache::get('user.' . $freshUser->passkey)->downloaded);
+
+        $this->assertFalse($cache->has('user.' . $user->id . '.peers'));
     }
 
     public function testV2PeerStartsLeechingWithNoOtherPeersPresentOnTheTorrent(): void
@@ -528,6 +534,9 @@ class AnnounceManagerTest extends TestCase
         factory(TorrentInfoHash::class)->create(['info_hash' => $infoHash, 'torrent_id' => $torrent->id]);
         $user = factory(User::class)->create();
 
+        $cache = $this->app->make(Repository::class);
+        $cache->put('user.' . $user->id . '.peers', 'test', 10);
+
         $response = $this->get(
             route(
                 'announce',
@@ -585,6 +594,8 @@ class AnnounceManagerTest extends TestCase
         $this->assertInstanceOf(stdClass::class, Cache::get('user.' . $freshUser->passkey));
         $this->assertSame((int) $freshUser->getOriginal('uploaded'), Cache::get('user.' . $freshUser->passkey)->uploaded);
         $this->assertSame((int) $freshUser->getOriginal('downloaded'), Cache::get('user.' . $freshUser->passkey)->downloaded);
+
+        $this->assertFalse($cache->has('user.' . $user->id . '.peers'));
     }
 
     public function testSeederDroppingOutOfTheSwarm()
@@ -599,6 +610,10 @@ class AnnounceManagerTest extends TestCase
         $torrent = factory(Torrent::class)->create(['seeders' => 1, 'leechers' => 0]);
         factory(TorrentInfoHash::class)->create(['info_hash' => $infoHash, 'torrent_id' => $torrent->id]);
         $user = factory(User::class)->create();
+
+        $cache = $this->app->make(Repository::class);
+        $cache->put('user.' . $user->id . '.peers', 'test', 10);
+
         $peer = factory(Peer::class)->states('v1')->create(
             [
                 'torrent_id' => $torrent->id,
@@ -674,9 +689,11 @@ class AnnounceManagerTest extends TestCase
         $freshUser = $user->fresh();
         $this->assertSame($user->getOriginal('uploaded') + 1000, (int) $freshUser->getOriginal('uploaded'));
         $this->assertSame($user->getOriginal('downloaded'), (int) $freshUser->getOriginal('downloaded'));
-        $this->assertInstanceOf(stdClass::class, Cache::get('user.' . $freshUser->passkey));
-        $this->assertSame((int) $freshUser->getOriginal('uploaded'), Cache::get('user.' . $freshUser->passkey)->uploaded);
-        $this->assertSame((int) $freshUser->getOriginal('downloaded'), Cache::get('user.' . $freshUser->passkey)->downloaded);
+        $this->assertInstanceOf(stdClass::class, $cache->get('user.' . $freshUser->passkey));
+        $this->assertSame((int) $freshUser->getOriginal('uploaded'), $cache->get('user.' . $freshUser->passkey)->uploaded);
+        $this->assertSame((int) $freshUser->getOriginal('downloaded'), $cache->get('user.' . $freshUser->passkey)->downloaded);
+
+        $this->assertFalse($cache->has('user.' . $user->id . '.peers'));
     }
 
     public function testLeecherDroppingOutOfTheSwarm()
@@ -697,6 +714,10 @@ class AnnounceManagerTest extends TestCase
         );
         factory(TorrentInfoHash::class)->create(['info_hash' => $infoHash, 'torrent_id' => $torrent->id]);
         $user = factory(User::class)->create();
+
+        $cache = $this->app->make(Repository::class);
+        $cache->put('user.' . $user->id . '.peers', 'test', 10);
+
         $peer = factory(Peer::class)->states('v1')->create(
             [
                 'torrent_id' => $torrent->id,
@@ -771,9 +792,11 @@ class AnnounceManagerTest extends TestCase
         $freshUser = $user->fresh();
         $this->assertSame($user->getOriginal('uploaded') + 1000, (int) $freshUser->getOriginal('uploaded'));
         $this->assertSame($user->getOriginal('downloaded') + 1200, (int) $freshUser->getOriginal('downloaded'));
-        $this->assertInstanceOf(stdClass::class, Cache::get('user.' . $freshUser->passkey));
-        $this->assertSame((int) $freshUser->getOriginal('uploaded'), Cache::get('user.' . $freshUser->passkey)->uploaded);
-        $this->assertSame((int) $freshUser->getOriginal('downloaded'), Cache::get('user.' . $freshUser->passkey)->downloaded);
+        $this->assertInstanceOf(stdClass::class, $cache->get('user.' . $freshUser->passkey));
+        $this->assertSame((int) $freshUser->getOriginal('uploaded'), $cache->get('user.' . $freshUser->passkey)->uploaded);
+        $this->assertSame((int) $freshUser->getOriginal('downloaded'), $cache->get('user.' . $freshUser->passkey)->downloaded);
+
+        $this->assertFalse($cache->has('user.' . $user->id . '.peers'));
     }
 
     public function testLeecherCompletingTheTorrent()
@@ -796,6 +819,10 @@ class AnnounceManagerTest extends TestCase
         );
         factory(TorrentInfoHash::class)->create(['info_hash' => $infoHash, 'torrent_id' => $torrent->id]);
         $user = factory(User::class)->create();
+
+        $cache = $this->app->make(Repository::class);
+        $cache->put('user.' . $user->id . '.peers', 'test', 10);
+
         $peerOne = factory(Peer::class)->states('v1')->create(['torrent_id' => $torrent->id, 'seeder' => true, 'peer_id' => $peerIdOne]);
         factory(PeerIP::class)->create(['peerID' => $peerOne->id, 'IP' => '98.165.38.51', 'port' => 55555]);
         $peerTwo = factory(Peer::class)->states('v1')->create(['torrent_id' => $torrent->id, 'seeder' => false, 'peer_id' => $peerIdTwo]);
@@ -906,9 +933,11 @@ class AnnounceManagerTest extends TestCase
         $freshUser = $user->fresh();
         $this->assertSame($user->getOriginal('uploaded'), (int) $freshUser->getOriginal('uploaded'));
         $this->assertSame($user->getOriginal('downloaded') + 4000, (int) $freshUser->getOriginal('downloaded'));
-        $this->assertInstanceOf(stdClass::class, Cache::get('user.' . $freshUser->passkey));
-        $this->assertSame((int) $freshUser->getOriginal('uploaded'), Cache::get('user.' . $freshUser->passkey)->uploaded);
-        $this->assertSame((int) $freshUser->getOriginal('downloaded'), Cache::get('user.' . $freshUser->passkey)->downloaded);
+        $this->assertInstanceOf(stdClass::class, $cache->get('user.' . $freshUser->passkey));
+        $this->assertSame((int) $freshUser->getOriginal('uploaded'), $cache->get('user.' . $freshUser->passkey)->uploaded);
+        $this->assertSame((int) $freshUser->getOriginal('downloaded'), $cache->get('user.' . $freshUser->passkey)->downloaded);
+
+        $this->assertFalse($cache->has('user.' . $user->id . '.peers'));
     }
 
     public function testSeederContinuingToSeed()
