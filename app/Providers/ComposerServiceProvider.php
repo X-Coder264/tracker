@@ -19,7 +19,7 @@ class ComposerServiceProvider extends ServiceProvider
         'partials.torrent', 'partials.peer', 'user-snatches.show',
     ];
 
-    public function boot(ViewFactory $viewFactory)
+    public function boot(ViewFactory $viewFactory): void
     {
         $viewFactory->composer(
             ['layouts.app'],
