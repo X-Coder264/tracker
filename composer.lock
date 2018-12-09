@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "29f574cb538a815f9c90c87a09a1ccbc",
+    "content-hash": "7e2f4d183cdad624ca1334d727147225",
     "packages": [
         {
             "name": "cloudcreativity/json-api",
@@ -2468,16 +2468,16 @@
         },
         {
             "name": "spatie/laravel-permission",
-            "version": "2.28",
+            "version": "2.28.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/spatie/laravel-permission.git",
-                "reference": "e4c3801008c2b4d1002b6b8c624a6a216d32f4f8"
+                "reference": "1b5a0631f77d72f06a8949b9e065ba0804ec93a3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/spatie/laravel-permission/zipball/e4c3801008c2b4d1002b6b8c624a6a216d32f4f8",
-                "reference": "e4c3801008c2b4d1002b6b8c624a6a216d32f4f8",
+                "url": "https://api.github.com/repos/spatie/laravel-permission/zipball/1b5a0631f77d72f06a8949b9e065ba0804ec93a3",
+                "reference": "1b5a0631f77d72f06a8949b9e065ba0804ec93a3",
                 "shasum": ""
             },
             "require": {
@@ -2529,7 +2529,7 @@
                 "security",
                 "spatie"
             ],
-            "time": "2018-11-30T07:29:54+00:00"
+            "time": "2018-12-07T16:59:39+00:00"
         },
         {
             "name": "swiftmailer/swiftmailer",
@@ -5168,16 +5168,16 @@
         },
         {
             "name": "phpunit/phpunit",
-            "version": "7.4.5",
+            "version": "7.5.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/phpunit.git",
-                "reference": "61d34e8dd6eb3555900f0f2a2fa9e7e570730102"
+                "reference": "520723129e2b3fc1dc4c0953e43c9d40e1ecb352"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/61d34e8dd6eb3555900f0f2a2fa9e7e570730102",
-                "reference": "61d34e8dd6eb3555900f0f2a2fa9e7e570730102",
+                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/520723129e2b3fc1dc4c0953e43c9d40e1ecb352",
+                "reference": "520723129e2b3fc1dc4c0953e43c9d40e1ecb352",
                 "shasum": ""
             },
             "require": {
@@ -5222,7 +5222,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "7.4-dev"
+                    "dev-master": "7.5-dev"
                 }
             },
             "autoload": {
@@ -5248,7 +5248,7 @@
                 "testing",
                 "xunit"
             ],
-            "time": "2018-12-03T05:01:24+00:00"
+            "time": "2018-12-07T07:08:12+00:00"
         },
         {
             "name": "sebastian/code-unit-reverse-lookup",
