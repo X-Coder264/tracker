@@ -1,20 +1,8 @@
-module.exports = {
-    MainNavigation: function(callback) {
-        callback(require('js/mainNavigation'));
-    },
-    UsersController: function(callback) {
-        require.ensure([], function() {
-            callback(require('js/controllers/user'));
-        });
-    },
-    LocalesController: function(callback) {
-        require.ensure([], function() {
-            callback(require('js/controllers/locale'));
-        });
-    },
-    TorrentsController: function(callback) {
-        require.ensure([], function() {
-            callback(require('js/controllers/torrent'));
-        });
-    }
+import MainNavigation from './mainNavigation';
+
+export default {
+    MainNavigation: () => MainNavigation,
+    UsersController: () => import('./controllers/user'),
+    LocalesController: () => import('./controllers/locale'),
+    TorrentsController: () => import('./controllers/torrent')
 };

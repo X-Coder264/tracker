@@ -12,10 +12,13 @@
 </head>
 <body>
 
+<div id="app"></div>
+
 <script>
     window.bootData = {
         baseUrl: '/cms/',
         baseApiUrl: '/cms/api/',
+        usePatchForUpdate: true,
         currentUser: {
             caption: '{{ $user->email }}'
         },
