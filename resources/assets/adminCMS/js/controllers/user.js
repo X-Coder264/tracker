@@ -1,16 +1,15 @@
-import BaseResource from 'trikoder-cmf-ui/src/js/controllers/baseResource';
-import TextListItem from 'trikoder-cmf-ui/src/js/listElements/text';
-import LinkListItem from 'trikoder-cmf-ui/src/js/listElements/link';
-import DateTimeListItem from 'trikoder-cmf-ui/src/js/listElements/dateTime';
-import ContextMenu from 'trikoder-cmf-ui/src/js/listElements/contextMenu';
-import TextInput from 'trikoder-cmf-ui/src/js/formElements/text';
-import ExternalAdmin from 'trikoder-cmf-ui/src/js/formElements/externalAdmin';
-import SelectInput from 'trikoder-cmf-ui/src/js/formElements/select';
+import TextListItem from 'cmf/js/listElements/text';
+import LinkListItem from 'cmf/js/listElements/link';
+import DateTimeListItem from 'cmf/js/listElements/dateTime';
+import ContextMenu from 'cmf/js/listElements/contextMenu';
+import TextInput from 'cmf/js/formElements/text';
+import ExternalAdmin from 'cmf/js/formElements/externalAdmin';
+import SelectInput from 'cmf/js/formElements/select';
 import _ from 'underscore';
-import bootData from 'trikoder-cmf-ui/src/js/library/bootData';
+import bootData from 'cmf/js/library/bootData';
 import sortGenerator from '../helpers/sortGenerator';
 
-module.exports = BaseResource.extend({
+export default {
 
     resourceName: 'users',
 
@@ -19,7 +18,7 @@ module.exports = BaseResource.extend({
         edit: ['locale']
     },
 
-    setupList: function(listHandler) {
+    setupList({list}) {
 
         this.addCreateControl('Create new user');
 
@@ -27,27 +26,27 @@ module.exports = BaseResource.extend({
         // Filters
         //--------------------------------------------------------------
 
-        listHandler.addFilter(TextInput, {
+        list.addFilter(TextInput, {
             name: 'id',
             label: 'ID'
         });
 
-        listHandler.addFilter(TextInput, {
+        list.addFilter(TextInput, {
             name: 'name',
             label: 'Name'
         });
 
-        listHandler.addFilter(TextInput, {
+        list.addFilter(TextInput, {
             name: 'email',
             label: 'E-mail'
         });
 
-        listHandler.addFilter(TextInput, {
+        list.addFilter(TextInput, {
             name: 'timezone',
             label: 'Timezone'
         });
 
-        listHandler.addFilter(TextInput, {
+        list.addFilter(TextInput, {
             name: 'slug',
             label: 'Slug'
         });
@@ -56,7 +55,7 @@ module.exports = BaseResource.extend({
         // Sorts
         //--------------------------------------------------------------
 
-        listHandler.addSort(sortGenerator([
+        list.addSort(sortGenerator([
             'ID -> id',
             'Created at -> created-at',
             'Updated at -> updated-at'
@@ -66,7 +65,7 @@ module.exports = BaseResource.extend({
         // Mass action
         //--------------------------------------------------------------
 
-        listHandler.addMassAction([{
+        list.addMassAction([{
             caption: 'Delete',
             action: model => model.destroy(),
             confirm: true
@@ -76,43 +75,43 @@ module.exports = BaseResource.extend({
         // List items
         //--------------------------------------------------------------
 
-        listHandler.addItem(TextListItem, {
+        list.addItem(TextListItem, {
             caption: 'ID',
             mapTo: 'id'
         });
 
-        listHandler.addItem(LinkListItem, {
+        list.addItem(LinkListItem, {
             caption: 'Name',
             mapTo: 'name',
             action: 'editItem'
         });
 
-        listHandler.addItem(TextListItem, {
+        list.addItem(TextListItem, {
             caption: 'E-mail',
             mapTo: 'email'
         });
 
-        listHandler.addItem(TextListItem, {
+        list.addItem(TextListItem, {
             caption: 'Timezone',
             mapTo: 'timezone'
         });
 
-        listHandler.addItem(TextListItem, {
+        list.addItem(TextListItem, {
             caption: 'Slug',
             mapTo: 'slug'
         });
 
-        listHandler.addItem(DateTimeListItem, {
+        list.addItem(DateTimeListItem, {
             caption: 'Created at',
             mapTo: 'created-at'
         });
 
-        listHandler.addItem(DateTimeListItem, {
+        list.addItem(DateTimeListItem, {
             caption: 'Updated at',
             mapTo: 'updated-at'
         });
 
-        listHandler.addItem(ContextMenu, {
+        list.addItem(ContextMenu, {
             caption: 'Actions',
             items: [
                 {caption: 'Edit user', action: 'editItem'},
@@ -122,28 +121,28 @@ module.exports = BaseResource.extend({
 
     },
 
-    setupEdit: function(editHandler, method, id) {
+    setupEdit: function({edit, method, resourceModel}) {
 
         this.addToIndexControl().addSaveControl();
 
-        editHandler.addField(TextInput, {
+        edit.addField(TextInput, {
             label: 'Name',
             name: 'name'
         });
 
-        editHandler.addField(TextInput, {
+        edit.addField(TextInput, {
             label: 'E-mail',
             name: 'email'
         });
 
         if (method === 'create') {
-            editHandler.addField(TextInput, {
+            edit.addField(TextInput, {
                 label: 'Password',
                 name: 'password'
             });
         }
 
-        editHandler.addField(SelectInput, {
+        edit.addField(SelectInput, {
             label: 'Timezone',
             name: 'timezone',
             selectOptions: _.map(bootData('enumerations.timezones'), (caption, value) => {
@@ -152,7 +151,7 @@ module.exports = BaseResource.extend({
             attributes: {inputWrapper: {className: 'selectType1 fullWidth'}}
         });
 
-        editHandler.addField(ExternalAdmin, {
+        edit.addField(ExternalAdmin, {
             name: 'locale',
             label: 'Locale',
             mapCaptionTo: 'locale',
@@ -161,4 +160,4 @@ module.exports = BaseResource.extend({
 
     }
 
-});
+};

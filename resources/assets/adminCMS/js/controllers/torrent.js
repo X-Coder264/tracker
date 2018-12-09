@@ -1,14 +1,13 @@
-import BaseResource from 'trikoder-cmf-ui/src/js/controllers/baseResource';
-import TextListItem from 'trikoder-cmf-ui/src/js/listElements/text';
-import LinkListItem from 'trikoder-cmf-ui/src/js/listElements/link';
-import DateTimeListItem from 'trikoder-cmf-ui/src/js/listElements/dateTime';
-import ContextMenu from 'trikoder-cmf-ui/src/js/listElements/contextMenu';
-import TextInput from 'trikoder-cmf-ui/src/js/formElements/text';
+import TextListItem from 'cmf/js/listElements/text';
+import LinkListItem from 'cmf/js/listElements/link';
+import DateTimeListItem from 'cmf/js/listElements/dateTime';
+import ContextMenu from 'cmf/js/listElements/contextMenu';
+import TextInput from 'cmf/js/formElements/text';
 import sortGenerator from '../helpers/sortGenerator';
-import ExternalAdmin from 'trikoder-cmf-ui/src/js/formElements/externalAdmin';
-import TextareaInput from 'trikoder-cmf-ui/src/js/formElements/textarea';
+import ExternalAdmin from 'cmf/js/formElements/externalAdmin';
+import TextareaInput from 'cmf/js/formElements/textarea';
 
-module.exports = BaseResource.extend({
+export default {
 
     resourceName: 'torrents',
 
@@ -17,7 +16,7 @@ module.exports = BaseResource.extend({
         edit: ['uploader']
     },
 
-    setupList: function(listHandler) {
+    setupList({list}) {
 
         //this.addCreateControl('Create new torrent');
 
@@ -25,34 +24,34 @@ module.exports = BaseResource.extend({
         // Filters
         //--------------------------------------------------------------
 
-        listHandler.addFilter(TextInput, {
+        list.addFilter(TextInput, {
             name: 'id',
             label: 'ID'
         });
 
-        listHandler.addFilter(TextInput, {
+        list.addFilter(TextInput, {
             name: 'name',
             label: 'Name'
         });
 
-        listHandler.addFilter(ExternalAdmin, {
+        list.addFilter(ExternalAdmin, {
             name: 'uploader',
             label: 'Uploader',
             mapCaptionTo: 'name',
             relation: {type: 'hasOne', resourceName: 'users'}
         });
 
-        listHandler.addFilter(TextInput, {
+        list.addFilter(TextInput, {
             name: 'minimumSize',
             label: 'Size in MB (greater than)'
         });
 
-        listHandler.addFilter(TextInput, {
+        list.addFilter(TextInput, {
             name: 'maximumSize',
             label: 'Size in MB (less than)'
         });
 
-        listHandler.addFilter(TextInput, {
+        list.addFilter(TextInput, {
             name: 'slug',
             label: 'Slug'
         });
@@ -61,7 +60,7 @@ module.exports = BaseResource.extend({
         // Sorts
         //--------------------------------------------------------------
 
-        listHandler.addSort(sortGenerator([
+        list.addSort(sortGenerator([
             'ID -> id',
             'Created at -> created-at',
             'Updated at -> updated-at'
@@ -71,7 +70,7 @@ module.exports = BaseResource.extend({
         // Mass action
         //--------------------------------------------------------------
 
-        listHandler.addMassAction([{
+        list.addMassAction([{
             caption: 'Delete',
             action: model => model.destroy(),
             confirm: true
@@ -81,43 +80,43 @@ module.exports = BaseResource.extend({
         // List items
         //--------------------------------------------------------------
 
-        listHandler.addItem(TextListItem, {
+        list.addItem(TextListItem, {
             caption: 'ID',
             mapTo: 'id'
         });
 
-        listHandler.addItem(LinkListItem, {
+        list.addItem(LinkListItem, {
             caption: 'Name',
             mapTo: 'name',
             action: 'editItem'
         });
 
-        listHandler.addItem(TextListItem, {
+        list.addItem(TextListItem, {
             caption: 'Size',
             mapTo: 'size'
         });
 
-        listHandler.addItem(TextListItem, {
+        list.addItem(TextListItem, {
             caption: 'Slug',
             mapTo: 'slug'
         });
 
-        listHandler.addItem(TextListItem, {
+        list.addItem(TextListItem, {
             caption: 'Uploader',
             mapTo: 'uploader.name'
         });
 
-        listHandler.addItem(DateTimeListItem, {
+        list.addItem(DateTimeListItem, {
             caption: 'Created at',
             mapTo: 'created-at'
         });
 
-        listHandler.addItem(DateTimeListItem, {
+        list.addItem(DateTimeListItem, {
             caption: 'Updated at',
             mapTo: 'updated-at'
         });
 
-        listHandler.addItem(ContextMenu, {
+        list.addItem(ContextMenu, {
             caption: 'Actions',
             items: [
                 {caption: 'Edit torrent', action: 'editItem'},
@@ -127,27 +126,27 @@ module.exports = BaseResource.extend({
 
     },
 
-    setupEdit: function(editHandler, method, id) {
+    setupEdit: function({edit, method, resourceModel}) {
 
         this.addToIndexControl().addSaveControl();
 
-        editHandler.addField(TextInput, {
+        edit.addField(TextInput, {
             label: 'Name',
             name: 'name'
         });
 
-        editHandler.addField(TextInput, {
+        edit.addField(TextInput, {
             label: 'Size',
             name: 'size',
-            readOnly: true,
+            readOnly: true
         });
 
-        editHandler.addField(TextareaInput, {
+        edit.addField(TextareaInput, {
             label: 'Description',
             name: 'description'
         });
 
-        editHandler.addField(ExternalAdmin, {
+        edit.addField(ExternalAdmin, {
             name: 'uploader',
             label: 'Uploader',
             mapCaptionTo: 'name',
@@ -156,4 +155,4 @@ module.exports = BaseResource.extend({
 
     }
 
-});
+};

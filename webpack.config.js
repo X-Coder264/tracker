@@ -1,10 +1,13 @@
+require('dotenv').config();
+
 const fs = require('fs');
 const gracefulFs = require('graceful-fs');
 gracefulFs.gracefulify(fs);
-var webpack = require('webpack');
-var path = require('path');
-var CopyWebpackPlugin = require('copy-webpack-plugin');
-var ExtractTextPlugin = require('extract-text-webpack-plugin');
+const webpack = require('webpack');
+const VueLoaderPlugin = require('vue-loader/lib/plugin');
+const path = require('path');
+const CopyWebpackPlugin = require('copy-webpack-plugin');
+const isProduction = process.env.NODE_ENV === 'production';
 
 module.exports = function(env) {
 
@@ -13,24 +16,38 @@ module.exports = function(env) {
         dist: path.resolve(__dirname, 'public/admin'),
         public: '/admin/',
         nodeModules: 'node_modules',
-        cmfSrc: 'node_modules/trikoder-cmf-ui/src/',
-        cmfNodeModules: 'node_modules/trikoder-cmf-ui/node_modules'
+        cmfSrc: 'node_modules/@trikoder/trim/src/',
+        cmfNodeModules: 'node_modules/@trikoder/trim/node_modules'
     };
 
     var webpackConfig = {
+
+        mode: isProduction ? 'production' : 'development',
 
         entry: {
             main: paths.src + 'js/main.js'
         },
 
         output: {
-            path: paths.dist ,
+            path: paths.dist,
             filename: '[name].js',
             publicPath: paths.public
         },
 
         module: {
             rules: [
+                {
+                    test: /\.vue$/,
+                    loader: 'vue-loader',
+                },
+                {
+                    test: /\.(js|vue)$/,
+                    loader: 'eslint-loader',
+                    enforce: 'pre',
+                    include: [
+                        path.join(__dirname, 'src')
+                    ]
+                },
 
                 {
                     test: /\.js$/,
@@ -38,55 +55,59 @@ module.exports = function(env) {
                         {loader: 'babel-loader'},
                         {loader: 'eslint-loader'}
                     ],
-                    exclude: /node_modules/
-                },
-
-                {
-                    test: /\.(jst)$/,
-                    use: [
-                        {loader: 'nunjucks-loader'}
+                    exclude: /node_modules/,
+                    include: [
+                        path.join(__dirname, 'node_modules/@trikoder/trim/src')
                     ]
+
                 },
 
                 {
                     test: /\.scss$/,
                     exclude: /login\.scss/,
                     use: [
-                        {loader: 'style-loader'},
-                        {loader: 'css-loader'},
-                        {loader: 'sass-loader', options: {
-                            includePaths: [paths.nodeModules, paths.cmfNodeModules]
-                        }}
+                        'vue-style-loader',
+                        'css-loader',
+                        'postcss-loader',
+                        'sass-loader',
+                        {
+                            loader: 'sass-resources-loader',
+                            options: {
+                                resources: [
+                                    './node_modules/@trikoder/trim/src/scss/library/_all.scss',
+                                    './resources/assets/adminCMS/scss/_overrides.scss'
+                                ]
+                            }
+                        }
                     ]
                 },
 
                 {
-                    test: /login\.scss/,
-                    use: ExtractTextPlugin.extract({
-                        use: [
-                            {loader: 'css-loader'},
-                            {loader: 'sass-loader', options: {
-                                includePaths: [paths.nodeModules, paths.cmfNodeModules]
-                            }}
-                        ]
-                    })
+                    test: /\.(png|jpg|gif|svg)$/,
+                    loader: 'file-loader',
+                    options: {
+                        name: 'images/[name].[ext]'
+                    }
                 },
-
                 {
-                    test: /\.(png|jpg|gif|svg|eot|ttf|woff|woff2)$/,
+                    test: /\.(woff2?|eot|ttf|otf)(\?.*)?$/,
                     loader: 'url-loader',
-                    options: {limit: 10000}
+                    options: {
+                        limit: 10000,
+                        name: 'fonts/[name].[ext]'
+                    }
                 },
 
                 {
                     test: /\.css$/,
                     use: [
-                        {loader: 'style-loader'},
-                        {loader: 'css-loader'}
+                        'vue-style-loader',
+                        'css-loader',
+                        'postcss-loader'
                     ]
                 }
 
-            ],
+            ]
         },
 
         resolve: {
@@ -97,49 +118,45 @@ module.exports = function(env) {
                 paths.cmfNodeModules
             ],
             alias: {
-                cmf: path.resolve(__dirname, paths.cmfSrc)
-            }
+                'vue$': 'vue/dist/vue.esm.js',
+                'cmf': '@trikoder/trim/src'
+            },
+            extensions: ['*', '.js', '.vue', '.json']
         },
 
         plugins: [
 
+            new VueLoaderPlugin(),
+
             new webpack.DefinePlugin({
                 'process.env': {
-                    'NODE_ENV': JSON.stringify(env.mode),
-                    'PUBLIC_PATH': JSON.stringify(paths.public)
+                    BASE_URL: JSON.stringify(process.env.BASE_URL),
+                    BASE_API_URL: JSON.stringify(process.env.BASE_API_URL),
+                    ASSET_PATH: JSON.stringify('/dist/'),
+                    NODE_ENV: JSON.stringify(isProduction ? 'production' : 'development')
                 }
             }),
-
-            new CopyWebpackPlugin([{
-                from: require('path').dirname(require.resolve('ckeditor')),
-                to: paths.dist + '/ckeditor',
-                ignore: ['*.php']
-            }]),
 
             new CopyWebpackPlugin([
                 {
                     from: `${paths.cmfSrc}font/icons/fonts`,
-                    to: path.resolve(__dirname, 'public') + '/src/font/icons/fonts',
+                    to: path.resolve(__dirname, 'public') + '/src/font/icons/fonts'
                 },
                 {
                     from: `${paths.cmfSrc}font/webFonts`,
-                    to: path.resolve(__dirname, 'public') + '/src/font/webFonts',
-                },
-            ]),
-
-
-            new ExtractTextPlugin('[name].css'),
-
+                    to: path.resolve(__dirname, 'public') + '/src/font/webFonts'
+                }
+            ])
         ],
 
-        stats : {
-            assets : true,
-            excludeAssets : [/.*ckeditor\/.*/]
+        stats: {
+            assets: true,
+            excludeAssets: [/.*ckeditor\/.*/]
         }
 
     };
 
-    if (env.mode === 'production') {
+    if (isProduction) {
 
         webpackConfig.plugins.push(new webpack.LoaderOptionsPlugin({
             minimize: true,
@@ -149,7 +166,7 @@ module.exports = function(env) {
         webpackConfig.plugins.push(new webpack.optimize.UglifyJsPlugin({
             comments: false,
             mangle: {
-                screw_ie8: true,
+                screw_ie8: true
             },
             compress: {
                 screw_ie8: true,
