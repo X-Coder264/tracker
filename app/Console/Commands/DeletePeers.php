@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Console\Commands;
 
-use Carbon\Carbon;
 use Illuminate\Console\Command;
-use Illuminate\Contracts\Config\Repository;
+use App\Repositories\PeerRepository;
+use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Database\ConnectionInterface;
 
 class DeletePeers extends Command
@@ -25,19 +25,21 @@ class DeletePeers extends Command
      */
     protected $description = 'Deletes all obsolete peers';
 
-    public function handle(ConnectionInterface $connection, Repository $config): void
+    public function handle(PeerRepository $peerRepository, ConnectionInterface $connection, Repository $cache): void
     {
-        $obsoletePeerIds = $connection
-            ->table('peers')
-            ->where('updated_at', '<', Carbon::now()->subMinutes($config->get('tracker.announce_interval') + 5))
-            ->select('id')
-            ->get()
-            ->pluck('id');
-
-        if ($obsoletePeerIds->isNotEmpty()) {
-            $connection->table('peers')->whereIn('id', $obsoletePeerIds)->delete();
+        $count = 0;
+        foreach ($peerRepository->getObsoletePeersQuery()->cursor() as $obsoletePeer) {
+            $connection->table('peers')->where('id', '=', $obsoletePeer->id)->delete();
+            $count++;
+            if ($obsoletePeer->seeder) {
+                $connection->table('torrents')->where('id', '=', $obsoletePeer->torrent_id)->decrement('seeders');
+            } else {
+                $connection->table('torrents')->where('id', '=', $obsoletePeer->torrent_id)->decrement('leechers');
+            }
+            $cache->forget('torrent.' . $obsoletePeer->torrent_id);
+            $cache->forget('user.' . $obsoletePeer->user_id . '.peers');
         }
 
-        $this->info(sprintf('%s obsolete peers were deleted.', $obsoletePeerIds->count()));
+        $this->info(sprintf('Deleted obsolete peers: %d', $count));
     }
 }

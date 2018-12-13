@@ -7,10 +7,14 @@ namespace Tests\Feature\Console\Commands;
 use Carbon\Carbon;
 use Tests\TestCase;
 use App\Models\Peer;
+use App\Models\User;
 use App\Models\PeerIP;
+use App\Models\Torrent;
 use App\Models\PeerVersion;
+use Illuminate\Support\Collection;
 use App\Console\Commands\DeletePeers;
 use Illuminate\Console\Scheduling\Event;
+use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -23,28 +27,79 @@ class DeletePeersTest extends TestCase
     {
         $this->withoutExceptionHandling();
 
-        $obsoletePeer = factory(Peer::class)->states('v1')->create(
-            ['updated_at' => Carbon::now()->subMinutes(config('tracker.announce_interval') + 6)]
-        );
-        factory(PeerIP::class)->create(['peerID' => $obsoletePeer->id]);
-        $nonObsoletePeer = factory(Peer::class)->states('v1')->create(
-            ['updated_at' => Carbon::now()->subMinutes(config('tracker.announce_interval') + 4)]
-        );
-        factory(PeerIP::class)->create(['peerID' => $nonObsoletePeer->id]);
+        $userOne = factory(User::class)->create();
+        $userTwo = factory(User::class)->create();
 
-        $this->artisan(DeletePeers::class);
+        $torrent = factory(Torrent::class)->create(['seeders' => 2, 'leechers' => 2]);
 
-        $this->assertSame(1, Peer::count());
-        $this->assertSame(1, PeerVersion::count());
-        $this->assertSame(1, PeerIP::count());
+        /** @var Repository $cache */
+        $cache = $this->app->make(Repository::class);
+
+        $cache->put('torrent.' . $torrent->id, 'test', 10);
+        $cache->put('user.' . $userOne->id . '.peers', 'test', 10);
+        $cache->put('user.' . $userTwo->id . '.peers', 'test', 10);
+
+        $obsoletePeerOne = factory(Peer::class)->states('v1', 'seeder')->create(
+            [
+                'torrent_id' => $torrent->id,
+                'user_id' => $userOne->id,
+                'updated_at' => Carbon::now()->subMinutes(config('tracker.announce_interval') + 11),
+            ]
+        );
+        factory(PeerIP::class)->create(['peerID' => $obsoletePeerOne->id]);
+
+        $obsoletePeerOne = factory(Peer::class)->states('v1', 'leecher')->create(
+            [
+                'torrent_id' => $torrent->id,
+                'user_id' => $userTwo->id,
+                'updated_at' => Carbon::now()->subMinutes(config('tracker.announce_interval') + 11),
+            ]
+        );
+        factory(PeerIP::class)->create(['peerID' => $obsoletePeerOne->id]);
+
+        $nonObsoletePeerOne = factory(Peer::class)->states('v1', 'seeder')->create(
+            [
+                'torrent_id' => $torrent->id,
+                'user_id' => $userTwo->id,
+                'updated_at' => Carbon::now()->subMinutes(config('tracker.announce_interval') + 9),
+            ]
+        );
+        factory(PeerIP::class)->create(['peerID' => $nonObsoletePeerOne->id]);
+
+        $nonObsoletePeerTwo = factory(Peer::class)->states('v1', 'leecher')->create(
+            [
+                'torrent_id' => $torrent->id,
+                'user_id' => $userOne->id,
+                'updated_at' => Carbon::now()->subMinutes(config('tracker.announce_interval') + 9),
+            ]
+        );
+        factory(PeerIP::class)->create(['peerID' => $nonObsoletePeerTwo->id]);
+
+        $this->artisan(DeletePeers::class)
+            ->expectsOutput('Deleted obsolete peers: 2');
+
+        $this->assertSame(2, Peer::count());
+        $this->assertSame(2, PeerVersion::count());
+        $this->assertSame(2, PeerIP::count());
+
+        $freshTorrent = $torrent->fresh();
+        $this->assertSame(1, $freshTorrent->seeders);
+        $this->assertSame(1, $freshTorrent->leechers);
 
         try {
-            Peer::findOrFail($nonObsoletePeer->id);
-            PeerVersion::where('peerID', '=', $nonObsoletePeer->id)->firstOrFail();
-            PeerIP::where('peerID', '=', $nonObsoletePeer->id)->firstOrFail();
+            Peer::findOrFail($nonObsoletePeerOne->id);
+            PeerVersion::where('peerID', '=', $nonObsoletePeerOne->id)->firstOrFail();
+            PeerIP::where('peerID', '=', $nonObsoletePeerOne->id)->firstOrFail();
+            Peer::findOrFail($nonObsoletePeerTwo->id);
+            PeerVersion::where('peerID', '=', $nonObsoletePeerTwo->id)->firstOrFail();
+            PeerIP::where('peerID', '=', $nonObsoletePeerTwo->id)->firstOrFail();
         } catch (ModelNotFoundException $exception) {
             $this->fail('This peer and its related data should not have been deleted.');
         }
+
+        $this->assertFalse($cache->has('torrent.' . $torrent->id));
+        $this->assertFalse($cache->has('user.' . $userOne->id . '.peers'));
+        $this->assertFalse($cache->has('user.' . $userTwo->id . '.peers'));
     }
 
     public function testTheCommandIsScheduledProperly(): void
@@ -52,12 +107,12 @@ class DeletePeersTest extends TestCase
         /** @var Schedule $schedule */
         $schedule = $this->app->make(Schedule::class);
 
-        $events = collect($schedule->events())->filter(function (Event $event) {
+        $events = (new Collection($schedule->events()))->filter(function (Event $event) {
             return stripos($event->command, 'peers:delete');
         });
 
         if (1 !== $events->count()) {
-            $this->fail('The command DeletePeers was not scheduled.');
+            $this->fail(sprintf('The command %s was not scheduled.', DeletePeers::class));
         }
 
         $events->each(function (Event $event) {
