@@ -6,6 +6,7 @@ services:
     image: mysql:8.0
     volumes:
       - mysql:/var/lib/mysql
+      - ../configurations/mysql.cnf:/etc/mysql/my.cnf
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_PASSWORD}
       MYSQL_DATABASE: ${MYSQL_DATABASE}
