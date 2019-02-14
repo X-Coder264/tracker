@@ -1,127 +1,137 @@
+@php
+$timezones = [
+    'Pacific/Midway' => '(UTC-11:00) Midway Island',
+    'Pacific/Samoa' => '(UTC-11:00) Samoa',
+    'Pacific/Honolulu' => '(UTC-10:00) Hawaii',
+    'US/Alaska' => '(UTC-09:00) Alaska',
+    'America/Los_Angeles' => '(UTC-08:00) Pacific Time (US &amp; Canada)',
+    'America/Tijuana' => '(UTC-08:00) Tijuana',
+    'US/Arizona' => '(UTC-07:00) Arizona',
+    'America/Chihuahua' => '(UTC-07:00) Chihuahua, La Paz',
+    'America/Mazatlan' => '(UTC-07:00) Mazatlan',
+    'US/Mountain' => '(UTC-07:00) Mountain Time (US &amp; Canada)',
+    'America/Managua' => '(UTC-06:00) Central America',
+    'US/Central' => '(UTC-06:00) Central Time (US &amp; Canada)',
+    'America/Mexico_City' => '(UTC-06:00) Mexico City, Guadalajara',
+    'America/Monterrey' => '(UTC-06:00) Monterrey',
+    'Canada/Saskatchewan' => '(UTC-06:00) Saskatchewan',
+    'America/Bogota' => '(UTC-05:00) Bogota, Quito',
+    'US/Eastern' => '(UTC-05:00) Eastern Time (US &amp; Canada)',
+    'US/East-Indiana' => '(UTC-05:00) Indiana (East)',
+    'America/Lima' => '(UTC-05:00) Lima',
+    'Canada/Atlantic' => '(UTC-04:00) Atlantic Time (Canada)',
+    'America/Caracas' => '(UTC-04:30) Caracas',
+    'America/La_Paz' => '(UTC-04:00) La Paz',
+    'America/Santiago' => '(UTC-04:00) Santiago',
+    'Canada/Newfoundland' => '(UTC-03:30) Newfoundland',
+    'America/Sao_Paulo' => '(UTC-03:00) Brasilia',
+    'America/Argentina/Buenos_Aires' => '(UTC-03:00) Buenos Aires, Georgetown',
+    'America/Godthab' => '(UTC-03:00) Greenland',
+    'America/Noronha' => '(UTC-02:00) Mid-Atlantic',
+    'Atlantic/Azores' => '(UTC-01:00) Azores',
+    'Atlantic/Cape_Verde' => '(UTC-01:00) Cape Verde Is.',
+    'Africa/Casablanca' => '(UTC+00:00) Casablanca',
+    'Europe/London' => '(UTC+00:00) London, Edinburgh',
+    'Etc/Greenwich' => '(UTC+00:00) Greenwich Mean Time : Dublin',
+    'Europe/Lisbon' => '(UTC+00:00) Lisbon',
+    'Africa/Monrovia' => '(UTC+00:00) Monrovia',
+    'UTC' => '(UTC+00:00) UTC',
+    'Europe/Amsterdam' => '(UTC+01:00) Amsterdam',
+    'Europe/Belgrade' => '(UTC+01:00) Belgrade',
+    'Europe/Berlin' => '(UTC+01:00) Berlin, Bern',
+    'Europe/Bratislava' => '(UTC+01:00) Bratislava',
+    'Europe/Brussels' => '(UTC+01:00) Brussels',
+    'Europe/Budapest' => '(UTC+01:00) Budapest',
+    'Europe/Copenhagen' => '(UTC+01:00) Copenhagen',
+    'Europe/Ljubljana' => '(UTC+01:00) Ljubljana',
+    'Europe/Madrid' => '(UTC+01:00) Madrid',
+    'Europe/Paris' => '(UTC+01:00) Paris',
+    'Europe/Prague' => '(UTC+01:00) Prague',
+    'Europe/Rome' => '(UTC+01:00) Rome',
+    'Europe/Sarajevo' => '(UTC+01:00) Sarajevo',
+    'Europe/Skopje' => '(UTC+01:00) Skopje',
+    'Europe/Stockholm' => '(UTC+01:00) Stockholm',
+    'Europe/Vienna' => '(UTC+01:00) Vienna',
+    'Europe/Warsaw' => '(UTC+01:00) Warsaw',
+    'Africa/Lagos' => '(UTC+01:00) West Central Africa',
+    'Europe/Zagreb' => '(UTC+01:00) Zagreb',
+    'Europe/Athens' => '(UTC+02:00) Athens',
+    'Europe/Bucharest' => '(UTC+02:00) Bucharest',
+    'Africa/Cairo' => '(UTC+02:00) Cairo',
+    'Africa/Harare' => '(UTC+02:00) Harare',
+    'Europe/Helsinki' => '(UTC+02:00) Helsinki, Kyiv',
+    'Europe/Istanbul' => '(UTC+02:00) Istanbul',
+    'Asia/Jerusalem' => '(UTC+02:00) Jerusalem',
+    'Africa/Johannesburg' => '(UTC+02:00) Pretoria',
+    'Europe/Riga' => '(UTC+02:00) Riga',
+    'Europe/Sofia' => '(UTC+02:00) Sofia',
+    'Europe/Tallinn' => '(UTC+02:00) Tallinn',
+    'Europe/Vilnius' => '(UTC+02:00) Vilnius',
+    'Asia/Baghdad' => '(UTC+03:00) Baghdad',
+    'Asia/Kuwait' => '(UTC+03:00) Kuwait',
+    'Europe/Minsk' => '(UTC+03:00) Minsk',
+    'Africa/Nairobi' => '(UTC+03:00) Nairobi',
+    'Asia/Riyadh' => '(UTC+03:00) Riyadh',
+    'Europe/Volgograd' => '(UTC+03:00) Volgograd',
+    'Asia/Tehran' => '(UTC+03:30) Tehran',
+    'Asia/Muscat' => '(UTC+04:00) Muscat, Abu Dhabi',
+    'Asia/Baku' => '(UTC+04:00) Baku',
+    'Europe/Moscow' => '(UTC+04:00) Moscow, St. Petersburg',
+    'Asia/Tbilisi' => '(UTC+04:00) Tbilisi',
+    'Asia/Yerevan' => '(UTC+04:00) Yerevan',
+    'Asia/Kabul' => '(UTC+04:30) Kabul',
+    'Asia/Karachi' => '(UTC+05:00) Karachi, Islamabad',
+    'Asia/Tashkent' => '(UTC+05:00) Tashkent',
+    'Asia/Kolkata' => '(UTC+05:30) Kolkata, Chennai, Mumbai, New Delhi, Sri Jayawardenepura',
+    'Asia/Katmandu' => '(UTC+05:45) Kathmandu',
+    'Asia/Almaty' => '(UTC+06:00) Almaty',
+    'Asia/Dhaka' => '(UTC+06:00) Dhaka, Astana',
+    'Asia/Yekaterinburg' => '(UTC+06:00) Ekaterinburg',
+    'Asia/Rangoon' => '(UTC+06:30) Rangoon',
+    'Asia/Bangkok' => '(UTC+07:00) Bangkok, Hanoi',
+    'Asia/Jakarta' => '(UTC+07:00) Jakarta',
+    'Asia/Novosibirsk' => '(UTC+07:00) Novosibirsk',
+    'Asia/Chongqing' => '(UTC+08:00) Chongqing',
+    'Asia/Hong_Kong' => '(UTC+08:00) Hong Kong, Beijing',
+    'Asia/Krasnoyarsk' => '(UTC+08:00) Krasnoyarsk',
+    'Asia/Kuala_Lumpur' => '(UTC+08:00) Kuala Lumpur',
+    'Australia/Perth' => '(UTC+08:00) Perth',
+    'Asia/Singapore' => '(UTC+08:00) Singapore',
+    'Asia/Taipei' => '(UTC+08:00) Taipei',
+    'Asia/Ulan_Bator' => '(UTC+08:00) Ulaan Bataar',
+    'Asia/Urumqi' => '(UTC+08:00) Urumqi',
+    'Asia/Irkutsk' => '(UTC+09:00) Irkutsk',
+    'Asia/Tokyo' => '(UTC+09:00) Tokyo, Osaka, Sapporo',
+    'Asia/Seoul' => '(UTC+09:00) Seoul',
+    'Australia/Adelaide' => '(UTC+09:30) Adelaide',
+    'Australia/Darwin' => '(UTC+09:30) Darwin',
+    'Australia/Brisbane' => '(UTC+10:00) Brisbane',
+    'Australia/Canberra' => '(UTC+10:00) Canberra',
+    'Pacific/Guam' => '(UTC+10:00) Guam',
+    'Australia/Hobart' => '(UTC+10:00) Hobart',
+    'Australia/Melbourne' => '(UTC+10:00) Melbourne',
+    'Pacific/Port_Moresby' => '(UTC+10:00) Port Moresby',
+    'Australia/Sydney' => '(UTC+10:00) Sydney',
+    'Asia/Yakutsk' => '(UTC+10:00) Yakutsk',
+    'Asia/Vladivostok' => '(UTC+11:00) Vladivostok',
+    'Pacific/Auckland' => '(UTC+12:00) Auckland, Wellington',
+    'Pacific/Fiji' => '(UTC+12:00) Fiji, Marshall Is.',
+    'Pacific/Kwajalein' => '(UTC+12:00) International Date Line West',
+    'Asia/Kamchatka' => '(UTC+12:00) Kamchatka',
+    'Asia/Magadan' => '(UTC+12:00) Magadan, New Caledonia, Solomon Is.',
+    'Pacific/Tongatapu' => '(UTC+13:00) Nuku\'alofa',
+];
+@endphp
+
 <div class="form-group row">
     <label for="timezone" class="col-md-4 col-form-label text-md-right">{{ trans('messages.timezones_select.timezone') }}</label>
     <div class="col-md-6">
         <select class="form-control{{ $errors->has('timezone') ? ' is-invalid' : '' }}" name="timezone" id="timezone" required>
-            <option value='Pacific/Midway' @if (auth()->check() && 'Pacific/Midway' === auth()->user()->timezone) selected @endif>(UTC-11:00) Midway Island</option>
-            <option value='Pacific/Samoa' @if (auth()->check() && 'Pacific/Samoa' === auth()->user()->timezone) selected @endif>(UTC-11:00) Samoa</option>
-            <option value='Pacific/Honolulu' @if (auth()->check() && 'Pacific/Honolulu' === auth()->user()->timezone) selected @endif>(UTC-10:00) Hawaii</option>
-            <option value='US/Alaska' @if (auth()->check() && 'US/Alaska' === auth()->user()->timezone) selected @endif>(UTC-09:00) Alaska</option>
-            <option value='America/Los_Angeles' @if (auth()->check() && 'America/Los_Angeles' === auth()->user()->timezone) selected @endif>(UTC-08:00) Pacific Time (US &amp; Canada)</option>
-            <option value='America/Tijuana' @if (auth()->check() && 'America/Tijuana' === auth()->user()->timezone) selected @endif>(UTC-08:00) Tijuana</option>
-            <option value='US/Arizona' @if (auth()->check() && 'US/Arizona' === auth()->user()->timezone) selected @endif>(UTC-07:00) Arizona</option>
-            <option value='America/Chihuahua' @if (auth()->check() && 'America/Chihuahua' === auth()->user()->timezone) selected @endif>(UTC-07:00) Chihuahua, La Paz</option>
-            <option value='America/Mazatlan' @if (auth()->check() && 'America/Mazatlan' === auth()->user()->timezone) selected @endif>(UTC-07:00) Mazatlan</option>
-            <option value='US/Mountain' @if (auth()->check() && 'US/Mountain' === auth()->user()->timezone) selected @endif>(UTC-07:00) Mountain Time (US &amp; Canada)</option>
-            <option value='America/Managua' @if (auth()->check() && 'America/Managua' === auth()->user()->timezone) selected @endif>(UTC-06:00) Central America</option>
-            <option value='US/Central' @if (auth()->check() && 'US/Central' === auth()->user()->timezone) selected @endif>(UTC-06:00) Central Time (US &amp; Canada)</option>
-            <option value='America/Mexico_City' @if (auth()->check() && 'America/Mexico_City' === auth()->user()->timezone) selected @endif>(UTC-06:00) Mexico City, Guadalajara</option>
-            <option value='America/Monterrey' @if (auth()->check() && 'America/Monterrey' === auth()->user()->timezone) selected @endif>(UTC-06:00) Monterrey</option>
-            <option value='Canada/Saskatchewan' @if (auth()->check() && 'Canada/Saskatchewan' === auth()->user()->timezone) selected @endif>(UTC-06:00) Saskatchewan</option>
-            <option value='America/Bogota' @if (auth()->check() && 'America/Bogota' === auth()->user()->timezone) selected @endif>(UTC-05:00) Bogota, Quito</option>
-            <option value='US/Eastern' @if (auth()->check() && 'US/Eastern' === auth()->user()->timezone) selected @endif>(UTC-05:00) Eastern Time (US &amp; Canada)</option>
-            <option value='US/East-Indiana' @if (auth()->check() && 'US/East-Indiana' === auth()->user()->timezone) selected @endif>(UTC-05:00) Indiana (East)</option>
-            <option value='America/Lima' @if (auth()->check() && 'America/Lima' === auth()->user()->timezone) selected @endif>(UTC-05:00) Lima</option>
-            <option value='Canada/Atlantic' @if (auth()->check() && 'Canada/Atlantic' === auth()->user()->timezone) selected @endif>(UTC-04:00) Atlantic Time (Canada)</option>
-            <option value='America/Caracas' @if (auth()->check() && 'America/Caracas' === auth()->user()->timezone) selected @endif>(UTC-04:30) Caracas</option>
-            <option value='America/La_Paz' @if (auth()->check() && 'America/La_Paz' === auth()->user()->timezone) selected @endif>(UTC-04:00) La Paz</option>
-            <option value='America/Santiago' @if (auth()->check() && 'America/Santiago' === auth()->user()->timezone) selected @endif>(UTC-04:00) Santiago</option>
-            <option value='Canada/Newfoundland' @if (auth()->check() && 'Canada/Newfoundland' === auth()->user()->timezone) selected @endif>(UTC-03:30) Newfoundland</option>
-            <option value='America/Sao_Paulo' @if (auth()->check() && 'America/Sao_Paulo' === auth()->user()->timezone) selected @endif>(UTC-03:00) Brasilia</option>
-            <option value='America/Argentina/Buenos_Aires' @if (auth()->check() && 'America/Argentina/Buenos_Aires' === auth()->user()->timezone) selected @endif>(UTC-03:00) Buenos Aires, Georgetown</option>
-            <option value='America/Godthab' @if (auth()->check() && 'America/Godthab' === auth()->user()->timezone) selected @endif>(UTC-03:00) Greenland</option>
-            <option value='America/Noronha' @if (auth()->check() && 'America/Noronha' === auth()->user()->timezone) selected @endif>(UTC-02:00) Mid-Atlantic</option>
-            <option value='Atlantic/Azores' @if (auth()->check() && 'Atlantic/Azores' === auth()->user()->timezone) selected @endif>(UTC-01:00) Azores</option>
-            <option value='Atlantic/Cape_Verde' @if (auth()->check() && 'Atlantic/Cape_Verde' === auth()->user()->timezone) selected @endif>(UTC-01:00) Cape Verde Is.</option>
-            <option value='Africa/Casablanca' @if (auth()->check() && 'Africa/Casablanca' === auth()->user()->timezone) selected @endif>(UTC+00:00) Casablanca</option>
-            <option value='Europe/London' @if (auth()->check() && 'Europe/London' === auth()->user()->timezone) selected @endif>(UTC+00:00) London, Edinburgh</option>
-            <option value='Etc/Greenwich' @if (auth()->check() && 'Etc/Greenwich' === auth()->user()->timezone) selected @endif>(UTC+00:00) Greenwich Mean Time : Dublin</option>
-            <option value='Europe/Lisbon' @if (auth()->check() && 'Europe/Lisbon' === auth()->user()->timezone) selected @endif>(UTC+00:00) Lisbon</option>
-            <option value='Africa/Monrovia' @if (auth()->check() && 'Africa/Monrovia' === auth()->user()->timezone) selected @endif>(UTC+00:00) Monrovia</option>
-            <option value='UTC' @if (!auth()->check() || 'UTC' === auth()->user()->timezone) selected @endif>(UTC+00:00) UTC</option>
-            <option value='Europe/Amsterdam' @if (auth()->check() && 'Europe/Amsterdam' === auth()->user()->timezone) selected @endif>(UTC+01:00) Amsterdam</option>
-            <option value='Europe/Belgrade' @if (auth()->check() && 'Europe/Belgrade' === auth()->user()->timezone) selected @endif>(UTC+01:00) Belgrade</option>
-            <option value='Europe/Berlin' @if (auth()->check() && 'Europe/Berlin' === auth()->user()->timezone) selected @endif>(UTC+01:00) Berlin, Bern</option>
-            <option value='Europe/Bratislava' @if (auth()->check() && 'Europe/Bratislava' === auth()->user()->timezone) selected @endif>(UTC+01:00) Bratislava</option>
-            <option value='Europe/Brussels' @if (auth()->check() && 'Europe/Brussels' === auth()->user()->timezone) selected @endif>(UTC+01:00) Brussels</option>
-            <option value='Europe/Budapest' @if (auth()->check() && 'Europe/Budapest' === auth()->user()->timezone) selected @endif>(UTC+01:00) Budapest</option>
-            <option value='Europe/Copenhagen' @if (auth()->check() && 'Europe/Copenhagen' === auth()->user()->timezone) selected @endif>(UTC+01:00) Copenhagen</option>
-            <option value='Europe/Ljubljana' @if (auth()->check() && 'Europe/Ljubljana' === auth()->user()->timezone) selected @endif>(UTC+01:00) Ljubljana</option>
-            <option value='Europe/Madrid' @if (auth()->check() && 'Europe/Madrid' === auth()->user()->timezone) selected @endif>(UTC+01:00) Madrid</option>
-            <option value='Europe/Paris' @if (auth()->check() && 'Europe/Paris' === auth()->user()->timezone) selected @endif>(UTC+01:00) Paris</option>
-            <option value='Europe/Prague' @if (auth()->check() && 'Europe/Prague' === auth()->user()->timezone) selected @endif>(UTC+01:00) Prague</option>
-            <option value='Europe/Rome' @if (auth()->check() && 'Europe/Rome' === auth()->user()->timezone) selected @endif>(UTC+01:00) Rome</option>
-            <option value='Europe/Sarajevo' @if (auth()->check() && 'Europe/Sarajevo' === auth()->user()->timezone) selected @endif>(UTC+01:00) Sarajevo</option>
-            <option value='Europe/Skopje' @if (auth()->check() && 'Europe/Skopje' === auth()->user()->timezone) selected @endif>(UTC+01:00) Skopje</option>
-            <option value='Europe/Stockholm' @if (auth()->check() && 'Europe/Stockholm' === auth()->user()->timezone) selected @endif>(UTC+01:00) Stockholm</option>
-            <option value='Europe/Vienna' @if (auth()->check() && 'Europe/Vienna' === auth()->user()->timezone) selected @endif>(UTC+01:00) Vienna</option>
-            <option value='Europe/Warsaw' @if (auth()->check() && 'Europe/Warsaw' === auth()->user()->timezone) selected @endif>(UTC+01:00) Warsaw</option>
-            <option value='Africa/Lagos' @if (auth()->check() && 'Africa/Lagos' === auth()->user()->timezone) selected @endif>(UTC+01:00) West Central Africa</option>
-            <option value='Europe/Zagreb' @if (auth()->check() && 'Europe/Zagreb' === auth()->user()->timezone) selected @endif>(UTC+01:00) Zagreb</option>
-            <option value='Europe/Athens' @if (auth()->check() && 'Europe/Athens' === auth()->user()->timezone) selected @endif>(UTC+02:00) Athens</option>
-            <option value='Europe/Bucharest' @if (auth()->check() && 'Europe/Bucharest' === auth()->user()->timezone) selected @endif>(UTC+02:00) Bucharest</option>
-            <option value='Africa/Cairo' @if (auth()->check() && 'Africa/Cairo' === auth()->user()->timezone) selected @endif>(UTC+02:00) Cairo</option>
-            <option value='Africa/Harare' @if (auth()->check() && 'Africa/Harare' === auth()->user()->timezone) selected @endif>(UTC+02:00) Harare</option>
-            <option value='Europe/Helsinki' @if (auth()->check() && 'Europe/Helsinki' === auth()->user()->timezone) selected @endif>(UTC+02:00) Helsinki, Kyiv</option>
-            <option value='Europe/Istanbul' @if (auth()->check() && 'Europe/Istanbul' === auth()->user()->timezone) selected @endif>(UTC+02:00) Istanbul</option>
-            <option value='Asia/Jerusalem' @if (auth()->check() && 'Asia/Jerusalem' === auth()->user()->timezone) selected @endif>(UTC+02:00) Jerusalem</option>
-            <option value='Africa/Johannesburg' @if (auth()->check() && 'Africa/Johannesburg' === auth()->user()->timezone) selected @endif>(UTC+02:00) Pretoria</option>
-            <option value='Europe/Riga' @if (auth()->check() && 'Europe/Riga' === auth()->user()->timezone) selected @endif>(UTC+02:00) Riga</option>
-            <option value='Europe/Sofia' @if (auth()->check() && 'Europe/Sofia' === auth()->user()->timezone) selected @endif>(UTC+02:00) Sofia</option>
-            <option value='Europe/Tallinn' @if (auth()->check() && 'Europe/Tallinn' === auth()->user()->timezone) selected @endif>(UTC+02:00) Tallinn</option>
-            <option value='Europe/Vilnius' @if (auth()->check() && 'Europe/Vilnius' === auth()->user()->timezone) selected @endif>(UTC+02:00) Vilnius</option>
-            <option value='Asia/Baghdad' @if (auth()->check() && 'Asia/Baghdad' === auth()->user()->timezone) selected @endif>(UTC+03:00) Baghdad</option>
-            <option value='Asia/Kuwait' @if (auth()->check() && 'Asia/Kuwait' === auth()->user()->timezone) selected @endif>(UTC+03:00) Kuwait</option>
-            <option value='Europe/Minsk' @if (auth()->check() && 'Europe/Minsk' === auth()->user()->timezone) selected @endif>(UTC+03:00) Minsk</option>
-            <option value='Africa/Nairobi' @if (auth()->check() && 'Africa/Nairobi' === auth()->user()->timezone) selected @endif>(UTC+03:00) Nairobi</option>
-            <option value='Asia/Riyadh' @if (auth()->check() && 'Asia/Riyadh' === auth()->user()->timezone) selected @endif>(UTC+03:00) Riyadh</option>
-            <option value='Europe/Volgograd' @if (auth()->check() && 'Europe/Volgograd' === auth()->user()->timezone) selected @endif>(UTC+03:00) Volgograd</option>
-            <option value='Asia/Tehran' @if (auth()->check() && 'Asia/Tehran' === auth()->user()->timezone) selected @endif>(UTC+03:30) Tehran</option>
-            <option value='Asia/Muscat' @if (auth()->check() && 'Asia/Muscat' === auth()->user()->timezone) selected @endif>(UTC+04:00) Muscat, Abu Dhabi</option>
-            <option value='Asia/Baku' @if (auth()->check() && 'Asia/Baku' === auth()->user()->timezone) selected @endif>(UTC+04:00) Baku</option>
-            <option value='Europe/Moscow' @if (auth()->check() && 'Europe/Moscow' === auth()->user()->timezone) selected @endif>(UTC+04:00) Moscow, St. Petersburg</option>
-            <option value='Asia/Tbilisi' @if (auth()->check() && 'Asia/Tbilisi' === auth()->user()->timezone) selected @endif>(UTC+04:00) Tbilisi</option>
-            <option value='Asia/Yerevan' @if (auth()->check() && 'Asia/Yerevan' === auth()->user()->timezone) selected @endif>(UTC+04:00) Yerevan</option>
-            <option value='Asia/Kabul' @if (auth()->check() && 'Asia/Kabul' === auth()->user()->timezone) selected @endif>(UTC+04:30) Kabul</option>
-            <option value='Asia/Karachi' @if (auth()->check() && 'Asia/Karachi' === auth()->user()->timezone) selected @endif>(UTC+05:00) Karachi, Islamabad</option>
-            <option value='Asia/Tashkent' @if (auth()->check() && 'Asia/Tashkent' === auth()->user()->timezone) selected @endif>(UTC+05:00) Tashkent</option>
-            <option value='Asia/Kolkata' @if (auth()->check() && 'Asia/Kolkata' === auth()->user()->timezone) selected @endif>(UTC+05:30) Kolkata, Chennai, Mumbai, New Delhi, Sri Jayawardenepura</option>
-            <option value='Asia/Katmandu' @if (auth()->check() && 'Asia/Katmandu' === auth()->user()->timezone) selected @endif>(UTC+05:45) Kathmandu</option>
-            <option value='Asia/Almaty' @if (auth()->check() && 'Asia/Almaty' === auth()->user()->timezone) selected @endif>(UTC+06:00) Almaty</option>
-            <option value='Asia/Dhaka' @if (auth()->check() && 'Asia/Dhaka' === auth()->user()->timezone) selected @endif>(UTC+06:00) Dhaka, Astana</option>
-            <option value='Asia/Yekaterinburg' @if (auth()->check() && 'Asia/Yekaterinburg' === auth()->user()->timezone) selected @endif>(UTC+06:00) Ekaterinburg</option>
-            <option value='Asia/Rangoon' @if (auth()->check() && 'Asia/Rangoon' === auth()->user()->timezone) selected @endif>(UTC+06:30) Rangoon</option>
-            <option value='Asia/Bangkok' @if (auth()->check() && 'Asia/Bangkok' === auth()->user()->timezone) selected @endif>(UTC+07:00) Bangkok, Hanoi</option>
-            <option value='Asia/Jakarta' @if (auth()->check() && 'Asia/Jakarta' === auth()->user()->timezone) selected @endif>(UTC+07:00) Jakarta</option>
-            <option value='Asia/Novosibirsk' @if (auth()->check() && 'Asia/Novosibirsk' === auth()->user()->timezone) selected @endif>(UTC+07:00) Novosibirsk</option>
-            <option value='Asia/Chongqing' @if (auth()->check() && 'Asia/Chongqing' === auth()->user()->timezone) selected @endif>(UTC+08:00) Chongqing</option>
-            <option value='Asia/Hong_Kong' @if (auth()->check() && 'Asia/Hong_Kong' === auth()->user()->timezone) selected @endif>(UTC+08:00) Hong Kong, Beijing</option>
-            <option value='Asia/Krasnoyarsk' @if (auth()->check() && 'Asia/Krasnoyarsk' === auth()->user()->timezone) selected @endif>(UTC+08:00) Krasnoyarsk</option>
-            <option value='Asia/Kuala_Lumpur' @if (auth()->check() && 'Asia/Kuala_Lumpur' === auth()->user()->timezone) selected @endif>(UTC+08:00) Kuala Lumpur</option>
-            <option value='Australia/Perth' @if (auth()->check() && 'Australia/Perth' === auth()->user()->timezone) selected @endif>(UTC+08:00) Perth</option>
-            <option value='Asia/Singapore' @if (auth()->check() && 'Asia/Singapore' === auth()->user()->timezone) selected @endif>(UTC+08:00) Singapore</option>
-            <option value='Asia/Taipei' @if (auth()->check() && 'Asia/Taipei' === auth()->user()->timezone) selected @endif>(UTC+08:00) Taipei</option>
-            <option value='Asia/Ulan_Bator' @if (auth()->check() && 'Asia/Ulan_Bator' === auth()->user()->timezone) selected @endif>(UTC+08:00) Ulaan Bataar</option>
-            <option value='Asia/Urumqi' @if (auth()->check() && 'Asia/Urumqi' === auth()->user()->timezone) selected @endif>(UTC+08:00) Urumqi</option>
-            <option value='Asia/Irkutsk' @if (auth()->check() && 'Asia/Irkutsk' === auth()->user()->timezone) selected @endif>(UTC+09:00) Irkutsk</option>
-            <option value='Asia/Tokyo' @if (auth()->check() && 'Asia/Tokyo' === auth()->user()->timezone) selected @endif>(UTC+09:00) Tokyo, Osaka, Sapporo</option>
-            <option value='Asia/Seoul' @if (auth()->check() && 'Asia/Seoul' === auth()->user()->timezone) selected @endif>(UTC+09:00) Seoul</option>
-            <option value='Australia/Adelaide' @if (auth()->check() && 'Australia/Adelaide' === auth()->user()->timezone) selected @endif>(UTC+09:30) Adelaide</option>
-            <option value='Australia/Darwin' @if (auth()->check() && 'Australia/Darwin' === auth()->user()->timezone) selected @endif>(UTC+09:30) Darwin</option>
-            <option value='Australia/Brisbane' @if (auth()->check() && 'Australia/Brisbane' === auth()->user()->timezone) selected @endif>(UTC+10:00) Brisbane</option>
-            <option value='Australia/Canberra' @if (auth()->check() && 'Australia/Canberra' === auth()->user()->timezone) selected @endif>(UTC+10:00) Canberra</option>
-            <option value='Pacific/Guam' @if (auth()->check() && 'Pacific/Guam' === auth()->user()->timezone) selected @endif>(UTC+10:00) Guam</option>
-            <option value='Australia/Hobart' @if (auth()->check() && 'Australia/Hobart' === auth()->user()->timezone) selected @endif>(UTC+10:00) Hobart</option>
-            <option value='Australia/Melbourne' @if (auth()->check() && 'Australia/Melbourne' === auth()->user()->timezone) selected @endif>(UTC+10:00) Melbourne</option>
-            <option value='Pacific/Port_Moresby' @if (auth()->check() && 'Pacific/Port_Moresby' === auth()->user()->timezone) selected @endif>(UTC+10:00) Port Moresby</option>
-            <option value='Australia/Sydney' @if (auth()->check() && 'Australia/Sydney' === auth()->user()->timezone) selected @endif>(UTC+10:00) Sydney</option>
-            <option value='Asia/Yakutsk' @if (auth()->check() && 'Asia/Yakutsk' === auth()->user()->timezone) selected @endif>(UTC+10:00) Yakutsk</option>
-            <option value='Asia/Vladivostok' @if (auth()->check() && 'Asia/Vladivostok' === auth()->user()->timezone) selected @endif>(UTC+11:00) Vladivostok</option>
-            <option value='Pacific/Auckland' @if (auth()->check() && 'Pacific/Auckland' === auth()->user()->timezone) selected @endif>(UTC+12:00) Auckland, Wellington</option>
-            <option value='Pacific/Fiji' @if (auth()->check() && 'Pacific/Fiji' === auth()->user()->timezone) selected @endif>(UTC+12:00) Fiji, Marshall Is.</option>
-            <option value='Pacific/Kwajalein' @if (auth()->check() && 'Pacific/Kwajalein' === auth()->user()->timezone) selected @endif>(UTC+12:00) International Date Line West</option>
-            <option value='Asia/Kamchatka' @if (auth()->check() && 'Asia/Kamchatka' === auth()->user()->timezone) selected @endif>(UTC+12:00) Kamchatka</option>
-            <option value='Asia/Magadan' @if (auth()->check() && 'Asia/Magadan' === auth()->user()->timezone) selected @endif>(UTC+12:00) Magadan, New Caledonia, Solomon Is.</option>
-            <option value='Pacific/Tongatapu' @if (auth()->check() && 'Pacific/Tongatapu' === auth()->user()->timezone) selected @endif>(UTC+13:00) Nuku'alofa</option>
+            @foreach ($timezones as $zone => $label)
+                <option value="{{ $zone }}" @if (auth()->check() && $zone === auth()->user()->timezone) selected @endif>
+                    {{ $label }}
+                </option>
+            @endforeach
         </select>
 
         @if ($errors->has('timezone'))
