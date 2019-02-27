@@ -6,6 +6,7 @@ namespace App\Models;
 
 use App\Notifications\ResetPassword;
 use Illuminate\Support\Facades\Hash;
+use App\Models\PrivateMessages\Thread;
 use Spatie\Permission\Traits\HasRoles;
 use Facades\App\Services\SizeFormatter;
 use Illuminate\Notifications\Notifiable;
@@ -134,5 +135,10 @@ class User extends Authenticatable
     public function snatches(): HasMany
     {
         return $this->hasMany(Snatch::class);
+    }
+
+    public function threads(): HasMany
+    {
+        return $this->hasMany(Thread::class);
     }
 }

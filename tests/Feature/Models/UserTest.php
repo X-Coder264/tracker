@@ -10,6 +10,7 @@ use App\Models\Locale;
 use App\Models\Snatch;
 use App\Models\Torrent;
 use Illuminate\Support\Facades\Hash;
+use App\Models\PrivateMessages\Thread;
 use Facades\App\Services\SizeFormatter;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -128,5 +129,16 @@ class UserTest extends TestCase
         $this->assertSame($user->snatches[0]->created_at->format('Y-m-d H:i:s'), $snatch->created_at->format('Y-m-d H:i:s'));
         $this->assertSame($user->snatches[0]->updated_at->format('Y-m-d H:i:s'), $snatch->updated_at->format('Y-m-d H:i:s'));
         $this->assertSame($user->snatches[0]->finished_at->format('Y-m-d H:i:s'), $snatch->finished_at->format('Y-m-d H:i:s'));
+    }
+
+    public function testThreadsRelationship(): void
+    {
+        factory(Thread::class)->create();
+
+        $user = User::firstOrFail();
+        $thread = Thread::firstOrFail();
+        $this->assertInstanceOf(HasMany::class, $user->threads());
+        $this->assertInstanceOf(Collection::class, $user->threads);
+        $this->assertTrue($user->threads[0]->is($thread));
     }
 }

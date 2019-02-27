@@ -36,7 +36,9 @@
                             </tbody>
                         </table>
                     </div>
-                    {{ $torrents->render() }}
+                    <div class="row justify-content-center">
+                        {{ $torrents->render() }}
+                    </div>
                 @endif
             </div>
         </div>

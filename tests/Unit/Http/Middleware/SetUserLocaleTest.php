@@ -9,6 +9,7 @@ use Tests\TestCase;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Router;
 use Illuminate\Contracts\Auth\Guard;
+use Illuminate\Contracts\Http\Kernel;
 use App\Http\Middleware\SetUserLocale;
 use Illuminate\Contracts\Cache\Repository;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -108,6 +109,8 @@ class SetUserLocaleTest extends TestCase
 
     public function testMiddlewareIsAppliedOnAllWebRoutes(): void
     {
+        $this->app->make(Kernel::class);
+
         /** @var Router $router */
         $router = $this->app->make(Router::class);
         $this->assertTrue(in_array(SetUserLocale::class, $router->getMiddlewareGroups()['web']));

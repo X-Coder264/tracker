@@ -18,6 +18,8 @@ class UserStatsComposerTest extends TestCase
 
     public function testDataForLoggedInUser(): void
     {
+        $this->withoutExceptionHandling();
+
         $user = factory(User::class)->create();
         $this->actingAs($user);
 
@@ -25,7 +27,7 @@ class UserStatsComposerTest extends TestCase
         $leechingPeer = factory(Peer::class)->create(['user_id' => $user->id, 'seeder' => false]);
 
         $viewFactory = $this->app->make(Factory::class);
-        $view = $viewFactory->make('layouts.app');
+        $view = $viewFactory->make('partials.user-statistics');
         $view->render();
         $viewData = $view->getData();
         $this->assertSame(2, $viewData['numberOfSeedingTorrents']);
@@ -41,11 +43,13 @@ class UserStatsComposerTest extends TestCase
 
     public function testDataForLoggedInUserWhenTheUserDoesNotSeedOrLeechAnything(): void
     {
+        $this->withoutExceptionHandling();
+
         $user = factory(User::class)->create();
         $this->actingAs($user);
 
         $viewFactory = $this->app->make(Factory::class);
-        $view = $viewFactory->make('layouts.app');
+        $view = $viewFactory->make('partials.user-statistics');
         $view->render();
         $viewData = $view->getData();
         $this->assertSame(0, $viewData['numberOfSeedingTorrents']);

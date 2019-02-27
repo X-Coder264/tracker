@@ -7,7 +7,6 @@ namespace App\Http\Controllers;
 use App\Models\Torrent;
 use Illuminate\Http\Response;
 use App\Models\TorrentComment;
-use Illuminate\Routing\Redirector;
 use Illuminate\Contracts\Auth\Guard;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Contracts\Cache\Repository;
@@ -21,11 +20,6 @@ class TorrentCommentController
      * @var ResponseFactory
      */
     private $responseFactory;
-
-    /**
-     * @var Redirector
-     */
-    private $redirector;
 
     /**
      * @var Translator
@@ -44,13 +38,11 @@ class TorrentCommentController
 
     public function __construct(
         ResponseFactory $responseFactory,
-        Redirector $redirector,
         Translator $translator,
         Repository $cache,
         Guard $guard
     ) {
         $this->responseFactory = $responseFactory;
-        $this->redirector = $redirector;
         $this->translator = $translator;
         $this->cache = $cache;
         $this->guard = $guard;
@@ -73,7 +65,7 @@ class TorrentCommentController
 
         $this->cache->delete('torrent.' . $torrent->id . '.comments');
 
-        return $this->redirector->route('torrents.show', $torrent)
+        return $this->responseFactory->redirectToRoute('torrents.show', $torrent)
             ->with('torrentCommentSuccess', $this->translator->trans('messages.torrent-comments.create-success-message'));
     }
 
@@ -88,7 +80,7 @@ class TorrentCommentController
 
         $this->cache->delete('torrent.' . $torrentComment->torrent_id . '.comments');
 
-        return $this->redirector->route('torrents.show', $torrentComment->torrent)
+        return $this->responseFactory->redirectToRoute('torrents.show', $torrentComment->torrent)
             ->with('torrentCommentSuccess', $this->translator->trans('messages.torrent-comments.update-success-message'));
     }
 }

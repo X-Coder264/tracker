@@ -19,19 +19,19 @@ use Illuminate\Contracts\Routing\Registrar;
 /** @var Registrar $router */
 
 // Authentication Routes...
-$this->get('login', 'Auth\LoginController@showLoginForm')->name('login');
-$this->post('login', 'Auth\LoginController@login');
-$this->post('logout', 'Auth\LoginController@logout')->name('logout');
+$router->get('login', 'Auth\LoginController@showLoginForm')->name('login');
+$router->post('login', 'Auth\LoginController@login');
+$router->post('logout', 'Auth\LoginController@logout')->name('logout');
 
 // Registration Routes...
-$this->get('register', 'Auth\RegisterController@showRegistrationForm')->name('register');
-$this->post('register', 'Auth\RegisterController@register');
+$router->get('register', 'Auth\RegisterController@showRegistrationForm')->name('register');
+$router->post('register', 'Auth\RegisterController@register');
 
 // Password Reset Routes...
-$this->get('password/reset', 'Auth\ForgotPasswordController@showLinkRequestForm')->name('password.request');
-$this->post('password/email', 'Auth\ForgotPasswordController@sendResetLinkEmail')->name('password.email');
-$this->get('password/reset/{token}', 'Auth\ResetPasswordController@showResetForm')->name('password.reset');
-$this->post('password/reset', 'Auth\ResetPasswordController@reset')->name('password.update');
+$router->get('password/reset', 'Auth\ForgotPasswordController@showLinkRequestForm')->name('password.request');
+$router->post('password/email', 'Auth\ForgotPasswordController@sendResetLinkEmail')->name('password.email');
+$router->get('password/reset/{token}', 'Auth\ResetPasswordController@showResetForm')->name('password.reset');
+$router->post('password/reset', 'Auth\ResetPasswordController@reset')->name('password.update');
 
 $router->get('announce', 'AnnounceController@store')->name('announce');
 $router->get('scrape', 'ScrapeController@show')->name('scrape');
@@ -70,4 +70,9 @@ $router->group(['middleware' => [Authenticate::class]], function (Registrar $rou
     $router->post('users/rss', 'RSS\UserTorrentFeedController@store')->name('users.rss.store');
     $router->get('users/{user}', 'UserController@show')->name('users.show');
     $router->put('users/{user}', 'UserController@update')->name('users.update');
+
+    $router->get('threads', 'PrivateMessages\ThreadController@index')->name('threads.index');
+    $router->get('threads/{thread}/message/create', 'PrivateMessages\ThreadMessageController@create')->name('thread-messages.create');
+    $router->post('threads/{thread}/message', 'PrivateMessages\ThreadMessageController@store')->name('thread-messages.store');
+    $router->get('threads/{thread}', 'PrivateMessages\ThreadController@show')->name('threads.show');
 });

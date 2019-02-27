@@ -28,8 +28,6 @@ class SizeFormatter
             $count++;
         }
 
-        $formattedString = number_format($size, 2, '.', '') . ' ' . $this->map[$count];
-
-        return $formattedString;
+        return number_format($size, 2, '.', '') . ' ' . $this->map[$count];
     }
 }

@@ -191,7 +191,10 @@
                         </div>
                         <br>
                     @endif
-                    <a href="{{ route('torrent-comments.create', $torrent) }}" class="btn btn-primary btn-block">{{ trans('messages.torrents.show.add_comment') }}</a><br>
+                    <a href="{{ route('torrent-comments.create', $torrent) }}" class="btn btn-primary btn-block">
+                        {{ trans('messages.torrents.show.add_comment') }}
+                    </a>
+                    <br>
                     @if ($torrentComments->isEmpty())
                             <div class="card text-dark bg-warning">
                                 <div class="card-body">

@@ -46,19 +46,19 @@ class AnnounceManagerTest extends TestCase
 
         $response = $this->get(
             route(
-            'announce',
-            [
-                'info_hash'  => hex2bin($infoHash),
-                'passkey'    => $user->passkey,
-                'peer_id'    => hex2bin($peerId),
-                'event'      => 'started',
-                'ip'         => $IP,
-                'port'       => $port,
-                'downloaded' => 0,
-                'uploaded'   => 0,
-                'left'       => $torrent->getOriginal('size'),
-            ]
-        ),
+                'announce',
+                [
+                    'info_hash'  => hex2bin($infoHash),
+                    'passkey'    => $user->passkey,
+                    'peer_id'    => hex2bin($peerId),
+                    'event'      => 'started',
+                    'ip'         => $IP,
+                    'port'       => $port,
+                    'downloaded' => 0,
+                    'uploaded'   => 0,
+                    'left'       => $torrent->getOriginal('size'),
+                ]
+            ),
             [
                 'REMOTE_ADDR'     => $IP,
                 'HTTP_USER_AGENT' => $userAgent,

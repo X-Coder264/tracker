@@ -2,7 +2,7 @@
 <html lang="{{ config('app.locale') }}">
 <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <!-- CSRF Token -->
     <meta name="csrf-token" content="{{ csrf_token() }}">
@@ -11,6 +11,7 @@
 
     <!-- Styles -->
     <link href="{{ asset('css/bootstrap.min.css') }}" rel="stylesheet">
+    <link href="{{ asset('css/fontawesome.min.css') }}" rel="stylesheet">
 
     @yield('stylesheets')
 
@@ -21,43 +22,18 @@
         @include('partials.navigation')
 
         <main role="main" class="py-4">
-
-            @if (auth()->check())
-                <div class="row">
-                    <div class="col-md-10 mx-auto">
-                        <div class="card">
-                            <div class="card-body">
-                                {{ trans('messages.common.uploaded') }}: {{ auth()->user()->uploaded }} |
-                                {{ trans('messages.common.downloaded') }}: {{ auth()->user()->downloaded }} |
-                                {{ trans('messages.common.seeding') }}: {{ $numberOfSeedingTorrents }} |
-                                {{ trans('messages.common.leeching') }}: {{ $numberOfLeechingTorrents }}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <br>
-            @endif
+            @include('partials.user-statistics')
 
             @yield('content')
         </main>
     </div>
 
-    <footer class="footer" style="flex-shrink: 0;">
-        <div class="container-fluid">
-            <div class="col-12">
-                <div class="card">
-                    <div class="card-body">
-                        <p class="text-muted text-center">LaraTracker {{ date('Y') }}</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </footer>
+    @include('partials.footer')
 
     <!-- Scripts -->
     <script src="{{ asset('js/jquery.min.js') }}"></script>
     <script src="{{ asset('js/bootstrap.bundle.min.js') }}"></script>
+    <script src="{{ asset('js/fontawesome.min.js') }}"></script>
 
     @yield('scripts')
 

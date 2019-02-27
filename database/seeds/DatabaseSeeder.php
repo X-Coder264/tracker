@@ -17,5 +17,6 @@ class DatabaseSeeder extends Seeder
         $this->call(TorrentCategorySeeder::class);
         $this->call(TorrentSeeder::class);
         $this->call(PeerSeeder::class);
+        $this->call(ThreadSeeder::class);
     }
 }

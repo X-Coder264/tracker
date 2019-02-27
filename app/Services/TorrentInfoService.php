@@ -6,7 +6,11 @@ namespace App\Services;
 
 use Generator;
 use App\Models\Torrent;
-use Illuminate\Cache\CacheManager;
+use App\Enumerations\Cache;
+use App\Presenters\IMDb\Title;
+use App\Services\IMDb\IMDBManager;
+use App\Services\IMDb\TitleFactory;
+use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Contracts\Filesystem\Factory as FilesystemManager;
 

@@ -14,7 +14,6 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use App\Models\TorrentCategory;
 use Illuminate\Cache\CacheManager;
-use Illuminate\Routing\Redirector;
 use App\Services\TorrentInfoService;
 use Illuminate\Contracts\Auth\Guard;
 use Illuminate\Http\RedirectResponse;
@@ -89,7 +88,7 @@ class TorrentController
             'torrents.page.' . $page . '.perPage.' . $torrentPerPage,
             Cache::TEN_MINUTES,
             function () use ($torrentPerPage): LengthAwarePaginator {
-                return Torrent::with(['uploader'])->where('seeders', '>', 0)
+                return Torrent::with(['uploader', 'category'])->where('seeders', '>', 0)
                                               ->orderBy('id', 'desc')
                                               ->paginate($torrentPerPage);
             }
@@ -157,14 +156,13 @@ class TorrentController
      */
     public function store(
         TorrentUploadRequest $request,
-        TorrentUploadManager $torrentUploadManager,
-        Redirector $redirector
+        TorrentUploadManager $torrentUploadManager
     ): RedirectResponse {
         $torrent = $torrentUploadManager->upload($request);
 
         $this->cacheManager->tags('torrents')->flush();
 
-        return $redirector->route('torrents.show', $torrent)
+        return $this->responseFactory->redirectToRoute('torrents.show', $torrent)
                          ->with('success', $this->translator->trans('messages.torrents.store-successfully-uploaded-torrent.message'));
     }
 

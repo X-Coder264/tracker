@@ -7,8 +7,8 @@ namespace App\Http\Middleware;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Auth\AuthManager;
-use Illuminate\Routing\Redirector;
 use Symfony\Component\HttpFoundation\Response;
+use Illuminate\Contracts\Routing\ResponseFactory;
 
 class RedirectIfAuthenticated
 {
@@ -18,20 +18,20 @@ class RedirectIfAuthenticated
     private $authManager;
 
     /**
-     * @var Redirector
+     * @var ResponseFactory
      */
-    private $redirector;
+    private $responseFactory;
 
-    public function __construct(AuthManager $authManager, Redirector $redirector)
+    public function __construct(AuthManager $authManager, ResponseFactory $responseFactory)
     {
         $this->authManager = $authManager;
-        $this->redirector = $redirector;
+        $this->responseFactory = $responseFactory;
     }
 
     public function handle(Request $request, Closure $next, ?string $guard = null): Response
     {
         if ($this->authManager->guard($guard)->check()) {
-            return $this->redirector->route('home');
+            return $this->responseFactory->redirectToRoute('home');
         }
 
         return $next($request);

@@ -8,6 +8,7 @@ use Carbon\Carbon;
 use Tests\TestCase;
 use App\Models\User;
 use Illuminate\Routing\Router;
+use Illuminate\Contracts\Http\Kernel;
 use App\Http\Middleware\UpdateUserLastSeenAtInfo;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
@@ -62,6 +63,8 @@ class UpdateUserLastSeenAtInfoTest extends TestCase
 
     public function testMiddlewareIsAppliedOnAllWebRoutes(): void
     {
+        $this->app->make(Kernel::class);
+
         /** @var Router $router */
         $router = $this->app->make(Router::class);
         $this->assertTrue(in_array(UpdateUserLastSeenAtInfo::class, $router->getMiddlewareGroups()['web']));

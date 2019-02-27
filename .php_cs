@@ -4,7 +4,7 @@ $finder = PhpCsFixer\Finder::create()
     ->in(__DIR__)
     ->ignoreDotFiles(true)
     ->ignoreVCS(true)
-    ->exclude(['vendor', 'storage', 'resources', 'public', 'bootstrap', 'config'])
+    ->exclude(['vendor', 'storage', 'resources', 'public', 'bootstrap', 'config', 'node_modules'])
     ->files()
     ->name('*.php')
 ;
@@ -79,6 +79,7 @@ return PhpCsFixer\Config::create()
         'phpdoc_no_useless_inheritdoc' => true,
         'phpdoc_return_self_reference' => true,
         'phpdoc_summary' => true,
+        'return_assignment' => true,
         'return_type_declaration' => ['space_before' => 'none'],
         'self_accessor' => true,
         'semicolon_after_instruction' => true,
