@@ -194,7 +194,7 @@ class LoginControllerTest extends TestCase
 
         $response->assertRedirect(route('login'));
         $response->assertSessionHasErrors('email');
-        $this->assertContains(
+        $this->assertStringContainsString(
             'Too many login attempts.',
             collect(
                 $response

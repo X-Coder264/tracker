@@ -7,11 +7,12 @@ namespace App\JsonApi\Torrents;
 use App\Models\Torrent;
 use App\JsonApi\OffsetStrategy;
 use Illuminate\Support\Collection;
-use Illuminate\Database\Eloquent\Builder;
-use CloudCreativity\LaravelJsonApi\Store\EloquentAdapter;
+use CloudCreativity\LaravelJsonApi\Eloquent\AbstractAdapter;
 
-class Adapter extends EloquentAdapter
+class Adapter extends AbstractAdapter
 {
+    protected $primaryKey = 'id';
+
     /**
      * @var array
      */
@@ -25,40 +26,26 @@ class Adapter extends EloquentAdapter
         parent::__construct(new Torrent(), $paging);
     }
 
-    /**
-     * Apply the supplied filters to the builder instance.
-     */
-    protected function filter(Builder $builder, Collection $filters)
+    protected function filter($query, Collection $filters)
     {
         if ($filters->has('name')) {
-            $builder->where('torrents.name', '=', $filters->get('name'));
+            $query->where('torrents.name', '=', $filters->get('name'));
         }
 
         if ($filters->has('uploader')) {
-            $builder->where('torrents.uploader_id', '=', $filters->get('uploader'));
+            $query->where('torrents.uploader_id', '=', $filters->get('uploader'));
         }
 
         if ($filters->has('minimumSize')) {
-            $builder->where('torrents.size', '>', (int) $filters->get('minimumSize') * 1024 * 1024);
+            $query->where('torrents.size', '>', (int) $filters->get('minimumSize') * 1024 * 1024);
         }
 
         if ($filters->has('maximumSize')) {
-            $builder->where('torrents.size', '<', (int) $filters->get('maximumSize') * 1024 * 1024);
+            $query->where('torrents.size', '<', (int) $filters->get('maximumSize') * 1024 * 1024);
         }
 
         if ($filters->has('slug')) {
-            $builder->where('torrents.slug', '=', $filters->get('slug'));
+            $query->where('torrents.slug', '=', $filters->get('slug'));
         }
-    }
-
-    /**
-     * Is this a search for a singleton resource?
-     *
-     *
-     * @return bool
-     */
-    protected function isSearchOne(Collection $filters)
-    {
-        return false;
     }
 }

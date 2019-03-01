@@ -63,7 +63,7 @@ class Torrent extends Model
 
     public function uploader(): BelongsTo
     {
-        return $this->belongsTo(User::class)->select(['id', 'name', 'slug']);
+        return $this->belongsTo(User::class);
     }
 
     public function infoHashes(): HasMany

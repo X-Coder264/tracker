@@ -8,7 +8,7 @@ use App\Models\User;
 use App\Observers\UserObserver;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Contracts\Cache\Repository;
-use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Contracts\Container\Container;
 use App\Repositories\PrivateMessages\ThreadParticipantRepository;
 use App\Repositories\PrivateMessages\CachedThreadParticipantRepository;
 use App\Repositories\PrivateMessages\ThreadParticipantRepositoryInterface;
@@ -19,10 +19,10 @@ class AppServiceProvider extends ServiceProvider
     {
         User::observe(UserObserver::class);
 
-        $this->app->singleton(ThreadParticipantRepositoryInterface::class, function (Application $app) {
+        $this->app->singleton(ThreadParticipantRepositoryInterface::class, function (Container $container) {
             return new CachedThreadParticipantRepository(
-                $app->make(Repository::class),
-                $app->make(ThreadParticipantRepository::class)
+                $container->make(Repository::class),
+                $container->make(ThreadParticipantRepository::class)
             );
         });
     }

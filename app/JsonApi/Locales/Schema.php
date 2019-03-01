@@ -6,9 +6,9 @@ namespace App\JsonApi\Locales;
 
 use App\Models\Locale;
 use App\JsonApi\ResourceTypes;
-use CloudCreativity\LaravelJsonApi\Schema\EloquentSchema;
+use Neomerx\JsonApi\Schema\SchemaProvider;
 
-class Schema extends EloquentSchema
+class Schema extends SchemaProvider
 {
     /**
      * @var string
@@ -16,21 +16,23 @@ class Schema extends EloquentSchema
     protected $resourceType = ResourceTypes::LOCALE;
 
     /**
-     * @var array
+     * @param Locale $resource
      */
-    protected $attributes = [
-        'locale',
-        'localeShort',
-    ];
+    public function getId($resource): string
+    {
+        return (string) $resource->id;
+    }
 
     /**
      * @param Locale $resource
-     * @param bool   $isPrimary
-     *
-     * @return array
      */
-    public function getRelationships($resource, $isPrimary, array $includeRelationships)
+    public function getAttributes($resource): array
     {
-        return [];
+        return [
+            'locale' => $resource->locale,
+            'locale-short' => $resource->localeShort,
+            'created-at' => $resource->created_at->toAtomString(),
+            'updated-at' => $resource->updated_at->toAtomString(),
+        ];
     }
 }

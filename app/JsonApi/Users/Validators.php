@@ -5,25 +5,10 @@ declare(strict_types=1);
 namespace App\JsonApi\Users;
 
 use App\Models\User;
-use App\JsonApi\ResourceTypes;
-use CloudCreativity\LaravelJsonApi\Validators\AbstractValidatorProvider;
-use CloudCreativity\JsonApi\Contracts\Validators\RelationshipsValidatorInterface;
+use CloudCreativity\LaravelJsonApi\Validation\AbstractValidators;
 
-class Validators extends AbstractValidatorProvider
+class Validators extends AbstractValidators
 {
-    /**
-     * @var string
-     */
-    protected $resourceType = ResourceTypes::USER;
-
-    /**
-     * @var array
-     */
-    protected $queryRules = [
-        'page.offset' => 'integer|min:0',
-        'page.limit' => 'integer|between:1,60',
-    ];
-
     /**
      * @var array
      */
@@ -51,10 +36,7 @@ class Validators extends AbstractValidatorProvider
         'torrents', 'locale',
     ];
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function attributeRules($record = null)
+    protected function rules($record = null): array
     {
         /** @var User|null $record */
 
@@ -70,11 +52,11 @@ class Validators extends AbstractValidatorProvider
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function relationshipRules(RelationshipsValidatorInterface $relationships, $record = null)
+    protected function queryRules(): array
     {
-        $relationships->hasOne('locale', ResourceTypes::LOCALE, null === $record, false);
+        return [
+            'page.offset' => 'integer|min:0',
+            'page.limit' => 'integer|between:1,60',
+        ];
     }
 }

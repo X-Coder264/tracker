@@ -8,7 +8,7 @@
         <item>
             @foreach ($items as $item)
                 <title>{{ $item->getTitle() }}</title>
-                <pubDate>{{ $item->getPubDate()->format('D, d M Y H:i:s O') }}</pubDate>
+                <pubDate>{{ $item->getPubDate()->toRssString() }}</pubDate>
                 <guid>{{ $item->getGuid() }}</guid>
                 <enclosure url="{{ $item->getLink() }}" type="application/x-bittorrent" />
             @endforeach
