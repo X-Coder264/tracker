@@ -6,9 +6,9 @@ namespace App\JsonApi\Users;
 
 use App\Models\User;
 use App\JsonApi\ResourceTypes;
-use CloudCreativity\LaravelJsonApi\Schema\EloquentSchema;
+use Neomerx\JsonApi\Schema\SchemaProvider;
 
-class Schema extends EloquentSchema
+class Schema extends SchemaProvider
 {
     /**
      * @var string
@@ -16,14 +16,27 @@ class Schema extends EloquentSchema
     protected $resourceType = ResourceTypes::USER;
 
     /**
-     * @var array
+     * @param User $resource
      */
-    protected $attributes = [
-        'name',
-        'slug',
-        'email',
-        'timezone',
-    ];
+    public function getId($resource): string
+    {
+        return (string) $resource->id;
+    }
+
+    /**
+     * @param User $resource
+     */
+    public function getAttributes($resource): array
+    {
+        return [
+            'name' => $resource->name,
+            'slug' => $resource->slug,
+            'email' => $resource->email,
+            'timezone' => $resource->timezone,
+            'created-at' => $resource->created_at->toAtomString(),
+            'updated-at' => $resource->updated_at->toAtomString(),
+        ];
+    }
 
     /**
      * @param User $resource

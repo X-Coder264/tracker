@@ -6,9 +6,9 @@ namespace App\JsonApi\Torrents;
 
 use App\Models\Torrent;
 use App\JsonApi\ResourceTypes;
-use CloudCreativity\LaravelJsonApi\Schema\EloquentSchema;
+use Neomerx\JsonApi\Schema\SchemaProvider;
 
-class Schema extends EloquentSchema
+class Schema extends SchemaProvider
 {
     /**
      * @var string
@@ -16,14 +16,27 @@ class Schema extends EloquentSchema
     protected $resourceType = ResourceTypes::TORRENT;
 
     /**
-     * @var array
+     * @param Torrent $resource
      */
-    protected $attributes = [
-        'name',
-        'size',
-        'description',
-        'slug',
-    ];
+    public function getId($resource): string
+    {
+        return (string) $resource->id;
+    }
+
+    /**
+     * @param Torrent $resource
+     */
+    public function getAttributes($resource): array
+    {
+        return [
+            'name' => $resource->name,
+            'size' => $resource->size,
+            'description' => $resource->description,
+            'slug' => $resource->slug,
+            'created-at' => $resource->created_at->toAtomString(),
+            'updated-at' => $resource->updated_at->toAtomString(),
+        ];
+    }
 
     /**
      * @param Torrent $resource

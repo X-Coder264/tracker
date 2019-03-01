@@ -4,6 +4,18 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Resolver
+    |--------------------------------------------------------------------------
+    |
+    | The API's resolver is the class that works out the fully qualified
+    | class name of adapters, schemas, authorizers and validators for your
+    | resource types. We recommend using our default implementation but you
+    | can override it here if desired.
+    */
+    'resolver' => \CloudCreativity\LaravelJsonApi\Resolver\ResolverFactory::class,
+
+    /*
+    |--------------------------------------------------------------------------
     | Root Namespace
     |--------------------------------------------------------------------------
     |
@@ -15,10 +27,13 @@ return [
     | The `by-resource` setting determines how your units are organised within
     | your root namespace.
     |
-    | - true: e.g. \App\JsonApi\Posts\{Schema, Hydrator}
+    | - true:
+    |   - e.g. App\JsonApi\Posts\{Adapter, Schema, Validators}
+    |   - e.g. App\JsonApi\Comments\{Adapter, Schema, Validators}
     | - false:
-    |   - e.g. \App\JsonApi\Schemas\{User, Post, Comment}
-    |   - e.g. \App\JsonApi\Hydrators\{User, Post, Comment}
+    |   - e.g. App\JsonApi\Adapters\PostAdapter, CommentAdapter}
+    |   - e.g. App\JsonApi\Schemas\{PostSchema, CommentSchema}
+    |   - e.g. App\JsonApi\Validators\{PostValidator, CommentValidator}
     |
     */
     'namespace' => null,
@@ -83,6 +98,24 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Jobs
+    |--------------------------------------------------------------------------
+    |
+    | Defines settings for the asynchronous processing feature. We recommend
+    | referring to the documentation on asynchronous processing if you are
+    | using this feature.
+    |
+    | Note that if you use a different model class, it must implement the
+    | asynchronous process interface.
+    |
+    */
+    'jobs' => [
+        'resource' => 'queue-jobs',
+        'model' => \CloudCreativity\LaravelJsonApi\Queue\ClientJob::class,
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
     | Supported JSON API Extensions
     |--------------------------------------------------------------------------
     |
@@ -93,26 +126,47 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Content Negotiation
+    | Encoding Media Types
     |--------------------------------------------------------------------------
     |
-    | This is where you register how different media types are mapped to
-    | encoders and decoders. Encoders do the work of converting your records
-    | into JSON API resources. Decoders are used to convert incoming request
-    | body content into objects.
+    | This defines the JSON API encoding used for particular media
+    | types supported by your API. This array can contain either
+    | media types as values, or can be keyed by a media type with the value
+    | being the options that are passed to the `json_encode` method.
     |
-    | If there is not an encoder/decoder registered for a specific media-type,
-    | then an error will be sent to the client as per the JSON-API spec.
+    | These values are also used for Content Negotiation. If a client requests
+    | via the HTTP Accept header a media type that is not listed here,
+    | a 406 Not Acceptable response will be sent.
+    |
+    | If you want to support media types that do not return responses with JSON
+    | API encoded data, you can do this at runtime. Refer to the
+    | Content Negotiation chapter in the docs for details.
     |
     */
-    'codecs' => [
-        'encoders' => [
-            'application/vnd.api+json',
-            'text/plain' => JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES,
-        ],
-        'decoders' => [
-            'application/vnd.api+json',
-        ],
+    'encoding' => [
+        'application/vnd.api+json',
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Decoding Media Types
+    |--------------------------------------------------------------------------
+    |
+    | This defines the media types that your API can receive from clients.
+    | This array is keyed by expected media types, with the value being the
+    | service binding that decodes the media type.
+    |
+    | These values are also used for Content Negotiation. If a client sends
+    | a content type not listed here, it will receive a
+    | 415 Unsupported Media Type response.
+    |
+    | Decoders can also be calculated at runtime, and/or you can add support
+    | for media types for specific resources or requests. Refer to the
+    | Content Negotiation chapter in the docs for details.
+    |
+    */
+    'decoding' => [
+        'application/vnd.api+json',
     ],
 
     /*
@@ -130,22 +184,5 @@ return [
     |
     */
     'providers' => [],
-
-    /*
-    |--------------------------------------------------------------------------
-    | Errors
-    |--------------------------------------------------------------------------
-    |
-    | This is an array of JSON API errors that can be returned by the API.
-    | The value here is an array of errors specific to this API, with string
-    | array keys that are the references used to create those errors.
-    |
-    | Errors contained here will be merged on top of the default errors
-    | supplied by this package (merging is not recursive). This means if you
-    | need to override any of the default errors, you can include an error here
-    | with the same key as the default error you want to override. Default
-    | errors can be found in the package's 'config/json-api-errors.php' file.
-    */
-    'errors' => [],
 
 ];

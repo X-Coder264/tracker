@@ -6,10 +6,10 @@ namespace App\JsonApi;
 
 use Illuminate\Support\Collection;
 use Illuminate\Contracts\Pagination\Paginator;
+use CloudCreativity\LaravelJsonApi\Factories\Factory;
 use CloudCreativity\LaravelJsonApi\Pagination\CreatesPages;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
-use CloudCreativity\JsonApi\Contracts\Pagination\PageInterface;
-use CloudCreativity\JsonApi\Contracts\Factories\FactoryInterface;
+use CloudCreativity\LaravelJsonApi\Contracts\Pagination\PageInterface;
 use Neomerx\JsonApi\Contracts\Http\Query\QueryParametersParserInterface;
 use Neomerx\JsonApi\Contracts\Encoder\Parameters\EncodingParametersInterface;
 use CloudCreativity\LaravelJsonApi\Contracts\Pagination\PagingStrategyInterface;
@@ -39,11 +39,11 @@ class OffsetStrategy implements PagingStrategyInterface
     protected $metaKey;
 
     /**
-     * @var FactoryInterface
+     * @var Factory
      */
     private $factory;
 
-    public function __construct(FactoryInterface $factory)
+    public function __construct(Factory $factory)
     {
         $this->metaKey = QueryParametersParserInterface::PARAM_PAGE;
         $this->factory = $factory;

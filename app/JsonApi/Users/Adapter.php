@@ -7,11 +7,14 @@ namespace App\JsonApi\Users;
 use App\Models\User;
 use App\JsonApi\OffsetStrategy;
 use Illuminate\Support\Collection;
-use Illuminate\Database\Eloquent\Builder;
-use CloudCreativity\LaravelJsonApi\Store\EloquentAdapter;
+use CloudCreativity\LaravelJsonApi\Eloquent\BelongsTo;
+use CloudCreativity\LaravelJsonApi\Eloquent\AbstractAdapter;
+use Neomerx\JsonApi\Contracts\Encoder\Parameters\EncodingParametersInterface;
 
-class Adapter extends EloquentAdapter
+class Adapter extends AbstractAdapter
 {
+    protected $primaryKey = 'id';
+
     /**
      * @var array
      */
@@ -19,59 +22,53 @@ class Adapter extends EloquentAdapter
         'offset' => 0,
     ];
 
+    protected $includePaths = ['locale' => 'language'];
+
     public function __construct(OffsetStrategy $paging)
     {
         $paging->withMetaKey(null);
         parent::__construct(new User(), $paging);
     }
 
-    /**
-     * Apply the supplied filters to the builder instance.
-     */
-    protected function filter(Builder $builder, Collection $filters)
+    protected function filter($query, Collection $filters)
     {
         if ($filters->has('name')) {
-            $builder->where('users.name', '=', $filters->get('name'));
+            $query->where('users.name', '=', $filters->get('name'));
         }
 
         if ($filters->has('email')) {
-            $builder->where('users.email', '=', $filters->get('email'));
+            $query->where('users.email', '=', $filters->get('email'));
         }
 
         if ($filters->has('timezone')) {
-            $builder->where('users.timezone', '=', $filters->get('timezone'));
+            $query->where('users.timezone', '=', $filters->get('timezone'));
         }
 
         if ($filters->has('slug')) {
-            $builder->where('users.slug', '=', $filters->get('slug'));
+            $query->where('users.slug', '=', $filters->get('slug'));
         }
     }
 
-    /**
-     * Is this a search for a singleton resource?
-     *
-     *
-     * @return bool
-     */
-    protected function isSearchOne(Collection $filters)
+    protected function with($query, EncodingParametersInterface $parameters)
     {
-        return false;
-    }
+        $includePaths = $parameters->getIncludePaths() ?? [];
 
-    /**
-     * Add eager loading to the query.
-     */
-    protected function with(Builder $builder, Collection $includePaths)
-    {
+        $includePaths = new Collection($includePaths);
+
         if (true === $includePaths->isEmpty()) {
-            $builder->with(['torrents', 'language']);
+            $query->with(['torrents', 'language']);
         } else {
             if ($includePaths->contains('torrents')) {
-                $builder->with('torrents');
+                $query->with('torrents');
             }
             if ($includePaths->contains('locale')) {
-                $builder->with('language');
+                $query->with('language');
             }
         }
+    }
+
+    protected function locale(): BelongsTo
+    {
+        return $this->belongsTo('language');
     }
 }

@@ -39,7 +39,7 @@ class ResetPassword extends Notification
             ->greeting(__('messages.reset_password.greeting', ['name' => $notifiable->name]))
             ->salutation(__('messages.reset_password.salutation', ['site' => config('app.name')]))
             ->line(__('messages.reset_password.email-line-1'))
-            ->action(__('messages.reset_password.action'), route('password.reset', $this->token))
+            ->action(__('messages.reset_password.action'), route('password.reset', ['token' => $this->token]))
             ->line(__('messages.reset_password.email-line-2'));
     }
 }
