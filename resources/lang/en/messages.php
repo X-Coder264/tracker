@@ -56,6 +56,7 @@ return [
     'torrents.store-successfully-uploaded-torrent.message' => 'The torrent was successfully uploaded. You need to download the .torrent file and start seeding it and after that the torrent will be visible on the site.',
     'validation.variable.required' => 'The :var is not present in the request.',
     'validation.variable.string' => 'The :var must be a string.',
+    'validation.variable.event' => 'The event must be empty or one of values: started, stopped or completed.',
     'validation.variable.size' => 'The :var must have exactly 20 characters.',
     'validation.variable.port' => 'The received port (:port) is not valid.',
     'validation.variable.uploaded' => 'The received uploaded amount (:uploaded) is not valid.',

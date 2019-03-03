@@ -6,16 +6,16 @@ namespace Tests\Feature\Http\Controllers;
 
 use Tests\TestCase;
 use Illuminate\Http\Response;
-use App\Services\AnnounceManager;
+use App\Services\Announce\Manager;
 
 class AnnounceControllerTest extends TestCase
 {
     public function testStore()
     {
-        $announceService = $this->createMock(AnnounceManager::class);
+        $announceService = $this->createMock(Manager::class);
         $returnValue = 'test xyz 264';
         $announceService->method('announce')->willReturn($returnValue);
-        $this->app->instance(AnnounceManager::class, $announceService);
+        $this->app->instance(Manager::class, $announceService);
 
         $response = $this->get(route('announce'));
 

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Tests\Feature\Services;
+namespace Tests\Feature\Services\Announce;
 
 use stdClass;
 use Tests\TestCase;
@@ -21,7 +21,7 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
-class AnnounceManagerTest extends TestCase
+class ManagerTest extends TestCase
 {
     use RefreshDatabase;
 
@@ -2785,6 +2785,8 @@ class AnnounceManagerTest extends TestCase
 
     public function testLeftIsRequired()
     {
+        $this->withoutExceptionHandling();
+
         $response = $this->get(
             route('announce', $this->validParams([
                 'left' => '',
