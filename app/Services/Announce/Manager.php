@@ -4,16 +4,16 @@ declare(strict_types=1);
 
 namespace App\Services\Announce;
 
-use App\Enumerations\AnnounceEvent;
-use App\Presenters\Announce\Data;
+use stdClass;
+use Generator;
+use Carbon\Carbon;
 use App\Presenters\Ip;
 use App\Services\Bencoder;
-use Carbon\CarbonImmutable;
-use Generator;
-use stdClass;
-use Carbon\Carbon;
 use App\Enumerations\Cache;
+use Carbon\CarbonImmutable;
 use Illuminate\Http\Request;
+use App\Presenters\Announce\Data;
+use App\Enumerations\AnnounceEvent;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Contracts\Config\Repository;
 use Illuminate\Database\ConnectionInterface;
@@ -95,10 +95,12 @@ class Manager
     public function announce(Request $request): string
     {
         try {
+            // @todo move data factory to controller
             $data = $this->dataFactory->makeFromRequest($request);
         } catch (AnnounceValidationException $exception) {
             $validationData = $exception->getValidationMessages() ?: $exception->getMessage();
 
+            // @todo move to separate service
             return $this->announceErrorResponse($validationData);
         }
 
@@ -164,13 +166,13 @@ class Manager
             ->where('user_id', '=', $user->id)
             ->first();
 
-        switch ($data->getEvent()){
+        switch ($data->getEvent()) {
             case AnnounceEvent::STARTED:
                 return $this->startedEventAnnounceResponse($data, $user, $peer, $torrent, $snatch, $isSeeding);
             case AnnounceEvent::STOPPED:
                 return $this->stoppedEventAnnounceResponse($data, $user, $peer, $torrent, $snatch, $isSeeding);
             case AnnounceEvent::COMPLETED:
-                if(0 === $data->getLeft()){
+                if (0 === $data->getLeft()) {
                     return $this->completedEventAnnounceResponse($data, $user, $peer, $torrent, $snatch, $isSeeding);
                 }
         }
@@ -251,7 +253,7 @@ class Manager
         $peer->id = $this->connection
             ->table('peers')
             ->insertGetId(
-            [
+                [
                 'peer_id'    => bin2hex($data->getPeerId()),
                 'torrent_id' => $torrent->id,
                 'user_id'    => $user->id,
@@ -282,7 +284,7 @@ class Manager
      */
     private function updatePeerIfItExists(Data $data, ?stdClass $peer, stdClass $torrent, bool $isSeeding): void
     {
-        if (null === $peer){
+        if (null === $peer) {
             return;
         }
 
@@ -322,7 +324,7 @@ class Manager
         $snatch->id = $this->connection
             ->table('snatches')
             ->insertGetId(
-            [
+                [
                 'torrent_id'     => $torrent->id,
                 'user_id'        => $user->id,
                 'uploaded'       => $this->uploadedInThisAnnounceCycle,
@@ -341,7 +343,7 @@ class Manager
      */
     private function updateSnatchIfItExists(Data $data, ?stdClass $snatch): void
     {
-        if (null === $snatch){
+        if (null === $snatch) {
             return;
         }
 
@@ -406,12 +408,12 @@ class Manager
 
         $dataToInsert = [];
         /** @var $ip Ip */
-        foreach($ips as $ip){
+        foreach ($ips as $ip) {
             if (null === $ip) {
                 continue;
             }
 
-            if (empty($ip->getIp()) || empty($ip->getPort())){
+            if (empty($ip->getIp()) || empty($ip->getPort())) {
                 continue;
             }
 
@@ -423,7 +425,7 @@ class Manager
             ];
         }
 
-        if(!empty($dataToInsert)){
+        if (!empty($dataToInsert)) {
             // reduce number of queries with one insert
             $this->connection
                 ->table('peers_ip')
@@ -459,7 +461,7 @@ class Manager
 
     private function stoppedEventAnnounceResponse(Data $data, stdClass $user, ?stdClass $peer, stdClass $torrent, ?stdClass $snatch, bool $isSeeding): string
     {
-        if(null !== $peer) {
+        if (null !== $peer) {
             $this->connection
                 ->table('peers')
                 ->where('id', '=', $peer->id)
@@ -538,10 +540,11 @@ class Manager
         // specify what kind of response it wants, else return non-compact response
         if ($data->isCompactResponse()) {
             $response = $this->compactResponse($peersIterator, $response);
-        }else{
+        } else {
             $response = $this->nonCompactResponse($peersIterator, $response);
         }
 
+        // @todo move encoder to controller
         return $this->encoder->encode($response);
     }
 
@@ -627,6 +630,7 @@ class Manager
             $response['retry in'] = 'never';
         }
 
+        // @todo move encoder to controller
         return $this->encoder->encode($response);
     }
 }

@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Tests\Unit\Services\Announce;
 
-use App\Services\Announce\DataFactory;
 use Tests\TestCase;
 use ReflectionClass;
 use App\Services\Bencoder;
 use App\Services\Announce\Manager;
+use App\Services\Announce\DataFactory;
 use Illuminate\Contracts\Config\Repository;
 use Illuminate\Database\ConnectionInterface;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -17,7 +17,6 @@ use Illuminate\Cache\Repository as CacheRepository;
 
 class ManagerTest extends TestCase
 {
-
     public function testErrorResponseWithStringParameter()
     {
         /** @var MockObject|Bencoder $encoder */

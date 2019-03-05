@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Tests\Unit\Presenters;
 
-use App\Presenters\Ip;
 use Generator;
+use App\Presenters\Ip;
 use PHPUnit\Framework\TestCase;
 
 class IpTest extends TestCase
@@ -20,20 +20,19 @@ class IpTest extends TestCase
         $this->assertSame($ip, $ipObject->getIp());
         $this->assertSame($port, $ipObject->getPort());
 
-        if($isIpV4){
+        if ($isIpV4) {
             $this->assertTrue($ipObject->isV4());
             $this->assertFalse($ipObject->isV6());
-        }else{
+        } else {
             $this->assertFalse($ipObject->isV4());
             $this->assertTrue($ipObject->isV6());
         }
 
-        if (null === $port){
+        if (null === $port) {
             $this->assertFalse($ipObject->hasPort());
-        }else{
+        } else {
             $this->assertTrue($ipObject->hasPort());
         }
-
     }
 
     public function ipDataProvider(): Generator

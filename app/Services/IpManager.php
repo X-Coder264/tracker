@@ -4,17 +4,18 @@ declare(strict_types=1);
 
 namespace App\Services;
 
-use App\Exceptions\InvalidIpException;
 use App\Presenters\Ip;
+use App\Exceptions\InvalidIpException;
 
 class IpManager
 {
     protected const PORT_VALUE = [
         'min' => 1,
-        'max' => 65535
+        'max' => 65535,
     ];
 
     protected const IPv4 = FILTER_FLAG_IPV4;
+
     protected const IPv6 = FILTER_FLAG_IPV6;
 
     /**
@@ -35,7 +36,7 @@ class IpManager
 
     protected function is(string $ip, int $type): bool
     {
-        if(false === filter_var($ip, FILTER_VALIDATE_IP, $type)){
+        if (false === filter_var($ip, FILTER_VALIDATE_IP, $type)) {
             return false;
         }
 
@@ -63,7 +64,7 @@ class IpManager
 
         if (2 === count($explodedIpString)) {
             $ip = $explodedIpString[0];
-            $port = (int)$explodedIpString[1];
+            $port = (int) $explodedIpString[1];
         }
 
         if (!$this->isV4($ip)) {
@@ -90,7 +91,7 @@ class IpManager
             $port = (int) substr($ipWithPort, strrpos($ipWithPort, ':') + 1);
         }
 
-        if(!$this->isV6($ip)){
+        if (!$this->isV6($ip)) {
             throw InvalidIpException::badIpV6();
         }
 
@@ -102,11 +103,11 @@ class IpManager
      */
     public function makeIpV4(string $ip, ?int $port): Ip
     {
-        if (null !== $port){
+        if (null !== $port) {
             $port = $this->isPortValid($port) ? $port : null;
         }
 
-        if (!$this->isV4($ip)){
+        if (!$this->isV4($ip)) {
             throw InvalidIpException::badIpV4();
         }
 
@@ -118,11 +119,11 @@ class IpManager
      */
     public function makeIpV6(string $ip, ?int $port): Ip
     {
-        if (null !== $port){
+        if (null !== $port) {
             $port = $this->isPortValid($port) ? $port : null;
         }
 
-        if (!$this->isV6($ip)){
+        if (!$this->isV6($ip)) {
             throw InvalidIpException::badIpV6();
         }
 
@@ -136,11 +137,11 @@ class IpManager
      */
     public function make(string $ip, ?int $port): Ip
     {
-        if($this->isV4($ip)){
+        if ($this->isV4($ip)) {
             return $this->makeIpV4($ip, $port);
         }
 
-        if($this->isV6($ip)){
+        if ($this->isV6($ip)) {
             return $this->makeIpV6($ip, $port);
         }
 

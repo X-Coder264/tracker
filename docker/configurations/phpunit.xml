@@ -2,7 +2,7 @@
 <phpunit backupGlobals="false"
          backupStaticAttributes="false"
          beStrictAboutTestsThatDoNotTestAnything="true"
-         bootstrap="vendor/autoload.php"
+         bootstrap="../../vendor/autoload.php"
          colors="true"
          convertErrorsToExceptions="true"
          convertNoticesToExceptions="true"
@@ -11,16 +11,16 @@
          stopOnFailure="false">
     <testsuites>
         <testsuite name="Unit">
-            <directory suffix="Test.php">./tests/Unit</directory>
+            <directory suffix="Test.php">../../tests/Unit</directory>
         </testsuite>
 
         <testsuite name="Feature">
-            <directory suffix="Test.php">./tests/Feature</directory>
+            <directory suffix="Test.php">../../tests/Feature</directory>
         </testsuite>
     </testsuites>
     <filter>
         <whitelist processUncoveredFilesFromWhitelist="true">
-            <directory suffix=".php">./app</directory>
+            <directory suffix=".php">../../app</directory>
         </whitelist>
     </filter>
     <php>
@@ -39,7 +39,10 @@
         <env name="MIN_ANNOUNCE_INTERVAL" value="1"/>
         <env name="REDIS_HOST" value="redis"/>
     </php>
-    <listeners>
-        <listener class="NunoMaduro\Collision\Adapters\Phpunit\Listener" />
-    </listeners>
+    <!--
+   Uncomment this when the next nunomaduro/collision version gets tagged
+   <listeners>
+       <listener class="NunoMaduro\Collision\Adapters\Phpunit\Listener" />
+   </listeners>
+   -->
 </phpunit>

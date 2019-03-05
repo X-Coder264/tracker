@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
-use App\Services\Announce\DataFactory;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use App\Services\Announce\Manager as AnnounceManager;
+use App\Services\Announce\DataFactory;
 use Illuminate\Contracts\Routing\ResponseFactory;
+use App\Services\Announce\Manager as AnnounceManager;
 
 class AnnounceController
 {
@@ -21,6 +21,7 @@ class AnnounceController
      * @var ResponseFactory
      */
     private $responseFactory;
+
     /**
      * @var DataFactory
      */
@@ -30,8 +31,7 @@ class AnnounceController
         AnnounceManager $announceManager,
         ResponseFactory $responseFactory,
         DataFactory $dataFactory
-    )
-    {
+    ) {
         $this->announceManager = $announceManager;
         $this->responseFactory = $responseFactory;
         $this->dataFactory = $dataFactory;

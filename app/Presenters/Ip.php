@@ -7,7 +7,9 @@ namespace App\Presenters;
 class Ip
 {
     private $ip;
+
     private $port;
+
     private $isV4;
 
     public function __construct(string $ip, ?int $port, bool $isV4)

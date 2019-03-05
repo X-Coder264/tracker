@@ -5,20 +5,20 @@ declare(strict_types=1);
 namespace App\Presenters\Announce;
 
 use App\Enumerations\AnnounceEvent;
-use App\Exceptions\AnnounceValidationException;
 use Illuminate\Translation\Translator;
+use App\Exceptions\AnnounceValidationException;
 use Illuminate\Validation\Factory as ValidationFactory;
 
 class DataValidator
 {
     private $validationFactory;
+
     private $translator;
 
     public function __construct(
         ValidationFactory $validationFactory,
         Translator $translator
-    )
-    {
+    ) {
         $this->validationFactory = $validationFactory;
         $this->translator = $translator;
     }
@@ -29,7 +29,7 @@ class DataValidator
     public function validate(array $data): void
     {
         $event = AnnounceEvent::PING;
-        if(isset($data['event'])){
+        if (isset($data['event'])) {
             $event = $data['event'];
         }
 
@@ -44,11 +44,11 @@ class DataValidator
      */
     protected function validateEvent(?string $event): void
     {
-        if (AnnounceEvent::PING === $event){
+        if (AnnounceEvent::PING === $event) {
             return;
         }
 
-        if (!in_array($event, [AnnounceEvent::STARTED, AnnounceEvent::STOPPED, AnnounceEvent::COMPLETED])){
+        if (!in_array($event, [AnnounceEvent::STARTED, AnnounceEvent::STOPPED, AnnounceEvent::COMPLETED])) {
             $errorMessage = $this->translator->trans('messages.validation.variable.event');
 
             throw new AnnounceValidationException($errorMessage);

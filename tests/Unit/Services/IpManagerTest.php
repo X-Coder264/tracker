@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Tests\Unit\Services;
 
-use App\Exceptions\InvalidIpException;
+use Generator;
 use App\Presenters\Ip;
 use App\Services\IpManager;
-use Generator;
 use PHPUnit\Framework\TestCase;
+use App\Exceptions\InvalidIpException;
 
 class IpManagerTest extends TestCase
 {
@@ -19,12 +19,11 @@ class IpManagerTest extends TestCase
     {
         $ipManager = new IpManager();
 
-        if($valid){
+        if ($valid) {
             $this->assertTrue($ipManager->isV4($ip));
-        }else{
+        } else {
             $this->assertFalse($ipManager->isV4($ip));
         }
-
     }
 
     /**
@@ -34,9 +33,9 @@ class IpManagerTest extends TestCase
     {
         $ipManager = new IpManager();
 
-        if($valid){
+        if ($valid) {
             $this->assertTrue($ipManager->isV6($ip));
-        }else{
+        } else {
             $this->assertFalse($ipManager->isV6($ip));
         }
     }
@@ -82,9 +81,9 @@ class IpManagerTest extends TestCase
     {
         $ipManager = new IpManager();
 
-        if($isValid){
+        if ($isValid) {
             $this->assertTrue($ipManager->isPortValid($port));
-        }else{
+        } else {
             $this->assertFalse($ipManager->isPortValid($port));
         }
     }
@@ -100,10 +99,10 @@ class IpManagerTest extends TestCase
 
         $this->assertInstanceOf(Ip::class, $ipObject);
 
-        if($type === 'ipV4'){
+        if ('ipV4' === $type) {
             $this->assertTrue($ipObject->isV4());
             $this->assertFalse($ipObject->isV6());
-        }elseif($type === 'ipV6'){
+        } elseif ('ipV6' === $type) {
             $this->assertFalse($ipObject->isV4());
             $this->assertTrue($ipObject->isV6());
         }

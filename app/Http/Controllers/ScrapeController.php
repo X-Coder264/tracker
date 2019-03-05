@@ -7,9 +7,9 @@ namespace App\Http\Controllers;
 use App\Services\Bencoder;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use App\Services\Announce\Manager as AnnounceManager;
 use Illuminate\Contracts\Translation\Translator;
 use Illuminate\Contracts\Routing\ResponseFactory;
+use App\Services\Announce\Manager as AnnounceManager;
 
 class ScrapeController
 {
