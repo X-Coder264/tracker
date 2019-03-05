@@ -8,6 +8,7 @@ use App\Enumerations\AnnounceEvent;
 use App\Presenters\Announce\Data;
 use App\Presenters\Ip;
 use App\Services\Bencoder;
+use Carbon\CarbonImmutable;
 use Generator;
 use stdClass;
 use Carbon\Carbon;
@@ -244,7 +245,7 @@ class Manager
      */
     private function insertPeer(Data $data, stdClass $user, stdClass $torrent, bool $isSeeding): stdClass
     {
-        $now = Carbon::now();
+        $now = CarbonImmutable::now();
 
         $peer = new stdClass();
         $peer->id = $this->connection
@@ -285,7 +286,7 @@ class Manager
             return;
         }
 
-        $now = Carbon::now();
+        $now = CarbonImmutable::now();
 
         $this->connection
             ->table('peers')
@@ -315,7 +316,7 @@ class Manager
      */
     private function insertSnatch(Data $data, stdClass $user, stdClass $torrent): void
     {
-        $now = Carbon::now();
+        $now = CarbonImmutable::now();
 
         $snatch = new stdClass();
         $snatch->id = $this->connection
@@ -344,7 +345,7 @@ class Manager
             return;
         }
 
-        $now = Carbon::now();
+        $now = CarbonImmutable::now();
 
         $finishedAt = $snatch->finished_at;
         if (0 === $data->getLeft() && null === $snatch->finished_at) {

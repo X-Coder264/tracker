@@ -28,7 +28,7 @@ class DataValidator
      */
     public function validate(array $data): void
     {
-        $event = AnnounceEvent::MISSING;
+        $event = AnnounceEvent::PING;
         if(isset($data['event'])){
             $event = $data['event'];
         }
@@ -44,7 +44,7 @@ class DataValidator
      */
     protected function validateEvent(?string $event): void
     {
-        if (AnnounceEvent::MISSING === $event){
+        if (AnnounceEvent::PING === $event){
             return;
         }
 

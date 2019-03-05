@@ -12,6 +12,10 @@ final class AnnounceEvent
 
     const COMPLETED = 'completed';
 
-    // event is not provided, so it's missing
-    const MISSING = null;
+    /**
+     * Not existing event (BEP 3) but it's representation of
+     * announce event when it's not present or it's empty.
+     * Announcement done in regular intervals.
+     */
+    const PING = null;
 }

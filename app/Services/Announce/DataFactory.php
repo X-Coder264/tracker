@@ -9,7 +9,7 @@ use App\Exceptions\AnnounceValidationException;
 use App\Presenters\Announce\Data;
 use App\Presenters\Announce\DataValidator;
 use App\Presenters\Ip;
-use App\Presenters\IpManager;
+use App\Services\IpManager;
 use Illuminate\Contracts\Translation\Translator;
 use Illuminate\Http\Request;
 
@@ -42,7 +42,7 @@ class DataFactory
     public function makeFromRequest(Request $request): Data
     {
         $fields = [
-            'event', 'passkey', 'client_ip', 'user_agent', 'info_hash', 'peer_id',
+            'event', 'passkey', 'info_hash', 'peer_id',
             'ip', 'port', 'ipv4', 'ipv6', 'uploaded', 'left', 'compact', 'numwant',
             'downloaded', 'uploaded'
         ];
@@ -69,18 +69,10 @@ class DataFactory
         $this->dataValidator->validate($data);
 
         if(!isset($data['event'])){
-            $data['event'] = AnnounceEvent::MISSING;
+            $data['event'] = AnnounceEvent::PING;
         }
 
-        if($data['event'] !== AnnounceEvent::STOPPED){
-            // in order to support IPv6 peers (BEP 7) a more complex IP validation logic is needed
-            $ips = $this->extractIpData($data);
-        }else{
-            $ips = [
-                'v4' => null,
-                'v6' => null
-            ];
-        }
+        $ips = $this->extractIpData($data);
 
         $numberOfWantedPeers = null;
         if(isset($data['numwant'])){
@@ -115,6 +107,17 @@ class DataFactory
      */
     protected function extractIpData(array $data): array
     {
+        $ip = [
+            'v4' => null,
+            'v6' => null
+        ];
+
+        if($data['event'] === AnnounceEvent::STOPPED){
+            return $ip;
+        }
+
+        // in order to support IPv6 peers (BEP 7) a more complex IP validation logic is needed
+
         $port = (int)$data['port'];
 
         $ips = [
