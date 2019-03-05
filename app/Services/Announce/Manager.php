@@ -8,16 +8,14 @@ use stdClass;
 use Generator;
 use Carbon\Carbon;
 use App\Presenters\Ip;
-use App\Services\Bencoder;
 use App\Enumerations\Cache;
 use Carbon\CarbonImmutable;
-use Illuminate\Http\Request;
 use App\Presenters\Announce\Data;
 use App\Enumerations\AnnounceEvent;
+use App\Presenters\Announce\Response;
 use Illuminate\Database\Query\Builder;
-use Illuminate\Contracts\Config\Repository;
+use App\Exceptions\ValidationException;
 use Illuminate\Database\ConnectionInterface;
-use App\Exceptions\AnnounceValidationException;
 use Illuminate\Contracts\Translation\Translator;
 use Illuminate\Contracts\Cache\Repository as CacheRepository;
 
@@ -26,11 +24,6 @@ use Illuminate\Contracts\Cache\Repository as CacheRepository;
  */
 class Manager
 {
-    /**
-     * @var Bencoder
-     */
-    private $encoder;
-
     /**
      * @var ConnectionInterface
      */
@@ -45,11 +38,6 @@ class Manager
      * @var Translator
      */
     private $translator;
-
-    /**
-     * @var Repository
-     */
-    private $config;
 
     /**
      * @var int
@@ -77,41 +65,30 @@ class Manager
     private $dataFactory;
 
     public function __construct(
-        Bencoder $encoder,
         ConnectionInterface $connection,
         CacheRepository $cache,
         Translator $translator,
-        Repository $config,
         DataFactory $dataFactory
     ) {
-        $this->encoder = $encoder;
         $this->connection = $connection;
         $this->cache = $cache;
         $this->translator = $translator;
-        $this->config = $config;
         $this->dataFactory = $dataFactory;
     }
 
-    public function announce(Request $request): string
+    /**
+     * @throws ValidationException
+     */
+    public function announce(Data $data): Response
     {
-        try {
-            // @todo move data factory to controller
-            $data = $this->dataFactory->makeFromRequest($request);
-        } catch (AnnounceValidationException $exception) {
-            $validationData = $exception->getValidationMessages() ?: $exception->getMessage();
-
-            // @todo move to separate service
-            return $this->announceErrorResponse($validationData);
-        }
-
         $user = $this->getUser($data->getPassKey());
 
         if (null === $user) {
-            return $this->announceErrorResponse($this->translator->trans('messages.announce.invalid_passkey'), true);
+            throw ValidationException::single($this->translator->trans('messages.announce.invalid_passkey'), true);
         }
 
         if (true === (bool) $user->banned) {
-            return $this->announceErrorResponse($this->translator->trans('messages.announce.banned_user'), true);
+            throw ValidationException::single($this->translator->trans('messages.announce.banned_user'), true);
         }
 
         $torrent = $this
@@ -123,7 +100,7 @@ class Manager
             ->first();
 
         if (null === $torrent) {
-            return $this->announceErrorResponse($this->translator->trans('messages.announce.invalid_info_hash'));
+            throw ValidationException::single($this->translator->trans('messages.announce.invalid_info_hash'));
         }
 
         $isSeeding = 0 === $data->getLeft();
@@ -139,7 +116,7 @@ class Manager
             ->first();
 
         if (null === $peer && (AnnounceEvent::COMPLETED === $data->getEvent() || AnnounceEvent::STOPPED === $data->getEvent())) {
-            return $this->announceErrorResponse($this->translator->trans('messages.announce.invalid_peer_id'));
+            throw ValidationException::single($this->translator->trans('messages.announce.invalid_peer_id'));
         }
 
         $timeNow = Carbon::now();
@@ -166,54 +143,31 @@ class Manager
             ->where('user_id', '=', $user->id)
             ->first();
 
+        $peers = null;
         switch ($data->getEvent()) {
             case AnnounceEvent::STARTED:
-                return $this->startedEventAnnounceResponse($data, $user, $peer, $torrent, $snatch, $isSeeding);
+                $peers = $this->startedEventAnnounceResponse($data, $user, $peer, $torrent, $snatch, $isSeeding);
+
+                break;
             case AnnounceEvent::STOPPED:
-                return $this->stoppedEventAnnounceResponse($data, $user, $peer, $torrent, $snatch, $isSeeding);
+                $peers = $this->stoppedEventAnnounceResponse($data, $user, $peer, $torrent, $snatch, $isSeeding);
+
+                break;
             case AnnounceEvent::COMPLETED:
                 if (0 === $data->getLeft()) {
-                    return $this->completedEventAnnounceResponse($data, $user, $peer, $torrent, $snatch, $isSeeding);
+                    $peers = $this->completedEventAnnounceResponse($data, $user, $peer, $torrent, $snatch, $isSeeding);
                 }
+
+                break;
         }
 
-        return $this->noEventAnnounceResponse($data, $user, $peer, $torrent, $snatch, $isSeeding);
-    }
-
-    public function scrape(array $infoHashes): string
-    {
-        $response = [];
-
-        foreach ($infoHashes as $infoHash) {
-            $torrent = $this->connection
-                ->table('torrents')
-                ->join('torrent_info_hashes', 'torrents.id', '=', 'torrent_info_hashes.torrent_id')
-                ->where('info_hash', '=', bin2hex($infoHash))
-                ->select(['torrents.id', 'seeders', 'leechers'])
-                ->first();
-
-            if (null === $torrent) {
-                continue;
-            }
-
-            $snatchesCount = $this->connection
-                ->table('snatches')
-                ->where('torrent_id', '=', $torrent->id)
-                ->where('left', '=', 0)
-                ->count();
-
-            $response['files'][$infoHash] = [
-                'complete' => (int) $torrent->seeders,
-                'incomplete' => (int) $torrent->leechers,
-                'downloaded' => $snatchesCount,
-            ];
+        if (null === $peers) {
+            $peers = $this->noEventAnnounceResponse($data, $user, $peer, $torrent, $snatch, $isSeeding);
         }
 
-        if (empty($response['files'])) {
-            return $this->announceErrorResponse($this->translator->trans('messages.scrape.no_torrents'));
-        }
+        $count = $this->getSeedersAndLeechersCount($data, $torrent, $isSeeding);
 
-        return $this->encoder->encode($response);
+        return new Response($peers, $count['seeders'], $count['leechers']);
     }
 
     public function getUser(string $passkey): ?stdClass
@@ -433,7 +387,7 @@ class Manager
         }
     }
 
-    private function startedEventAnnounceResponse(Data $data, stdClass $user, ?stdClass $peer, ?stdClass $torrent, ?stdClass $snatch, bool $isSeeding): string
+    private function startedEventAnnounceResponse(Data $data, stdClass $user, ?stdClass $peer, ?stdClass $torrent, ?stdClass $snatch, bool $isSeeding): Generator
     {
         if (null !== $peer) {
             $this->updatePeerIfItExists($data, $peer, $torrent, $isSeeding);
@@ -459,7 +413,7 @@ class Manager
         return $this->announceSuccessResponse($data, $user, $torrent, $isSeeding);
     }
 
-    private function stoppedEventAnnounceResponse(Data $data, stdClass $user, ?stdClass $peer, stdClass $torrent, ?stdClass $snatch, bool $isSeeding): string
+    private function stoppedEventAnnounceResponse(Data $data, stdClass $user, ?stdClass $peer, stdClass $torrent, ?stdClass $snatch, bool $isSeeding): Generator
     {
         if (null !== $peer) {
             $this->connection
@@ -481,7 +435,7 @@ class Manager
         return $this->announceSuccessResponse($data, $user, $torrent, $isSeeding);
     }
 
-    private function completedEventAnnounceResponse(Data $data, stdClass $user, ?stdClass $peer, stdClass $torrent, ?stdClass $snatch, bool $isSeeding): string
+    private function completedEventAnnounceResponse(Data $data, stdClass $user, ?stdClass $peer, stdClass $torrent, ?stdClass $snatch, bool $isSeeding): Generator
     {
         $this->updatePeerIfItExists($data, $peer, $torrent, $isSeeding);
         $this->insertPeerIPs($data, $peer);
@@ -492,7 +446,7 @@ class Manager
         return $this->announceSuccessResponse($data, $user, $torrent, $isSeeding);
     }
 
-    private function noEventAnnounceResponse(Data $data, stdClass $user, ?stdClass $peer, stdClass $torrent, ?stdClass $snatch, bool $isSeeding): string
+    private function noEventAnnounceResponse(Data $data, stdClass $user, ?stdClass $peer, stdClass $torrent, ?stdClass $snatch, bool $isSeeding): Generator
     {
         if (null !== $peer) {
             $this->updatePeerIfItExists($data, $peer, $torrent, $isSeeding);
@@ -528,24 +482,11 @@ class Manager
             ->cursor();
     }
 
-    private function announceSuccessResponse(Data $data, stdClass $user, stdClass $torrent, bool $isSeeding): string
+    private function announceSuccessResponse(Data $data, stdClass $user, stdClass $torrent, bool $isSeeding): Generator
     {
         $this->updateUser($data, $user);
 
-        $response = $this->getCommonResponsePart($data, $torrent, $isSeeding);
-
-        $peersIterator = $this->getPeers($data, $user, $torrent, $isSeeding);
-
-        // return compact response if the client wantsgetCommonResponsePart a compact response or if the client did not
-        // specify what kind of response it wants, else return non-compact response
-        if ($data->isCompactResponse()) {
-            $response = $this->compactResponse($peersIterator, $response);
-        } else {
-            $response = $this->nonCompactResponse($peersIterator, $response);
-        }
-
-        // @todo move encoder to controller
-        return $this->encoder->encode($response);
+        return $this->getPeers($data, $user, $torrent, $isSeeding);
     }
 
     private function getSeedersAndLeechersCount(Data $data, stdClass $torrent, bool $isSeeding): array
@@ -561,76 +502,9 @@ class Manager
             }
         }
 
-        return [$seedersCount, $leechersCount];
-    }
-
-    private function getCommonResponsePart(Data $data, stdClass $torrent, bool $isSeeding): array
-    {
-        $response['interval'] = $this->config->get('tracker.announce_interval') * 60;
-        $response['min interval'] = $this->config->get('tracker.min_announce_interval') * 60;
-
-        $peersCount = $this->getSeedersAndLeechersCount($data, $torrent, $isSeeding);
-        $response['complete'] = $peersCount[0];
-        $response['incomplete'] = $peersCount[1];
-
-        return $response;
-    }
-
-    private function compactResponse(Generator $peers, array $response): array
-    {
-        $response['peers'] = '';
-
-        // BEP 7 -> IPv6 peers support -> http://www.bittorrent.org/beps/bep_0007.html
-        $response['peers6'] = '';
-
-        foreach ($peers as $peer) {
-            $peerIPAddress = inet_pton($peer->IP);
-            $peerPort = pack('n*', $peer->port);
-
-            if (true === (bool) $peer->isIPv6) {
-                $response['peers6'] .= $peerIPAddress . $peerPort;
-            } else {
-                $response['peers'] .= $peerIPAddress . $peerPort;
-            }
-        }
-
-        return $response;
-    }
-
-    private function nonCompactResponse(Generator $peers, array $response): array
-    {
-        $response['peers'] = [];
-
-        foreach ($peers as $peer) {
-            // IPv6 peers are not separated for non-compact responses
-            $response['peers'][] = [
-                'peer id' => hex2bin($peer->peer_id),
-                'ip'      => $peer->IP,
-                'port'    => (int) $peer->port,
-            ];
-        }
-
-        return $response;
-    }
-
-    /**
-     * @param array|string $error
-     */
-    private function announceErrorResponse($error, bool $neverRetry = false): string
-    {
-        $response = [];
-        if (is_array($error)) {
-            $response['failure reason'] = implode(' ', $error);
-        } else {
-            $response['failure reason'] = $error;
-        }
-
-        // BEP 31 -> http://www.bittorrent.org/beps/bep_0031.html
-        if (true === $neverRetry) {
-            $response['retry in'] = 'never';
-        }
-
-        // @todo move encoder to controller
-        return $this->encoder->encode($response);
+        return [
+            'seeders' => $seedersCount,
+            'leechers' => $leechersCount,
+        ];
     }
 }

@@ -39,11 +39,6 @@ class Data
      */
     private $ipV6;
 
-    /**
-     * @var bool
-     */
-    private $isCompactResponse;
-
     public function __construct(
         ?string $event,
         string $passKey,
@@ -53,7 +48,6 @@ class Data
         int $downloaded,
         int $uploaded,
         int $left,
-        bool $isCompactResponse,
         ?int $numberOfWantedPeers,
         ?Ip $ipV4,
         ?Ip $ipV6
@@ -66,7 +60,6 @@ class Data
         $this->downloaded = $downloaded;
         $this->uploaded = $uploaded;
         $this->left = $left;
-        $this->isCompactResponse = $isCompactResponse;
 
         if (null !== $numberOfWantedPeers && $numberOfWantedPeers > 0) {
             $this->numberOfWantedPeers = $numberOfWantedPeers;
@@ -85,7 +78,6 @@ class Data
     {
         return null !== $this->event;
     }
-
 
     public function getPassKey(): string
     {
@@ -122,23 +114,15 @@ class Data
         return $this->left;
     }
 
-
-    public function isCompactResponse(): bool
-    {
-        return $this->isCompactResponse;
-    }
-
     public function getNumberOfWantedPeers(): int
     {
         return $this->numberOfWantedPeers;
     }
 
-
     public function getIpV4(): ?Ip
     {
         return $this->ipV4;
     }
-
 
     public function getIpV6(): ?Ip
     {

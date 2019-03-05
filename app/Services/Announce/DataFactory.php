@@ -9,8 +9,8 @@ use App\Services\IpManager;
 use Illuminate\Http\Request;
 use App\Presenters\Announce\Data;
 use App\Enumerations\AnnounceEvent;
+use App\Exceptions\ValidationException;
 use App\Presenters\Announce\DataValidator;
-use App\Exceptions\AnnounceValidationException;
 use Illuminate\Contracts\Translation\Translator;
 
 class DataFactory
@@ -38,7 +38,7 @@ class DataFactory
     }
 
     /**
-     * @throws AnnounceValidationException
+     * @throws ValidationException
      */
     public function makeFromRequest(Request $request): Data
     {
@@ -63,7 +63,7 @@ class DataFactory
     }
 
     /**
-     * @throws AnnounceValidationException
+     * @throws ValidationException
      */
     public function makeFromArray(array $data): Data
     {
@@ -80,13 +80,6 @@ class DataFactory
             $numberOfWantedPeers = (int) $data['numwant'];
         }
 
-        // return compact response if the client wants a compact response or if the client did not
-        // specify what kind of response it wants, else return non-compact response
-        $compact = true;
-        if (isset($data['compact']) && 0 === (int) $data['compact']) {
-            $compact = false;
-        }
-
         return new Data(
             $data['event'],
             $data['passkey'],
@@ -96,7 +89,6 @@ class DataFactory
             (int) $data['downloaded'],
             (int) $data['uploaded'],
             (int) $data['left'],
-            $compact,
             $numberOfWantedPeers,
             $ips['v4'],
             $ips['v6']
@@ -104,7 +96,7 @@ class DataFactory
     }
 
     /**
-     * @throws AnnounceValidationException
+     * @throws ValidationException
      */
     protected function extractIpData(array $data): array
     {
@@ -164,7 +156,7 @@ class DataFactory
 
         if (empty($ips['v4']) && empty($ips['v6'])) {
             // throw the validation exception if there is not at least one IP address and port set
-            throw new AnnounceValidationException($this->translator->trans('messages.announce.invalid_ip_or_port'));
+            throw ValidationException::single($this->translator->trans('messages.announce.invalid_ip_or_port'));
         }
 
         return $ips;

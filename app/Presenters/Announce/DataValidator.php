@@ -6,7 +6,7 @@ namespace App\Presenters\Announce;
 
 use App\Enumerations\AnnounceEvent;
 use Illuminate\Translation\Translator;
-use App\Exceptions\AnnounceValidationException;
+use App\Exceptions\ValidationException;
 use Illuminate\Validation\Factory as ValidationFactory;
 
 class DataValidator
@@ -24,7 +24,7 @@ class DataValidator
     }
 
     /**
-     * @throws AnnounceValidationException
+     * @throws ValidationException
      */
     public function validate(array $data): void
     {
@@ -40,7 +40,7 @@ class DataValidator
     }
 
     /**
-     * @throws AnnounceValidationException
+     * @throws ValidationException
      */
     protected function validateEvent(?string $event): void
     {
@@ -49,47 +49,50 @@ class DataValidator
         }
 
         if (!in_array($event, [AnnounceEvent::STARTED, AnnounceEvent::STOPPED, AnnounceEvent::COMPLETED])) {
-            $errorMessage = $this->translator->trans('messages.validation.variable.event');
-
-            throw new AnnounceValidationException($errorMessage);
+            throw ValidationException::single(
+                $this->translator->trans('messages.validation.variable.event')
+            );
         }
     }
 
     /**
-     * @throws AnnounceValidationException
+     * @throws ValidationException
      */
     protected function validateInfoHash(?string $infoHash): void
     {
         if (null === $infoHash) {
             $errorMessage = $this->translator->trans('messages.validation.variable.required', ['var' => 'info_hash']);
 
-            throw new AnnounceValidationException($errorMessage);
+            throw ValidationException::single($errorMessage);
         }
 
         if (20 !== strlen($infoHash)) {
             $errorMessage = $this->translator->trans('messages.validation.variable.size', ['var' => 'info_hash']);
 
-            throw new AnnounceValidationException($errorMessage);
+            throw ValidationException::single($errorMessage);
         }
     }
 
+    /**
+     * @throws ValidationException
+     */
     private function validatePeerID(?string $peerId): void
     {
         if (null === $peerId) {
             $errorMessage = $this->translator->trans('messages.validation.variable.required', ['var' => 'peer_id']);
 
-            throw new AnnounceValidationException($errorMessage);
+            throw ValidationException::single($errorMessage);
         }
 
         if (20 !== strlen($peerId)) {
             $errorMessage = $this->translator->trans('messages.validation.variable.size', ['var' => 'peer_id']);
 
-            throw new AnnounceValidationException($errorMessage);
+            throw ValidationException::single($errorMessage);
         }
     }
 
     /**
-     * @throws AnnounceValidationException
+     * @throws ValidationException
      */
     private function validateData(array $data): void
     {
@@ -125,9 +128,7 @@ class DataValidator
         );
 
         if ($validator->fails()) {
-            $errors = $validator->errors();
-
-            throw new AnnounceValidationException('', $errors->all());
+            throw ValidationException::multiple(...$validator->errors()->all());
         }
     }
 }
