@@ -1,4 +1,4 @@
-FROM php:7.2-fpm-alpine
+FROM php:7.3-fpm-alpine
 
 ARG HOST_USER_ID
 ARG HOST_GROUP_ID
@@ -13,7 +13,8 @@ RUN set -xe && \
         libxml2-dev \
         git \
         openssh-client \
-        zlib-dev && \
+        zlib-dev \
+        libzip-dev && \
     # create app user
     addgroup -S -g ${HOST_GROUP_ID} app && \
     adduser -S -s /bin/sh -DS -u ${HOST_USER_ID} -G app app && \

@@ -38,10 +38,9 @@
         <server name="ANNOUNCE_INTERVAL" value="40"/>
         <server name="MIN_ANNOUNCE_INTERVAL" value="1"/>
     </php>
-    <!--
-    Uncomment this when the next nunomaduro/collision version gets tagged
+
     <listeners>
         <listener class="NunoMaduro\Collision\Adapters\Phpunit\Listener" />
     </listeners>
-    -->
+
 </phpunit>

@@ -2,7 +2,7 @@ version: '3.7'
 
 services:
   php:
-    image: tracker-php:1.0
+    image: tracker-php:1.1
     hostname: php
     environment:
       PHP_IDE_CONFIG: serverName=tracker.loc
