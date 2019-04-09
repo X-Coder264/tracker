@@ -202,7 +202,6 @@ class TorrentControllerTest extends TestCase
         $response->assertSee($torrent->category->name);
         $response->assertSee($torrentComment->comment);
         $response->assertSee($peer->user->name);
-        $response->assertSee($peer->updated_at->diffForHumans());
         $response->assertSee($response->viewData('imdbData')->getName());
         $response->assertSee($response->viewData('imdbData')->getRating());
         $response->assertSee($response->viewData('imdbData')->getPlotOutline());
