@@ -39,26 +39,23 @@ class TorrentFeedControllerTest extends TestCase
         $this->assertSame($url, $xml['channel']['link']);
         $this->assertNotEmpty($xml['channel']['title']);
         $this->assertNotEmpty($xml['channel']['description']);
-        $this->assertSame(2, count($xml['channel']['item']['title']));
-        $this->assertSame($torrents[1]->name, $xml['channel']['item']['title'][0]);
-        $this->assertSame($torrents[0]->name, $xml['channel']['item']['title'][1]);
-        $this->assertSame(2, count($xml['channel']['item']['pubDate']));
-        $this->assertSame($torrents[1]->created_at->format('D, d M Y H:i:s O'), $xml['channel']['item']['pubDate'][0]);
-        $this->assertSame($torrents[0]->created_at->format('D, d M Y H:i:s O'), $xml['channel']['item']['pubDate'][1]);
-        $this->assertSame(2, count($xml['channel']['item']['guid']));
-        $this->assertSame($torrents[1]->infoHashes->first()->info_hash, $xml['channel']['item']['guid'][0]);
-        $this->assertSame($torrents[0]->infoHashes->first()->info_hash, $xml['channel']['item']['guid'][1]);
-        $this->assertSame(2, count($xml['channel']['item']['enclosure']));
+        $this->assertSame(2, count($xml['channel']['item']));
+        $this->assertSame($torrents[1]->name, $xml['channel']['item'][0]['title']);
+        $this->assertSame($torrents[0]->name, $xml['channel']['item'][1]['title']);
+        $this->assertSame($torrents[1]->created_at->format('D, d M Y H:i:s O'), $xml['channel']['item'][0]['pubDate']);
+        $this->assertSame($torrents[0]->created_at->format('D, d M Y H:i:s O'), $xml['channel']['item'][1]['pubDate']);
+        $this->assertSame($torrents[1]->infoHashes->first()->info_hash, $xml['channel']['item'][0]['guid']);
+        $this->assertSame($torrents[0]->infoHashes->first()->info_hash, $xml['channel']['item'][1]['guid']);
         $this->assertSame(
             route('torrents.download', ['torrent' => $torrents[1], 'passkey' => $user->passkey]),
-            $xml['channel']['item']['enclosure'][0]['@attributes']['url']
+            $xml['channel']['item'][0]['enclosure']['@attributes']['url']
         );
         $this->assertSame(
             route('torrents.download', ['torrent' => $torrents[0], 'passkey' => $user->passkey]),
-            $xml['channel']['item']['enclosure'][1]['@attributes']['url']
+            $xml['channel']['item'][1]['enclosure']['@attributes']['url']
         );
-        $this->assertSame('application/x-bittorrent', $xml['channel']['item']['enclosure'][0]['@attributes']['type']);
-        $this->assertSame('application/x-bittorrent', $xml['channel']['item']['enclosure'][1]['@attributes']['type']);
+        $this->assertSame('application/x-bittorrent', $xml['channel']['item'][0]['enclosure']['@attributes']['type']);
+        $this->assertSame('application/x-bittorrent', $xml['channel']['item'][1]['enclosure']['@attributes']['type']);
 
         /** @var Repository $cache */
         $cache = $this->app->make(Repository::class);
@@ -71,26 +68,23 @@ class TorrentFeedControllerTest extends TestCase
         $this->assertSame($url, $xml['channel']['link']);
         $this->assertNotEmpty($xml['channel']['title']);
         $this->assertNotEmpty($xml['channel']['description']);
-        $this->assertSame(2, count($xml['channel']['item']['title']));
-        $this->assertSame($torrents[1]->name, $xml['channel']['item']['title'][0]);
-        $this->assertSame($torrents[0]->name, $xml['channel']['item']['title'][1]);
-        $this->assertSame(2, count($xml['channel']['item']['pubDate']));
-        $this->assertSame($torrents[1]->created_at->format('D, d M Y H:i:s O'), $xml['channel']['item']['pubDate'][0]);
-        $this->assertSame($torrents[0]->created_at->format('D, d M Y H:i:s O'), $xml['channel']['item']['pubDate'][1]);
-        $this->assertSame(2, count($xml['channel']['item']['guid']));
-        $this->assertSame($torrents[1]->infoHashes->first()->info_hash, $xml['channel']['item']['guid'][0]);
-        $this->assertSame($torrents[0]->infoHashes->first()->info_hash, $xml['channel']['item']['guid'][1]);
-        $this->assertSame(2, count($xml['channel']['item']['enclosure']));
+        $this->assertSame(2, count($xml['channel']['item']));
+        $this->assertSame($torrents[1]->name, $xml['channel']['item'][0]['title']);
+        $this->assertSame($torrents[0]->name, $xml['channel']['item'][1]['title']);
+        $this->assertSame($torrents[1]->created_at->format('D, d M Y H:i:s O'), $xml['channel']['item'][0]['pubDate']);
+        $this->assertSame($torrents[0]->created_at->format('D, d M Y H:i:s O'), $xml['channel']['item'][1]['pubDate']);
+        $this->assertSame($torrents[1]->infoHashes->first()->info_hash, $xml['channel']['item'][0]['guid']);
+        $this->assertSame($torrents[0]->infoHashes->first()->info_hash, $xml['channel']['item'][1]['guid']);
         $this->assertSame(
             route('torrents.download', ['torrent' => $torrents[1], 'passkey' => $user->passkey]),
-            $xml['channel']['item']['enclosure'][0]['@attributes']['url']
+            $xml['channel']['item'][0]['enclosure']['@attributes']['url']
         );
         $this->assertSame(
             route('torrents.download', ['torrent' => $torrents[0], 'passkey' => $user->passkey]),
-            $xml['channel']['item']['enclosure'][1]['@attributes']['url']
+            $xml['channel']['item'][1]['enclosure']['@attributes']['url']
         );
-        $this->assertSame('application/x-bittorrent', $xml['channel']['item']['enclosure'][0]['@attributes']['type']);
-        $this->assertSame('application/x-bittorrent', $xml['channel']['item']['enclosure'][1]['@attributes']['type']);
+        $this->assertSame('application/x-bittorrent', $xml['channel']['item'][0]['enclosure']['@attributes']['type']);
+        $this->assertSame('application/x-bittorrent', $xml['channel']['item'][1]['enclosure']['@attributes']['type']);
     }
 
     public function testShowWithCategories(): void

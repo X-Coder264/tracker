@@ -5,13 +5,13 @@
         <title>{{ $title }}</title>
         <description>{{ $description }}</description>
         <link>{{ $url }}</link>
-        <item>
-            @foreach ($items as $item)
+        @foreach ($items as $item)
+            <item>
                 <title>{{ $item->getTitle() }}</title>
                 <pubDate>{{ $item->getPubDate()->toRssString() }}</pubDate>
                 <guid>{{ $item->getGuid() }}</guid>
                 <enclosure url="{{ $item->getLink() }}" type="application/x-bittorrent" />
-            @endforeach
-        </item>
+            </item>
+        @endforeach
     </channel>
 </rss>
