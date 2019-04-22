@@ -87,7 +87,7 @@ final class ResponseFactory
         return $this->convertToResponse($data);
     }
 
-    public function compact(Generator $peers): array
+    private function compact(Generator $peers): array
     {
         $response['peers'] = '';
 
@@ -108,7 +108,7 @@ final class ResponseFactory
         return $response;
     }
 
-    public function nonCompact(Generator $peers): array
+    private function nonCompact(Generator $peers): array
     {
         $response['peers'] = [];
 

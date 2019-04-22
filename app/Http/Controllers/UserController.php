@@ -9,7 +9,7 @@ use App\Models\Locale;
 use Illuminate\Http\Response;
 use App\Services\SizeFormatter;
 use Illuminate\Routing\Redirector;
-use App\Repositories\UserRepository;
+use App\Repositories\User\UserRepository;
 use Illuminate\Contracts\Auth\Guard;
 use Illuminate\Http\RedirectResponse;
 use App\Http\Requests\UpdateUserRequest;

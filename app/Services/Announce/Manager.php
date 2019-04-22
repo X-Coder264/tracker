@@ -4,11 +4,12 @@ declare(strict_types=1);
 
 namespace App\Services\Announce;
 
+use App\Presenters\User;
+use App\Repositories\User\UserRepositoryInterface;
 use stdClass;
 use Generator;
 use Carbon\Carbon;
 use App\Presenters\Ip;
-use App\Enumerations\Cache;
 use Carbon\CarbonImmutable;
 use App\Presenters\Announce\Data;
 use App\Enumerations\AnnounceEvent;
@@ -40,57 +41,38 @@ class Manager
     private $translator;
 
     /**
-     * @var int
+     * @var array
      */
-    private $seedTime = 0;
-
-    /**
-     * @var int
-     */
-    private $leechTime = 0;
-
-    /**
-     * @var int
-     */
-    private $downloadedInThisAnnounceCycle = 0;
-
-    /**
-     * @var int
-     */
-    private $uploadedInThisAnnounceCycle = 0;
+    private $statistics;
 
     /**
      * @var DataFactory
      */
     private $dataFactory;
+    /**
+     * @var UserRepositoryInterface
+     */
+    private $userRepository;
 
     public function __construct(
         ConnectionInterface $connection,
         CacheRepository $cache,
         Translator $translator,
-        DataFactory $dataFactory
+        DataFactory $dataFactory,
+        UserRepositoryInterface $userRepository
     ) {
         $this->connection = $connection;
         $this->cache = $cache;
         $this->translator = $translator;
         $this->dataFactory = $dataFactory;
+        $this->userRepository = $userRepository;
     }
 
     /**
      * @throws ValidationException
      */
-    public function announce(Data $data): Response
+    public function announce(Data $data, User $user, CarbonImmutable $timeNow): Response
     {
-        $user = $this->getUser($data->getPassKey());
-
-        if (null === $user) {
-            throw ValidationException::single($this->translator->trans('messages.announce.invalid_passkey'), true);
-        }
-
-        if (true === (bool) $user->banned) {
-            throw ValidationException::single($this->translator->trans('messages.announce.banned_user'), true);
-        }
-
         $torrent = $this
             ->connection
             ->table('torrents')
@@ -111,7 +93,7 @@ class Manager
             ->join('peers_version', 'peers.id', '=', 'peers_version.peerID')
             ->where('peer_id', '=', bin2hex($data->getPeerId()))
             ->where('torrent_id', '=', $torrent->id)
-            ->where('user_id', '=', $user->id)
+            ->where('user_id', '=', $user->getId())
             ->select('peers.*', 'peers_version.version')
             ->first();
 
@@ -119,65 +101,58 @@ class Manager
             throw ValidationException::single($this->translator->trans('messages.announce.invalid_peer_id'));
         }
 
-        $timeNow = Carbon::now();
         $downloaded = $data->getDownloaded();
         $uploaded = $data->getUploaded();
 
+        $statistic = [];
+
         if (null === $peer) {
-            $this->downloadedInThisAnnounceCycle = $downloaded;
-            $this->uploadedInThisAnnounceCycle = $uploaded;
+            $statistic['downloadedInThisAnnounceCycle'] = $downloaded;
+            $statistic['uploadedInThisAnnounceCycle'] = $uploaded;
         } else {
-            $this->downloadedInThisAnnounceCycle = max(0, $downloaded - $peer->downloaded);
-            $this->uploadedInThisAnnounceCycle = max(0, $uploaded - $peer->uploaded);
+            $statistic['downloadedInThisAnnounceCycle'] = max(0, $downloaded - $peer->downloaded);
+            $statistic['uploadedInThisAnnounceCycle'] = max(0, $uploaded - $peer->uploaded);
             if (false === $isSeeding || (true === $isSeeding && AnnounceEvent::COMPLETED === $data->getEvent())) {
-                $this->leechTime = $timeNow->diffInSeconds(new Carbon($peer->updated_at));
+                $statistic['leechTime'] = $timeNow->diffInSeconds(new Carbon($peer->updated_at));
             } else {
-                $this->seedTime = $timeNow->diffInSeconds(new Carbon($peer->updated_at));
+                $statistic['seedTime'] = $timeNow->diffInSeconds(new Carbon($peer->updated_at));
             }
         }
+
+        $this->statistics = $statistic;
 
         $snatch = $this
             ->connection
             ->table('snatches')
             ->where('torrent_id', '=', $torrent->id)
-            ->where('user_id', '=', $user->id)
+            ->where('user_id', '=', $user->getId())
             ->first();
 
         $peers = null;
         switch ($data->getEvent()) {
             case AnnounceEvent::STARTED:
-                $peers = $this->startedEventAnnounceResponse($data, $user, $peer, $torrent, $snatch, $isSeeding);
+                $peers = $this->startedEventAnnounceResponse($data, $user, $peer, $torrent, $snatch, $isSeeding, $timeNow);
 
                 break;
             case AnnounceEvent::STOPPED:
-                $peers = $this->stoppedEventAnnounceResponse($data, $user, $peer, $torrent, $snatch, $isSeeding);
+                $peers = $this->stoppedEventAnnounceResponse($data, $user, $peer, $torrent, $snatch, $isSeeding, $timeNow);
 
                 break;
             case AnnounceEvent::COMPLETED:
                 if (0 === $data->getLeft()) {
-                    $peers = $this->completedEventAnnounceResponse($data, $user, $peer, $torrent, $snatch, $isSeeding);
+                    $peers = $this->completedEventAnnounceResponse($data, $user, $peer, $torrent, $snatch, $isSeeding, $timeNow);
                 }
 
                 break;
         }
 
         if (null === $peers) {
-            $peers = $this->noEventAnnounceResponse($data, $user, $peer, $torrent, $snatch, $isSeeding);
+            $peers = $this->noEventAnnounceResponse($data, $user, $peer, $torrent, $snatch, $isSeeding, $timeNow);
         }
 
         $count = $this->getSeedersAndLeechersCount($data, $torrent, $isSeeding);
 
         return new Response($peers, $count['seeders'], $count['leechers']);
-    }
-
-    public function getUser(string $passkey): ?stdClass
-    {
-        return $this->cache->remember('user.' . $passkey, Cache::ONE_DAY, function () use ($passkey) {
-            return $this->connection->table('users')
-                ->where('passkey', '=', $passkey)
-                ->select(['id', 'slug', 'uploaded', 'downloaded', 'banned'])
-                ->first();
-        });
     }
 
     private function adjustTorrentPeers(stdClass $torrent, int $seeder, int $leecher): void
@@ -199,10 +174,8 @@ class Manager
     /**
      * Insert a new peer into the DB.
      */
-    private function insertPeer(Data $data, stdClass $user, stdClass $torrent, bool $isSeeding): stdClass
+    private function insertPeer(Data $data, User $user, stdClass $torrent, bool $isSeeding, CarbonImmutable $now): stdClass
     {
-        $now = CarbonImmutable::now();
-
         $peer = new stdClass();
         $peer->id = $this->connection
             ->table('peers')
@@ -210,9 +183,9 @@ class Manager
                 [
                 'peer_id'    => bin2hex($data->getPeerId()),
                 'torrent_id' => $torrent->id,
-                'user_id'    => $user->id,
-                'uploaded'   => $this->uploadedInThisAnnounceCycle,
-                'downloaded' => $this->downloadedInThisAnnounceCycle,
+                'user_id'    => $user->getId(),
+                'uploaded'   => $this->statistics['uploadedInThisAnnounceCycle'],
+                'downloaded' => $this->statistics['downloadedInThisAnnounceCycle'],
                 'seeder'     => $isSeeding,
                 'userAgent'  => $data->getUserAgent(),
                 'created_at' => $now,
@@ -228,7 +201,7 @@ class Manager
             ]
         );
 
-        $this->cache->forget(sprintf('user.%s.peers', $user->id));
+        $this->cache->forget(sprintf('user.%s.peers', $user->getId()));
 
         return $peer;
     }
@@ -236,21 +209,19 @@ class Manager
     /**
      * Update the peer if it already exists in the DB.
      */
-    private function updatePeerIfItExists(Data $data, ?stdClass $peer, stdClass $torrent, bool $isSeeding): void
+    private function updatePeerIfItExists(Data $data, ?stdClass $peer, stdClass $torrent, bool $isSeeding, CarbonImmutable $now): void
     {
         if (null === $peer) {
             return;
         }
-
-        $now = CarbonImmutable::now();
 
         $this->connection
             ->table('peers')
             ->where('id', '=', $peer->id)
             ->update(
                 [
-                    'uploaded'   => $peer->uploaded + $this->uploadedInThisAnnounceCycle,
-                    'downloaded' => $peer->downloaded + $this->downloadedInThisAnnounceCycle,
+                    'uploaded'   => $peer->uploaded + $this->statistics['uploadedInThisAnnounceCycle'],
+                    'downloaded' => $peer->downloaded + $this->statistics['downloadedInThisAnnounceCycle'],
                     'seeder'     => $isSeeding,
                     'userAgent'  => $data->getUserAgent(),
                     'updated_at' => $now,
@@ -270,19 +241,17 @@ class Manager
     /**
      * Insert a new snatch into the DB.
      */
-    private function insertSnatch(Data $data, stdClass $user, stdClass $torrent): void
+    private function insertSnatch(Data $data, User $user, stdClass $torrent, CarbonImmutable $now): void
     {
-        $now = CarbonImmutable::now();
-
         $snatch = new stdClass();
         $snatch->id = $this->connection
             ->table('snatches')
             ->insertGetId(
                 [
                 'torrent_id'     => $torrent->id,
-                'user_id'        => $user->id,
-                'uploaded'       => $this->uploadedInThisAnnounceCycle,
-                'downloaded'     => $this->downloadedInThisAnnounceCycle,
+                'user_id'        => $user->getId(),
+                'uploaded'       => $this->statistics['uploadedInThisAnnounceCycle'],
+                'downloaded'     => $this->statistics['downloadedInThisAnnounceCycle'],
                 'left'           => $data->getLeft(),
                 'timesAnnounced' => 1,
                 'userAgent'      => $data->getUserAgent(),
@@ -295,13 +264,11 @@ class Manager
     /**
      * Update the snatch if it already exists in the DB.
      */
-    private function updateSnatchIfItExists(Data $data, ?stdClass $snatch): void
+    private function updateSnatchIfItExists(Data $data, ?stdClass $snatch, CarbonImmutable $now): void
     {
         if (null === $snatch) {
             return;
         }
-
-        $now = CarbonImmutable::now();
 
         $finishedAt = $snatch->finished_at;
         if (0 === $data->getLeft() && null === $snatch->finished_at) {
@@ -313,11 +280,11 @@ class Manager
             ->where('id', '=', $snatch->id)
             ->update(
                 [
-                    'uploaded'       => $snatch->uploaded + $this->uploadedInThisAnnounceCycle,
-                    'downloaded'     => $snatch->downloaded + $this->downloadedInThisAnnounceCycle,
+                    'uploaded'       => $snatch->uploaded + $this->statistics['uploadedInThisAnnounceCycle'],
+                    'downloaded'     => $snatch->downloaded + $this->statistics['downloadedInThisAnnounceCycle'],
                     'left'           => $data->getLeft(),
-                    'seedTime'       => $snatch->seedTime + $this->seedTime,
-                    'leechTime'      => $snatch->leechTime + $this->leechTime,
+                    'seedTime'       => $snatch->seedTime + $this->statistics['seedTime'],
+                    'leechTime'      => $snatch->leechTime + $this->statistics['leechTime'],
                     'timesAnnounced' => $snatch->timesAnnounced + 1,
                     'finished_at'    => $finishedAt,
                     'userAgent'      => $data->getUserAgent(),
@@ -329,20 +296,12 @@ class Manager
     /**
      * Update the user uploaded and downloaded data.
      */
-    private function updateUser(Data $data, stdClass $user): void
+    private function updateUser(User $user): void
     {
-        $user->uploaded = $user->uploaded + $this->uploadedInThisAnnounceCycle;
-        $user->downloaded = $user->downloaded + $this->downloadedInThisAnnounceCycle;
+        $user->setUpdated($user->getUpdated() + $this->statistics['uploadedInThisAnnounceCycle']);
+        $user->setDownloaded($user->getDownloaded() + $this->statistics['downloadedInThisAnnounceCycle']);
 
-        $this->connection->table('users')
-            ->where('id', '=', $user->id)
-            ->update(
-                [
-                    'uploaded'   => $user->uploaded,
-                    'downloaded' => $user->downloaded,
-                ]
-            );
-        $this->cache->put(sprintf('user.%s', $data->getPassKey()), $user, Cache::ONE_DAY);
+        $this->userRepository->updateUserStatistics($user);
     }
 
     /**
@@ -387,13 +346,21 @@ class Manager
         }
     }
 
-    private function startedEventAnnounceResponse(Data $data, stdClass $user, ?stdClass $peer, ?stdClass $torrent, ?stdClass $snatch, bool $isSeeding): Generator
+    private function startedEventAnnounceResponse(
+        Data $data,
+        User $user,
+        ?stdClass $peer,
+        ?stdClass $torrent,
+        ?stdClass $snatch,
+        bool $isSeeding,
+        CarbonImmutable $timeNow
+    ): Generator
     {
         if (null !== $peer) {
-            $this->updatePeerIfItExists($data, $peer, $torrent, $isSeeding);
-            $this->updateSnatchIfItExists($data, $snatch);
+            $this->updatePeerIfItExists($data, $peer, $torrent, $isSeeding, $timeNow);
+            $this->updateSnatchIfItExists($data, $snatch, $timeNow);
         } else {
-            $peer = $this->insertPeer($data, $user, $torrent, $isSeeding);
+            $peer = $this->insertPeer($data, $user, $torrent, $isSeeding, $timeNow);
 
             if (true === $isSeeding) {
                 $this->adjustTorrentPeers($torrent, 1, 0);
@@ -401,9 +368,9 @@ class Manager
                 $this->adjustTorrentPeers($torrent, 0, 1);
 
                 if (null !== $snatch) {
-                    $this->updateSnatchIfItExists($data, $snatch);
+                    $this->updateSnatchIfItExists($data, $snatch, $timeNow);
                 } else {
-                    $this->insertSnatch($data, $user, $torrent);
+                    $this->insertSnatch($data, $user, $torrent, $timeNow);
                 }
             }
         }
@@ -413,7 +380,15 @@ class Manager
         return $this->announceSuccessResponse($data, $user, $torrent, $isSeeding);
     }
 
-    private function stoppedEventAnnounceResponse(Data $data, stdClass $user, ?stdClass $peer, stdClass $torrent, ?stdClass $snatch, bool $isSeeding): Generator
+    private function stoppedEventAnnounceResponse(
+        Data $data,
+        User $user,
+        ?stdClass $peer,
+        stdClass $torrent,
+        ?stdClass $snatch,
+        bool $isSeeding,
+        CarbonImmutable $timeNow
+    ): Generator
     {
         if (null !== $peer) {
             $this->connection
@@ -422,7 +397,7 @@ class Manager
                 ->delete();
         }
 
-        $this->cache->forget(sprintf('user.%s.peers', $user->id));
+        $this->cache->forget(sprintf('user.%s.peers', $user->getId()));
 
         if (true === $isSeeding) {
             $this->adjustTorrentPeers($torrent, -1, 0);
@@ -430,28 +405,44 @@ class Manager
             $this->adjustTorrentPeers($torrent, 0, -1);
         }
 
-        $this->updateSnatchIfItExists($data, $snatch);
+        $this->updateSnatchIfItExists($data, $snatch, $timeNow);
 
         return $this->announceSuccessResponse($data, $user, $torrent, $isSeeding);
     }
 
-    private function completedEventAnnounceResponse(Data $data, stdClass $user, ?stdClass $peer, stdClass $torrent, ?stdClass $snatch, bool $isSeeding): Generator
+    private function completedEventAnnounceResponse(
+        Data $data,
+        User $user,
+        ?stdClass $peer,
+        stdClass $torrent,
+        ?stdClass $snatch,
+        bool $isSeeding,
+        CarbonImmutable $timeNow
+    ): Generator
     {
-        $this->updatePeerIfItExists($data, $peer, $torrent, $isSeeding);
+        $this->updatePeerIfItExists($data, $peer, $torrent, $isSeeding, $timeNow);
         $this->insertPeerIPs($data, $peer);
-        $this->cache->forget(sprintf('user.%s.peers', $user->id));
+        $this->cache->forget(sprintf('user.%s.peers', $user->getId()));
         $this->adjustTorrentPeers($torrent, 1, -1);
-        $this->updateSnatchIfItExists($data, $snatch);
+        $this->updateSnatchIfItExists($data, $snatch, $timeNow);
 
         return $this->announceSuccessResponse($data, $user, $torrent, $isSeeding);
     }
 
-    private function noEventAnnounceResponse(Data $data, stdClass $user, ?stdClass $peer, stdClass $torrent, ?stdClass $snatch, bool $isSeeding): Generator
+    private function noEventAnnounceResponse(
+        Data $data,
+        User $user,
+        ?stdClass $peer,
+        stdClass $torrent,
+        ?stdClass $snatch,
+        bool $isSeeding,
+        CarbonImmutable $timeNow
+    ): Generator
     {
         if (null !== $peer) {
-            $this->updatePeerIfItExists($data, $peer, $torrent, $isSeeding);
+            $this->updatePeerIfItExists($data, $peer, $torrent, $isSeeding, $timeNow);
         } else {
-            $peer = $this->insertPeer($data, $user, $torrent, $isSeeding);
+            $peer = $this->insertPeer($data, $user, $torrent, $isSeeding, $timeNow);
             if (true === $isSeeding) {
                 $this->adjustTorrentPeers($torrent, 1, 0);
             } else {
@@ -460,12 +451,12 @@ class Manager
         }
 
         $this->insertPeerIPs($data, $peer);
-        $this->updateSnatchIfItExists($data, $snatch);
+        $this->updateSnatchIfItExists($data, $snatch, $timeNow);
 
         return $this->announceSuccessResponse($data, $user, $torrent, $isSeeding);
     }
 
-    protected function getPeers(Data $data, stdClass $user, stdClass $torrent, bool $isSeeding): Generator
+    protected function getPeers(Data $data, User $user, stdClass $torrent, bool $isSeeding): Generator
     {
         return $this->connection->table('peers')
             ->join('peers_ip', 'peers.id', '=', 'peers_ip.peerID')
@@ -473,7 +464,7 @@ class Manager
             ->when($isSeeding, function (Builder $query) {
                 return $query->where('seeder', '!=', true);
             })
-            ->where('user_id', '!=', $user->id)
+            ->where('user_id', '!=', $user->getId())
             ->where('torrent_id', '=', $torrent->id)
             ->where('peers_version.version', '=', $torrent->version)
             ->limit($data->getNumberOfWantedPeers())
@@ -482,9 +473,9 @@ class Manager
             ->cursor();
     }
 
-    private function announceSuccessResponse(Data $data, stdClass $user, stdClass $torrent, bool $isSeeding): Generator
+    private function announceSuccessResponse(Data $data, User $user, stdClass $torrent, bool $isSeeding): Generator
     {
-        $this->updateUser($data, $user);
+        $this->updateUser($user);
 
         return $this->getPeers($data, $user, $torrent, $isSeeding);
     }
