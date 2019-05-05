@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Tests\Feature\Models;
 
 use Tests\TestCase;
+use App\Models\News;
 use App\Models\User;
 use App\Models\Locale;
 use App\Models\Snatch;
@@ -140,5 +141,16 @@ class UserTest extends TestCase
         $this->assertInstanceOf(HasMany::class, $user->threads());
         $this->assertInstanceOf(Collection::class, $user->threads);
         $this->assertTrue($user->threads[0]->is($thread));
+    }
+
+    public function testNewsRelationship(): void
+    {
+        factory(News::class)->create();
+
+        $user = User::firstOrFail();
+        $news = News::firstOrFail();
+        $this->assertInstanceOf(HasMany::class, $user->news());
+        $this->assertInstanceOf(Collection::class, $user->news);
+        $this->assertTrue($user->news[0]->is($news));
     }
 }

@@ -5,11 +5,13 @@ declare(strict_types=1);
 namespace Tests\Feature\Http\Controllers;
 
 use Tests\TestCase;
+use App\Models\News;
 use App\Models\Peer;
 use App\Models\User;
 use App\Models\Torrent;
 use Illuminate\Http\Response;
 use App\Services\SizeFormatter;
+use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class HomeControllerTest extends TestCase
@@ -31,6 +33,9 @@ class HomeControllerTest extends TestCase
         factory(Peer::class)->states('seeder')->create(['torrent_id' => $torrent->id, 'user_id' => $user->id]);
         factory(Peer::class, 2)->states('leecher')->create(['torrent_id' => $torrent->id, 'user_id' => $user->id]);
 
+        $newsOne = factory(News::class)->create(['user_id' => $user]);
+        $newsTwo = factory(News::class)->create(['user_id' => $user, 'subject' => 'test foo', 'text' => 'text foobar']);
+
         $response = $this->get(route('home'));
 
         $response->assertStatus(Response::HTTP_OK);
@@ -44,7 +49,14 @@ class HomeControllerTest extends TestCase
             'torrentsCount' => 4,
             'deadTorrentsCount' => 3,
             'totalTorrentSize' => $this->app->make(SizeFormatter::class)->getFormattedSize((int) Torrent::sum('size')),
+            'news' => $newsTwo,
         ]);
+
+        $response->assertSee('test foo');
+        $response->assertSee('text foobar');
+
+        $cache = $this->app->make(Repository::class);
+        $this->assertTrue($newsTwo->is($cache->get('news')));
     }
 
     public function testGuestsCannotSeeTheHomePage(): void
