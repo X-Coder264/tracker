@@ -99,7 +99,7 @@ class TorrentController
 
     public function create(): Response
     {
-        $categories = $this->cacheManager->remember('torrentCategories', Cache::THIRTY_MINUTES, function () {
+        $categories = $this->cacheManager->remember('torrentCategories', Cache::ONE_DAY, function () {
             return TorrentCategory::all();
         });
 
