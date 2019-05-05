@@ -7,7 +7,15 @@
         <div class="card">
             <div class="card-header">{{ trans('messages.home.page_title') }}</div>
             <div class="card-body">
-                {{ trans('messages.home.no_news') }}
+                @if (null === $news)
+                    <p class="card-text">{{ trans('messages.home.no_news') }}</p>
+                @else
+                    <h3 class="card-subtitle mb-4 text-center font-weight-bold">
+                        {{ $news->subject }} - <a href="{{ route('users.show', $news->author) }}">{{ $news->author->name }}</a>
+                    </h3>
+
+                    <p class="card-text">{!! $news->text !!}</p>
+                @endif
             </div>
         </div>
     </div>

@@ -141,4 +141,9 @@ class User extends Authenticatable
     {
         return $this->hasMany(Thread::class);
     }
+
+    public function news(): HasMany
+    {
+        return $this->hasMany(News::class);
+    }
 }

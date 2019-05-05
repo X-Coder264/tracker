@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace App\Providers;
 
+use App\Models\News;
 use App\Models\User;
 use App\Models\TorrentCategory;
+use App\Observers\NewsObserver;
 use App\Observers\UserObserver;
 use Illuminate\Support\ServiceProvider;
 use App\Observers\TorrentCategoryObserver;
@@ -21,6 +23,7 @@ class AppServiceProvider extends ServiceProvider
     {
         User::observe(UserObserver::class);
         TorrentCategory::observe(TorrentCategoryObserver::class);
+        News::observe(NewsObserver::class);
 
         $this->app->singleton(ThreadParticipantRepositoryInterface::class, function (Container $container) {
             return new CachedThreadParticipantRepository(
