@@ -11,7 +11,7 @@
         "php": "^7.3.2",
         "ext-json": "*",
         "ext-pdo": "*",
-        "cloudcreativity/laravel-json-api": "^1.1",
+        "cloudcreativity/laravel-json-api": "^1.2",
         "cviebrock/eloquent-sluggable": "^4.8",
         "fideloper/proxy": "^4.1",
         "guzzlehttp/guzzle": "^6.3",
@@ -25,12 +25,12 @@
     "require-dev": {
         "ext-simplexml": "*",
         "barryvdh/laravel-debugbar": "^3.2",
-        "filp/whoops": "^2.3",
+        "filp/whoops": "^2.4",
         "friendsofphp/php-cs-fixer": "^2.15",
         "fzaninotto/faker": "^1.8",
         "mockery/mockery": "^1.2",
         "nunomaduro/collision": "^3.0",
-        "phpunit/phpunit": "^8.1"
+        "phpunit/phpunit": "^8.2"
     },
     "config": {
         "optimize-autoloader": true,
