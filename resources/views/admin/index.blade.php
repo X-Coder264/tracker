@@ -24,6 +24,7 @@
             numberKey: 'number',
             limitKey: 'size'
         },
+        validationErrorField: 'detail',
         currentUser: {
             caption: '{{ $user->email }}'
         },
