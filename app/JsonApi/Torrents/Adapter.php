@@ -5,24 +5,20 @@ declare(strict_types=1);
 namespace App\JsonApi\Torrents;
 
 use App\Models\Torrent;
-use App\JsonApi\OffsetStrategy;
 use Illuminate\Support\Collection;
 use CloudCreativity\LaravelJsonApi\Eloquent\AbstractAdapter;
+use CloudCreativity\LaravelJsonApi\Pagination\StandardStrategy;
 
 class Adapter extends AbstractAdapter
 {
     protected $primaryKey = 'id';
 
-    /**
-     * @var array
-     */
-    protected $defaultPagination = [
-        'offset' => 0,
-    ];
+    protected $defaultPagination = ['number' => 1];
 
-    public function __construct(OffsetStrategy $paging)
+    public function __construct(StandardStrategy $paging)
     {
         $paging->withMetaKey(null);
+
         parent::__construct(new Torrent(), $paging);
     }
 

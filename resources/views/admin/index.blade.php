@@ -19,6 +19,11 @@
         baseUrl: '/cms/',
         baseApiUrl: '/cms/api/',
         usePatchForUpdate: true,
+        apiPagination: {
+            strategy: 'pageBased',
+            numberKey: 'number',
+            limitKey: 'size'
+        },
         currentUser: {
             caption: '{{ $user->email }}'
         },

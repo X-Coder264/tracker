@@ -362,28 +362,44 @@ class UsersControllerTest extends AdminApiTestCase
         $this->assertCount(1, $jsonResponse['data']);
     }
 
-    public function testPagination()
+    public function testPaginationFirstPage(): void
     {
         $this->withoutExceptionHandling();
 
         $users = factory(User::class, 3)->create();
         $this->actingAs($users[0]);
-        $response = $this->makeRequest('GET', route('admin.users.index', ['page[offset]' => 0, 'page[limit]' => 2, 'sort' => 'id']));
+        $response = $this->makeRequest('GET', route('admin.users.index', ['page[number]' => 1, 'page[size]' => 2, 'sort' => 'id']));
         $jsonResponse = $response->getJsonResponse();
 
         $this->assertSame(3, $jsonResponse['meta']['total']);
         $this->assertSame($users[0]->id, (int) $jsonResponse['data'][0]['id']);
         $this->assertSame($users[1]->id, (int) $jsonResponse['data'][1]['id']);
         $this->assertCount(2, $jsonResponse['data']);
+    }
 
-        $response = $this->makeRequest('GET', route('admin.users.index', ['page[offset]' => 1, 'page[limit]' => 2, 'sort' => 'id']));
+    public function testPaginationSecondPage(): void
+    {
+        $this->withoutExceptionHandling();
+
+        $users = factory(User::class, 3)->create();
+        $this->actingAs($users[0]);
+
+        $response = $this->makeRequest('GET', route('admin.users.index', ['page[number]' => 2, 'page[size]' => 2, 'sort' => 'id']));
         $jsonResponse = $response->getJsonResponse();
 
         $this->assertSame(3, $jsonResponse['meta']['total']);
         $this->assertSame($users[2]->id, (int) $jsonResponse['data'][0]['id']);
         $this->assertCount(1, $jsonResponse['data']);
+    }
 
-        $response = $this->makeRequest('GET', route('admin.users.index', ['page[offset]' => 2, 'page[limit]' => 2, 'sort' => 'id']));
+    public function testPaginationThirdPage(): void
+    {
+        $this->withoutExceptionHandling();
+
+        $users = factory(User::class, 3)->create();
+        $this->actingAs($users[0]);
+
+        $response = $this->makeRequest('GET', route('admin.users.index', ['page[number]' => 3, 'page[size]' => 2, 'sort' => 'id']));
         $jsonResponse = $response->getJsonResponse();
 
         $this->assertSame(3, $jsonResponse['meta']['total']);

@@ -5,28 +5,24 @@ declare(strict_types=1);
 namespace App\JsonApi\Users;
 
 use App\Models\User;
-use App\JsonApi\OffsetStrategy;
 use Illuminate\Support\Collection;
 use CloudCreativity\LaravelJsonApi\Eloquent\BelongsTo;
 use CloudCreativity\LaravelJsonApi\Eloquent\AbstractAdapter;
+use CloudCreativity\LaravelJsonApi\Pagination\StandardStrategy;
 use Neomerx\JsonApi\Contracts\Encoder\Parameters\EncodingParametersInterface;
 
 class Adapter extends AbstractAdapter
 {
     protected $primaryKey = 'id';
 
-    /**
-     * @var array
-     */
-    protected $defaultPagination = [
-        'offset' => 0,
-    ];
+    protected $defaultPagination = ['number' => 1];
 
     protected $includePaths = ['locale' => 'language'];
 
-    public function __construct(OffsetStrategy $paging)
+    public function __construct(StandardStrategy $paging)
     {
         $paging->withMetaKey(null);
+
         parent::__construct(new User(), $paging);
     }
 

@@ -55,8 +55,8 @@ class Validators extends AbstractValidators
     protected function queryRules(): array
     {
         return [
-            'page.offset' => 'integer|min:0',
-            'page.limit' => 'integer|between:1,60',
+            'page.number' => 'integer|min:1',
+            'page.size' => 'integer|between:1,60',
         ];
     }
 }
