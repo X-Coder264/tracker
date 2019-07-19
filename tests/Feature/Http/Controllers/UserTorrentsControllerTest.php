@@ -8,12 +8,12 @@ use Tests\TestCase;
 use App\Models\Peer;
 use App\Models\User;
 use App\Models\Torrent;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 class UserTorrentsControllerTest extends TestCase
 {
-    use RefreshDatabase;
+    use DatabaseTransactions;
 
     public function testShowUploadedTorrents(): void
     {

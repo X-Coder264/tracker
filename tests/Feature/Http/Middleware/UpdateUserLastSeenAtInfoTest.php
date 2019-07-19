@@ -10,11 +10,11 @@ use App\Models\User;
 use Illuminate\Routing\Router;
 use Illuminate\Contracts\Http\Kernel;
 use App\Http\Middleware\UpdateUserLastSeenAtInfo;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 
 class UpdateUserLastSeenAtInfoTest extends TestCase
 {
-    use RefreshDatabase;
+    use DatabaseTransactions;
 
     public function testUserLastSeenAtGetsUpdatedIfItWasNullBefore(): void
     {

@@ -7,12 +7,12 @@ namespace Tests\Feature\Http\Controllers;
 use Tests\TestCase;
 use App\Models\User;
 use App\Models\Snatch;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 class UserSnatchesControllerTest extends TestCase
 {
-    use RefreshDatabase;
+    use DatabaseTransactions;
 
     public function testShow(): void
     {

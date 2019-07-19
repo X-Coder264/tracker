@@ -7,11 +7,11 @@ namespace Tests\Feature\Http\Controllers\Admin;
 use Tests\TestCase;
 use App\Models\User;
 use Illuminate\Http\Response;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 
 class IndexControllerTest extends TestCase
 {
-    use RefreshDatabase;
+    use DatabaseTransactions;
 
     public function testIndex()
     {

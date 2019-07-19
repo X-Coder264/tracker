@@ -10,12 +10,12 @@ use App\Models\Snatch;
 use App\Models\Torrent;
 use Facades\App\Services\SizeFormatter;
 use Facades\App\Services\SecondsDurationFormatter;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 
 class SnatchTest extends TestCase
 {
-    use RefreshDatabase;
+    use DatabaseTransactions;
 
     public function testUploadedAccessor(): void
     {

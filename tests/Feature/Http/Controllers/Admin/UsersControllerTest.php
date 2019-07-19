@@ -12,11 +12,11 @@ use Illuminate\Http\Response;
 use App\JsonApi\ResourceTypes;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 
 class UsersControllerTest extends AdminApiTestCase
 {
-    use RefreshDatabase;
+    use DatabaseTransactions;
 
     public function testIndex()
     {

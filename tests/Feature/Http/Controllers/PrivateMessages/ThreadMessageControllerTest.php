@@ -11,11 +11,11 @@ use App\Models\PrivateMessages\Thread;
 use Illuminate\Contracts\Cache\Repository;
 use App\Models\PrivateMessages\ThreadMessage;
 use App\Models\PrivateMessages\ThreadParticipant;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 
 class ThreadMessageControllerTest extends TestCase
 {
-    use RefreshDatabase;
+    use DatabaseTransactions;
 
     public function testCreate(): void
     {

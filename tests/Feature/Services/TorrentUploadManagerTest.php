@@ -29,12 +29,12 @@ use App\Services\IMDb\IMDBImagesManager;
 use Illuminate\Contracts\Routing\UrlGenerator;
 use Illuminate\Contracts\Translation\Translator;
 use PHPUnit\Framework\ExpectationFailedException;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Contracts\Filesystem\Factory as FilesystemManager;
 
 class TorrentUploadManagerTest extends TestCase
 {
-    use RefreshDatabase;
+    use DatabaseTransactions;
 
     public function testTorrentUploadWithAV1OnlyTorrent(): void
     {

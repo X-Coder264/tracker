@@ -10,11 +10,11 @@ use App\Models\User;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 
 class UserStatsComposerTest extends TestCase
 {
-    use RefreshDatabase;
+    use DatabaseTransactions;
 
     public function testDataForLoggedInUser(): void
     {

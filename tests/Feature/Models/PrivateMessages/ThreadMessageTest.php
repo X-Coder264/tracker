@@ -8,12 +8,12 @@ use Tests\TestCase;
 use App\Models\User;
 use App\Models\PrivateMessages\Thread;
 use App\Models\PrivateMessages\ThreadMessage;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 
 class ThreadMessageTest extends TestCase
 {
-    use RefreshDatabase;
+    use DatabaseTransactions;
 
     public function testUserRelationship(): void
     {

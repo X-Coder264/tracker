@@ -7,12 +7,12 @@ namespace Tests\Feature\Models;
 use Tests\TestCase;
 use App\Models\Torrent;
 use App\Models\TorrentInfoHash;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 
 class TorrentInfoHashTest extends TestCase
 {
-    use RefreshDatabase;
+    use DatabaseTransactions;
 
     public function testTorrentRelationship(): void
     {

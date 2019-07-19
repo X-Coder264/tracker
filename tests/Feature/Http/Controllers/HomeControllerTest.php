@@ -12,11 +12,11 @@ use App\Models\Torrent;
 use Illuminate\Http\Response;
 use App\Services\SizeFormatter;
 use Illuminate\Contracts\Cache\Repository;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 
 class HomeControllerTest extends TestCase
 {
-    use RefreshDatabase;
+    use DatabaseTransactions;
 
     public function testIndex(): void
     {

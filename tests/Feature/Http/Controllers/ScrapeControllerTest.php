@@ -11,11 +11,11 @@ use App\Models\Torrent;
 use App\Services\Bdecoder;
 use App\Services\Bencoder;
 use App\Models\TorrentInfoHash;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 
 class ScrapeControllerTest extends TestCase
 {
-    use RefreshDatabase;
+    use DatabaseTransactions;
 
     public function testScrape(): void
     {

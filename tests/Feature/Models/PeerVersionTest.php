@@ -7,12 +7,12 @@ namespace Tests\Feature\Models;
 use Tests\TestCase;
 use App\Models\Peer;
 use App\Models\PeerVersion;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 
 class PeerVersionTest extends TestCase
 {
-    use RefreshDatabase;
+    use DatabaseTransactions;
 
     public function testPeerRelationship(): void
     {

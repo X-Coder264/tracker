@@ -8,12 +8,12 @@ use Tests\TestCase;
 use App\Models\News;
 use App\Models\User;
 use Illuminate\Contracts\Cache\Repository;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 
 class NewsTest extends TestCase
 {
-    use RefreshDatabase;
+    use DatabaseTransactions;
 
     public function testNewsHasSlug(): void
     {

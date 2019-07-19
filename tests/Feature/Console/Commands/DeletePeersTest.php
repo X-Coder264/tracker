@@ -16,12 +16,12 @@ use App\Console\Commands\DeletePeers;
 use Illuminate\Console\Scheduling\Event;
 use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Console\Scheduling\Schedule;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class DeletePeersTest extends TestCase
 {
-    use RefreshDatabase;
+    use DatabaseTransactions;
 
     public function testObsoletePeersGetDeleted(): void
     {

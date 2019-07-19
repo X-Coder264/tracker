@@ -24,7 +24,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Contracts\Cache\Repository;
 use PHPUnit\Framework\MockObject\MockObject;
 use App\Services\FileSizeCollectionFormatter;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
@@ -32,7 +32,7 @@ use Illuminate\Contracts\Filesystem\Factory as FilesystemManager;
 
 class TorrentControllerTest extends TestCase
 {
-    use RefreshDatabase;
+    use DatabaseTransactions;
 
     /**
      * @var User

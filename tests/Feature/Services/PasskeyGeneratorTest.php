@@ -8,11 +8,11 @@ use Tests\TestCase;
 use App\Models\User;
 use ReflectionClass;
 use App\Services\PasskeyGenerator;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 
 class PasskeyGeneratorTest extends TestCase
 {
-    use RefreshDatabase;
+    use DatabaseTransactions;
 
     public function testGetUserWithTheSpecifiedPasskey()
     {

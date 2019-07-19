@@ -9,11 +9,11 @@ use App\Models\User;
 use App\Models\Torrent;
 use Illuminate\Http\Response;
 use App\Models\TorrentComment;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 
 class TorrentCommentControllerTest extends TestCase
 {
-    use RefreshDatabase;
+    use DatabaseTransactions;
 
     public function testCreate()
     {

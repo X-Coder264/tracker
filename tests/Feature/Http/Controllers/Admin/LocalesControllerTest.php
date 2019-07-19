@@ -8,11 +8,11 @@ use App\Models\User;
 use App\Models\Locale;
 use Tests\AdminApiTestCase;
 use Illuminate\Support\Carbon;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 
 class LocalesControllerTest extends AdminApiTestCase
 {
-    use RefreshDatabase;
+    use DatabaseTransactions;
 
     public function testIndex()
     {

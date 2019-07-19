@@ -10,12 +10,12 @@ use Illuminate\Database\Connection;
 use App\Models\PrivateMessages\Thread;
 use Illuminate\Contracts\Cache\Repository;
 use App\Models\PrivateMessages\ThreadParticipant;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use App\Repositories\PrivateMessages\CachedThreadParticipantRepository;
 
 class CachedThreadParticipantRepositoryTest extends TestCase
 {
-    use RefreshDatabase;
+    use DatabaseTransactions;
 
     public function testGetUnreadThreadsForUser(): void
     {

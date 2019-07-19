@@ -10,11 +10,11 @@ use App\Models\User;
 use App\Models\Torrent;
 use App\Services\StatisticsManager;
 use Illuminate\Database\Connection;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 
 class StatisticsManagerTest extends TestCase
 {
-    use RefreshDatabase;
+    use DatabaseTransactions;
 
     /**
      * @var StatisticsManager

@@ -10,11 +10,11 @@ use App\Models\User;
 use App\Models\Locale;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Contracts\Cache\Repository;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 
 class SetUserLocaleTest extends TestCase
 {
-    use RefreshDatabase;
+    use DatabaseTransactions;
 
     public function testSettingUserLocale()
     {

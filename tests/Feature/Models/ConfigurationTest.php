@@ -6,11 +6,11 @@ namespace Tests\Feature\Models;
 
 use Tests\TestCase;
 use App\Models\Configuration;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 
 class ConfigurationTest extends TestCase
 {
-    use RefreshDatabase;
+    use DatabaseTransactions;
 
     public function testGetConfigurationValueScope(): void
     {

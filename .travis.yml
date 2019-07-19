@@ -30,6 +30,7 @@ install:
   - cp .env.testing .env
   - travis_retry composer install --no-interaction --prefer-source
   - php artisan storage:link
+  - php artisan migrate --env=testing
 
 # Create a storage folder for test coverage report
 before_script:

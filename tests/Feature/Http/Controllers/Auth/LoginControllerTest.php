@@ -8,11 +8,11 @@ use Tests\TestCase;
 use App\Models\User;
 use App\Models\Locale;
 use Illuminate\Http\Response;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 
 class LoginControllerTest extends TestCase
 {
-    use RefreshDatabase;
+    use DatabaseTransactions;
 
     public function testUserCanViewTheLoginForm()
     {

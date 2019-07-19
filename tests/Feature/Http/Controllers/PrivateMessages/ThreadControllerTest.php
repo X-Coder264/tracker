@@ -12,12 +12,12 @@ use App\Models\PrivateMessages\Thread;
 use Illuminate\Contracts\Cache\Repository;
 use App\Models\PrivateMessages\ThreadMessage;
 use App\Models\PrivateMessages\ThreadParticipant;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 class ThreadControllerTest extends TestCase
 {
-    use RefreshDatabase;
+    use DatabaseTransactions;
 
     public function testIndex(): void
     {

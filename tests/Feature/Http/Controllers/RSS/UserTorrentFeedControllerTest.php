@@ -8,11 +8,11 @@ use Tests\TestCase;
 use App\Models\User;
 use App\Models\TorrentCategory;
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 
 class UserTorrentFeedControllerTest extends TestCase
 {
-    use RefreshDatabase;
+    use DatabaseTransactions;
 
     public function testShow(): void
     {

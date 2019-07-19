@@ -8,12 +8,12 @@ use Tests\TestCase;
 use App\Models\Snatch;
 use App\Models\Torrent;
 use Illuminate\Contracts\Cache\Repository;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 class SnatchControllerTest extends TestCase
 {
-    use RefreshDatabase;
+    use DatabaseTransactions;
 
     public function testShow(): void
     {

@@ -9,11 +9,11 @@ use App\Models\User;
 use App\Models\Torrent;
 use App\Models\TorrentCategory;
 use Illuminate\Contracts\Cache\Repository;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 
 class TorrentFeedControllerTest extends TestCase
 {
-    use RefreshDatabase;
+    use DatabaseTransactions;
 
     public function testShowWithoutCategories(): void
     {

@@ -19,11 +19,11 @@ use App\Models\TorrentInfoHash;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Contracts\Cache\Repository;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 
 class AnnounceManagerTest extends TestCase
 {
-    use RefreshDatabase;
+    use DatabaseTransactions;
 
     public function testV1PeerStartsLeechingWithNoOtherPeersPresentOnTheTorrent()
     {

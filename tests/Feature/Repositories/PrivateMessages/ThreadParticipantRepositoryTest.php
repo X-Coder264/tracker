@@ -9,12 +9,12 @@ use Tests\TestCase;
 use App\Models\User;
 use App\Models\PrivateMessages\Thread;
 use App\Models\PrivateMessages\ThreadParticipant;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use App\Repositories\PrivateMessages\ThreadParticipantRepository;
 
 class ThreadParticipantRepositoryTest extends TestCase
 {
-    use RefreshDatabase;
+    use DatabaseTransactions;
 
     public function testGetUnreadThreadsForUser(): void
     {

@@ -8,11 +8,11 @@ use Tests\TestCase;
 use App\Models\Torrent;
 use App\Presenters\IMDb\Title;
 use App\Services\TorrentInfoService;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 
 class TorrentInfoServiceTest extends TestCase
 {
-    use RefreshDatabase;
+    use DatabaseTransactions;
 
     public function testGetIMDBData(): void
     {

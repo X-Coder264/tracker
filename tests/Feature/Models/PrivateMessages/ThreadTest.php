@@ -10,13 +10,13 @@ use App\Models\PrivateMessages\Thread;
 use Illuminate\Database\Eloquent\Collection;
 use App\Models\PrivateMessages\ThreadMessage;
 use App\Models\PrivateMessages\ThreadParticipant;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 
 class ThreadTest extends TestCase
 {
-    use RefreshDatabase;
+    use DatabaseTransactions;
 
     public function testThreadHasSlug(): void
     {

@@ -9,11 +9,11 @@ use App\Models\User;
 use Illuminate\Routing\Router;
 use Illuminate\Contracts\Http\Kernel;
 use App\Http\Middleware\CheckIfTheUserIsBanned;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 
 class CheckIfTheUserIsBannedTest extends TestCase
 {
-    use RefreshDatabase;
+    use DatabaseTransactions;
 
     public function testBannedUserGetsLoggedOutAndRedirectedToLoginPage(): void
     {

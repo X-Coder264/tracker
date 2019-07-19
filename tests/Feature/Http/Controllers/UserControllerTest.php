@@ -16,11 +16,11 @@ use Illuminate\Support\Facades\Cache;
 use App\Http\Middleware\SetUserLocale;
 use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Contracts\Translation\Translator;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 
 class UserControllerTest extends TestCase
 {
-    use RefreshDatabase;
+    use DatabaseTransactions;
 
     public function testEdit()
     {
