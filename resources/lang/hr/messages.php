@@ -139,5 +139,8 @@ return [
     'common.currently-seeding' => 'Trenutno se seeda',
     'common.currently-leeching' => 'Trenutno se leecha',
     'common.no-torrents-on-seed' => 'Trenutno nema torrenta na seedu.',
-    'common.no-torrents-on-leech' => 'Trenutno nema torrenta na leechu.'
+    'common.no-torrents-on-leech' => 'Trenutno nema torrenta na leechu.',
+    'torrent.successfully_updated' => 'Torrent je uspješno editiran.',
+    'torrent.not_allowed_to_edit' => 'Nemate dozvolu za editirati ovaj torrent.',
+    'torrent.edit' => 'Editiraj',
 ];

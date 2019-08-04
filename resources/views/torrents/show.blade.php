@@ -41,6 +41,9 @@
             <div class="card">
                 <div class="card-header">
                     <a href="{{ route('torrents.download', $torrent) }}" class="btn btn-primary">{{ $torrent->name }}</a>
+                    @if ($user->can('update', $torrent))
+                        <a href="{{ route('torrents.edit', $torrent) }}" class="btn btn-primary">{{ trans('messages.torrent.edit') }}</a>
+                    @endif
                 </div>
 
                 <div class="card-body">

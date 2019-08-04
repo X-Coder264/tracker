@@ -50,6 +50,8 @@ $router->group(['middleware' => [Authenticate::class]], function (Registrar $rou
     $router->get('torrents', 'TorrentController@index')->name('torrents.index');
     $router->get('torrents/create', 'TorrentController@create')->name('torrents.create');
     $router->get('torrents/{torrent}', 'TorrentController@show')->name('torrents.show');
+    $router->get('torrents/{torrent}/edit', 'TorrentController@edit')->name('torrents.edit');
+    $router->put('torrents/{torrent}', 'TorrentController@update')->name('torrents.update');
     $router->post('torrents', 'TorrentController@store')->name('torrents.store');
 
     $router->get('torrent-comments/{torrent}/create', 'TorrentCommentController@create')->name('torrent-comments.create');

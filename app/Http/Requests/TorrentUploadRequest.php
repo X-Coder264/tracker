@@ -25,8 +25,9 @@ class TorrentUploadRequest extends FormRequest
         return [
             'torrent'     => 'required|file|mimetypes:application/x-bittorrent',
             'name'        => 'required|string|min:5|max:255|unique:torrents',
-            'description' => 'required|string',
+            'description' => 'required|string|min:30',
             'category'    => 'required|exists:torrent_categories,id',
+            'imdb_url'    => 'nullable|url',
         ];
     }
 

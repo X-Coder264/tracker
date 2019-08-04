@@ -11,6 +11,7 @@ use App\Models\Torrent;
 use App\Services\Bdecoder;
 use App\Services\Bencoder;
 use Illuminate\Http\Response;
+use InvalidArgumentException;
 use App\Models\TorrentComment;
 use App\Presenters\IMDb\Title;
 use App\Models\TorrentCategory;
@@ -22,8 +23,11 @@ use App\Services\IMDb\TitleFactory;
 use App\Services\TorrentInfoService;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Contracts\Cache\Repository;
+use Illuminate\Database\Eloquent\Collection;
 use PHPUnit\Framework\MockObject\MockObject;
 use App\Services\FileSizeCollectionFormatter;
+use Illuminate\Contracts\Routing\UrlGenerator;
+use Illuminate\Contracts\Translation\Translator;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
@@ -44,9 +48,6 @@ class TorrentControllerTest extends TestCase
      */
     private $torrentsPerPage = 3;
 
-    /**
-     * Setup the test environment.
-     */
     protected function setUp(): void
     {
         parent::setUp();
@@ -55,14 +56,14 @@ class TorrentControllerTest extends TestCase
         $this->actingAs($this->user);
     }
 
-    public function testIndex()
+    public function testIndex(): void
     {
         $this->withoutExceptionHandling();
 
         $visibleTorrent = factory(Torrent::class)->states('alive')->create(['uploader_id' => $this->user->id, 'name' => 'test']);
         $deadTorrent = factory(Torrent::class)->states('dead')->create(['uploader_id' => $this->user->id]);
 
-        $response = $this->get(route('torrents.index'));
+        $response = $this->get($this->app->make(UrlGenerator::class)->route('torrents.index'));
         $response->assertStatus(Response::HTTP_OK);
         $response->assertViewIs('torrents.index');
         $response->assertViewHas(['torrents', 'timezone']);
@@ -93,7 +94,7 @@ class TorrentControllerTest extends TestCase
         $visibleTorrent = factory(Torrent::class)->states('alive')->create(['uploader_id' => $this->user->id, 'name' => 'test']);
         $deadTorrent = factory(Torrent::class)->states('dead')->create(['uploader_id' => $this->user->id]);
 
-        $response = $this->get(route('torrents.index', ['page' => 'invalid-string']));
+        $response = $this->get($this->app->make(UrlGenerator::class)->route('torrents.index', ['page' => 'invalid-string']));
         $response->assertStatus(Response::HTTP_OK);
         $response->assertViewIs('torrents.index');
         $response->assertViewHas(['torrents', 'timezone']);
@@ -116,14 +117,26 @@ class TorrentControllerTest extends TestCase
         $cacheManager->tags('torrents')->flush();
     }
 
-    public function testCreate()
+    public function testCreate(): void
     {
         $this->withoutExceptionHandling();
 
-        $response = $this->get(route('torrents.create'));
+        $urlGenerator = $this->app->make(UrlGenerator::class);
 
-        $response->assertStatus(Response::HTTP_OK);
+        /** @var TorrentCategory[] $categories */
+        $categories = factory(TorrentCategory::class, 2)->create();
+
+        $response = $this->get($urlGenerator->route('torrents.create'));
+
+        $response->assertOk();
         $response->assertViewIs('torrents.create');
+
+        $response->assertViewHas('torrent');
+        $this->assertInstanceOf(Torrent::class, $response->original->gatherData()['torrent']);
+        $response->assertViewHas('categories', function (Collection $collection) use ($categories) {
+            return 2 === $collection->count() && $collection->contains($categories[0]) && $collection->contains($categories[1]);
+        });
+        $response->assertViewHas('formActionUrl', $urlGenerator->route('torrents.store'));
     }
 
     public function testShow(): void
@@ -175,7 +188,7 @@ class TorrentControllerTest extends TestCase
         $torrentInfo->method('getTorrentFileNamesAndSizes')->willReturn($returnValue);
         $this->app->instance(TorrentInfoService::class, $torrentInfo);
 
-        $response = $this->get(route('torrents.show', $torrent));
+        $response = $this->get($this->app->make(UrlGenerator::class)->route('torrents.show', $torrent));
         $response->assertOk();
         $response->assertViewIs('torrents.show');
         $response->assertViewHas('torrent');
@@ -185,6 +198,7 @@ class TorrentControllerTest extends TestCase
         $response->assertViewHas('torrentComments');
         $response->assertViewHas('imdbData');
         $response->assertViewHas('posterExists', false);
+        $response->assertViewHas('user', $this->user);
         $response->assertViewHas('timezone', $this->user->timezone);
         $this->assertInstanceOf(LengthAwarePaginator::class, $response->viewData('torrentComments'));
         $this->assertSame(10, $response->viewData('torrentComments')->perPage());
@@ -227,13 +241,291 @@ class TorrentControllerTest extends TestCase
 
         $torrentInfo->method('getTorrentFileNamesAndSizes')->will($this->throwException(new FileNotFoundException()));
 
-        $response = $this->get(route('torrents.show', $torrent));
+        $response = $this->get($this->app->make(UrlGenerator::class)->route('torrents.show', $torrent));
         $response->assertStatus(Response::HTTP_NOT_FOUND);
         $response->assertSee(trans('messages.torrent-file-missing.error-message'));
         $response->assertDontSee($torrent->name);
     }
 
-    public function testDownloadWithASCIITorrentFileName()
+    public function testEdit(): void
+    {
+        $this->withoutExceptionHandling();
+
+        $torrent = factory(Torrent::class)->create(['uploader_id' => $this->user->id]);
+
+        $urlGenerator = $this->app->make(UrlGenerator::class);
+
+        $response = $this->get($urlGenerator->route('torrents.edit', $torrent));
+
+        $response->assertOk();
+        $response->assertViewIs('torrents.edit');
+        $response->assertViewHas('torrent', $torrent);
+        $response->assertViewHas('categories', function (Collection $collection) use ($torrent) {
+            return 1 === $collection->count() && $collection->contains($torrent->category);
+        });
+        $response->assertViewHas('formActionUrl', $urlGenerator->route('torrents.update', $torrent));
+    }
+
+    public function testEditWhenTheUserIsNotTheUploaderOfTheTorrent(): void
+    {
+        $this->withoutExceptionHandling();
+
+        $torrent = factory(Torrent::class)->create();
+
+        $urlGenerator = $this->app->make(UrlGenerator::class);
+
+        $response = $this->get($urlGenerator->route('torrents.edit', $torrent));
+
+        $response->assertStatus(Response::HTTP_FOUND);
+        $response->assertRedirect($urlGenerator->route('torrents.index'));
+        $response->assertSessionHas(
+            'error',
+            $this->app->make(Translator::class)->trans('messages.torrent.not_allowed_to_edit')
+        );
+    }
+
+    public function testUpdate(): void
+    {
+        $this->withoutExceptionHandling();
+
+        $torrent = factory(Torrent::class)->create(['uploader_id' => $this->user->id]);
+
+        $category = factory(TorrentCategory::class)->create(['imdb' => true]);
+
+        $imdbManager = $this->createMock(IMDBManager::class);
+        $imdbManager->expects($this->once())
+            ->method('getIMDBIdFromFullURL')
+            ->with('https://www.imdb.com/title/tt0468575/')
+            ->willReturn('0468575');
+
+        $this->app->instance(IMDBManager::class, $imdbManager);
+
+        $urlGenerator = $this->app->make(UrlGenerator::class);
+
+        $name = 'test foo 123';
+        $description = str_repeat('Foo bar', 55);
+
+        $response = $this->from($urlGenerator->route('torrents.edit', $torrent))->put(
+            $urlGenerator->route('torrents.update', $torrent),
+            [
+                'name' => $name,
+                'description' => $description,
+                'category' => $category->id,
+                'imdb_url' => 'https://www.imdb.com/title/tt0468575/',
+            ]
+        );
+
+        $response->assertStatus(Response::HTTP_FOUND);
+        $response->assertRedirect($urlGenerator->route('torrents.edit', $torrent));
+        $response->assertSessionHas(
+            'success',
+            $this->app->make(Translator::class)->trans('messages.torrent.successfully_updated')
+        );
+
+        $torrent->refresh();
+
+        $this->assertSame($name, $torrent->name);
+        $this->assertSame($description, $torrent->description);
+        $this->assertSame('0468575', $torrent->imdb_id);
+        $this->assertTrue($torrent->category->is($category));
+    }
+
+    public function testUpdateWithInvalidName(): void
+    {
+        $this->withoutExceptionHandling();
+
+        $torrent = factory(Torrent::class)->create(['uploader_id' => $this->user->id]);
+
+        factory(TorrentCategory::class)->create(['imdb' => true]);
+
+        $urlGenerator = $this->app->make(UrlGenerator::class);
+
+        $name = 'xy';
+
+        $response = $this->from($urlGenerator->route('torrents.edit', $torrent))->put(
+            $urlGenerator->route('torrents.update', $torrent),
+            $this->validParams(['name' => $name])
+        );
+
+        $response->assertStatus(Response::HTTP_FOUND);
+        $response->assertRedirect($urlGenerator->route('torrents.edit', $torrent));
+        $response->assertSessionHasErrors('name');
+
+        $freshTorrent = $torrent->fresh();
+
+        $this->assertSame($torrent->name, $freshTorrent->name);
+        $this->assertSame($torrent->description, $freshTorrent->description);
+        $this->assertSame($torrent->imdb_id, $freshTorrent->imdb_id);
+        $this->assertTrue($freshTorrent->category->is($torrent->category));
+    }
+
+    public function testUpdateWithInvalidDescription(): void
+    {
+        $this->withoutExceptionHandling();
+
+        $torrent = factory(Torrent::class)->create(['uploader_id' => $this->user->id]);
+
+        $category = factory(TorrentCategory::class)->create(['imdb' => true]);
+
+        $urlGenerator = $this->app->make(UrlGenerator::class);
+
+        $description = 'xy';
+
+        $response = $this->from($urlGenerator->route('torrents.edit', $torrent))->put(
+            $urlGenerator->route('torrents.update', $torrent),
+            $this->validParams(['description' => $description])
+        );
+
+        $response->assertStatus(Response::HTTP_FOUND);
+        $response->assertRedirect($urlGenerator->route('torrents.edit', $torrent));
+        $response->assertSessionHasErrors('description');
+
+        $freshTorrent = $torrent->fresh();
+
+        $this->assertSame($torrent->name, $freshTorrent->name);
+        $this->assertSame($torrent->description, $freshTorrent->description);
+        $this->assertSame($torrent->imdb_id, $freshTorrent->imdb_id);
+        $this->assertTrue($freshTorrent->category->is($torrent->category));
+    }
+
+    public function testUpdateWithInvalidCategory(): void
+    {
+        $this->withoutExceptionHandling();
+
+        $torrent = factory(Torrent::class)->create(['uploader_id' => $this->user->id]);
+
+        factory(TorrentCategory::class)->create(['imdb' => true]);
+
+        $urlGenerator = $this->app->make(UrlGenerator::class);
+
+        $response = $this->from($urlGenerator->route('torrents.edit', $torrent))->put(
+            $urlGenerator->route('torrents.update', $torrent),
+            $this->validParams(['category' => 9999])
+        );
+
+        $response->assertStatus(Response::HTTP_FOUND);
+        $response->assertRedirect($urlGenerator->route('torrents.edit', $torrent));
+        $response->assertSessionHasErrors('category');
+
+        $freshTorrent = $torrent->fresh();
+
+        $this->assertSame($torrent->name, $freshTorrent->name);
+        $this->assertSame($torrent->description, $freshTorrent->description);
+        $this->assertSame($torrent->imdb_id, $freshTorrent->imdb_id);
+        $this->assertTrue($freshTorrent->category->is($torrent->category));
+    }
+
+    public function testUpdateWithInvalidImdbUrl(): void
+    {
+        $this->withoutExceptionHandling();
+
+        $torrent = factory(Torrent::class)->create(['uploader_id' => $this->user->id]);
+
+        factory(TorrentCategory::class)->create(['imdb' => true]);
+
+        $urlGenerator = $this->app->make(UrlGenerator::class);
+
+        $response = $this->from($urlGenerator->route('torrents.edit', $torrent))->put(
+            $urlGenerator->route('torrents.update', $torrent),
+            $this->validParams(['imdb_url' => 'foobar'])
+        );
+
+        $response->assertStatus(Response::HTTP_FOUND);
+        $response->assertRedirect($urlGenerator->route('torrents.edit', $torrent));
+        $response->assertSessionHasErrors('imdb_url');
+
+        $freshTorrent = $torrent->fresh();
+
+        $this->assertSame($torrent->name, $freshTorrent->name);
+        $this->assertSame($torrent->description, $freshTorrent->description);
+        $this->assertSame($torrent->imdb_id, $freshTorrent->imdb_id);
+        $this->assertTrue($freshTorrent->category->is($torrent->category));
+    }
+
+    public function testUpdateWhenTheUserIsNotTheUploaderOfTheTorrent(): void
+    {
+        $this->withoutExceptionHandling();
+
+        $torrent = factory(Torrent::class)->create();
+
+        $category = factory(TorrentCategory::class)->create(['imdb' => true]);
+
+        $urlGenerator = $this->app->make(UrlGenerator::class);
+
+        $name = 'test foo 123';
+        $description = str_repeat('Foo bar', 55);
+
+        $response = $this->from($urlGenerator->route('torrents.edit', $torrent))->put(
+            $urlGenerator->route('torrents.update', $torrent),
+            [
+                'name' => $name,
+                'description' => $description,
+                'category' => $category->id,
+                'imdb_url' => 'https://www.imdb.com/title/tt0468575/',
+            ]
+        );
+
+        $response->assertStatus(Response::HTTP_FOUND);
+        $response->assertRedirect($urlGenerator->route('torrents.index'));
+        $response->assertSessionHas(
+            'error',
+            $this->app->make(Translator::class)->trans('messages.torrent.not_allowed_to_edit')
+        );
+
+        $freshTorrent = $torrent->fresh();
+
+        $this->assertSame($torrent->name, $freshTorrent->name);
+        $this->assertSame($torrent->description, $freshTorrent->description);
+        $this->assertSame($torrent->imdb_id, $freshTorrent->imdb_id);
+        $this->assertTrue($freshTorrent->category->is($torrent->category));
+    }
+
+    public function testUpdateWhenImdbLinkParsingThrowsAnException(): void
+    {
+        $this->withoutExceptionHandling();
+
+        $torrent = factory(Torrent::class)->create(['uploader_id' => $this->user->id]);
+
+        $category = factory(TorrentCategory::class)->create(['imdb' => true]);
+
+        $imdbManager = $this->createMock(IMDBManager::class);
+        $imdbManager->expects($this->once())
+            ->method('getIMDBIdFromFullURL')
+            ->willThrowException(new InvalidArgumentException());
+
+        $this->app->instance(IMDBManager::class, $imdbManager);
+
+        $urlGenerator = $this->app->make(UrlGenerator::class);
+
+        $name = 'test foo 123';
+        $description = str_repeat('Foo bar', 55);
+
+        $response = $this->from($urlGenerator->route('torrents.edit', $torrent))->put(
+            $urlGenerator->route('torrents.update', $torrent),
+            [
+                'name' => $name,
+                'description' => $description,
+                'category' => $category->id,
+                'imdb_url' => 'https://www.imdb.com/title/tt0468575/',
+            ]
+        );
+
+        $response->assertStatus(Response::HTTP_FOUND);
+        $response->assertRedirect($urlGenerator->route('torrents.edit', $torrent));
+        $response->assertSessionHas(
+            'success',
+            $this->app->make(Translator::class)->trans('messages.torrent.successfully_updated')
+        );
+
+        $torrent->refresh();
+
+        $this->assertSame($name, $torrent->name);
+        $this->assertSame($description, $torrent->description);
+        $this->assertNull($torrent->imdb_id);
+        $this->assertTrue($torrent->category->is($category));
+    }
+
+    public function testDownloadWithASCIITorrentFileName(): void
     {
         $this->withoutExceptionHandling();
 
@@ -258,19 +550,19 @@ class TorrentControllerTest extends TestCase
         $encoderReturnValue = 'something xyz';
         $encoder->expects($this->once())
             ->method('encode')
-            ->with($this->equalTo(array_merge($decoderReturnValue, ['announce' => route('announce', ['passkey' => $this->user->passkey])])))
+            ->with($this->equalTo(array_merge($decoderReturnValue, ['announce' => $this->app->make(UrlGenerator::class)->route('announce', ['passkey' => $this->user->passkey])])))
             ->willReturn($encoderReturnValue);
 
         $this->app->instance(Bencoder::class, $encoder);
 
-        $response = $this->get(route('torrents.download', $torrent));
+        $response = $this->get($this->app->make(UrlGenerator::class)->route('torrents.download', $torrent));
         $response->assertStatus(Response::HTTP_OK);
         $this->assertSame($encoderReturnValue, $response->getContent());
         $response->assertHeader('Content-Type', 'application/x-bittorrent');
         $response->assertHeader('Content-Disposition', 'attachment; filename=' . $torrent->name . '.torrent');
     }
 
-    public function testDownloadWithUTF8TorrentFileNameWhichIncludesSpecialCharacters()
+    public function testDownloadWithUTF8TorrentFileNameWhichIncludesSpecialCharacters(): void
     {
         $this->withoutExceptionHandling();
 
@@ -295,12 +587,12 @@ class TorrentControllerTest extends TestCase
         $encoderReturnValue = 'something xyz';
         $encoder->expects($this->once())
             ->method('encode')
-            ->with($this->equalTo(array_merge($decoderReturnValue, ['announce' => route('announce', ['passkey' => $this->user->passkey])])))
+            ->with($this->equalTo(array_merge($decoderReturnValue, ['announce' => $this->app->make(UrlGenerator::class)->route('announce', ['passkey' => $this->user->passkey])])))
             ->willReturn($encoderReturnValue);
 
         $this->app->instance(Bencoder::class, $encoder);
 
-        $response = $this->get(route('torrents.download', $torrent));
+        $response = $this->get($this->app->make(UrlGenerator::class)->route('torrents.download', $torrent));
         $response->assertStatus(Response::HTTP_OK);
         $this->assertSame($encoderReturnValue, $response->getContent());
         $response->assertHeader('Content-Type', 'application/x-bittorrent');
@@ -314,11 +606,11 @@ class TorrentControllerTest extends TestCase
         $response->assertHeader('Content-Disposition', $dispositionHeader);
     }
 
-    public function testDownloadWhenStorageThrowsAnException()
+    public function testDownloadWhenStorageThrowsAnException(): void
     {
         $torrent = factory(Torrent::class)->create(['uploader_id' => $this->user->id]);
         Storage::shouldReceive('disk->get')->once()->with("{$torrent->id}.torrent")->andThrow(new FileNotFoundException());
-        $response = $this->get(route('torrents.download', $torrent));
+        $response = $this->get($this->app->make(UrlGenerator::class)->route('torrents.download', $torrent));
         $response->assertStatus(Response::HTTP_NOT_FOUND);
         $response->assertSee(trans('messages.torrent-file-missing.error-message'));
         $response->assertDontSee($torrent->name);
@@ -351,12 +643,12 @@ class TorrentControllerTest extends TestCase
         $encoderReturnValue = 'something xyz';
         $encoder->expects($this->once())
             ->method('encode')
-            ->with($this->equalTo(array_merge($decoderReturnValue, ['announce' => route('announce', ['passkey' => $this->user->passkey])])))
+            ->with($this->equalTo(array_merge($decoderReturnValue, ['announce' => $this->app->make(UrlGenerator::class)->route('announce', ['passkey' => $this->user->passkey])])))
             ->willReturn($encoderReturnValue);
 
         $this->app->instance(Bencoder::class, $encoder);
 
-        $response = $this->get(route('torrents.download', ['torrent' => $torrent, 'passkey' => $this->user->passkey]));
+        $response = $this->get($this->app->make(UrlGenerator::class)->route('torrents.download', ['torrent' => $torrent, 'passkey' => $this->user->passkey]));
         $response->assertStatus(Response::HTTP_OK);
         $this->assertSame($encoderReturnValue, $response->getContent());
         $response->assertHeader('Content-Type', 'application/x-bittorrent');
@@ -369,165 +661,162 @@ class TorrentControllerTest extends TestCase
 
         $torrent = factory(Torrent::class)->create(['uploader_id' => $this->user->id, 'name' => 'xyz']);
 
-        $response = $this->get(route('torrents.download', ['torrent' => $torrent, 'passkey' => 'does-not-exist']));
+        $response = $this->get($this->app->make(UrlGenerator::class)->route('torrents.download', ['torrent' => $torrent, 'passkey' => 'does-not-exist']));
         $response->assertStatus(302);
-        $response->assertRedirect(route('login'));
+        $response->assertRedirect($this->app->make(UrlGenerator::class)->route('login'));
     }
 
-    public function testGuestsCannotSeeTheTorrentsIndexPage()
+    public function testGuestsCannotSeeTheTorrentsIndexPage(): void
     {
         $this->app->make('auth')->guard()->logout();
-        $response = $this->get(route('torrents.index'));
+        $response = $this->get($this->app->make(UrlGenerator::class)->route('torrents.index'));
         $response->assertStatus(Response::HTTP_FOUND);
-        $response->assertRedirect(route('login'));
+        $response->assertRedirect($this->app->make(UrlGenerator::class)->route('login'));
     }
 
-    public function testGuestsCannotSeeTheTorrentPage()
+    public function testGuestsCannotSeeTheTorrentPage(): void
     {
         $this->app->make('auth')->guard()->logout();
         $torrent = factory(Torrent::class)->create(['uploader_id' => $this->user->id]);
-        $response = $this->get(route('torrents.show', $torrent));
+        $response = $this->get($this->app->make(UrlGenerator::class)->route('torrents.show', $torrent));
         $response->assertStatus(Response::HTTP_FOUND);
-        $response->assertRedirect(route('login'));
+        $response->assertRedirect($this->app->make(UrlGenerator::class)->route('login'));
     }
 
     public function testGuestsCannotDownloadTorrentsIfPasskeyIsNotProvided(): void
     {
         $this->app->make('auth')->guard()->logout();
         $torrent = factory(Torrent::class)->create(['uploader_id' => $this->user->id]);
-        $response = $this->get(route('torrents.download', $torrent));
+        $response = $this->get($this->app->make(UrlGenerator::class)->route('torrents.download', $torrent));
         $response->assertStatus(Response::HTTP_FOUND);
-        $response->assertRedirect(route('login'));
+        $response->assertRedirect($this->app->make(UrlGenerator::class)->route('login'));
     }
 
-    public function testGuestsCannotUploadTorrents()
+    public function testGuestsCannotUploadTorrents(): void
     {
         $this->app->make('auth')->guard()->logout();
-        $response = $this->post(route('torrents.store'), $this->validParams());
+        $response = $this->post($this->app->make(UrlGenerator::class)->route('torrents.store'), $this->validParams());
         $response->assertStatus(Response::HTTP_FOUND);
-        $response->assertRedirect(route('login'));
+        $response->assertRedirect($this->app->make(UrlGenerator::class)->route('login'));
         $this->assertSame(0, Torrent::count());
     }
 
-    public function testTorrentFileIsRequired()
+    public function testTorrentFileIsRequired(): void
     {
-        $response = $this->from(route('torrents.create'))->post(route('torrents.store'), $this->validParams([
+        $response = $this->from($this->app->make(UrlGenerator::class)->route('torrents.create'))->post($this->app->make(UrlGenerator::class)->route('torrents.store'), $this->validParams([
             'torrent' => null,
         ]));
         $response->assertStatus(Response::HTTP_FOUND);
-        $response->assertRedirect(route('torrents.create'));
+        $response->assertRedirect($this->app->make(UrlGenerator::class)->route('torrents.create'));
         $response->assertSessionHasErrors('torrent');
         $this->assertSame(0, Torrent::count());
     }
 
-    public function testTorrentMustBeAFile()
+    public function testTorrentMustBeAFile(): void
     {
-        $response = $this->from(route('torrents.create'))->post(route('torrents.store'), $this->validParams([
+        $response = $this->from($this->app->make(UrlGenerator::class)->route('torrents.create'))->post($this->app->make(UrlGenerator::class)->route('torrents.store'), $this->validParams([
             'torrent' => 'test string',
         ]));
         $response->assertStatus(Response::HTTP_FOUND);
-        $response->assertRedirect(route('torrents.create'));
+        $response->assertRedirect($this->app->make(UrlGenerator::class)->route('torrents.create'));
         $response->assertSessionHasErrors('torrent');
         $this->assertSame(0, Torrent::count());
     }
 
-    public function testFileMustBeATorrent()
+    public function testFileMustBeATorrent(): void
     {
-        $response = $this->from(route('torrents.create'))->post(route('torrents.store'), $this->validParams([
+        $response = $this->from($this->app->make(UrlGenerator::class)->route('torrents.create'))->post($this->app->make(UrlGenerator::class)->route('torrents.store'), $this->validParams([
             'torrent' => File::create('file.png'),
         ]));
         $response->assertStatus(Response::HTTP_FOUND);
-        $response->assertRedirect(route('torrents.create'));
+        $response->assertRedirect($this->app->make(UrlGenerator::class)->route('torrents.create'));
         $response->assertSessionHasErrors('torrent');
         $this->assertSame(0, Torrent::count());
     }
 
-    public function testNameIsRequired()
+    public function testNameIsRequired(): void
     {
-        $response = $this->from(route('torrents.create'))->post(route('torrents.store'), $this->validParams([
+        $response = $this->from($this->app->make(UrlGenerator::class)->route('torrents.create'))->post($this->app->make(UrlGenerator::class)->route('torrents.store'), $this->validParams([
             'name' => '',
         ]));
         $response->assertStatus(Response::HTTP_FOUND);
-        $response->assertRedirect(route('torrents.create'));
+        $response->assertRedirect($this->app->make(UrlGenerator::class)->route('torrents.create'));
         $response->assertSessionHasErrors('name');
         $this->assertSame(0, Torrent::count());
     }
 
-    public function testNameMustContainAtLeast5Chars()
+    public function testNameMustContainAtLeast5Chars(): void
     {
-        $response = $this->from(route('torrents.create'))->post(route('torrents.store'), $this->validParams([
+        $response = $this->from($this->app->make(UrlGenerator::class)->route('torrents.create'))->post($this->app->make(UrlGenerator::class)->route('torrents.store'), $this->validParams([
             'name' => str_repeat('X', 4),
         ]));
         $response->assertStatus(Response::HTTP_FOUND);
-        $response->assertRedirect(route('torrents.create'));
+        $response->assertRedirect($this->app->make(UrlGenerator::class)->route('torrents.create'));
         $response->assertSessionHasErrors('name');
         $this->assertSame(0, Torrent::count());
     }
 
-    public function testNameMustBeLessThan256CharsLong()
+    public function testNameMustBeLessThan256CharsLong(): void
     {
-        $response = $this->from(route('torrents.create'))->post(route('torrents.store'), $this->validParams([
+        $response = $this->from($this->app->make(UrlGenerator::class)->route('torrents.create'))->post($this->app->make(UrlGenerator::class)->route('torrents.store'), $this->validParams([
             'name' => str_repeat('X', 256),
         ]));
         $response->assertStatus(Response::HTTP_FOUND);
-        $response->assertRedirect(route('torrents.create'));
+        $response->assertRedirect($this->app->make(UrlGenerator::class)->route('torrents.create'));
         $response->assertSessionHasErrors('name');
         $this->assertSame(0, Torrent::count());
     }
 
-    public function testNameMustBeUnique()
+    public function testNameMustBeUnique(): void
     {
         $torrent = factory(Torrent::class)->create(['uploader_id' => $this->user->id]);
-        $response = $this->from(route('torrents.create'))->post(route('torrents.store'), $this->validParams([
+        $response = $this->from($this->app->make(UrlGenerator::class)->route('torrents.create'))->post($this->app->make(UrlGenerator::class)->route('torrents.store'), $this->validParams([
             'name' => $torrent->name,
         ]));
         $response->assertStatus(Response::HTTP_FOUND);
-        $response->assertRedirect(route('torrents.create'));
+        $response->assertRedirect($this->app->make(UrlGenerator::class)->route('torrents.create'));
         $response->assertSessionHasErrors('name');
         $this->assertSame(1, Torrent::count());
     }
 
-    public function testDescriptionIsRequired()
+    public function testDescriptionIsRequired(): void
     {
-        $response = $this->from(route('torrents.create'))->post(route('torrents.store'), $this->validParams([
+        $response = $this->from($this->app->make(UrlGenerator::class)->route('torrents.create'))->post($this->app->make(UrlGenerator::class)->route('torrents.store'), $this->validParams([
             'description' => '',
         ]));
         $response->assertStatus(Response::HTTP_FOUND);
-        $response->assertRedirect(route('torrents.create'));
+        $response->assertRedirect($this->app->make(UrlGenerator::class)->route('torrents.create'));
         $response->assertSessionHasErrors('description');
         $this->assertSame(0, Torrent::count());
     }
 
-    public function testCategoryIsRequired()
+    public function testCategoryIsRequired(): void
     {
-        $response = $this->from(route('torrents.create'))->post(route('torrents.store'), $this->validParams([
+        $response = $this->from($this->app->make(UrlGenerator::class)->route('torrents.create'))->post($this->app->make(UrlGenerator::class)->route('torrents.store'), $this->validParams([
             'category' => '',
         ]));
         $response->assertStatus(Response::HTTP_FOUND);
-        $response->assertRedirect(route('torrents.create'));
+        $response->assertRedirect($this->app->make(UrlGenerator::class)->route('torrents.create'));
         $response->assertSessionHasErrors('category');
         $this->assertSame(0, Torrent::count());
     }
 
-    public function testCategoryMustExistInDatabase()
+    public function testCategoryMustExistInDatabase(): void
     {
-        $response = $this->from(route('torrents.create'))->post(route('torrents.store'), $this->validParams([
+        $response = $this->from($this->app->make(UrlGenerator::class)->route('torrents.create'))->post($this->app->make(UrlGenerator::class)->route('torrents.store'), $this->validParams([
             'category' => '9999999',
         ]));
         $response->assertStatus(Response::HTTP_FOUND);
-        $response->assertRedirect(route('torrents.create'));
+        $response->assertRedirect($this->app->make(UrlGenerator::class)->route('torrents.create'));
         $response->assertSessionHasErrors('category');
         $this->assertSame(0, Torrent::count());
     }
 
-    /**
-     * @param array $overrides
-     */
-    private function validParams($overrides = []): array
+    private function validParams(array $overrides = []): array
     {
         return array_merge([
             'name'        => 'Test name',
-            'description' => 'Test description',
+            'description' => str_repeat('Test foobar', 5),
             'torrent'     => File::create('file.torrent'),
             'category'    => factory(TorrentCategory::class)->create()->id,
         ], $overrides);

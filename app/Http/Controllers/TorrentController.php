@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
+use Exception;
 use App\Models\User;
 use App\Models\Torrent;
 use App\Services\Bdecoder;
@@ -13,21 +14,27 @@ use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use App\Models\TorrentCategory;
+use App\Services\IMDb\IMDBManager;
 use Illuminate\Cache\CacheManager;
 use App\Services\TorrentInfoService;
 use Illuminate\Contracts\Auth\Guard;
 use Illuminate\Http\RedirectResponse;
 use App\Services\TorrentUploadManager;
+use Illuminate\Contracts\Auth\Access\Gate;
 use App\Http\Requests\TorrentUploadRequest;
 use App\Exceptions\FileNotWritableException;
 use Illuminate\Auth\AuthenticationException;
+use Illuminate\Contracts\Validation\Factory;
 use App\Services\FileSizeCollectionFormatter;
 use Illuminate\Contracts\Routing\UrlGenerator;
+use App\Repositories\TorrentCategoryRepository;
 use Illuminate\Contracts\Translation\Translator;
 use Illuminate\Contracts\Routing\ResponseFactory;
+use Illuminate\Auth\Access\AuthorizationException;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
+use Symfony\Component\HttpFoundation\Response as BaseResponse;
 use Illuminate\Contracts\Filesystem\Factory as FilesystemManager;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
@@ -58,18 +65,53 @@ class TorrentController
      */
     private $filesystemManager;
 
+    /**
+     * @var TorrentCategoryRepository
+     */
+    private $torrentCategoryRepository;
+
+    /**
+     * @var UrlGenerator
+     */
+    private $urlGenerator;
+
+    /**
+     * @var Factory
+     */
+    private $validatorFactory;
+
+    /**
+     * @var IMDBManager
+     */
+    private $IMDBManager;
+
+    /**
+     * @var Gate
+     */
+    private $gate;
+
     public function __construct(
         CacheManager $cacheManager,
         Guard $guard,
         ResponseFactory $responseFactory,
         Translator $translator,
-        FilesystemManager $filesystemManager
+        FilesystemManager $filesystemManager,
+        TorrentCategoryRepository $torrentCategoryRepository,
+        UrlGenerator $urlGenerator,
+        Factory $validatorFactory,
+        IMDBManager $IMDBManager,
+        Gate $gate
     ) {
         $this->cacheManager = $cacheManager;
         $this->guard = $guard;
         $this->responseFactory = $responseFactory;
         $this->translator = $translator;
         $this->filesystemManager = $filesystemManager;
+        $this->torrentCategoryRepository = $torrentCategoryRepository;
+        $this->urlGenerator = $urlGenerator;
+        $this->validatorFactory = $validatorFactory;
+        $this->IMDBManager = $IMDBManager;
+        $this->gate = $gate;
     }
 
     public function index(Request $request): Response
@@ -99,11 +141,13 @@ class TorrentController
 
     public function create(): Response
     {
-        $categories = $this->cacheManager->remember('torrentCategories', Cache::ONE_DAY, function () {
-            return TorrentCategory::all();
-        });
+        $categories = $this->torrentCategoryRepository->getAllCategories();
 
-        return $this->responseFactory->view('torrents.create', compact('categories'));
+        $torrent = new Torrent();
+
+        $formActionUrl = $this->urlGenerator->route('torrents.store');
+
+        return $this->responseFactory->view('torrents.create', compact('categories', 'torrent', 'formActionUrl'));
     }
 
     public function show(
@@ -136,6 +180,8 @@ class TorrentController
         $imdbData = $torrentInfoService->getTorrentIMDBData($torrent);
         $posterExists = $imdbData ? $this->filesystemManager->disk('imdb-images')->exists("{$imdbData->getId()}.jpg") : false;
 
+        $user = $this->guard->user();
+
         return $this->responseFactory->view(
             'torrents.show',
             compact(
@@ -145,7 +191,8 @@ class TorrentController
                 'torrentComments',
                 'filesCount',
                 'imdbData',
-                'posterExists'
+                'posterExists',
+                'user'
             )
         );
     }
@@ -164,6 +211,67 @@ class TorrentController
 
         return $this->responseFactory->redirectToRoute('torrents.show', $torrent)
                          ->with('success', $this->translator->trans('messages.torrents.store-successfully-uploaded-torrent.message'));
+    }
+
+    public function edit(Torrent $torrent): BaseResponse
+    {
+        try {
+            $this->gate->authorize('update', $torrent);
+        } catch (AuthorizationException $exception) {
+            return $this->responseFactory->redirectToRoute('torrents.index')
+                ->with('error', $this->translator->trans('messages.torrent.not_allowed_to_edit'));
+        }
+
+        $categories = $this->torrentCategoryRepository->getAllCategories();
+
+        $formActionUrl = $this->urlGenerator->route('torrents.update', $torrent);
+
+        return $this->responseFactory->view('torrents.edit', compact('categories', 'torrent', 'formActionUrl'));
+    }
+
+    public function update(Request $request, Torrent $torrent): RedirectResponse
+    {
+        try {
+            $this->gate->authorize('update', $torrent);
+        } catch (AuthorizationException $exception) {
+            return $this->responseFactory->redirectToRoute('torrents.index')
+                ->with('error', $this->translator->trans('messages.torrent.not_allowed_to_edit'));
+        }
+
+        $validator = $this->validatorFactory->make(
+            $request->all(),
+            [
+                'name' => 'required|string|min:5|max:255|unique:torrents',
+                'description' => 'required|string|min:30',
+                'category' => 'required|integer|exists:torrent_categories,id',
+                'imdb_url' => 'nullable|url',
+            ]
+        );
+
+        if ($validator->fails()) {
+            return $this->responseFactory->redirectToRoute('torrents.edit', $torrent)
+                ->withErrors($validator)
+                ->withInput();
+        }
+
+        $torrent->name = $request->input('name');
+        $torrent->description = $request->input('description');
+        $torrent->category_id = $request->input('category');
+
+        $category = TorrentCategory::findOrFail($request->input('category'));
+
+        if (true === $request->filled('imdb_url') && true === $category->imdb) {
+            try {
+                $imdbId = $this->IMDBManager->getIMDBIdFromFullURL($request->input('imdb_url'));
+                $torrent->imdb_id = $imdbId;
+            } catch (Exception $exception) {
+            }
+        }
+
+        $torrent->save();
+
+        return $this->responseFactory->redirectToRoute('torrents.edit', $torrent)
+            ->with('success', $this->translator->trans('messages.torrent.successfully_updated'));
     }
 
     public function download(

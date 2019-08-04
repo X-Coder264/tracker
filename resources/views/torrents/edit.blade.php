@@ -17,7 +17,3 @@
     </div>
 </div>
 @endsection
-
-@section('scripts')
-    <script src="{{ asset('js/getName.js') }}"></script>
-@endsection

@@ -9,9 +9,8 @@ use App\Models\Torrent;
 use Illuminate\Http\Request;
 use App\Models\TorrentCategory;
 use App\Models\TorrentInfoHash;
-use Illuminate\Auth\AuthManager;
 use App\Services\IMDb\IMDBManager;
-use Illuminate\Cache\CacheManager;
+use Illuminate\Contracts\Auth\Guard;
 use Illuminate\Filesystem\Filesystem;
 use App\Services\IMDb\IMDBImagesManager;
 use App\Exceptions\FileNotWritableException;
@@ -39,9 +38,9 @@ class TorrentUploadManager
     private $torrentInfoService;
 
     /**
-     * @var AuthManager
+     * @var Guard
      */
-    private $authManager;
+    private $guard;
 
     /**
      * @var Filesystem
@@ -64,11 +63,6 @@ class TorrentUploadManager
     private $translator;
 
     /**
-     * @var CacheManager
-     */
-    private $cacheManager;
-
-    /**
      * @var IMDBManager
      */
     private $IMDBManager;
@@ -82,24 +76,22 @@ class TorrentUploadManager
         Bencoder $encoder,
         Bdecoder $decoder,
         TorrentInfoService $torrentInfoService,
-        AuthManager $authManager,
+        Guard $guard,
         Filesystem $filesystem,
         FilesystemManager $filesystemManager,
         UrlGenerator $urlGenerator,
         Translator $translator,
-        CacheManager $cacheManager,
         IMDBManager $IMDBManager,
         IMDBImagesManager $IMDBImagesManager
     ) {
         $this->encoder = $encoder;
         $this->decoder = $decoder;
         $this->torrentInfoService = $torrentInfoService;
-        $this->authManager = $authManager;
+        $this->guard = $guard;
         $this->filesystem = $filesystem;
         $this->filesystemManager = $filesystemManager;
         $this->urlGenerator = $urlGenerator;
         $this->translator = $translator;
-        $this->cacheManager = $cacheManager;
         $this->IMDBManager = $IMDBManager;
         $this->IMDBImagesManager = $IMDBImagesManager;
     }
@@ -154,8 +146,9 @@ class TorrentUploadManager
             }
         } while (true !== $this->areHashesUnique($infoHashes));
 
-        $category = TorrentCategory::where('id', '=', $request->input('category'))->firstOrFail();
+        $category = TorrentCategory::findOrFail($request->input('category'));
 
+        $imdbId = null;
         if (true === $request->filled('imdb_url') && true === $category->imdb) {
             try {
                 $imdbId = $this->IMDBManager->getIMDBIdFromFullURL($request->input('imdb_url'));
@@ -168,9 +161,9 @@ class TorrentUploadManager
         $torrent->name = $request->input('name');
         $torrent->size = $torrentSize;
         $torrent->description = $request->input('description');
-        $torrent->uploader_id = $this->authManager->guard()->id();
+        $torrent->uploader_id = $this->guard->id();
         $torrent->category_id = $category->id;
-        $torrent->imdb_id = $imdbId ?? null;
+        $torrent->imdb_id = $imdbId;
         $torrent->save();
         $torrent->infoHashes()->saveMany($torrentInfoHashModels);
 

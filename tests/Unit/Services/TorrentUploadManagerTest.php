@@ -8,10 +8,9 @@ use Tests\TestCase;
 use ReflectionClass;
 use App\Services\Bdecoder;
 use App\Services\Bencoder;
-use Illuminate\Auth\AuthManager;
 use App\Services\IMDb\IMDBManager;
-use Illuminate\Cache\CacheManager;
 use App\Services\TorrentInfoService;
+use Illuminate\Contracts\Auth\Guard;
 use Illuminate\Filesystem\Filesystem;
 use App\Services\TorrentUploadManager;
 use App\Services\IMDb\IMDBImagesManager;
@@ -43,12 +42,11 @@ class TorrentUploadManagerTest extends TestCase
             $encoder,
             $decoder,
             $torrentInfoService,
-            $this->app->make(AuthManager::class),
+            $this->app->make(Guard::class),
             $this->app->make(Filesystem::class),
             $this->app->make(FilesystemManager::class),
             $this->app->make(UrlGenerator::class),
             $this->app->make(Translator::class),
-            $this->app->make(CacheManager::class),
             $this->app->make(IMDBManager::class),
             $this->app->make(IMDBImagesManager::class)
         );
@@ -80,12 +78,11 @@ class TorrentUploadManagerTest extends TestCase
             $encoder,
             $decoder,
             $torrentInfoService,
-            $this->app->make(AuthManager::class),
+            $this->app->make(Guard::class),
             $this->app->make(Filesystem::class),
             $this->app->make(FilesystemManager::class),
             $this->app->make(UrlGenerator::class),
             $this->app->make(Translator::class),
-            $this->app->make(CacheManager::class),
             $this->app->make(IMDBManager::class),
             $this->app->make(IMDBImagesManager::class)
         );

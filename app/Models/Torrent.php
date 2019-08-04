@@ -8,10 +8,19 @@ use Facades\App\Services\SizeFormatter;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 use Cviebrock\EloquentSluggable\Sluggable;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Cviebrock\EloquentSluggable\SluggableScopeHelpers;
 
+/**
+ * @property User $uploader
+ * @property Collection|TorrentInfoHash[] $infoHashes
+ * @property Collection|Peer[] $peers
+ * @property Collection|TorrentComment[] $comments
+ * @property TorrentCategory $category
+ * @property Collection|Snatch[] $snatches
+ */
 class Torrent extends Model
 {
     use Sluggable;

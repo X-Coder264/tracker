@@ -139,5 +139,8 @@ return [
     'common.currently-seeding' => 'Currently seeding',
     'common.currently-leeching' => 'Currently leeching',
     'common.no-torrents-on-seed' => 'There are no torrents being seeded at the moment.',
-    'common.no-torrents-on-leech' => 'There are no torrents being leeched at the moment.'
+    'common.no-torrents-on-leech' => 'There are no torrents being leeched at the moment.',
+    'torrent.successfully_updated' => 'The torrent was succesfully updated.',
+    'torrent.not_allowed_to_edit' => 'You are not allowed to edit this torrent.',
+    'torrent.edit' => 'Edit',
 ];

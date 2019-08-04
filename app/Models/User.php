@@ -12,11 +12,19 @@ use Facades\App\Services\SizeFormatter;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Builder;
 use Cviebrock\EloquentSluggable\Sluggable;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Cviebrock\EloquentSluggable\SluggableScopeHelpers;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
+/**
+ * @property Collection|Torrent[] $torrents
+ * @property Locale $language
+ * @property Collection|Snatch[] $snatches
+ * @property Collection|Thread[] $threads
+ * @property Collection|News[] $news
+ */
 class User extends Authenticatable
 {
     use Notifiable, Sluggable, SluggableScopeHelpers, HasRoles;

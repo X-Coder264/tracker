@@ -16,12 +16,12 @@ use Illuminate\Http\Response;
 use App\Models\TorrentCategory;
 use App\Models\TorrentInfoHash;
 use App\Services\SizeFormatter;
-use Illuminate\Auth\AuthManager;
 use Illuminate\Http\Testing\File;
 use Illuminate\Http\UploadedFile;
 use App\Services\IMDb\IMDBManager;
 use Illuminate\Cache\CacheManager;
 use App\Services\TorrentInfoService;
+use Illuminate\Contracts\Auth\Guard;
 use Illuminate\Filesystem\Filesystem;
 use App\Services\TorrentUploadManager;
 use Illuminate\Support\Facades\Storage;
@@ -65,7 +65,7 @@ class TorrentUploadManagerTest extends TestCase
         Storage::fake('imdb-images');
 
         $torrentName = 'Test name';
-        $torrentDescription = 'Test description';
+        $torrentDescription = str_repeat('Test foo', 20);
 
         $response = $this->from(route('torrents.create'))->post(route('torrents.store'), [
             'torrent'     => $torrentFile,
@@ -148,7 +148,7 @@ class TorrentUploadManagerTest extends TestCase
         Storage::fake('torrents');
 
         $torrentName = 'Test name';
-        $torrentDescription = 'Test description';
+        $torrentDescription = str_repeat('Test foo', 20);
 
         $response = $this->from(route('torrents.create'))->post(route('torrents.store'), [
             'torrent'     => $torrentFile,
@@ -225,7 +225,7 @@ class TorrentUploadManagerTest extends TestCase
         Storage::fake('torrents');
 
         $torrentName = 'Test name';
-        $torrentDescription = 'Test description';
+        $torrentDescription = str_repeat('Test foo', 20);
 
         $response = $this->from(route('torrents.create'))->post(route('torrents.store'), [
             'torrent'     => $torrentFile,
@@ -303,7 +303,7 @@ class TorrentUploadManagerTest extends TestCase
         $this->app->instance(TorrentInfoService::class, $infoService);
 
         $torrentName = 'Test name';
-        $torrentDescription = 'Test description';
+        $torrentDescription = str_repeat('Test foo', 20);
 
         $response = $this->from(route('torrents.create'))->post(route('torrents.store'), [
             'torrent'     => File::create('file.torrent'),
@@ -361,7 +361,7 @@ class TorrentUploadManagerTest extends TestCase
         $encoder->method('encode')->willReturn($torrentValue);
 
         $torrentName = 'Test name';
-        $torrentDescription = 'Test description';
+        $torrentDescription = str_repeat('Test foo', 20);
 
         $response = $this->from(route('torrents.create'))->post(route('torrents.store'), [
             'torrent'     => File::create('file.torrent'),
@@ -426,7 +426,7 @@ class TorrentUploadManagerTest extends TestCase
         Storage::fake('imdb-images');
 
         $torrentName = 'Test name';
-        $torrentDescription = 'Test description';
+        $torrentDescription = str_repeat('Test foo', 20);
 
         $imdbManager = $this->createMock(IMDBManager::class);
         $imdbManager->expects($this->once())
@@ -513,7 +513,7 @@ class TorrentUploadManagerTest extends TestCase
         $encoder->method('encode')->willReturn($torrentValue);
 
         $torrentName = 'Test name';
-        $torrentDescription = 'Test description';
+        $torrentDescription = str_repeat('Test foo', 20);
 
         $response = $this->from(route('torrents.create'))->post(route('torrents.store'), [
             'torrent'     => File::create('file.torrent'),
@@ -582,7 +582,7 @@ class TorrentUploadManagerTest extends TestCase
         $encoder->method('encode')->willReturn($torrentValue);
 
         $torrentName = 'Test name';
-        $torrentDescription = 'Test description';
+        $torrentDescription = str_repeat('Test foo', 20);
 
         $response = $this->from(route('torrents.create'))->post(route('torrents.store'), [
             'torrent'     => File::create('file.torrent'),
@@ -630,7 +630,7 @@ class TorrentUploadManagerTest extends TestCase
         $this->app->instance(Bdecoder::class, $decoder);
 
         $torrentName = 'Test name';
-        $torrentDescription = 'Test description';
+        $torrentDescription = str_repeat('Test foo', 20);
 
         $response = $this->from(route('torrents.create'))->post(route('torrents.store'), [
             'torrent'     => File::create('file.torrent'),
@@ -671,7 +671,7 @@ class TorrentUploadManagerTest extends TestCase
         $this->assertArrayNotHasKey('private', $decodedTorrent['info']);
 
         $torrentName = 'Test name';
-        $torrentDescription = 'Test description';
+        $torrentDescription = str_repeat('Test foo', 20);
 
         $response = $this->from(route('torrents.create'))->post(route('torrents.store'), [
             'torrent'     => $torrentFile,
@@ -709,7 +709,7 @@ class TorrentUploadManagerTest extends TestCase
         );
 
         $torrentName = 'Test name';
-        $torrentDescription = 'Test description';
+        $torrentDescription = str_repeat('Test foo', 20);
 
         $response = $this->from(route('torrents.create'))->post(route('torrents.store'), [
             'torrent'     => $torrentFile,
@@ -763,12 +763,11 @@ class TorrentUploadManagerTest extends TestCase
                     $encoder,
                     $decoder,
                     $infoService,
-                    $this->app->make(AuthManager::class),
+                    $this->app->make(Guard::class),
                     $this->app->make(Filesystem::class),
                     $this->app->make(FilesystemManager::class),
                     $this->app->make(UrlGenerator::class),
                     $this->app->make(Translator::class),
-                    $this->app->make(CacheManager::class),
                     $this->app->make(IMDBManager::class),
                     $this->app->make(IMDBImagesManager::class),
                 ]
@@ -790,7 +789,7 @@ class TorrentUploadManagerTest extends TestCase
         $this->app->instance(TorrentUploadManager::class, $torrentUploadManager);
 
         $torrentName = 'Test name';
-        $torrentDescription = 'Test description';
+        $torrentDescription = str_repeat('Test foo', 20);
 
         $response = $this->from(route('torrents.create'))->post(route('torrents.store'), [
             'torrent'     => File::create('file.torrent'),
@@ -838,7 +837,7 @@ class TorrentUploadManagerTest extends TestCase
         );
 
         $torrentName = 'Test name';
-        $torrentDescription = 'Test description';
+        $torrentDescription = str_repeat('Test foo', 20);
 
         $response = $this->from(route('torrents.create'))->post(route('torrents.store'), [
             'torrent'     => $torrentFile,
@@ -884,7 +883,7 @@ class TorrentUploadManagerTest extends TestCase
         $encoder->method('encode')->willReturn($torrentValue);
 
         $torrentName = 'Test name';
-        $torrentDescription = 'Test description';
+        $torrentDescription = str_repeat('Test foo', 20);
 
         $response = $this->from(route('torrents.create'))->post(route('torrents.store'), [
             'torrent'     => File::create('file.torrent'),
