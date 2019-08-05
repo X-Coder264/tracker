@@ -8,13 +8,14 @@ use Tests\TestCase;
 use App\Models\User;
 use App\Models\Locale;
 use Illuminate\Http\Response;
+use Illuminate\Contracts\Hashing\Hasher;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 
 class LoginControllerTest extends TestCase
 {
     use DatabaseTransactions;
 
-    public function testUserCanViewTheLoginForm()
+    public function testUserCanViewTheLoginForm(): void
     {
         $this->withoutExceptionHandling();
 
@@ -24,7 +25,7 @@ class LoginControllerTest extends TestCase
         $response->assertViewIs('auth.login');
     }
 
-    public function testUserCanLoginWithCorrectCredentials()
+    public function testUserCanLoginWithCorrectCredentials(): void
     {
         $this->withoutExceptionHandling();
 
@@ -35,7 +36,7 @@ class LoginControllerTest extends TestCase
         $user = new User();
         $user->name = 'test';
         $user->email = $email;
-        $user->password = $password;
+        $user->password = $this->app->make(Hasher::class)->make($password);
         $user->locale_id = $locale->id;
         $user->timezone = 'Europe/Zagreb';
         $user->save();
@@ -61,7 +62,7 @@ class LoginControllerTest extends TestCase
         $user = new User();
         $user->name = 'test';
         $user->email = $email;
-        $user->password = $password;
+        $user->password = $this->app->make(Hasher::class)->make($password);
         $user->locale_id = $locale->id;
         $user->timezone = 'Europe/Zagreb';
         $user->banned = true;
@@ -78,10 +79,10 @@ class LoginControllerTest extends TestCase
         $response->assertSessionHas('error', trans('messages.user.banned'));
     }
 
-    public function testUserCannotLoginWithIncorrectPassword()
+    public function testUserCannotLoginWithIncorrectPassword(): void
     {
         $user = factory(User::class)->create([
-            'password' => 'test123',
+            'password' => $this->app->make(Hasher::class)->make('test123'),
         ]);
 
         $response = $this->from(route('login'))->post(route('login'), [
@@ -96,7 +97,7 @@ class LoginControllerTest extends TestCase
         $this->assertGuest();
     }
 
-    public function testUserCannotLoginWithEmailThatDoesNotExist()
+    public function testUserCannotLoginWithEmailThatDoesNotExist(): void
     {
         $response = $this->from(route('login'))->post(route('login'), [
             'email' => 'test123@gmail.com',
@@ -110,12 +111,12 @@ class LoginControllerTest extends TestCase
         $this->assertGuest();
     }
 
-    public function testRememberMeFunctionality()
+    public function testRememberMeFunctionality(): void
     {
         $password = 'test1234';
 
         $user = factory(User::class)->create([
-            'password' => $password,
+            'password' => $this->app->make(Hasher::class)->make($password),
         ]);
 
         $response = $this->post(route('login'), [
@@ -134,7 +135,7 @@ class LoginControllerTest extends TestCase
         $this->assertAuthenticatedAs($user);
     }
 
-    public function testEmailIsRequired()
+    public function testEmailIsRequired(): void
     {
         $response = $this->from(route('login'))->post(route('login'), $this->validParams([
             'email' => '',
@@ -147,7 +148,7 @@ class LoginControllerTest extends TestCase
         $this->assertGuest();
     }
 
-    public function testPasswordIsRequired()
+    public function testPasswordIsRequired(): void
     {
         $response = $this->from(route('login'))->post(route('login'), $this->validParams([
             'password' => '',
@@ -160,7 +161,7 @@ class LoginControllerTest extends TestCase
         $this->assertGuest();
     }
 
-    public function testLoggedInUserGetsRedirectedToTheHomePage()
+    public function testLoggedInUserGetsRedirectedToTheHomePage(): void
     {
         $user = factory(User::class)->create();
         $this->actingAs($user);
@@ -169,7 +170,7 @@ class LoginControllerTest extends TestCase
         $response->assertRedirect(route('home'));
     }
 
-    public function testUserCanLogout()
+    public function testUserCanLogout(): void
     {
         $user = factory(User::class)->create();
         $this->actingAs($user);
@@ -179,10 +180,10 @@ class LoginControllerTest extends TestCase
         $this->assertGuest();
     }
 
-    public function testUserCannotMakeMoreThanFiveAttemptsInOneMinute()
+    public function testUserCannotMakeMoreThanFiveAttemptsInOneMinute(): void
     {
         $user = factory(User::class)->create([
-            'password' => 'test123',
+            'password' => $this->app->make(Hasher::class)->make('test123'),
         ]);
 
         foreach (range(0, 5) as $x) {
@@ -210,10 +211,7 @@ class LoginControllerTest extends TestCase
         $this->assertGuest();
     }
 
-    /**
-     * @param array $overrides
-     */
-    private function validParams($overrides = []): array
+    private function validParams(array $overrides = []): array
     {
         $locale = factory(Locale::class)->create();
         $email = 'test@gmail.com';
@@ -222,7 +220,7 @@ class LoginControllerTest extends TestCase
         $user = new User();
         $user->name = 'test';
         $user->email = $email;
-        $user->password = $password;
+        $user->password = $this->app->make(Hasher::class)->make($password);
         $user->locale_id = $locale->id;
         $user->timezone = 'Europe/Zagreb';
         $user->save();

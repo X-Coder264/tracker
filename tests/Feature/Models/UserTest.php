@@ -10,7 +10,6 @@ use App\Models\User;
 use App\Models\Locale;
 use App\Models\Snatch;
 use App\Models\Torrent;
-use Illuminate\Support\Facades\Hash;
 use App\Models\PrivateMessages\Thread;
 use Facades\App\Services\SizeFormatter;
 use Illuminate\Database\Eloquent\Collection;
@@ -21,22 +20,6 @@ use Illuminate\Foundation\Testing\DatabaseTransactions;
 class UserTest extends TestCase
 {
     use DatabaseTransactions;
-
-    public function testPasswordMutator(): void
-    {
-        $password = 'test password 123';
-
-        $locale = factory(Locale::class)->create();
-        $user = new User();
-        $user->email = 'test@gmail.com';
-        $user->name = 'test name';
-        $user->password = $password;
-        $user->locale_id = $locale->id;
-        $user->timezone = 'Europe/Zagreb';
-        $user->save();
-
-        $this->assertTrue(Hash::check($password, $user->password));
-    }
 
     public function testUserHasSlug(): void
     {

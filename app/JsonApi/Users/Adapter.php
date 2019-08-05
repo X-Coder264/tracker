@@ -6,7 +6,9 @@ namespace App\JsonApi\Users;
 
 use App\Models\User;
 use Illuminate\Support\Collection;
+use Illuminate\Contracts\Hashing\Hasher;
 use CloudCreativity\LaravelJsonApi\Eloquent\BelongsTo;
+use CloudCreativity\LaravelJsonApi\Document\ResourceObject;
 use CloudCreativity\LaravelJsonApi\Eloquent\AbstractAdapter;
 use CloudCreativity\LaravelJsonApi\Pagination\StandardStrategy;
 use Neomerx\JsonApi\Contracts\Encoder\Parameters\EncodingParametersInterface;
@@ -19,11 +21,18 @@ class Adapter extends AbstractAdapter
 
     protected $includePaths = ['locale' => 'language'];
 
-    public function __construct(StandardStrategy $paging)
+    /**
+     * @var Hasher
+     */
+    private $hasher;
+
+    public function __construct(StandardStrategy $paging, Hasher $hasher)
     {
         $paging->withMetaKey(null);
 
         parent::__construct(new User(), $paging);
+
+        $this->hasher = $hasher;
     }
 
     protected function filter($query, Collection $filters)
@@ -66,5 +75,10 @@ class Adapter extends AbstractAdapter
     protected function locale(): BelongsTo
     {
         return $this->belongsTo('language');
+    }
+
+    protected function creating(User $user, ResourceObject $resource): void
+    {
+        $user->password = $this->hasher->make($resource['password']);
     }
 }

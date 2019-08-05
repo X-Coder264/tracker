@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Models;
 
 use App\Notifications\ResetPassword;
-use Illuminate\Support\Facades\Hash;
 use App\Models\PrivateMessages\Thread;
 use Spatie\Permission\Traits\HasRoles;
 use Facades\App\Services\SizeFormatter;
@@ -82,14 +81,6 @@ class User extends Authenticatable
     public function getRouteKeyName()
     {
         return 'slug';
-    }
-
-    /**
-     * Set the user's password.
-     */
-    public function setPasswordAttribute(string $password): void
-    {
-        $this->attributes['password'] = Hash::make($password);
     }
 
     /**

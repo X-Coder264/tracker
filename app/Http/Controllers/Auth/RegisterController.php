@@ -9,6 +9,7 @@ use App\Models\Locale;
 use Illuminate\Http\Response;
 use Illuminate\Validation\Rule;
 use Illuminate\Routing\Controller;
+use Illuminate\Contracts\Hashing\Hasher;
 use Illuminate\Contracts\Routing\UrlGenerator;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Auth\RegistersUsers;
@@ -41,11 +42,17 @@ class RegisterController extends Controller
      */
     private $urlGenerator;
 
-    public function __construct(ValidatorFactory $validatorFactory, UrlGenerator $urlGenerator)
+    /**
+     * @var Hasher
+     */
+    private $hasher;
+
+    public function __construct(ValidatorFactory $validatorFactory, UrlGenerator $urlGenerator, Hasher $hasher)
     {
         $this->middleware(RedirectIfAuthenticated::class);
         $this->validatorFactory = $validatorFactory;
         $this->urlGenerator = $urlGenerator;
+        $this->hasher = $hasher;
     }
 
     public function showRegistrationForm(ResponseFactory $responseFactory): Response
@@ -77,7 +84,7 @@ class RegisterController extends Controller
         return User::create([
             'name'      => $data['name'],
             'email'     => $data['email'],
-            'password'  => $data['password'],
+            'password'  => $this->hasher->make($data['password']),
             'timezone'  => $data['timezone'],
             'locale_id' => $data['locale'],
         ]);

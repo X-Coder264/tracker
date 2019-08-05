@@ -8,10 +8,10 @@ use Tests\TestCase;
 use App\Models\User;
 use App\Models\Locale;
 use Illuminate\Http\Response;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Contracts\Hashing\Hasher;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 
@@ -19,7 +19,7 @@ class RegisterControllerTest extends TestCase
 {
     use DatabaseTransactions;
 
-    public function testUserCanViewTheRegistrationForm()
+    public function testUserCanViewTheRegistrationForm(): void
     {
         $this->withoutExceptionHandling();
 
@@ -31,7 +31,7 @@ class RegisterControllerTest extends TestCase
         $response->assertViewHas('locales');
     }
 
-    public function testUserCanRegister()
+    public function testUserCanRegister(): void
     {
         $this->withoutExceptionHandling();
 
@@ -66,7 +66,7 @@ class RegisterControllerTest extends TestCase
         $user = User::firstOrFail();
         $this->assertSame($user->name, $name);
         $this->assertSame($user->email, $email);
-        $this->assertTrue(Hash::check($password, $user->password));
+        $this->assertTrue($this->app->make(Hasher::class)->check($password, $user->password));
         $this->assertSame($user->timezone, $timezone);
         $this->assertTrue($user->language->is($locale));
         $this->assertNotEmpty($user->passkey);
@@ -78,7 +78,7 @@ class RegisterControllerTest extends TestCase
         });
     }
 
-    public function testNameIsRequired()
+    public function testNameIsRequired(): void
     {
         $response = $this->from(route('register'))->post(route('register'), $this->validParams([
             'name' => '',
@@ -90,7 +90,7 @@ class RegisterControllerTest extends TestCase
         $this->assertGuest();
     }
 
-    public function testNameMustBeLessThan256CharsLong()
+    public function testNameMustBeLessThan256CharsLong(): void
     {
         $response = $this->from(route('register'))->post(route('register'), $this->validParams([
             'name' => str_repeat('X', 256),
@@ -103,7 +103,7 @@ class RegisterControllerTest extends TestCase
         $this->assertGuest();
     }
 
-    public function testNameMustBeUnique()
+    public function testNameMustBeUnique(): void
     {
         $user = factory(User::class)->create();
         $response = $this->from(route('register'))->post(route('register'), $this->validParams([
@@ -117,7 +117,7 @@ class RegisterControllerTest extends TestCase
         $this->assertGuest();
     }
 
-    public function testEmailIsRequired()
+    public function testEmailIsRequired(): void
     {
         $response = $this->from(route('register'))->post(route('register'), $this->validParams([
             'email' => '',
@@ -129,7 +129,7 @@ class RegisterControllerTest extends TestCase
         $this->assertGuest();
     }
 
-    public function testEmailMustBeLessThan256CharsLong()
+    public function testEmailMustBeLessThan256CharsLong(): void
     {
         $response = $this->from(route('register'))->post(route('register'), $this->validParams([
             'email' => str_repeat('X', 256),
@@ -142,7 +142,7 @@ class RegisterControllerTest extends TestCase
         $this->assertGuest();
     }
 
-    public function testEmailMustBeUnique()
+    public function testEmailMustBeUnique(): void
     {
         $user = factory(User::class)->create();
         $response = $this->from(route('register'))->post(route('register'), $this->validParams([
@@ -156,7 +156,7 @@ class RegisterControllerTest extends TestCase
         $this->assertGuest();
     }
 
-    public function testEmailMustBeAValidEmail()
+    public function testEmailMustBeAValidEmail(): void
     {
         $response = $this->from(route('register'))->post(route('register'), $this->validParams([
             'email' => 'xyz',
@@ -169,7 +169,7 @@ class RegisterControllerTest extends TestCase
         $this->assertGuest();
     }
 
-    public function testPasswordIsRequired()
+    public function testPasswordIsRequired(): void
     {
         $response = $this->from(route('register'))->post(route('register'), $this->validParams([
             'password' => '',
@@ -183,7 +183,7 @@ class RegisterControllerTest extends TestCase
         $this->assertGuest();
     }
 
-    public function testPasswordMustHaveAtLeast8Chars()
+    public function testPasswordMustHaveAtLeast8Chars(): void
     {
         $response = $this->from(route('register'))->post(route('register'), $this->validParams([
             'password' => str_repeat('X', 7),
@@ -197,7 +197,7 @@ class RegisterControllerTest extends TestCase
         $this->assertGuest();
     }
 
-    public function testPasswordMustBeConfirmed()
+    public function testPasswordMustBeConfirmed(): void
     {
         $response = $this->from(route('register'))->post(route('register'), $this->validParams([
             'password_confirmation' => '1234567',
@@ -210,7 +210,7 @@ class RegisterControllerTest extends TestCase
         $this->assertGuest();
     }
 
-    public function testLocaleIsRequired()
+    public function testLocaleIsRequired(): void
     {
         $response = $this->from(route('register'))->post(route('register'), $this->validParams([
             'locale' => '',
@@ -223,7 +223,7 @@ class RegisterControllerTest extends TestCase
         $this->assertGuest();
     }
 
-    public function testLocaleMustBeAValidLocale()
+    public function testLocaleMustBeAValidLocale(): void
     {
         $response = $this->from(route('register'))->post(route('register'), $this->validParams([
             'locale' => 2,
@@ -236,7 +236,7 @@ class RegisterControllerTest extends TestCase
         $this->assertGuest();
     }
 
-    public function testTimezoneIsRequired()
+    public function testTimezoneIsRequired(): void
     {
         $response = $this->from(route('register'))->post(route('register'), $this->validParams([
             'timezone' => '',
@@ -249,7 +249,7 @@ class RegisterControllerTest extends TestCase
         $this->assertGuest();
     }
 
-    public function testTimezoneMustBeAValidTimezone()
+    public function testTimezoneMustBeAValidTimezone(): void
     {
         $response = $this->from(route('register'))->post(route('register'), $this->validParams([
             'timezone' => 'Europe/Zagre',
@@ -262,7 +262,7 @@ class RegisterControllerTest extends TestCase
         $this->assertGuest();
     }
 
-    public function testLoggedInUserGetsRedirectedToTheHomePage()
+    public function testLoggedInUserGetsRedirectedToTheHomePage(): void
     {
         $user = factory(User::class)->create();
         $this->actingAs($user);
@@ -271,17 +271,14 @@ class RegisterControllerTest extends TestCase
         $response->assertRedirect(route('home'));
     }
 
-    private function assertSessionHasOldInput()
+    private function assertSessionHasOldInput(): void
     {
         $this->assertTrue(session()->hasOldInput('name'));
         $this->assertTrue(session()->hasOldInput('email'));
         $this->assertFalse(session()->hasOldInput('password'));
     }
 
-    /**
-     * @param array $overrides
-     */
-    private function validParams($overrides = []): array
+    private function validParams(array $overrides = []): array
     {
         $locale = factory(Locale::class)->create();
 

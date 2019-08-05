@@ -7,6 +7,7 @@ namespace App\Http\Controllers\Auth;
 use App\Models\User;
 use Illuminate\Support\Str;
 use Illuminate\Routing\Controller;
+use Illuminate\Contracts\Hashing\Hasher;
 use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Auth\Authenticatable;
@@ -41,10 +42,16 @@ class ResetPasswordController extends Controller
      */
     private $dispatcher;
 
-    public function __construct(Dispatcher $dispatcher)
+    /**
+     * @var Hasher
+     */
+    private $hasher;
+
+    public function __construct(Dispatcher $dispatcher, Hasher $hasher)
     {
         $this->middleware(RedirectIfAuthenticated::class);
         $this->dispatcher = $dispatcher;
+        $this->hasher = $hasher;
     }
 
     protected function rules(): array
@@ -64,7 +71,7 @@ class ResetPasswordController extends Controller
      */
     protected function resetPassword($user, $password)
     {
-        $user->password = $password;
+        $user->password = $this->hasher->make($password);
 
         $user->setRememberToken(Str::random(60));
 

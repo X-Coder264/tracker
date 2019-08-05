@@ -417,10 +417,7 @@ class UserControllerTest extends TestCase
         $response->assertSessionHasErrors('torrents_per_page');
     }
 
-    /**
-     * @param array $overrides
-     */
-    private function validParams($overrides = []): array
+    private function validParams(array $overrides = []): array
     {
         $locale = factory(Locale::class)->create();
 

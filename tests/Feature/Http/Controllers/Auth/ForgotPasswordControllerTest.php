@@ -9,7 +9,7 @@ use App\Models\User;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
 use App\Notifications\ResetPassword;
-use Illuminate\Support\Facades\Hash;
+use Illuminate\Contracts\Hashing\Hasher;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 
@@ -17,7 +17,7 @@ class ForgotPasswordControllerTest extends TestCase
 {
     use DatabaseTransactions;
 
-    public function testUserCanViewTheEmailPasswordForm()
+    public function testUserCanViewTheEmailPasswordForm(): void
     {
         $this->withoutExceptionHandling();
 
@@ -27,18 +27,18 @@ class ForgotPasswordControllerTest extends TestCase
         $response->assertViewIs('auth.passwords.email');
     }
 
-    public function testUserCannotViewTheEmailPasswordFormWhenAuthenticated()
+    public function testUserCannotViewTheEmailPasswordFormWhenAuthenticated(): void
     {
         $user = factory(User::class)->make();
         $response = $this->actingAs($user)->get(route('password.request'));
         $response->assertRedirect(route('home'));
     }
 
-    public function testUserReceivesAnEmailWithAPasswordResetLink()
+    public function testUserReceivesAnEmailWithAPasswordResetLink(): void
     {
         $this->withoutExceptionHandling();
 
-        Notification::fake();
+        $notificationFake = Notification::fake();
 
         $user = factory(User::class)->create();
 
@@ -53,7 +53,7 @@ class ForgotPasswordControllerTest extends TestCase
         $token = DB::table('password_resets')->first();
         $this->assertNotNull($token);
 
-        Notification::assertSentTo($user, ResetPassword::class, function (ResetPassword $notification) use ($user, $token) {
+        $notificationFake->assertSentTo($user, ResetPassword::class, function (ResetPassword $notification) use ($user, $token) {
             $mailData = $notification->toMail($user)->toArray();
 
             $this->assertSame('info', $mailData['level']);
@@ -71,15 +71,15 @@ class ForgotPasswordControllerTest extends TestCase
             $this->assertSame(trans('messages.reset_password.action'), $mailData['actionText']);
             $this->assertSame(route('password.reset', $notification->token), $mailData['actionUrl']);
 
-            $this->assertTrue(Hash::check($notification->token, $token->token));
+            $this->assertTrue($this->app->make(Hasher::class)->check($notification->token, $token->token));
 
             return true;
         });
     }
 
-    public function testUserDoesNotReceiveEmailWhenNotRegistered()
+    public function testUserDoesNotReceiveEmailWhenNotRegistered(): void
     {
-        Notification::fake();
+        $notificationFake = Notification::fake();
 
         $response = $this->from(route('password.email'))->post(route('password.email'), [
             'email' => 'nobody@example.com',
@@ -88,17 +88,17 @@ class ForgotPasswordControllerTest extends TestCase
         $response->assertRedirect(route('password.email'));
         $response->assertSessionHasErrors('email');
 
-        Notification::assertNothingSent();
+        $notificationFake->assertNothingSent();
     }
 
-    public function testEmailIsRequired()
+    public function testEmailIsRequired(): void
     {
         $response = $this->from(route('password.email'))->post(route('password.email'), []);
         $response->assertRedirect(route('password.email'));
         $response->assertSessionHasErrors('email');
     }
 
-    public function testEmailIsAValidEmail()
+    public function testEmailIsAValidEmail(): void
     {
         $response = $this->from(route('password.email'))->post(route('password.email'), [
             'email' => 'testxyz',

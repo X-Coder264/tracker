@@ -7,8 +7,8 @@ namespace Tests\Feature\Http\Controllers\Auth;
 use Tests\TestCase;
 use App\Models\User;
 use Illuminate\Http\Response;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Contracts\Hashing\Hasher;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
@@ -23,7 +23,7 @@ class ResetPasswordControllerTest extends TestCase
 
         $user = factory(User::class)->create();
 
-        Event::fake(PasswordReset::class);
+        $eventFake = Event::fake(PasswordReset::class);
 
         $token = $this->getValidToken($user);
         $newPassword = '1234567899';
@@ -43,22 +43,22 @@ class ResetPasswordControllerTest extends TestCase
         $updatedUser = User::firstOrFail();
         $this->assertNotSame($user->password, $updatedUser->password);
         $this->assertSame($user->email, $updatedUser->email);
-        $this->assertTrue(Hash::check($newPassword, $updatedUser->password));
+        $this->assertTrue($this->app->make(Hasher::class)->check($newPassword, $updatedUser->password));
 
-        Event::assertDispatched(PasswordReset::class, function (PasswordReset $event) use ($user) {
+        $eventFake->assertDispatched(PasswordReset::class, function (PasswordReset $event) use ($user) {
             $this->assertTrue($user->is($event->user));
 
             return true;
         });
     }
 
-    public function testUserCannotResetPasswordWithAnInvalidToken()
+    public function testUserCannotResetPasswordWithAnInvalidToken(): void
     {
         $this->withoutExceptionHandling();
 
         $password = 'invalid-123';
         $user = factory(User::class)->create([
-            'password' => $password,
+            'password' => $this->app->make(Hasher::class)->make($password),
         ]);
 
         $response = $this->from(route('password.reset', 'invalid-token'))->post(route('password.request'), [
@@ -70,15 +70,15 @@ class ResetPasswordControllerTest extends TestCase
 
         $response->assertRedirect(route('password.reset', 'invalid-token'));
         $this->assertSame($user->email, $user->fresh()->email);
-        $this->assertTrue(Hash::check($password, $user->fresh()->password));
+        $this->assertTrue($this->app->make(Hasher::class)->check($password, $user->fresh()->password));
         $this->assertGuest();
     }
 
-    public function testUserCannotResetPasswordWithoutProvidingANewPassword()
+    public function testUserCannotResetPasswordWithoutProvidingANewPassword(): void
     {
         $password = 'fesfgertgreze';
         $user = factory(User::class)->create([
-            'password' => $password,
+            'password' => $this->app->make(Hasher::class)->make($password),
         ]);
 
         $token = $this->getValidToken($user);
@@ -95,15 +95,15 @@ class ResetPasswordControllerTest extends TestCase
         $this->assertTrue(session()->hasOldInput('email'));
         $this->assertFalse(session()->hasOldInput('password'));
         $this->assertSame($user->email, $user->fresh()->email);
-        $this->assertTrue(Hash::check($password, $user->fresh()->password));
+        $this->assertTrue($this->app->make(Hasher::class)->check($password, $user->fresh()->password));
         $this->assertGuest();
     }
 
-    public function testUserCannotResetPasswordWithoutProvingAnEmail()
+    public function testUserCannotResetPasswordWithoutProvingAnEmail(): void
     {
         $password = 'fesfgertgreze';
         $user = factory(User::class)->create([
-            'password' => $password,
+            'password' => $this->app->make(Hasher::class)->make($password),
         ]);
 
         $token = $this->getValidToken($user);
@@ -119,7 +119,7 @@ class ResetPasswordControllerTest extends TestCase
         $response->assertSessionHasErrors('email');
         $this->assertFalse(session()->hasOldInput('password'));
         $this->assertSame($user->email, $user->fresh()->email);
-        $this->assertTrue(Hash::check($password, $user->fresh()->password));
+        $this->assertTrue($this->app->make(Hasher::class)->check($password, $user->fresh()->password));
         $this->assertGuest();
     }
 

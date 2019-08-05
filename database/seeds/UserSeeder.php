@@ -4,18 +4,16 @@ declare(strict_types=1);
 
 use App\Models\User;
 use Illuminate\Database\Seeder;
+use Illuminate\Contracts\Hashing\Hasher;
 
 class UserSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
-    public function run()
+    public function run(Hasher $hasher)
     {
         $user = new User();
         $user->name = 'PirateKing';
         $user->email = 'antonio.pauletich95@gmail.com';
-        $user->password = '123456';
+        $user->password = $hasher->make('123456');
         $user->passkey = bin2hex(random_bytes(32));
         $user->locale_id = 1;
         $user->timezone = 'Europe/Zagreb';
@@ -26,7 +24,7 @@ class UserSeeder extends Seeder
         $user = new User();
         $user->name = 'test';
         $user->email = 'test@gmail.com';
-        $user->password = '123456';
+        $user->password = $hasher->make('123456');
         $user->passkey = bin2hex(random_bytes(32));
         $user->locale_id = 2;
         $user->timezone = 'UTC';
@@ -36,7 +34,7 @@ class UserSeeder extends Seeder
         $user = new User();
         $user->name = 'test2';
         $user->email = 'test2@gmail.com';
-        $user->password = '123456';
+        $user->password = $hasher->make('123456');
         $user->passkey = bin2hex(random_bytes(32));
         $user->locale_id = 1;
         $user->timezone = 'America/Los_Angeles';

@@ -22,12 +22,10 @@ use Illuminate\Database\Eloquent\Factory;
 
 /** @var Factory $factory */
 $factory->define(User::class, function (Faker $faker) {
-    static $password;
-
     return [
         'name' => $faker->unique()->firstName,
         'email' => $faker->unique()->safeEmail,
-        'password' => $password ?: $password = 'secret',
+        'password' => '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', // password
         'passkey' => bin2hex(random_bytes(32)),
         'remember_token' => Str::random(10),
         'locale_id' => function () {

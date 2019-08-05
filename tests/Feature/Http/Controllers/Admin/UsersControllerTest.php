@@ -11,7 +11,7 @@ use Tests\AdminApiTestCase;
 use Illuminate\Http\Response;
 use App\JsonApi\ResourceTypes;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\Hash;
+use Illuminate\Contracts\Hashing\Hasher;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 
 class UsersControllerTest extends AdminApiTestCase
@@ -106,7 +106,7 @@ class UsersControllerTest extends AdminApiTestCase
         $this->assertSame($name, $user->name);
         $this->assertSame($email, $user->email);
         $this->assertSame($timezone, $user->timezone);
-        $this->assertTrue(Hash::check($password, $user->password));
+        $this->assertTrue($this->app->make(Hasher::class)->check($password, $user->password));
         $this->assertNotEmpty($user->passkey);
         $this->assertSame(64, strlen($user->passkey));
         $this->assertNotNull($user->slug);
