@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use Illuminate\Contracts\Routing\Registrar;
 use CloudCreativity\LaravelJsonApi\Facades\JsonApi;
 use CloudCreativity\LaravelJsonApi\Routing\RouteRegistrar;
 
@@ -16,8 +17,11 @@ use CloudCreativity\LaravelJsonApi\Routing\RouteRegistrar;
 |
 */
 
-JsonApi::register('default', ['namespace' => 'Admin'], function (RouteRegistrar $registrar) {
-    $registrar->resource('users');
-    $registrar->resource('locales');
-    $registrar->resource('torrents');
+/** @var Registrar $router */
+$router->group(['middleware' => ['auth:api']], function () {
+    JsonApi::register('default', ['namespace' => 'Admin'], function (RouteRegistrar $registrar) {
+        $registrar->resource('users');
+        $registrar->resource('locales');
+        $registrar->resource('torrents');
+    });
 });

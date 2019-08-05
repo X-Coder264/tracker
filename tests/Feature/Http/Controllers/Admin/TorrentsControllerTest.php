@@ -8,6 +8,7 @@ use App\Models\User;
 use App\Models\Torrent;
 use Tests\AdminApiTestCase;
 use Illuminate\Support\Carbon;
+use Laravel\Passport\Passport;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 
 class TorrentsControllerTest extends AdminApiTestCase
@@ -20,7 +21,7 @@ class TorrentsControllerTest extends AdminApiTestCase
 
         $user = factory(User::class)->create();
         $torrents = factory(Torrent::class, 2)->create();
-        $this->actingAs($user);
+        Passport::actingAs($user);
         $response = $this->makeRequest('GET', route('admin.torrents.index'));
         $jsonResponse = $response->getJsonResponse();
 
@@ -63,7 +64,7 @@ class TorrentsControllerTest extends AdminApiTestCase
 
         $user = factory(User::class)->create();
         $torrents = factory(Torrent::class, 2)->create();
-        $this->actingAs($user);
+        Passport::actingAs($user);
         $response = $this->makeRequest('GET', route('admin.torrents.index', ['filter[name]' => $torrents[1]->name]));
         $jsonResponse = $response->getJsonResponse();
 
@@ -95,7 +96,7 @@ class TorrentsControllerTest extends AdminApiTestCase
         $user = factory(User::class)->create();
         factory(Torrent::class, 2)->create();
         $torrent = factory(Torrent::class)->create(['uploader_id' => $user->id]);
-        $this->actingAs($user);
+        Passport::actingAs($user);
         $response = $this->makeRequest('GET', route('admin.torrents.index', ['filter[uploader]' => $user->id]));
         $jsonResponse = $response->getJsonResponse();
 
@@ -126,7 +127,7 @@ class TorrentsControllerTest extends AdminApiTestCase
 
         $user = factory(User::class)->create();
         $torrents = factory(Torrent::class, 2)->create();
-        $this->actingAs($user);
+        Passport::actingAs($user);
         $response = $this->makeRequest('GET', route('admin.torrents.index', ['filter[slug]' => $torrents[1]->slug]));
         $jsonResponse = $response->getJsonResponse();
 
@@ -158,7 +159,7 @@ class TorrentsControllerTest extends AdminApiTestCase
         $user = factory(User::class)->create();
         $firstTorrent = factory(Torrent::class)->create(['size' => 4194303]);
         $secondTorrent = factory(Torrent::class)->create(['size' => 4194305]);
-        $this->actingAs($user);
+        Passport::actingAs($user);
         $response = $this->makeRequest('GET', route('admin.torrents.index', ['filter[minimumSize]' => 4]));
         $jsonResponse = $response->getJsonResponse();
 
@@ -190,7 +191,7 @@ class TorrentsControllerTest extends AdminApiTestCase
         $user = factory(User::class)->create();
         $firstTorrent = factory(Torrent::class)->create(['size' => 4194303]);
         $secondTorrent = factory(Torrent::class)->create(['size' => 4194305]);
-        $this->actingAs($user);
+        Passport::actingAs($user);
         $response = $this->makeRequest('GET', route('admin.torrents.index', ['filter[maximumSize]' => 4]));
         $jsonResponse = $response->getJsonResponse();
 

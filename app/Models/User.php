@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use Laravel\Passport\HasApiTokens;
 use App\Notifications\ResetPassword;
 use App\Models\PrivateMessages\Thread;
 use Spatie\Permission\Traits\HasRoles;
@@ -26,7 +27,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
  */
 class User extends Authenticatable
 {
-    use Notifiable, Sluggable, SluggableScopeHelpers, HasRoles;
+    use Notifiable, Sluggable, SluggableScopeHelpers, HasRoles, HasApiTokens;
 
     /**
      * The attributes that are mass assignable.

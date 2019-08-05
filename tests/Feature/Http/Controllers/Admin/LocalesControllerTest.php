@@ -8,6 +8,7 @@ use App\Models\User;
 use App\Models\Locale;
 use Tests\AdminApiTestCase;
 use Illuminate\Support\Carbon;
+use Laravel\Passport\Passport;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 
 class LocalesControllerTest extends AdminApiTestCase
@@ -20,7 +21,7 @@ class LocalesControllerTest extends AdminApiTestCase
 
         $locale = factory(Locale::class)->create();
         $user = factory(User::class)->create();
-        $this->actingAs($user);
+        Passport::actingAs($user);
         $response = $this->makeRequest('GET', route('admin.locales.index'));
         $jsonResponse = $response->getJsonResponse();
 

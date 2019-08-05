@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Providers;
 
 use App\Models\Torrent;
+use Laravel\Passport\Passport;
 use App\Policies\TorrentPolicy;
 use Illuminate\Contracts\Auth\Access\Gate;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
@@ -28,5 +29,8 @@ class AuthServiceProvider extends ServiceProvider
         foreach ($this->policies as $class => $policy) {
             $gate->policy($class, $policy);
         }
+
+        Passport::routes();
+        Passport::ignoreCsrfToken();
     }
 }

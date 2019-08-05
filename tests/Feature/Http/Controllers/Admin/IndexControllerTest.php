@@ -7,6 +7,7 @@ namespace Tests\Feature\Http\Controllers\Admin;
 use Tests\TestCase;
 use App\Models\User;
 use Illuminate\Http\Response;
+use Laravel\Passport\Passport;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 
 class IndexControllerTest extends TestCase
@@ -16,7 +17,7 @@ class IndexControllerTest extends TestCase
     public function testIndex()
     {
         $user = factory(User::class)->create();
-        $this->actingAs($user);
+        Passport::actingAs($user);
         $response = $this->get(route('admin.index'));
 
         $response->assertStatus(Response::HTTP_OK);
