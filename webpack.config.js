@@ -30,7 +30,7 @@ module.exports = function(env) {
 
         output: {
             path: paths.dist,
-            filename: '[name].js',
+            filename: isProduction ? '[name].[contenthash].js' : '[name].js',
             publicPath: paths.public
         },
 
@@ -57,6 +57,7 @@ module.exports = function(env) {
                     ],
                     exclude: /node_modules/,
                     include: [
+                        path.join(__dirname, 'src'),
                         path.join(__dirname, 'node_modules/@trikoder/trim/src')
                     ]
 

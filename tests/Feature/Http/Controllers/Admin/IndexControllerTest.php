@@ -7,21 +7,28 @@ namespace Tests\Feature\Http\Controllers\Admin;
 use Tests\TestCase;
 use App\Models\User;
 use Illuminate\Http\Response;
-use Laravel\Passport\Passport;
+use Illuminate\Contracts\Config\Repository;
+use Illuminate\Contracts\Routing\UrlGenerator;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 
 class IndexControllerTest extends TestCase
 {
     use DatabaseTransactions;
 
-    public function testIndex()
+    public function testIndex(): void
     {
         $user = factory(User::class)->create();
-        Passport::actingAs($user);
-        $response = $this->get(route('admin.index'));
+        $this->actingAs($user);
+        $response = $this->get($this->app->make(UrlGenerator::class)->route('admin.index'));
 
         $response->assertStatus(Response::HTTP_OK);
         $response->assertViewIs('admin.index');
-        $response->assertViewHasAll([['user' => $user], ['projectName' => config('app.name')], 'enumerations']);
+        $response->assertViewHasAll(
+            [
+                ['user' => $user],
+                ['projectName' => $this->app->make(Repository::class)->get('app.name')],
+                'enumerations',
+            ]
+        );
     }
 }

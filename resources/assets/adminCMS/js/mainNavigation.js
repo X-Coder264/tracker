@@ -13,6 +13,10 @@ export default {
         routeName: 'resource.torrents.index',
         icon: 'messageSquare'
     }, {
+        caption: 'News',
+        key: 'news',
+        routeName: 'resource.news.index'
+    }, {
         caption: 'Locales',
         key: 'locale',
         routeName: 'resource.locales.index',

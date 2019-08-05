@@ -4,9 +4,9 @@
   "description": "admin CMS",
   "private": true,
   "scripts": {
-    "watch:development": "NODE_ENV=development npm run build:development && webpack --watch --progress --colors",
-    "build:development": "NODE_ENV=development webpack --progress --colors --display-error-details",
-    "build:production": "NODE_ENV=production webpack --progress --colors"
+    "watch:development": "cross-env NODE_ENV=development npm run build:development && webpack --watch --progress --colors",
+    "build:development": "cross-env NODE_ENV=development webpack --progress --colors --display-error-details",
+    "build:production": "cross-env NODE_ENV=production webpack --progress --colors"
   },
   "devDependencies": {
     "babel-eslint": "^10.0.2",
@@ -28,6 +28,7 @@
     "axios": "^0.18.1",
     "babel-loader": "^8.0.6",
     "copy-webpack-plugin": "^4.6.0",
+    "cross-env": "^5.2.0",
     "css-loader": "^2.1.1",
     "css-mqpacker": "^7.0.0",
     "dotenv": "^6.2.0",

@@ -4,5 +4,6 @@ export default {
     MainNavigation: () => MainNavigation,
     UsersController: () => import('./controllers/user'),
     LocalesController: () => import('./controllers/locale'),
-    TorrentsController: () => import('./controllers/torrent')
+    TorrentsController: () => import('./controllers/torrent'),
+    NewsController: () => import('./controllers/news')
 };

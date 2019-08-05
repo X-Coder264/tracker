@@ -19,5 +19,6 @@ export default router => {
     router.resource('users');
     router.resource('locales');
     router.resource('torrents');
+    router.resource('news');
 
 };

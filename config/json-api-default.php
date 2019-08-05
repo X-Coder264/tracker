@@ -56,6 +56,7 @@ return [
         'users'    => \App\Models\User::class,
         'locales'  => \App\Models\Locale::class,
         'torrents' => \App\Models\Torrent::class,
+        'news'     => \App\Models\News::class,
     ],
 
     /*

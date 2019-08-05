@@ -8,9 +8,22 @@ use Illuminate\Database\Eloquent\Model;
 use Cviebrock\EloquentSluggable\Sluggable;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+/**
+ * @property string $subject
+ * @property string $text
+ * @property int $user_id
+ * @property User $author
+ */
 class News extends Model
 {
     use Sluggable;
+
+    /**
+     * The attributes that aren't mass assignable.
+     *
+     * @var array
+     */
+    protected $guarded = [];
 
     public function sluggable(): array
     {

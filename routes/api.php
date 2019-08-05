@@ -23,5 +23,6 @@ $router->group(['middleware' => ['auth:api']], function () {
         $registrar->resource('users');
         $registrar->resource('locales');
         $registrar->resource('torrents');
+        $registrar->resource('news');
     });
 });
