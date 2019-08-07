@@ -12,3 +12,7 @@ runCommand "docker/env dev on" "Building and upping Docker containers..."
 title "Dependencies..."
 
 runCommand "docker/enter dev:php composer install -n" "Installing project PHP packages..."
+
+runCommand "docker/enter dev:php ./artisan migrate:refresh --seed" "Migrating fresh database with some dummy data"
+
+runCommand "docker/enter dev:php ./artisan passport:install" "Install Passport"
