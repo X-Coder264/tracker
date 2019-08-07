@@ -26,7 +26,7 @@
     "require-dev": {
         "ext-simplexml": "*",
         "barryvdh/laravel-debugbar": "^3.2",
-        "filp/whoops": "^2.4",
+        "filp/whoops": "^2.5",
         "friendsofphp/php-cs-fixer": "^2.15",
         "fzaninotto/faker": "^1.8",
         "mockery/mockery": "^1.2",
