@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Middleware;
 
 use App\Models\User;
+use Carbon\CarbonImmutable;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Contracts\Auth\Guard;
@@ -45,6 +46,7 @@ class SetUserLocale
             });
             $this->application->setLocale($locale);
             Carbon::setLocale($locale);
+            CarbonImmutable::setLocale($locale);
         }
 
         return $next($request);

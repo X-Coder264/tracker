@@ -7,6 +7,10 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 
+/**
+ * @property string $name
+ * @property mixed $value
+ */
 class Configuration extends Model
 {
     /**

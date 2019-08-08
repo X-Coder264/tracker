@@ -37,9 +37,19 @@ $factory->define(User::class, function (Faker $faker) {
         'torrents_per_page' => $faker->numberBetween(5, 30),
         'banned' => false,
         'last_seen_at' => Carbon::now()->subMinutes($faker->numberBetween(1, 100)),
+        'inviter_user_id' => null,
+        'invites_amount' => 0,
     ];
 });
 
 $factory->state(User::class, 'banned', [
     'banned' => true,
+]);
+
+$factory->state(User::class, 'has_available_invites', [
+    'invites_amount' => 5,
+]);
+
+$factory->state(User::class, 'has_no_available_invites', [
+    'invites_amount' => 0,
 ]);

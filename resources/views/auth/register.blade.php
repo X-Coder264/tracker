@@ -12,6 +12,22 @@
                 <form method="POST" action="{{ route('register') }}">
                     {{ csrf_field() }}
 
+                    @if ($isRegistrationInviteOnly)
+                        <div class="form-group row">
+                            <label for="invite" class="col-md-4 col-form-label text-md-right">{{ trans('messages.invite_code_label_caption') }}</label>
+
+                            <div class="col-md-6">
+                                <input id="invite" type="text" class="form-control{{ $errors->has('invite') ? ' is-invalid' : '' }}" name="invite" value="{{ old('invite') }}" required>
+
+                                @if ($errors->has('invite'))
+                                    <div class="invalid-feedback" role="alert">
+                                        <strong>{{ $errors->first('invite') }}</strong>
+                                    </div>
+                                @endif
+                            </div>
+                        </div>
+                    @endif
+
                     <div class="form-group row">
                         <label for="name" class="col-md-4 col-form-label text-md-right">{{ trans('messages.register.username') }}</label>
 

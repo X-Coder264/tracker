@@ -48,6 +48,9 @@
                         <a class="dropdown-item" href="{{ route('user-torrents.show-uploaded-torrents', auth()->user()) }}">
                             {{ trans('messages.navigation.my-torrents') }}
                         </a>
+                        <a class="dropdown-item" href="{{ route('invites.create') }}">
+                            {{ trans('messages.navigation.invites') }}
+                        </a>
                         <a class="dropdown-item" href="{{ route('logout') }}" onclick="event.preventDefault();
                                                  document.getElementById('logout-form').submit();">
                             {{ trans('messages.navigation.logout') }}

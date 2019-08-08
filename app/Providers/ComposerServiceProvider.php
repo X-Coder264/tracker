@@ -18,7 +18,7 @@ class ComposerServiceProvider extends ServiceProvider
     private $viewsThatNeedTimezoneInfo = [
         'torrents.index', 'torrents.show', 'users.show', 'snatches.show',
         'partials.torrent', 'partials.peer', 'user-snatches.show', 'private-messages.thread-index',
-        'private-messages.thread-show',
+        'private-messages.thread-show', 'invites.create',
     ];
 
     public function boot(ViewFactory $viewFactory): void

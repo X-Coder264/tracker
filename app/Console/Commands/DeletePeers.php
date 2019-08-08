@@ -9,7 +9,7 @@ use App\Repositories\PeerRepository;
 use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Database\ConnectionInterface;
 
-class DeletePeers extends Command
+final class DeletePeers extends Command
 {
     /**
      * The name and signature of the console command.

@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\Http\Middleware;
 
 use Closure;
-use Carbon\Carbon;
 use App\Models\User;
+use Carbon\CarbonImmutable;
 use Illuminate\Http\Request;
 use Illuminate\Contracts\Auth\Guard;
 use Symfony\Component\HttpFoundation\Response;
@@ -39,9 +39,9 @@ class UpdateUserLastSeenAtInfo
             /** @var User $user */
             $user = $this->guard->user();
             $lastSeenAt = $user->last_seen_at;
-            if (null === $lastSeenAt || Carbon::now()->diffInSeconds($lastSeenAt) > self::FIVE_MINUTES_IN_SECONDS) {
+            if (null === $lastSeenAt || CarbonImmutable::now()->diffInSeconds($lastSeenAt) > self::FIVE_MINUTES_IN_SECONDS) {
                 $user->timestamps = false;
-                $user->last_seen_at = Carbon::now();
+                $user->last_seen_at = CarbonImmutable::now();
                 $user->update();
                 $user->timestamps = true;
             }

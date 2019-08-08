@@ -18,5 +18,6 @@ class DatabaseSeeder extends Seeder
         $this->call(TorrentSeeder::class);
         $this->call(PeerSeeder::class);
         $this->call(ThreadSeeder::class);
+        $this->call(ConfigurationSeeder::class);
     }
 }

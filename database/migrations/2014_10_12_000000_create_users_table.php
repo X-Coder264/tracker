@@ -24,11 +24,14 @@ class CreateUsersTable extends Migration
             $table->foreign('locale_id')->references('id')->on('locales')->onUpdate('cascade')->onDelete('cascade');
             $table->unsignedBigInteger('uploaded')->default(0);
             $table->unsignedBigInteger('downloaded')->default(0);
-            $table->integer('torrents_per_page')->default(20);
+            $table->integer('torrents_per_page')->unsigned()->default(20);
+            $table->integer('invites_amount')->unsigned()->default(0);
             $table->boolean('banned')->default(false);
             $table->rememberToken();
             $table->string('slug')->unique();
             $table->timestamp('last_seen_at')->nullable();
+            $table->integer('inviter_user_id')->unsigned()->nullable()->index();
+            $table->foreign('inviter_user_id')->references('id')->on('users')->onUpdate('cascade')->onDelete('cascade');
             $table->timestamps();
         });
     }

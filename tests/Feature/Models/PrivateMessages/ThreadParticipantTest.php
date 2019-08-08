@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Models\PrivateMessages;
 
-use Carbon\Carbon;
 use Tests\TestCase;
 use App\Models\User;
+use Carbon\CarbonImmutable;
 use App\Models\PrivateMessages\Thread;
 use App\Models\PrivateMessages\ThreadParticipant;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -19,7 +19,7 @@ class ThreadParticipantTest extends TestCase
     public function testLastReadAtIsCastToCarbon(): void
     {
         $participant = factory(ThreadParticipant::class)->states('readTheThread')->create();
-        $this->assertInstanceOf(Carbon::class, $participant->last_read_at);
+        $this->assertInstanceOf(CarbonImmutable::class, $participant->last_read_at);
     }
 
     public function testUserRelationship(): void

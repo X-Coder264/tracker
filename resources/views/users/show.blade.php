@@ -74,6 +74,16 @@
                                     @endif
                                 </td>
                             </tr>
+                            <tr>
+                                <th>{{ trans('messages.user.profile_invited_by') }}</th>
+                                <td>
+                                    @if (null !== $user->inviter_user_id)
+                                        <a href="{{ route('users.show', $user->inviter) }}">{{ $user->inviter->name }}</a>
+                                    @else
+                                        -
+                                    @endif
+                                </td>
+                            </tr>
                         </tbody>
                     </table>
                 </div>

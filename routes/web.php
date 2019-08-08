@@ -77,4 +77,7 @@ $router->group(['middleware' => [Authenticate::class]], function (Registrar $rou
     $router->get('threads/{thread}/message/create', 'PrivateMessages\ThreadMessageController@create')->name('thread-messages.create');
     $router->post('threads/{thread}/message', 'PrivateMessages\ThreadMessageController@store')->name('thread-messages.store');
     $router->get('threads/{thread}', 'PrivateMessages\ThreadController@show')->name('threads.show');
+
+    $router->get('invites/create', 'InviteController@create')->name('invites.create');
+    $router->post('invites', 'InviteController@store')->name('invites.store');
 });

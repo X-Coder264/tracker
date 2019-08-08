@@ -5,11 +5,14 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Auth;
 
 use App\Models\User;
+use App\Models\Invite;
 use App\Models\Locale;
+use App\Models\Configuration;
 use Illuminate\Http\Response;
 use Illuminate\Validation\Rule;
 use Illuminate\Routing\Controller;
 use Illuminate\Contracts\Hashing\Hasher;
+use App\Enumerations\ConfigurationOptions;
 use Illuminate\Contracts\Routing\UrlGenerator;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Auth\RegistersUsers;
@@ -47,19 +50,31 @@ class RegisterController extends Controller
      */
     private $hasher;
 
-    public function __construct(ValidatorFactory $validatorFactory, UrlGenerator $urlGenerator, Hasher $hasher)
-    {
+    /**
+     * @var ResponseFactory
+     */
+    private $responseFactory;
+
+    public function __construct(
+        ValidatorFactory $validatorFactory,
+        UrlGenerator $urlGenerator,
+        Hasher $hasher,
+        ResponseFactory $responseFactory
+    ) {
         $this->middleware(RedirectIfAuthenticated::class);
         $this->validatorFactory = $validatorFactory;
         $this->urlGenerator = $urlGenerator;
         $this->hasher = $hasher;
+        $this->responseFactory = $responseFactory;
     }
 
-    public function showRegistrationForm(ResponseFactory $responseFactory): Response
+    public function showRegistrationForm(): Response
     {
         $locales = Locale::all();
 
-        return $responseFactory->view('auth.register', compact('locales'));
+        $isRegistrationInviteOnly = (bool) Configuration::getConfigurationValue(ConfigurationOptions::INVITE_ONLY_SIGNUP)->firstOrFail()->value;
+
+        return $this->responseFactory->view('auth.register', compact('locales', 'isRegistrationInviteOnly'));
     }
 
     protected function validator(array $data): Validator
@@ -67,7 +82,9 @@ class RegisterController extends Controller
         $locales = Locale::select('id')->get();
         $localeIDs = $locales->pluck('id')->toArray();
 
-        return $this->validatorFactory->make($data, [
+        $isRegistrationInviteOnly = (bool) Configuration::getConfigurationValue(ConfigurationOptions::INVITE_ONLY_SIGNUP)->firstOrFail()->value;
+
+        $rules = [
             'name'     => 'required|string|max:255|unique:users',
             'email'    => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:8|confirmed',
@@ -76,18 +93,38 @@ class RegisterController extends Controller
                 Rule::in($localeIDs),
             ],
             'timezone' => 'required|timezone',
-        ]);
+        ];
+
+        if ($isRegistrationInviteOnly) {
+            $rules['invite'] = 'required|string|max:255|exists:invites,code';
+        }
+
+        return $this->validatorFactory->make($data, $rules);
     }
 
     protected function create(array $data): User
     {
-        return User::create([
+        $inviterId = null;
+        $invite = null;
+        if (! empty($data['invite'])) {
+            $invite = Invite::where('code', '=', $data['invite'])->firstOrFail();
+            $inviterId = $invite->user_id;
+        }
+
+        $user = User::create([
             'name'      => $data['name'],
             'email'     => $data['email'],
             'password'  => $this->hasher->make($data['password']),
             'timezone'  => $data['timezone'],
             'locale_id' => $data['locale'],
+            'inviter_user_id' => $inviterId,
         ]);
+
+        if ($invite instanceof Invite) {
+            $invite->delete();
+        }
+
+        return $user;
     }
 
     public function redirectTo(): string

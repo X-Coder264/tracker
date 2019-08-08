@@ -6,9 +6,11 @@ namespace App\Providers;
 
 use App\Models\News;
 use App\Models\User;
+use Carbon\CarbonImmutable;
 use App\Models\TorrentCategory;
 use App\Observers\NewsObserver;
 use App\Observers\UserObserver;
+use Illuminate\Support\DateFactory;
 use Illuminate\Support\ServiceProvider;
 use App\Observers\TorrentCategoryObserver;
 use Illuminate\Contracts\Cache\Repository;
@@ -21,6 +23,8 @@ class AppServiceProvider extends ServiceProvider
 {
     public function boot(): void
     {
+        DateFactory::useClass(CarbonImmutable::class);
+
         User::observe(UserObserver::class);
         TorrentCategory::observe(TorrentCategoryObserver::class);
         News::observe(NewsObserver::class);

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use Carbon\CarbonImmutable;
 use Laravel\Passport\HasApiTokens;
 use App\Notifications\ResetPassword;
 use App\Models\PrivateMessages\Thread;
@@ -13,6 +14,7 @@ use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Builder;
 use Cviebrock\EloquentSluggable\Sluggable;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Cviebrock\EloquentSluggable\SluggableScopeHelpers;
@@ -24,6 +26,12 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
  * @property Collection|Snatch[] $snatches
  * @property Collection|Thread[] $threads
  * @property Collection|News[] $news
+ * @property Collection|Invite[] $invites
+ * @property int|null $inviter_user_id
+ * @property User|null $inviter
+ * @property CarbonImmutable|null $last_seen_at
+ * @property int $invites_amount
+ * @property Collection|User[] $invitees
  */
 class User extends Authenticatable
 {
@@ -36,6 +44,7 @@ class User extends Authenticatable
      */
     protected $fillable = [
         'name', 'email', 'password', 'timezone', 'locale_id', 'torrents_per_page', 'banned', 'last_seen_at',
+        'inviter_user_id',
     ];
 
     /**
@@ -145,5 +154,20 @@ class User extends Authenticatable
     public function news(): HasMany
     {
         return $this->hasMany(News::class);
+    }
+
+    public function invites(): HasMany
+    {
+        return $this->hasMany(Invite::class);
+    }
+
+    public function inviter(): HasOne
+    {
+        return $this->hasOne(self::class, 'id', 'inviter_user_id');
+    }
+
+    public function invitees(): HasMany
+    {
+        return $this->hasMany(self::class, 'inviter_user_id');
     }
 }

@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Http\Middleware;
 
-use Carbon\Carbon;
 use Tests\TestCase;
 use App\Models\User;
+use Carbon\CarbonImmutable;
 use Illuminate\Routing\Router;
 use Illuminate\Contracts\Http\Kernel;
 use App\Http\Middleware\UpdateUserLastSeenAtInfo;
@@ -28,8 +28,8 @@ class UpdateUserLastSeenAtInfoTest extends TestCase
         $this->get(route('home'));
 
         $freshUser = $user->fresh();
-        $this->assertInstanceOf(Carbon::class, $freshUser->last_seen_at);
-        $this->assertLessThanOrEqual(5, Carbon::now()->diffInSeconds($freshUser->last_seen_at));
+        $this->assertInstanceOf(CarbonImmutable::class, $freshUser->last_seen_at);
+        $this->assertLessThanOrEqual(5, CarbonImmutable::now()->diffInSeconds($freshUser->last_seen_at));
         $this->assertSame($user->updated_at->format('Y-m-d H:i:s'), $freshUser->updated_at->format('Y-m-d H:i:s'));
     }
 
@@ -37,7 +37,7 @@ class UpdateUserLastSeenAtInfoTest extends TestCase
     {
         $this->withoutExceptionHandling();
 
-        $user = factory(User::class)->create(['last_seen_at' => Carbon::now()->subMinutes(4)]);
+        $user = factory(User::class)->create(['last_seen_at' => CarbonImmutable::now()->subMinutes(4)]);
         $this->actingAs($user);
 
         $this->get(route('home'));
@@ -51,13 +51,13 @@ class UpdateUserLastSeenAtInfoTest extends TestCase
     {
         $this->withoutExceptionHandling();
 
-        $user = factory(User::class)->create(['last_seen_at' => Carbon::now()->subSeconds(UpdateUserLastSeenAtInfo::FIVE_MINUTES_IN_SECONDS + 1)]);
+        $user = factory(User::class)->create(['last_seen_at' => CarbonImmutable::now()->subSeconds(UpdateUserLastSeenAtInfo::FIVE_MINUTES_IN_SECONDS + 1)]);
         $this->actingAs($user);
 
         $this->get(route('home'));
 
         $freshUser = $user->fresh();
-        $this->assertLessThanOrEqual(5, Carbon::now()->diffInSeconds($freshUser->last_seen_at));
+        $this->assertLessThanOrEqual(5, CarbonImmutable::now()->diffInSeconds($freshUser->last_seen_at));
         $this->assertSame($user->updated_at->format('Y-m-d H:i:s'), $freshUser->updated_at->format('Y-m-d H:i:s'));
     }
 

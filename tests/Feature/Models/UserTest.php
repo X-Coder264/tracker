@@ -7,17 +7,20 @@ namespace Tests\Feature\Models;
 use Tests\TestCase;
 use App\Models\News;
 use App\Models\User;
+use App\Models\Invite;
 use App\Models\Locale;
 use App\Models\Snatch;
 use App\Models\Torrent;
+use Carbon\CarbonImmutable;
 use App\Models\PrivateMessages\Thread;
 use Facades\App\Services\SizeFormatter;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 
-class UserTest extends TestCase
+final class UserTest extends TestCase
 {
     use DatabaseTransactions;
 
@@ -135,5 +138,62 @@ class UserTest extends TestCase
         $this->assertInstanceOf(HasMany::class, $user->news());
         $this->assertInstanceOf(Collection::class, $user->news);
         $this->assertTrue($user->news[0]->is($news));
+    }
+
+    public function testInviterRelationshipWhenTheInviterExists(): void
+    {
+        /** @var User $user */
+        $user = factory(User::class)->create();
+        /** @var User $invitedUser */
+        $invitedUser = factory(User::class)->create(['inviter_user_id' => $user->id]);
+
+        $this->assertInstanceOf(HasOne::class, $invitedUser->inviter());
+        $this->assertInstanceOf(User::class, $invitedUser->inviter);
+        $this->assertTrue($invitedUser->inviter->is($user));
+    }
+
+    public function testInviterRelationshipWhenTheInviterDoesNotExist(): void
+    {
+        /** @var User $user */
+        $user = factory(User::class)->create();
+
+        $this->assertInstanceOf(HasOne::class, $user->inviter());
+        $this->assertNull($user->inviter);
+    }
+
+    public function testInvitesRelationship(): void
+    {
+        /** @var User $user */
+        $user = factory(User::class)->create();
+
+        /** @var Invite[] $invites */
+        $invites = factory(Invite::class, 2)->create(['user_id' => $user->id]);
+
+        $this->assertInstanceOf(HasMany::class, $user->invites());
+        $this->assertInstanceOf(Collection::class, $user->invites);
+        $this->assertTrue($invites[0]->is($user->invites[0]));
+        $this->assertTrue($invites[1]->is($user->invites[1]));
+    }
+
+    public function testLastSeenAtAtAttributeIsCastedToCarbon(): void
+    {
+        /** @var User $user */
+        $user = factory(User::class)->create();
+
+        $this->assertInstanceOf(CarbonImmutable::class, $user->last_seen_at);
+    }
+
+    public function testInviteesRelationship(): void
+    {
+        /** @var User $user */
+        $user = factory(User::class)->create();
+
+        /** @var User[] $users */
+        $users = factory(User::class, 2)->create(['inviter_user_id' => $user->id]);
+
+        $this->assertInstanceOf(HasMany::class, $user->invitees());
+        $this->assertInstanceOf(Collection::class, $user->invitees);
+        $this->assertTrue($users[0]->is($user->invitees[0]));
+        $this->assertTrue($users[1]->is($user->invitees[1]));
     }
 }
