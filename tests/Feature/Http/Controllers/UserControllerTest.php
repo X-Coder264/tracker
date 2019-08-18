@@ -98,8 +98,6 @@ class UserControllerTest extends TestCase
         $this->assertSame(3, $response->viewData('snatchesCount'));
         $response->assertSee($user->uploaded);
         $response->assertSee($user->downloaded);
-        $response->assertSee($user->last_seen_at->timezone('Europe/Zagreb')->format('d.m.Y. H:i'));
-        $response->assertSee($user->created_at->timezone('Europe/Zagreb')->format('d.m.Y. H:i'));
         $response->assertSee(route('user-torrents.show-uploaded-torrents', $user));
         $response->assertSee(route('user-torrents.show-seeding-torrents', $user));
         $response->assertSee(route('user-torrents.show-leeching-torrents', $user));
