@@ -4,32 +4,32 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "8f23414d8ccaf241a5856b47dd738ec8",
+    "content-hash": "9ae711b893d8d3ae821a92121925f238",
     "packages": [
         {
             "name": "cloudcreativity/laravel-json-api",
-            "version": "v1.3.0",
+            "version": "v1.3.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/cloudcreativity/laravel-json-api.git",
-                "reference": "c0c1a45733c00f0a1ec6550ed9f6baf6864bb730"
+                "reference": "ec24e281a5823275eb766cd7f5d1485990778b7f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/cloudcreativity/laravel-json-api/zipball/c0c1a45733c00f0a1ec6550ed9f6baf6864bb730",
-                "reference": "c0c1a45733c00f0a1ec6550ed9f6baf6864bb730",
+                "url": "https://api.github.com/repos/cloudcreativity/laravel-json-api/zipball/ec24e281a5823275eb766cd7f5d1485990778b7f",
+                "reference": "ec24e281a5823275eb766cd7f5d1485990778b7f",
                 "shasum": ""
             },
             "require": {
                 "cloudcreativity/utils-object": "^1.0",
                 "ext-json": "*",
-                "illuminate/console": "5.5.*|5.6.*|5.7.*|5.8.*|5.9.*",
-                "illuminate/contracts": "5.5.*|5.6.*|5.7.*|5.8.*|5.9.*",
-                "illuminate/database": "5.5.*|5.6.*|5.7.*|5.8.*|5.9.*",
-                "illuminate/filesystem": "5.5.*|5.6.*|5.7.*|5.8.*|5.9.*",
-                "illuminate/http": "5.5.*|5.6.*|5.7.*|5.8.*|5.9.*",
-                "illuminate/pagination": "5.5.*|5.6.*|5.7.*|5.8.*|5.9.*",
-                "illuminate/support": "5.5.*|5.6.*|5.7.*|5.8.*|5.9.*",
+                "illuminate/console": "^5.5|^6.0",
+                "illuminate/contracts": "^5.5|^6.0",
+                "illuminate/database": "^5.5|^6.0",
+                "illuminate/filesystem": "^5.5|^6.0",
+                "illuminate/http": "^5.5|^6.0",
+                "illuminate/pagination": "^5.5|^6.0",
+                "illuminate/support": "^5.5|^6.0",
                 "neomerx/json-api": "^1.0.3",
                 "php": "^7.1",
                 "ramsey/uuid": "^3.0",
@@ -42,8 +42,8 @@
                 "ext-sqlite3": "*",
                 "guzzlehttp/guzzle": "^6.3",
                 "mockery/mockery": "^1.1",
-                "orchestra/testbench": "3.5.*|3.6.*|3.7.*|3.8.*|3.9.*",
-                "phpunit/phpunit": "^6.0|^7.0"
+                "orchestra/testbench": "^3.5|^4.0",
+                "phpunit/phpunit": "^6.0|^7.0|^8.0"
             },
             "suggest": {
                 "cloudcreativity/json-api-testing": "Required to use the test helpers."
@@ -91,7 +91,7 @@
                 "jsonapi.org",
                 "laravel"
             ],
-            "time": "2019-07-24T10:28:07+00:00"
+            "time": "2019-08-19T14:10:34+00:00"
         },
         {
             "name": "cloudcreativity/utils-object",
@@ -1071,16 +1071,16 @@
         },
         {
             "name": "laravel/framework",
-            "version": "v5.8.32",
+            "version": "v5.8.33",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/framework.git",
-                "reference": "ee16d719516dfd77ed6c9538000bca49ded284e2"
+                "reference": "58b81842cbdcfbbd8302790ac0f98119ea1c56e5"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/framework/zipball/ee16d719516dfd77ed6c9538000bca49ded284e2",
-                "reference": "ee16d719516dfd77ed6c9538000bca49ded284e2",
+                "url": "https://api.github.com/repos/laravel/framework/zipball/58b81842cbdcfbbd8302790ac0f98119ea1c56e5",
+                "reference": "58b81842cbdcfbbd8302790ac0f98119ea1c56e5",
                 "shasum": ""
             },
             "require": {
@@ -1214,7 +1214,7 @@
                 "framework",
                 "laravel"
             ],
-            "time": "2019-08-13T14:11:52+00:00"
+            "time": "2019-08-20T15:45:17+00:00"
         },
         {
             "name": "laravel/passport",
@@ -1750,16 +1750,16 @@
         },
         {
             "name": "nesbot/carbon",
-            "version": "2.22.3",
+            "version": "2.23.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/briannesbitt/Carbon.git",
-                "reference": "738fbd8d80b2c5e158fda76c29c2de432fcc6f7e"
+                "reference": "767617a047e5b8b8b3b0b6023a2650847ed7df02"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/briannesbitt/Carbon/zipball/738fbd8d80b2c5e158fda76c29c2de432fcc6f7e",
-                "reference": "738fbd8d80b2c5e158fda76c29c2de432fcc6f7e",
+                "url": "https://api.github.com/repos/briannesbitt/Carbon/zipball/767617a047e5b8b8b3b0b6023a2650847ed7df02",
+                "reference": "767617a047e5b8b8b3b0b6023a2650847ed7df02",
                 "shasum": ""
             },
             "require": {
@@ -1806,14 +1806,14 @@
                     "homepage": "http://github.com/kylekatarnls"
                 }
             ],
-            "description": "A simple API extension for DateTime.",
+            "description": "A API extension for DateTime that supports 281 different languages.",
             "homepage": "http://carbon.nesbot.com",
             "keywords": [
                 "date",
                 "datetime",
                 "time"
             ],
-            "time": "2019-08-07T12:36:44+00:00"
+            "time": "2019-08-17T13:57:34+00:00"
         },
         {
             "name": "nikic/php-parser",
