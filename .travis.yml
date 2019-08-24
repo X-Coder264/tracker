@@ -20,6 +20,7 @@ services:
   - mysql
 
 before_install:
+  - yes '' | pecl install imagick
   - sudo mysql -e "use mysql; update user set authentication_string=PASSWORD('test') where User='root'; update user set plugin='mysql_native_password';FLUSH PRIVILEGES;"
   - sudo mysql_upgrade --user=root --password=test
   - sudo service mysql restart
@@ -35,7 +36,6 @@ install:
 # Create a storage folder for test coverage report
 before_script:
     - mkdir -p build/logs
-    - ls -al
 
 # Linting and running tests + generating code coverage report
 script:

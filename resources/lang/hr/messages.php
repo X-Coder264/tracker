@@ -156,4 +156,13 @@ return [
     'invites.user_created_at' => 'Registriran',
     'invites_no_invites_left_error_message' => 'Nemate niti jednu dostupnu pozivnicu.',
     'invites_successfully_created_message' => 'Uspješno ste napravili pozivnicu koja ističe za :count dan.|Uspješno ste napravili pozivnicu koja ističe za :count dana.|Uspješno ste napravili pozivnicu koja ističe za :count dana.',
+    '2fa_auth.caption' => 'Autentifikacija u dva koraka',
+    '2fa.info_message' => "Autentifikacija u dva koraka pruža jaču sigurnost Vašem računu na način da traži još jedan korak verifikacije prilikom ulogiranja u račun. Osim Vaše lozinke, bit će Vam potreban i kod generiran od strane Google Authenticator (ili Authy) aplikacije s Vašeg mobilnog uređaja.",
+    '2fa.please_scan_barcode_message' => 'Skenirajte ovaj barkod s <strong>Google Authenticator</strong> ili <strong>Authy</strong> aplikacijom i onda kliknite na gumb za uključivanje autentifikacije u dva koraka.',
+    '2fa.use_secret_key_message' => "Ako ne možete skenirati barkod, možete iskoristiti ovaj kod direktno u Vašoj aplikaciji: <strong>:code</strong>",
+    '2fa.enable_button.caption' => 'Uključi autentifikaciju u dva koraka',
+    '2fa.disable_button.caption' => 'Isključi autentifikaciju u dva koraka',
+    '2fa.successfully_enabled.message' => 'Uspješno ste uključili autentifikaciju u dva koraka za Vaš račun.',
+    '2fa.successfully_disabled.message' => 'Uspješno ste isključili autentifikaciju u dva koraka za Vaš račun.',
+    '2fa_code.caption' => 'Kod za autentifikaciju u dva koraka',
 ];
