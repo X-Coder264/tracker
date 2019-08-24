@@ -14,6 +14,9 @@ RUN set -xe && \
         git \
         openssh-client \
         zlib-dev \
+        imagemagick \
+        imagemagick-dev \
+        libtool \
         libzip-dev && \
     # create app user
     addgroup -S -g ${HOST_GROUP_ID} app && \
@@ -24,10 +27,10 @@ RUN set -xe && \
     php -r "unlink('composer-setup.php');" && \
     # install php extensions
     pecl channel-update pecl.php.net && \
-    pecl install xdebug apcu && \
+    pecl install xdebug apcu imagick && \
     docker-php-ext-install mbstring curl dom mysqli pdo_mysql zip && \
     # enable php extensions
-    docker-php-ext-enable xdebug apcu zip && \
+    docker-php-ext-enable xdebug apcu zip imagick && \
     # cleanup
     apk del --purge .phpize-deps && \
     rm -rf /tmp/* && \
