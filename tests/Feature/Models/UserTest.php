@@ -196,4 +196,37 @@ final class UserTest extends TestCase
         $this->assertTrue($users[0]->is($user->invitees[0]));
         $this->assertTrue($users[1]->is($user->invitees[1]));
     }
+
+    public function testAUserGets2FASecretKeyWhenCreating(): void
+    {
+        $locale = factory(Locale::class)->create();
+
+        $user = new User();
+        $user->email = 'test@gmail.com';
+        $user->name = 'test name';
+        $user->password = 'test test';
+        $user->locale_id = $locale->id;
+        $user->timezone = 'Europe/Zagreb';
+        $user->save();
+
+        $this->assertNotEmpty($user->two_factor_secret_key);
+        $this->assertSame(32, strlen($user->two_factor_secret_key));
+    }
+
+    public function test2FAIsDisabledByDefault(): void
+    {
+        $locale = factory(Locale::class)->create();
+
+        $user = new User();
+        $user->email = 'test@gmail.com';
+        $user->name = 'test name';
+        $user->password = 'test test';
+        $user->locale_id = $locale->id;
+        $user->timezone = 'Europe/Zagreb';
+        $user->save();
+
+        $user->refresh();
+
+        $this->assertFalse($user->is_two_factor_enabled);
+    }
 }

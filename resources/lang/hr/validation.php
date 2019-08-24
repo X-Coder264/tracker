@@ -83,11 +83,12 @@ return [
         'string'  => 'Polje :attribute mora biti :size znakova.',
         'array'   => 'Polje :attribute mora sadržavati :size stavki.',
     ],
-    'string'               => 'The :attribute must be a string.',
-    'timezone'             => 'Polje :attribute mora biti ispravna vremenska zona.',
-    'unique'               => 'Polje :attribute već postoji.',
-    'uploaded'             => 'The :attribute failed to upload.',
-    'url'                  => 'Polje :attribute nije ispravnog formata.',
+    'string'                => 'The :attribute must be a string.',
+    'timezone'              => 'Polje :attribute mora biti ispravna vremenska zona.',
+    'unique'                => 'Polje :attribute već postoji.',
+    'uploaded'              => 'The :attribute failed to upload.',
+    'url'                   => 'Polje :attribute nije ispravnog formata.',
+    'valid_two_factor_code' => 'Ovaj 2FA kod je neispravan.',
 
     /*
     |--------------------------------------------------------------------------

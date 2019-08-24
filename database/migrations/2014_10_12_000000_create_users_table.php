@@ -18,7 +18,7 @@ class CreateUsersTable extends Migration
             $table->string('name')->unique();
             $table->string('email')->unique();
             $table->string('password');
-            $table->string('passkey', 64)->unique()->nullable();
+            $table->string('passkey')->unique();
             $table->string('timezone', 30);
             $table->integer('locale_id')->unsigned()->index();
             $table->foreign('locale_id')->references('id')->on('locales')->onUpdate('cascade')->onDelete('cascade');
@@ -32,6 +32,8 @@ class CreateUsersTable extends Migration
             $table->timestamp('last_seen_at')->nullable();
             $table->integer('inviter_user_id')->unsigned()->nullable()->index();
             $table->foreign('inviter_user_id')->references('id')->on('users')->onUpdate('cascade')->onDelete('cascade');
+            $table->boolean('is_two_factor_enabled')->default(false);
+            $table->string('two_factor_secret_key')->unique();
             $table->timestamps();
         });
     }

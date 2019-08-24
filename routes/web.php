@@ -40,6 +40,9 @@ $router->get('torrents/download/{torrent}', 'TorrentController@download')->name(
 
 $router->get('rss/{passkey}/torrents', 'RSS\TorrentFeedController@show')->name('torrents.rss');
 
+$router->get('login/2fa', 'Auth\TwoFactorStepController@showTwoFactorStep')->name('2fa.show_form');
+$router->post('login/2fa', 'Auth\TwoFactorStepController@verifyTwoFactorStep')->name('2fa.verify');
+
 $router->group(['middleware' => [Authenticate::class]], function (Registrar $router) {
     $router->get('/', 'HomeController@index')->name('home');
 
@@ -80,4 +83,8 @@ $router->group(['middleware' => [Authenticate::class]], function (Registrar $rou
 
     $router->get('invites/create', 'InviteController@create')->name('invites.create');
     $router->post('invites', 'InviteController@store')->name('invites.store');
+
+    $router->get('2fa', 'TwoFactorAuth\StatusController@status')->name('2fa.status');
+    $router->post('2fa-enable', 'TwoFactorAuth\EnableController@enable')->name('2fa.enable');
+    $router->post('2fa-disable', 'TwoFactorAuth\DisableController@disable')->name('2fa.disable');
 });

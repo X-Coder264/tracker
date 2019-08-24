@@ -42,6 +42,9 @@
                         <a class="dropdown-item" href="{{ route('users.edit', auth()->user()) }}">
                             {{ trans('messages.navigation.users.edit_page') }}
                         </a>
+                        <a class="dropdown-item" href="{{ route('2fa.status') }}">
+                            {{ trans('messages.2fa_auth.caption') }}
+                        </a>
                         <a class="dropdown-item" href="{{ route('users.show', auth()->user()) }}">
                             {{ trans('messages.navigation.users.profile') }}
                         </a>

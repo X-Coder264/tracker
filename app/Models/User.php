@@ -32,6 +32,8 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
  * @property CarbonImmutable|null $last_seen_at
  * @property int $invites_amount
  * @property Collection|User[] $invitees
+ * @property bool $is_two_factor_enabled
+ * @property string $two_factor_secret_key
  */
 class User extends Authenticatable
 {
@@ -63,6 +65,7 @@ class User extends Authenticatable
      */
     protected $casts = [
         'banned' => 'bool',
+        'is_two_factor_enabled' => 'bool',
     ];
 
     /**

@@ -39,6 +39,7 @@ $factory->define(User::class, function (Faker $faker) {
         'last_seen_at' => Carbon::now()->subMinutes($faker->numberBetween(1, 100)),
         'inviter_user_id' => null,
         'invites_amount' => 0,
+        'is_two_factor_enabled' => false,
     ];
 });
 
@@ -52,4 +53,12 @@ $factory->state(User::class, 'has_available_invites', [
 
 $factory->state(User::class, 'has_no_available_invites', [
     'invites_amount' => 0,
+]);
+
+$factory->state(User::class, '2fa_enabled', [
+    'is_two_factor_enabled' => true,
+]);
+
+$factory->state(User::class, '2fa_disabled', [
+    'is_two_factor_enabled' => false,
 ]);
