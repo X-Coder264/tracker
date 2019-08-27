@@ -11,9 +11,6 @@ cache:
   directories:
     - $HOME/.composer/cache
     - $HOME/.app/cache
-env:
-  global:
-    - CHECK_PHP_SYNTAX="yes"
 
 services:
   - redis-server
@@ -39,8 +36,7 @@ before_script:
 
 # Linting and running tests + generating code coverage report
 script:
-  - if [[ "$CHECK_PHP_SYNTAX" == "yes" ]]; then php vendor/bin/php-cs-fixer fix --no-interaction --dry-run --diff -v; fi;
-  - if [[ "$CHECK_PHP_SYNTAX" == "yes" ]]; then mv ./.php_cs.cache $HOME/.app/cache/.php_cs.cache 2> /dev/null; fi;
+  - php vendor/bin/php-cs-fixer fix --no-interaction --dry-run --diff --using-cache=no -v
   - vendor/bin/phpunit --coverage-text --coverage-clover=build/logs/clover.xml
 
 after_success:
