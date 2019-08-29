@@ -66,7 +66,7 @@ class AnnounceManagerTest extends TestCase
     {
         /** @var MockObject|Bencoder $encoder */
         $encoder = $this->getMockBuilder(Bencoder::class)
-            ->setMethods(['encode'])
+            ->onlyMethods(['encode'])
             ->getMock();
         $error = 'Error xyz.';
         $returnValue = 'something';
@@ -94,7 +94,7 @@ class AnnounceManagerTest extends TestCase
     {
         /** @var MockObject|Bencoder $encoder */
         $encoder = $this->getMockBuilder(Bencoder::class)
-            ->setMethods(['encode'])
+            ->onlyMethods(['encode'])
             ->getMock();
         $error = ['Error X.', 'Error Y.'];
         $errorMessage = 'Error X. Error Y.';

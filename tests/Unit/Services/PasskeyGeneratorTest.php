@@ -16,7 +16,7 @@ class PasskeyGeneratorTest extends TestCase
     {
         /** @var PasskeyGenerator|MockObject $passkeyGenerator */
         $passkeyGenerator = $this->getMockBuilder(PasskeyGenerator::class)
-            ->setMethods(['generatePasskey', 'getUserWithTheSpecifiedPasskey'])
+            ->onlyMethods(['generatePasskey', 'getUserWithTheSpecifiedPasskey'])
             ->getMock();
         $passkeyGenerator->expects($this->exactly(2))
             ->method('generatePasskey')

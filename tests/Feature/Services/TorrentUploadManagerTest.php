@@ -772,7 +772,7 @@ class TorrentUploadManagerTest extends TestCase
                     $this->app->make(IMDBImagesManager::class),
                 ]
             )
-            ->setMethods(['areHashesUnique', 'getV1TorrentInfoHash', 'getV2TruncatedTorrentInfoHash'])
+            ->onlyMethods(['areHashesUnique', 'getV1TorrentInfoHash', 'getV2TruncatedTorrentInfoHash'])
             ->getMock();
         $torrentUploadManager->expects($this->exactly(4))
             ->method('areHashesUnique')

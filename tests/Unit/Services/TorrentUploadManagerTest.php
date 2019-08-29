@@ -25,7 +25,7 @@ class TorrentUploadManagerTest extends TestCase
     {
         /** @var MockObject|Bencoder $encoder */
         $encoder = $this->getMockBuilder(Bencoder::class)
-            ->setMethods(['encode'])
+            ->onlyMethods(['encode'])
             ->getMock();
         $array = ['x' => 'y'];
         $returnValue = 'xyz264';
@@ -61,7 +61,7 @@ class TorrentUploadManagerTest extends TestCase
     {
         /** @var MockObject|Bencoder $encoder */
         $encoder = $this->getMockBuilder(Bencoder::class)
-            ->setMethods(['encode'])
+            ->onlyMethods(['encode'])
             ->getMock();
         $array = ['x' => 'foobar'];
         $returnValue = 'xyz264';

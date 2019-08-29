@@ -78,7 +78,7 @@ class TorrentInfoServiceTest extends TestCase
                     $this->app->make(TitleFactory::class),
                 ]
             )
-            ->setMethods(['getTorrentFileNamesAndSizesFromTorrentInfoDict'])
+            ->onlyMethods(['getTorrentFileNamesAndSizesFromTorrentInfoDict'])
             ->getMock();
         $torrentInfoService->expects($this->once())
             ->method('getTorrentFileNamesAndSizesFromTorrentInfoDict')
