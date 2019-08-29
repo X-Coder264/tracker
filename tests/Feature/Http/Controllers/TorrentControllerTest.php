@@ -177,7 +177,7 @@ class TorrentControllerTest extends TestCase
                     $this->app->make(TitleFactory::class),
                 ]
             )
-            ->setMethods(['getTorrentFileNamesAndSizes'])
+            ->onlyMethods(['getTorrentFileNamesAndSizes'])
             ->getMock();
 
         $returnValue = [
@@ -194,6 +194,7 @@ class TorrentControllerTest extends TestCase
         $response->assertOk();
         $response->assertViewIs('torrents.show');
         $response->assertViewHas('torrent', $torrent);
+        $response->assertViewHas('cachedTorrent', $torrent);
         $response->assertViewHas('numberOfPeers', 1);
         $response->assertViewHas('torrentFileNamesAndSizes', $formatter->format($returnValue));
         $response->assertViewHas('filesCount', 1);
@@ -202,13 +203,18 @@ class TorrentControllerTest extends TestCase
         $response->assertViewHas('posterExists', false);
         $response->assertViewHas('user', $this->user);
         $response->assertViewHas('timezone', $this->user->timezone);
+
+        $cache = $this->app->make(Repository::class);
+
+        $cachedTorrent = $cache->get('torrent.' . $torrent->id);
+        $this->assertInstanceOf(Torrent::class, $torrent);
+        $this->assertTrue($torrent->is($cachedTorrent));
+
         $this->assertInstanceOf(LengthAwarePaginator::class, $response->viewData('torrentComments'));
         $this->assertSame(10, $response->viewData('torrentComments')->perPage());
         $this->assertSame(1, $response->viewData('torrentComments')->total());
         $this->assertSame(1, $response->viewData('torrentComments')->currentPage());
         $this->assertTrue($torrentComment->is($response->original->torrentComments[0]));
-
-        $cache = $this->app->make(Repository::class);
 
         /** @var LengthAwarePaginator $cachedTorrentComments */
         $cachedTorrentComments = $cache->get(sprintf('torrent.%d.comments.page.%d', $torrent->id, 1));

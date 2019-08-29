@@ -20,7 +20,6 @@ use App\Services\TorrentInfoService;
 use Illuminate\Contracts\Auth\Guard;
 use Illuminate\Http\RedirectResponse;
 use App\Services\TorrentUploadManager;
-use App\Repositories\TorrentRepository;
 use Illuminate\Contracts\Auth\Access\Gate;
 use App\Http\Requests\TorrentUploadRequest;
 use App\Exceptions\FileNotWritableException;
@@ -91,11 +90,6 @@ final class TorrentController
      */
     private $gate;
 
-    /**
-     * @var TorrentRepository
-     */
-    private $torrentRepository;
-
     public function __construct(
         CacheManager $cacheManager,
         Guard $guard,
@@ -106,8 +100,7 @@ final class TorrentController
         UrlGenerator $urlGenerator,
         Factory $validatorFactory,
         IMDBManager $IMDBManager,
-        Gate $gate,
-        TorrentRepository $torrentRepository
+        Gate $gate
     ) {
         $this->cacheManager = $cacheManager;
         $this->guard = $guard;
@@ -119,7 +112,6 @@ final class TorrentController
         $this->validatorFactory = $validatorFactory;
         $this->IMDBManager = $IMDBManager;
         $this->gate = $gate;
-        $this->torrentRepository = $torrentRepository;
     }
 
     public function index(Request $request): Response
@@ -174,12 +166,12 @@ final class TorrentController
 
         $torrentFileNamesAndSizes = $fileSizeCollectionFormatter->format($torrentFileNamesAndSizes);
 
-        /** @var Torrent $torrent */
-        $torrent = $this->cacheManager->remember('torrent.' . $torrent->id, Cache::THIRTY_MINUTES, function () use ($torrent): Torrent {
+        /** @var Torrent $cachedTorrent */
+        $cachedTorrent = $this->cacheManager->remember('torrent.' . $torrent->id, Cache::THIRTY_MINUTES, function () use ($torrent): Torrent {
             return $torrent->load(['uploader', 'peers.user', 'category', 'infoHashes']);
         });
 
-        $numberOfPeers = $torrent->peers->count();
+        $numberOfPeers = $cachedTorrent->peers->count();
 
         $page = (int) $request->input('page', 1);
 
@@ -191,7 +183,8 @@ final class TorrentController
         $imdbData = $torrentInfoService->getTorrentIMDBData($torrent);
         $posterExists = $imdbData ? $this->filesystemManager->disk('imdb-images')->exists("{$imdbData->getId()}.jpg") : false;
 
-        $this->torrentRepository->incrementViewCountForTorrent($torrent->id);
+        $torrent->views_count++;
+        $torrent->save();
 
         $user = $this->guard->user();
 
@@ -199,6 +192,7 @@ final class TorrentController
             'torrents.show',
             compact(
                 'torrent',
+                'cachedTorrent',
                 'numberOfPeers',
                 'torrentFileNamesAndSizes',
                 'torrentComments',

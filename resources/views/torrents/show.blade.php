@@ -60,7 +60,7 @@
                             <th>{{ trans('messages.common.size') }}</th>
                             <td>{{ $torrent->size }}</td>
                         </tr>
-                        @foreach ($torrent->infoHashes as $infoHash)
+                        @foreach ($cachedTorrent->infoHashes as $infoHash)
                             <tr>
                                 @if (1 === $infoHash->version)
                                     <th>{{ trans('messages.torrents.show.v1-info_hash') }}</th>
@@ -73,7 +73,7 @@
                         <tr>
                             <th>{{ trans('messages.common.uploader') }}</th>
                             <td>
-                                <a href="{{ route('users.show', $torrent->uploader) }}">{{ $torrent->uploader->name }}</a>
+                                <a href="{{ route('users.show', $cachedTorrent->uploader) }}">{{ $cachedTorrent->uploader->name }}</a>
                             </td>
                         </tr>
                         <tr>
@@ -126,7 +126,7 @@
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                @foreach ($torrent->peers as $peer)
+                                                @foreach ($cachedTorrent->peers as $peer)
                                                     <tr>
                                                         <td>{{ $peer->user->name }}</td>
                                                         <td>{{ $peer->uploaded }}</td>
