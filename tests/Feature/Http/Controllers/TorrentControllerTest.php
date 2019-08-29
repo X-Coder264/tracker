@@ -150,8 +150,10 @@ class TorrentControllerTest extends TestCase
                     'seeders' => 501,
                     'leechers' => 333,
                     'imdb_id' => '0468569',
+                    'views_count' => 0,
                 ]
             );
+
         $torrentComment = factory(TorrentComment::class)->create(
             ['torrent_id' => $torrent->id, 'user_id' => $torrent->uploader_id]
         );
@@ -191,7 +193,7 @@ class TorrentControllerTest extends TestCase
         $response = $this->get($this->app->make(UrlGenerator::class)->route('torrents.show', $torrent));
         $response->assertOk();
         $response->assertViewIs('torrents.show');
-        $response->assertViewHas('torrent');
+        $response->assertViewHas('torrent', $torrent);
         $response->assertViewHas('numberOfPeers', 1);
         $response->assertViewHas('torrentFileNamesAndSizes', $formatter->format($returnValue));
         $response->assertViewHas('filesCount', 1);
@@ -202,7 +204,20 @@ class TorrentControllerTest extends TestCase
         $response->assertViewHas('timezone', $this->user->timezone);
         $this->assertInstanceOf(LengthAwarePaginator::class, $response->viewData('torrentComments'));
         $this->assertSame(10, $response->viewData('torrentComments')->perPage());
+        $this->assertSame(1, $response->viewData('torrentComments')->total());
+        $this->assertSame(1, $response->viewData('torrentComments')->currentPage());
         $this->assertTrue($torrentComment->is($response->original->torrentComments[0]));
+
+        $cache = $this->app->make(Repository::class);
+
+        /** @var LengthAwarePaginator $cachedTorrentComments */
+        $cachedTorrentComments = $cache->get(sprintf('torrent.%d.comments.page.%d', $torrent->id, 1));
+        $this->assertInstanceOf(LengthAwarePaginator::class, $cachedTorrentComments);
+        $this->assertSame(10, $cachedTorrentComments->perPage());
+        $this->assertSame(1, $cachedTorrentComments->total());
+        $this->assertSame(1, $cachedTorrentComments->currentPage());
+        $this->assertTrue($torrentComment->is($cachedTorrentComments[0]));
+
         $this->assertInstanceOf(Title::class, $response->viewData('imdbData'));
         $this->assertSame('0468569', $response->viewData('imdbData')->getId());
         $response->assertSee($torrent->name);
@@ -229,7 +244,8 @@ class TorrentControllerTest extends TestCase
         $response->assertSee($peer->userAgent);
         $response->assertSee('953.67 MiB');
         $response->assertSee('Test.txt');
-        $this->assertTrue($torrent->is($response->original->torrent));
+        $torrent->refresh();
+        $this->assertSame(1, $torrent->views_count);
     }
 
     public function testShowWhenTorrentInfoServiceThrowsAnException(): void

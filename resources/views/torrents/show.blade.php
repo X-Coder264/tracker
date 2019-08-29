@@ -88,6 +88,10 @@
                             <th>{{ trans('messages.common.torrent_leechers') }}</th>
                             <td>{{ $torrent->leechers }}</td>
                         </tr>
+                        <tr>
+                            <th>{{ trans('messages.common.torrent_views_count') }}</th>
+                            <td>{{ $torrent->views_count }}</td>
+                        </tr>
                     </tbody>
                 </table>
             </div>

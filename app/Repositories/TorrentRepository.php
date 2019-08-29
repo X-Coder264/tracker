@@ -24,4 +24,9 @@ class TorrentRepository
             ->whereIn('category_id', $categoryIds)
             ->get();
     }
+
+    public function incrementViewCountForTorrent(int $torrentId): void
+    {
+        Torrent::where('id', '=', $torrentId)->increment('views_count');
+    }
 }

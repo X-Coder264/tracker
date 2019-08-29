@@ -20,6 +20,7 @@ use Cviebrock\EloquentSluggable\SluggableScopeHelpers;
  * @property Collection|TorrentComment[] $comments
  * @property TorrentCategory $category
  * @property Collection|Snatch[] $snatches
+ * @property int $views_count
  */
 class Torrent extends Model
 {

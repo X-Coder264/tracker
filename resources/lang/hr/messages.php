@@ -41,6 +41,7 @@ return [
     'common.torrent' => 'Torrent',
     'common.torrent_seeders' => 'Seederi',
     'common.torrent_leechers' => 'Leecheri',
+    'common.torrent_views_count' => 'Broj pregleda',
     'common.category' => 'Kategorija',
     'common.uploader' => 'Uploader',
     'common.size' => 'Veličina',

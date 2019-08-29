@@ -41,6 +41,7 @@ return [
     'common.torrent' => 'Torrent',
     'common.torrent_seeders' => 'Seeders',
     'common.torrent_leechers' => 'Leechers',
+    'common.torrent_views_count' => 'Times viewed',
     'common.category' => 'Category',
     'common.uploader' => 'Uploader',
     'common.size' => 'Size',

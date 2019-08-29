@@ -20,6 +20,7 @@ use App\Services\TorrentInfoService;
 use Illuminate\Contracts\Auth\Guard;
 use Illuminate\Http\RedirectResponse;
 use App\Services\TorrentUploadManager;
+use App\Repositories\TorrentRepository;
 use Illuminate\Contracts\Auth\Access\Gate;
 use App\Http\Requests\TorrentUploadRequest;
 use App\Exceptions\FileNotWritableException;
@@ -38,7 +39,7 @@ use Symfony\Component\HttpFoundation\Response as BaseResponse;
 use Illuminate\Contracts\Filesystem\Factory as FilesystemManager;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
-class TorrentController
+final class TorrentController
 {
     /**
      * @var CacheManager
@@ -90,6 +91,11 @@ class TorrentController
      */
     private $gate;
 
+    /**
+     * @var TorrentRepository
+     */
+    private $torrentRepository;
+
     public function __construct(
         CacheManager $cacheManager,
         Guard $guard,
@@ -100,7 +106,8 @@ class TorrentController
         UrlGenerator $urlGenerator,
         Factory $validatorFactory,
         IMDBManager $IMDBManager,
-        Gate $gate
+        Gate $gate,
+        TorrentRepository $torrentRepository
     ) {
         $this->cacheManager = $cacheManager;
         $this->guard = $guard;
@@ -112,6 +119,7 @@ class TorrentController
         $this->validatorFactory = $validatorFactory;
         $this->IMDBManager = $IMDBManager;
         $this->gate = $gate;
+        $this->torrentRepository = $torrentRepository;
     }
 
     public function index(Request $request): Response
@@ -151,6 +159,7 @@ class TorrentController
     }
 
     public function show(
+        Request $request,
         Torrent $torrent,
         TorrentInfoService $torrentInfoService,
         FileSizeCollectionFormatter $fileSizeCollectionFormatter
@@ -166,19 +175,23 @@ class TorrentController
         $torrentFileNamesAndSizes = $fileSizeCollectionFormatter->format($torrentFileNamesAndSizes);
 
         /** @var Torrent $torrent */
-        $torrent = $this->cacheManager->remember('torrent.' . $torrent->id, Cache::ONE_DAY, function () use ($torrent): Torrent {
+        $torrent = $this->cacheManager->remember('torrent.' . $torrent->id, Cache::THIRTY_MINUTES, function () use ($torrent): Torrent {
             return $torrent->load(['uploader', 'peers.user', 'category', 'infoHashes']);
         });
 
         $numberOfPeers = $torrent->peers->count();
 
+        $page = (int) $request->input('page', 1);
+
         /** @var LengthAwarePaginator $torrentComments */
-        $torrentComments = $this->cacheManager->remember('torrent.' . $torrent->id . '.comments', Cache::ONE_DAY, function () use ($torrent): LengthAwarePaginator {
+        $torrentComments = $this->cacheManager->remember(sprintf('torrent.%d.comments.page.%d', $torrent->id, $page), Cache::ONE_DAY, function () use ($torrent): LengthAwarePaginator {
             return $torrent->comments()->with('user')->paginate(10);
         });
 
         $imdbData = $torrentInfoService->getTorrentIMDBData($torrent);
         $posterExists = $imdbData ? $this->filesystemManager->disk('imdb-images')->exists("{$imdbData->getId()}.jpg") : false;
+
+        $this->torrentRepository->incrementViewCountForTorrent($torrent->id);
 
         $user = $this->guard->user();
 
