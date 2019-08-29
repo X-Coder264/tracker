@@ -70,6 +70,7 @@ return [
     'navigation.users.edit_page' => 'Edit your settings',
     'navigation.users.profile' => 'My profile',
     'navigation.my-torrents' => 'My torrents',
+    'navigation.rss' => 'RSS',
     'navigation.invites' => 'Invites',
     'common.email' => 'E-Mail address',
     'common.password' => 'Password',

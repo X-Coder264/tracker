@@ -70,6 +70,7 @@ return [
     'navigation.users.edit_page' => 'Promjeni svoje postavke',
     'navigation.users.profile' => 'Moj profil',
     'navigation.my-torrents' => 'Moji torrenti',
+    'navigation.rss' => 'RSS',
     'navigation.invites' => 'Pozivnice',
     'common.email' => 'E-Mail adresa',
     'common.password' => 'Lozinka',
