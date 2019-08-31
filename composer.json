@@ -20,7 +20,7 @@
         "laravel/framework": "5.8.*",
         "laravel/passport": "^7.4",
         "laravel/tinker": "^1.0",
-        "nesbot/carbon": "^2.23",
+        "nesbot/carbon": "^2.24",
         "pragmarx/google2fa": "^5.0",
         "pragmarx/google2fa-qrcode": "^1.0",
         "predis/predis": "^1.1.1",
