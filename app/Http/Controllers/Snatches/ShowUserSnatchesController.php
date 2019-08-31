@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Snatches;
 
 use App\Models\User;
 use Illuminate\Http\Response;
 use App\Repositories\UserRepository;
 use Illuminate\Contracts\Routing\ResponseFactory;
 
-class UserSnatchesController
+final class ShowUserSnatchesController
 {
     /**
      * @var UserRepository
@@ -27,7 +27,7 @@ class UserSnatchesController
         $this->responseFactory = $responseFactory;
     }
 
-    public function show(User $user): Response
+    public function __invoke(User $user): Response
     {
         $snatches = $this->userRepository->getUserSnatches($user->id, $user->torrents_per_page);
 

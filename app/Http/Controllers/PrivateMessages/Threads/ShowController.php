@@ -2,13 +2,12 @@
 
 declare(strict_types=1);
 
-namespace App\Http\Controllers\PrivateMessages;
+namespace App\Http\Controllers\PrivateMessages\Threads;
 
-use Carbon\Carbon;
+use Carbon\CarbonImmutable;
 use Illuminate\Http\Response;
 use Illuminate\Contracts\Auth\Guard;
 use App\Models\PrivateMessages\Thread;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Database\Eloquent\Collection;
 use App\Models\PrivateMessages\ThreadMessage;
@@ -18,17 +17,12 @@ use Illuminate\Contracts\Routing\ResponseFactory;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use App\Repositories\PrivateMessages\ThreadParticipantRepositoryInterface;
 
-class ThreadController
+final class ShowController
 {
     /**
      * @var Guard
      */
     private $guard;
-
-    /**
-     * @var UrlGenerator
-     */
-    private $urlGenerator;
 
     /**
      * @var ThreadParticipantRepositoryInterface
@@ -41,41 +35,30 @@ class ThreadController
     private $cache;
 
     /**
+     * @var UrlGenerator
+     */
+    private $urlGenerator;
+
+    /**
      * @var ResponseFactory
      */
     private $responseFactory;
 
     public function __construct(
         Guard $guard,
-        UrlGenerator $urlGenerator,
         ThreadParticipantRepositoryInterface $threadParticipantRepository,
         Repository $cache,
+        UrlGenerator $urlGenerator,
         ResponseFactory $responseFactory
     ) {
         $this->guard = $guard;
-        $this->urlGenerator = $urlGenerator;
         $this->threadParticipantRepository = $threadParticipantRepository;
         $this->cache = $cache;
+        $this->urlGenerator = $urlGenerator;
         $this->responseFactory = $responseFactory;
     }
 
-    public function index(): Response
-    {
-        $user = $this->guard->user();
-
-        $threads = Thread::with(['creator'])->whereHas('participants', function (Builder $query) {
-            $query->where('user_id', '=', $this->guard->id());
-        })->paginate(20);
-
-        $unreadThreads = $this->threadParticipantRepository->getUnreadThreadsForUser($user->getAuthIdentifier());
-
-        return $this->responseFactory->view(
-            'private-messages.thread-index',
-            compact('threads', 'user', 'unreadThreads')
-        );
-    }
-
-    public function show(Thread $thread): Response
+    public function __invoke(Thread $thread): Response
     {
         $user = $this->guard->user();
 
@@ -95,7 +78,7 @@ class ThreadController
             throw new NotFoundHttpException();
         }
 
-        $currentParticipant->last_read_at = Carbon::now();
+        $currentParticipant->last_read_at = CarbonImmutable::now();
         $currentParticipant->save();
 
         $unreadThreads = $this->threadParticipantRepository->getUnreadThreadsForUser($user->getAuthIdentifier());

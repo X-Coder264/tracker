@@ -20,7 +20,7 @@ use Illuminate\Contracts\Routing\UrlGenerator;
 use Illuminate\Contracts\Routing\ResponseFactory;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 
-class TorrentFeedController
+final class TorrentFeedController
 {
     /**
      * @var TorrentFeedItemFactory
@@ -75,7 +75,7 @@ class TorrentFeedController
         $this->responseFactory = $responseFactory;
     }
 
-    public function show(Request $request, string $passkey): Response
+    public function __invoke(Request $request, string $passkey): Response
     {
         $user = User::where('passkey', '=', $passkey)->first();
 

@@ -41,7 +41,7 @@ final class StatusController
         $this->responseFactory = $responseFactory;
     }
 
-    public function status(): Response
+    public function __invoke(): Response
     {
         /** @var User $user */
         $user = $this->guard->user();

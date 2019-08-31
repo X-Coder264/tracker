@@ -9,7 +9,7 @@ use Illuminate\Http\Response;
 use App\Services\AnnounceManager;
 use Illuminate\Contracts\Routing\ResponseFactory;
 
-class AnnounceController
+final class AnnounceController
 {
     /**
      * @var AnnounceManager
@@ -27,7 +27,7 @@ class AnnounceController
         $this->responseFactory = $responseFactory;
     }
 
-    public function store(Request $request): Response
+    public function __invoke(Request $request): Response
     {
         return $this->responseFactory->make(
             $this->announceManager->announce($request)

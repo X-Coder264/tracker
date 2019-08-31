@@ -11,7 +11,7 @@ use App\Services\AnnounceManager;
 use Illuminate\Contracts\Translation\Translator;
 use Illuminate\Contracts\Routing\ResponseFactory;
 
-class ScrapeController
+final class ScrapeController
 {
     /**
      * @var Bencoder
@@ -45,7 +45,7 @@ class ScrapeController
         $this->announceManager = $announceManager;
     }
 
-    public function show(Request $request): Response
+    public function __invoke(Request $request): Response
     {
         $passkey = $request->input('passkey');
 

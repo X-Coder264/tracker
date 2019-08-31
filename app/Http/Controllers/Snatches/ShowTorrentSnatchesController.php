@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Snatches;
 
 use App\Models\Snatch;
 use App\Models\Torrent;
@@ -13,7 +13,7 @@ use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Contracts\Routing\ResponseFactory;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
-final class SnatchController
+final class ShowTorrentSnatchesController
 {
     /**
      * @var Repository
@@ -31,7 +31,7 @@ final class SnatchController
         $this->responseFactory = $responseFactory;
     }
 
-    public function show(Request $request, Torrent $torrent): Response
+    public function __invoke(Request $request, Torrent $torrent): Response
     {
         $page = (int) $request->input('page', 1);
 

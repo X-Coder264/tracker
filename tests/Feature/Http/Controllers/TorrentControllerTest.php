@@ -76,15 +76,15 @@ class TorrentControllerTest extends TestCase
         $response->assertSee($visibleTorrent->category->name);
         $response->assertDontSee($deadTorrent->name);
 
-        $cacheManager = $this->app->make(CacheManager::class);
-        $cachedTorrents = $cacheManager->tags('torrents')->get('torrents.page.1.perPage.' . $this->torrentsPerPage);
+        $cache = $this->app->make(Repository::class);
+        $cachedTorrents = $cache->tags('torrents')->get('torrents.page.1.perPage.' . $this->torrentsPerPage);
 
         $this->assertInstanceOf(LengthAwarePaginator::class, $cachedTorrents);
         $this->assertSame(1, $cachedTorrents->count());
         $this->assertSame($this->user->torrents_per_page, $response->viewData('torrents')->perPage());
         $this->assertTrue($cachedTorrents[0]->is($visibleTorrent));
 
-        $cacheManager->tags('torrents')->flush();
+        $cache->tags('torrents')->flush();
     }
 
     public function testIndexWithNonNumericPage(): void

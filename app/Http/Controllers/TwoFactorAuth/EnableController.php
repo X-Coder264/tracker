@@ -34,7 +34,7 @@ final class EnableController
         $this->responseFactory = $responseFactory;
     }
 
-    public function enable(): RedirectResponse
+    public function __invoke(): RedirectResponse
     {
         /** @var User $user */
         $user = $this->guard->user();

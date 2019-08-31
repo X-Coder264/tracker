@@ -12,7 +12,7 @@ use App\Services\StatisticsManager;
 use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Contracts\Routing\ResponseFactory;
 
-class HomeController
+final class HomeController
 {
     /**
      * @var StatisticsManager
@@ -46,7 +46,7 @@ class HomeController
         $this->cache = $cache;
     }
 
-    public function index(): Response
+    public function __invoke(): Response
     {
         $news = $this->cache->remember('news', Cache::ONE_DAY, function (): ?News {
             return News::with('author')->orderByDesc('id')->first();

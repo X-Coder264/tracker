@@ -2,20 +2,18 @@
 
 declare(strict_types=1);
 
-namespace App\Http\Controllers\PrivateMessages;
+namespace App\Http\Controllers\PrivateMessages\ThreadMessages;
 
 use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 use Illuminate\Contracts\Auth\Guard;
 use Illuminate\Http\RedirectResponse;
 use App\Models\PrivateMessages\Thread;
 use Illuminate\Contracts\Cache\Repository;
-use App\Models\PrivateMessages\ThreadMessage;
 use App\Models\PrivateMessages\ThreadParticipant;
 use Illuminate\Contracts\Routing\ResponseFactory;
 
-class ThreadMessageController
+final class StoreController
 {
     /**
      * @var Guard
@@ -32,27 +30,14 @@ class ThreadMessageController
      */
     private $responseFactory;
 
-    public function __construct(
-        Guard $guard,
-        Repository $cache,
-        ResponseFactory $responseFactory
-    ) {
+    public function __construct(Guard $guard, Repository $cache, ResponseFactory $responseFactory)
+    {
         $this->guard = $guard;
         $this->cache = $cache;
         $this->responseFactory = $responseFactory;
     }
 
-    public function create(Thread $thread): Response
-    {
-        $threadMessage = new ThreadMessage();
-
-        return $this->responseFactory->view(
-            'private-messages.message-create',
-            compact('thread', 'threadMessage')
-        );
-    }
-
-    public function store(Request $request, Thread $thread): RedirectResponse
+    public function __invoke(Request $request, Thread $thread): RedirectResponse
     {
         /** @var User $user */
         $user = $this->guard->user();

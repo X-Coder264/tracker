@@ -10,9 +10,9 @@ use Illuminate\Contracts\Auth\Guard;
 use Illuminate\Contracts\Config\Repository;
 use Illuminate\Contracts\Routing\ResponseFactory;
 
-class IndexController
+final class IndexController
 {
-    public function index(Guard $guard, Repository $config, ResponseFactory $responseFactory): Response
+    public function __invoke(Guard $guard, Repository $config, ResponseFactory $responseFactory): Response
     {
         $user = $guard->user();
         $projectName = $config->get('app.name');

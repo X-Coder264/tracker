@@ -2,18 +2,17 @@
 
 declare(strict_types=1);
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Invites;
 
 use App\Models\User;
 use App\Models\Invite;
 use Carbon\CarbonImmutable;
-use Illuminate\Http\Response;
 use Illuminate\Contracts\Auth\Guard;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Contracts\Translation\Translator;
 use Illuminate\Contracts\Routing\ResponseFactory;
 
-final class InviteController
+final class StoreController
 {
     /**
      * @var Guard
@@ -37,18 +36,7 @@ final class InviteController
         $this->responseFactory = $responseFactory;
     }
 
-    public function create(): Response
-    {
-        /** @var User $user */
-        $user = $this->guard->user();
-        $user->load(['invites', 'invitees']);
-        $invites = $user->invites;
-        $invitees = $user->invitees;
-
-        return $this->responseFactory->view('invites.create', compact('user', 'invites', 'invitees'));
-    }
-
-    public function store(): RedirectResponse
+    public function __invoke(): RedirectResponse
     {
         /** @var User $user */
         $user = $this->guard->user();

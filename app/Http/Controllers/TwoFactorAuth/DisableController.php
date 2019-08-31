@@ -34,7 +34,7 @@ final class DisableController
         $this->responseFactory = $responseFactory;
     }
 
-    public function disable(): RedirectResponse
+    public function __invoke(): RedirectResponse
     {
         /** @var User $user */
         $user = $this->guard->user();
