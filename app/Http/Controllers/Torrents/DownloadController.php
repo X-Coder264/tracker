@@ -89,7 +89,7 @@ final class DownloadController
         try {
             $torrentFile = $this->filesystemManager->disk('torrents')->get("{$torrent->id}.torrent");
         } catch (FileNotFoundException $e) {
-            throw new NotFoundHttpException($this->translator->trans('messages.torrent-file-missing.error-message'));
+            throw new NotFoundHttpException($this->translator->get('messages.torrent-file-missing.error-message'));
         }
 
         $decodedTorrent = $this->decoder->decode($torrentFile);

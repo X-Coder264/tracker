@@ -117,7 +117,7 @@ class LoginControllerTest extends TestCase
         $response->assertStatus(302);
         $response->assertRedirect($urlGenerator->route('login'));
         $this->assertGuest();
-        $response->assertSessionHas('error', $this->app->make(Translator::class)->trans('messages.user.banned'));
+        $response->assertSessionHas('error', $this->app->make(Translator::class)->get('messages.user.banned'));
     }
 
     public function testUserCannotLoginWithIncorrectPassword(): void

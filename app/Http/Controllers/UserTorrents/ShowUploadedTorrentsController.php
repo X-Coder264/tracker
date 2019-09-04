@@ -51,9 +51,9 @@ final class ShowUploadedTorrentsController
         $loggedInUser = $this->guard->user();
 
         if ($user->is($loggedInUser)) {
-            $title = $this->translator->trans('messages.torrent.current-user.page_title');
+            $title = $this->translator->get('messages.torrent.current-user.page_title');
         } else {
-            $title = $this->translator->trans('messages.torrent.user.page_title');
+            $title = $this->translator->get('messages.torrent.user.page_title');
         }
 
         $torrents = $this->userRepository->getUploadedTorrents($user->id, $user->torrents_per_page);

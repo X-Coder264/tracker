@@ -43,7 +43,7 @@ final class StoreController
 
         if ($user->invites_amount < 1) {
             return $this->responseFactory->redirectToRoute('invites.create')
-                ->with('error', $this->translator->trans('messages.invites_no_invites_left_error_message'));
+                ->with('error', $this->translator->get('messages.invites_no_invites_left_error_message'));
         }
 
         $expiresInDays = 3;
@@ -58,6 +58,6 @@ final class StoreController
         $user->save();
 
         return $this->responseFactory->redirectToRoute('invites.create')
-            ->with('success', $this->translator->transChoice('messages.invites_successfully_created_message', $expiresInDays));
+            ->with('success', $this->translator->choice('messages.invites_successfully_created_message', $expiresInDays));
     }
 }

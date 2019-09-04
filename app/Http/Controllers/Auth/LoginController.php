@@ -100,7 +100,7 @@ class LoginController extends Controller
 
                 return $this->responseFactory->redirectToRoute('login')
                     ->withInput()
-                    ->with('error', $this->translator->trans('messages.user.banned'));
+                    ->with('error', $this->translator->get('messages.user.banned'));
             }
 
             $response = $this->sendLoginResponse($request);

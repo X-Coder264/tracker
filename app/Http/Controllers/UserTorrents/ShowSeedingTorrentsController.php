@@ -38,9 +38,9 @@ final class ShowSeedingTorrentsController
     {
         $peers = $this->userRepository->getSeedingTorrentPeers($user->id, $user->torrents_per_page);
 
-        $title = $this->translator->trans('messages.common.currently-seeding');
+        $title = $this->translator->get('messages.common.currently-seeding');
 
-        $noTorrentsMessage = $this->translator->trans('messages.common.no-torrents-on-seed');
+        $noTorrentsMessage = $this->translator->get('messages.common.no-torrents-on-seed');
 
         return $this->responseFactory->view(
             'user-torrents.show-peers',

@@ -57,6 +57,6 @@ final class UpdateController
         $this->cache->forget('user.' . $user->slug . '.locale');
         $this->cache->forget('user.' . $user->passkey);
 
-        return $this->redirector->back()->with('success', $this->translator->trans('messages.common.save_changes_successful'));
+        return $this->redirector->back()->with('success', $this->translator->get('messages.common.save_changes_successful'));
     }
 }

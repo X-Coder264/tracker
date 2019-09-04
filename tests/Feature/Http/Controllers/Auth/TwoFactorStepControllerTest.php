@@ -125,7 +125,7 @@ final class TwoFactorStepControllerTest extends TestCase
         $response->assertRedirect($urlGenerator->route('2fa.show_form'));
         $response->assertSessionHasErrors(
             'code',
-            $this->app->make(Translator::class)->trans('validation.valid_two_factor_code')
+            $this->app->make(Translator::class)->get('validation.valid_two_factor_code')
         );
         $response->assertSessionHasInput('code', $secretCode);
 

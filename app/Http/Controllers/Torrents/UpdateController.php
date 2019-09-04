@@ -63,7 +63,7 @@ final class UpdateController
             $this->gate->authorize('update', $torrent);
         } catch (AuthorizationException $exception) {
             return $this->responseFactory->redirectToRoute('torrents.index')
-                ->with('error', $this->translator->trans('messages.torrent.not_allowed_to_edit'));
+                ->with('error', $this->translator->get('messages.torrent.not_allowed_to_edit'));
         }
 
         $validator = $this->validatorFactory->make(
@@ -99,6 +99,6 @@ final class UpdateController
         $torrent->save();
 
         return $this->responseFactory->redirectToRoute('torrents.edit', $torrent)
-            ->with('success', $this->translator->trans('messages.torrent.successfully_updated'));
+            ->with('success', $this->translator->get('messages.torrent.successfully_updated'));
     }
 }

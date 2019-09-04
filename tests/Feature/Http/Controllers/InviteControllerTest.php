@@ -54,7 +54,7 @@ final class InviteControllerTest extends TestCase
 
         $response->assertSee($user->invitees[0]->name);
 
-        $response->assertSee($this->app->make(Translator::class)->trans('messages.invites.create'));
+        $response->assertSee($this->app->make(Translator::class)->get('messages.invites.create'));
     }
 
     public function testCreateAsANonLoggedInUser(): void
@@ -86,7 +86,7 @@ final class InviteControllerTest extends TestCase
 
         $response->assertSessionHas(
             'success',
-            $this->app->make(Translator::class)->transChoice('messages.invites_successfully_created_message', 3)
+            $this->app->make(Translator::class)->choice('messages.invites_successfully_created_message', 3)
         );
 
         $this->assertSame(1, Invite::count());
@@ -122,7 +122,7 @@ final class InviteControllerTest extends TestCase
 
         $response->assertSessionHas(
             'error',
-            $this->app->make(Translator::class)->trans('messages.invites_no_invites_left_error_message')
+            $this->app->make(Translator::class)->get('messages.invites_no_invites_left_error_message')
         );
 
         $this->assertSame(0, Invite::count());

@@ -79,7 +79,7 @@ final class ShowController
         try {
             $torrentFileNamesAndSizes = $this->torrentInfoService->getTorrentFileNamesAndSizes($torrent);
         } catch (FileNotFoundException $e) {
-            throw new NotFoundHttpException($this->translator->trans('messages.torrent-file-missing.error-message'));
+            throw new NotFoundHttpException($this->translator->get('messages.torrent-file-missing.error-message'));
         }
 
         $filesCount = count($torrentFileNamesAndSizes);

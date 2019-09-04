@@ -49,11 +49,11 @@ final class StatusControllerTest extends TestCase
 
         $translator = $this->app->make(Translator::class);
 
-        $response->assertSee($translator->trans('messages.2fa.info_message'));
-        $response->assertSee($translator->trans('messages.2fa.please_scan_barcode_message'));
-        $response->assertSee($translator->trans('messages.2fa.use_secret_key_message', ['code' => $user->two_factor_secret_key]));
-        $response->assertSee($translator->trans('messages.2fa.enable_button.caption'));
-        $response->assertDontSee($translator->trans('messages.2fa.disable_button.caption'));
+        $response->assertSee($translator->get('messages.2fa.info_message'));
+        $response->assertSee($translator->get('messages.2fa.please_scan_barcode_message'));
+        $response->assertSee($translator->get('messages.2fa.use_secret_key_message', ['code' => $user->two_factor_secret_key]));
+        $response->assertSee($translator->get('messages.2fa.enable_button.caption'));
+        $response->assertDontSee($translator->get('messages.2fa.disable_button.caption'));
     }
 
     public function testStatusPageWhenUser2FAIsEnabled(): void
@@ -78,11 +78,11 @@ final class StatusControllerTest extends TestCase
 
         $translator = $this->app->make(Translator::class);
 
-        $response->assertSee($translator->trans('messages.2fa.info_message'));
-        $response->assertDontSee($translator->trans('messages.2fa.please_scan_barcode_message'));
-        $response->assertDontSee($translator->trans('messages.2fa.use_secret_key_message', ['code' => $user->two_factor_secret_key]));
-        $response->assertDontSee($translator->trans('messages.2fa.enable_button.caption'));
-        $response->assertSee($translator->trans('messages.2fa.disable_button.caption'));
+        $response->assertSee($translator->get('messages.2fa.info_message'));
+        $response->assertDontSee($translator->get('messages.2fa.please_scan_barcode_message'));
+        $response->assertDontSee($translator->get('messages.2fa.use_secret_key_message', ['code' => $user->two_factor_secret_key]));
+        $response->assertDontSee($translator->get('messages.2fa.enable_button.caption'));
+        $response->assertSee($translator->get('messages.2fa.disable_button.caption'));
     }
 
     public function testStatusPageAsGuest(): void

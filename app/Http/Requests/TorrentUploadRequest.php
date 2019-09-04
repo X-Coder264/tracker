@@ -42,7 +42,7 @@ class TorrentUploadRequest extends FormRequest
         $translator = $this->container->make(Translator::class);
 
         return [
-            'torrent.mimetypes'    => $translator->trans('messages.validation.torrent-upload-invalid-torrent-file'),
+            'torrent.mimetypes'    => $translator->get('messages.validation.torrent-upload-invalid-torrent-file'),
         ];
     }
 }

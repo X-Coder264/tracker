@@ -13,7 +13,6 @@ return [
     |
     */
 
-    'password' => 'Lozinka mora sadržavati najmanje osam znakova i mora biti jednaka potvrdi.',
     'reset' => 'Lozinka vam je resetirana!',
     'sent' => 'Poslali smo vam email za resetiranje lozinke!',
     'token' => 'Ovaj token za resetiranje lozinke nije ispravan.',

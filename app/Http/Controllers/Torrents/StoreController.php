@@ -58,6 +58,6 @@ final class StoreController
         $this->cache->tags('torrents')->flush();
 
         return $this->responseFactory->redirectToRoute('torrents.show', $torrent)
-            ->with('success', $this->translator->trans('messages.torrents.store-successfully-uploaded-torrent.message'));
+            ->with('success', $this->translator->get('messages.torrents.store-successfully-uploaded-torrent.message'));
     }
 }

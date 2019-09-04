@@ -42,6 +42,6 @@ final class UpdateController
         $this->cache->delete('torrent.' . $torrentComment->torrent_id . '.comments');
 
         return $this->responseFactory->redirectToRoute('torrents.show', $torrentComment->torrent)
-            ->with('torrentCommentSuccess', $this->translator->trans('messages.torrent-comments.update-success-message'));
+            ->with('torrentCommentSuccess', $this->translator->get('messages.torrent-comments.update-success-message'));
     }
 }

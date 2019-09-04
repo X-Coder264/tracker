@@ -188,11 +188,11 @@ class AnnounceManager
         $this->user = $this->getUser($this->request->input('passkey'));
 
         if (null === $this->user) {
-            return $this->announceErrorResponse($this->translator->trans('messages.announce.invalid_passkey'), true);
+            return $this->announceErrorResponse($this->translator->get('messages.announce.invalid_passkey'), true);
         }
 
         if (true === (bool) $this->user->banned) {
-            return $this->announceErrorResponse($this->translator->trans('messages.announce.banned_user'), true);
+            return $this->announceErrorResponse($this->translator->get('messages.announce.banned_user'), true);
         }
 
         $this->torrent = $this->connection->table('torrents')
@@ -202,7 +202,7 @@ class AnnounceManager
                                                ->first();
 
         if (null === $this->torrent) {
-            return $this->announceErrorResponse($this->translator->trans('messages.announce.invalid_info_hash'));
+            return $this->announceErrorResponse($this->translator->get('messages.announce.invalid_info_hash'));
         }
 
         $left = (int) $this->request->input('left');
@@ -219,7 +219,7 @@ class AnnounceManager
             ->first();
 
         if (null === $this->peer && ('completed' === $this->event || 'stopped' === $this->event)) {
-            return $this->announceErrorResponse($this->translator->trans('messages.announce.invalid_peer_id'));
+            return $this->announceErrorResponse($this->translator->get('messages.announce.invalid_peer_id'));
         }
 
         $timeNow = Carbon::now();
@@ -289,7 +289,7 @@ class AnnounceManager
         }
 
         if (empty($response['files'])) {
-            return $this->announceErrorResponse($this->translator->trans('messages.scrape.no_torrents'));
+            return $this->announceErrorResponse($this->translator->get('messages.scrape.no_torrents'));
         }
 
         return $this->encoder->encode($response);
@@ -311,13 +311,13 @@ class AnnounceManager
     private function validateInfoHash(): void
     {
         if (true !== $this->request->filled('info_hash')) {
-            $errorMessage = $this->translator->trans('messages.validation.variable.required', ['var' => 'info_hash']);
+            $errorMessage = $this->translator->get('messages.validation.variable.required', ['var' => 'info_hash']);
 
             throw new AnnounceValidationException($errorMessage);
         }
 
         if (20 !== strlen($this->request->input('info_hash'))) {
-            $errorMessage = $this->translator->trans('messages.validation.variable.size', ['var' => 'info_hash']);
+            $errorMessage = $this->translator->get('messages.validation.variable.size', ['var' => 'info_hash']);
 
             throw new AnnounceValidationException($errorMessage);
         }
@@ -329,13 +329,13 @@ class AnnounceManager
     private function validatePeerID(): void
     {
         if (true !== $this->request->filled('peer_id')) {
-            $errorMessage = $this->translator->trans('messages.validation.variable.required', ['var' => 'peer_id']);
+            $errorMessage = $this->translator->get('messages.validation.variable.required', ['var' => 'peer_id']);
 
             throw new AnnounceValidationException($errorMessage);
         }
 
         if (20 !== strlen($this->request->input('peer_id'))) {
-            $errorMessage = $this->translator->trans('messages.validation.variable.size', ['var' => 'peer_id']);
+            $errorMessage = $this->translator->get('messages.validation.variable.size', ['var' => 'peer_id']);
 
             throw new AnnounceValidationException($errorMessage);
         }
@@ -357,23 +357,23 @@ class AnnounceManager
                 'numwant'    => 'sometimes|integer',
             ],
             [
-                'passkey.required'    => $this->translator->trans('messages.validation.variable.required', ['var' => 'passkey']),
-                'passkey.string'      => $this->translator->trans('messages.validation.variable.string', ['var' => 'passkey']),
-                'passkey.size'        => $this->translator->trans('messages.validation.variable.size', ['var' => 'passkey']),
-                'port.required'       => $this->translator->trans('messages.validation.variable.required', ['var' => 'port']),
-                'port.integer'        => $this->translator->trans('messages.validation.variable.port', ['port' => $this->request->input('port')]),
-                'port.min'            => $this->translator->trans('messages.validation.variable.port', ['port' => $this->request->input('port')]),
-                'port.max'            => $this->translator->trans('messages.validation.variable.port', ['port' => $this->request->input('port')]),
-                'uploaded.required'   => $this->translator->trans('messages.validation.variable.required', ['var' => 'uploaded']),
-                'uploaded.integer'    => $this->translator->trans('messages.validation.variable.integer', ['var' => 'uploaded']),
-                'uploaded.min'        => $this->translator->trans('messages.validation.variable.uploaded', ['uploaded' => $this->request->input('uploaded')]),
-                'downloaded.required' => $this->translator->trans('messages.validation.variable.required', ['var' => 'downloaded']),
-                'downloaded.integer'  => $this->translator->trans('messages.validation.variable.integer', ['var' => 'downloaded']),
-                'downloaded.min'      => $this->translator->trans('messages.validation.variable.downloaded', ['downloaded' => $this->request->input('downloaded')]),
-                'left.required'       => $this->translator->trans('messages.validation.variable.required', ['var' => 'left']),
-                'left.integer'        => $this->translator->trans('messages.validation.variable.integer', ['var' => 'left']),
-                'left.min'            => $this->translator->trans('messages.validation.variable.left', ['left' => $this->request->input('left')]),
-                'numwant.integer'     => $this->translator->trans('messages.validation.variable.integer', ['var' => 'numwant']),
+                'passkey.required'    => $this->translator->get('messages.validation.variable.required', ['var' => 'passkey']),
+                'passkey.string'      => $this->translator->get('messages.validation.variable.string', ['var' => 'passkey']),
+                'passkey.size'        => $this->translator->get('messages.validation.variable.size', ['var' => 'passkey']),
+                'port.required'       => $this->translator->get('messages.validation.variable.required', ['var' => 'port']),
+                'port.integer'        => $this->translator->get('messages.validation.variable.port', ['port' => $this->request->input('port')]),
+                'port.min'            => $this->translator->get('messages.validation.variable.port', ['port' => $this->request->input('port')]),
+                'port.max'            => $this->translator->get('messages.validation.variable.port', ['port' => $this->request->input('port')]),
+                'uploaded.required'   => $this->translator->get('messages.validation.variable.required', ['var' => 'uploaded']),
+                'uploaded.integer'    => $this->translator->get('messages.validation.variable.integer', ['var' => 'uploaded']),
+                'uploaded.min'        => $this->translator->get('messages.validation.variable.uploaded', ['uploaded' => $this->request->input('uploaded')]),
+                'downloaded.required' => $this->translator->get('messages.validation.variable.required', ['var' => 'downloaded']),
+                'downloaded.integer'  => $this->translator->get('messages.validation.variable.integer', ['var' => 'downloaded']),
+                'downloaded.min'      => $this->translator->get('messages.validation.variable.downloaded', ['downloaded' => $this->request->input('downloaded')]),
+                'left.required'       => $this->translator->get('messages.validation.variable.required', ['var' => 'left']),
+                'left.integer'        => $this->translator->get('messages.validation.variable.integer', ['var' => 'left']),
+                'left.min'            => $this->translator->get('messages.validation.variable.left', ['left' => $this->request->input('left')]),
+                'numwant.integer'     => $this->translator->get('messages.validation.variable.integer', ['var' => 'numwant']),
             ]
         );
 
@@ -462,7 +462,7 @@ class AnnounceManager
         // throw the validation exception if there is not at least one IP address and port set
         if (false === ((null !== $this->ipv4Address && null !== $this->ipv4Port) ||
                 (null !== $this->ipv6Address && null !== $this->ipv6Port))) {
-            throw new AnnounceValidationException($this->translator->trans('messages.announce.invalid_ip_or_port'));
+            throw new AnnounceValidationException($this->translator->get('messages.announce.invalid_ip_or_port'));
         }
     }
 

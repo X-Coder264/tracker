@@ -182,7 +182,7 @@ class TorrentUploadManager
 
         $torrent->delete();
 
-        throw new FileNotWritableException($this->translator->trans('messages.file-not-writable-exception.error-message'));
+        throw new FileNotWritableException($this->translator->get('messages.file-not-writable-exception.error-message'));
     }
 
     protected function getV1TorrentInfoHash(array $torrentInfoDictionary): string
@@ -215,6 +215,6 @@ class TorrentUploadManager
 
     private function throwInvalidTorrentFileException(): void
     {
-        throw ValidationException::withMessages(['torrent' => $this->translator->trans('messages.validation.torrent-upload-invalid-torrent-file')]);
+        throw ValidationException::withMessages(['torrent' => $this->translator->get('messages.validation.torrent-upload-invalid-torrent-file')]);
     }
 }

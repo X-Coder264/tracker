@@ -30,7 +30,7 @@ final class DisableControllerTest extends TestCase
         $response->assertRedirect($urlGenerator->route('2fa.status'));
         $response->assertSessionHas(
             'success',
-            $this->app->make(Translator::class)->trans('messages.2fa.successfully_disabled.message')
+            $this->app->make(Translator::class)->get('messages.2fa.successfully_disabled.message')
         );
 
         $user->refresh();

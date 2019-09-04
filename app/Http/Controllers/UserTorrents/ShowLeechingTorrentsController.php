@@ -38,9 +38,9 @@ final class ShowLeechingTorrentsController
     {
         $peers = $this->userRepository->getLeechingTorrentPeers($user->id, $user->torrents_per_page);
 
-        $title = $this->translator->trans('messages.common.currently-leeching');
+        $title = $this->translator->get('messages.common.currently-leeching');
 
-        $noTorrentsMessage = $this->translator->trans('messages.common.no-torrents-on-leech');
+        $noTorrentsMessage = $this->translator->get('messages.common.no-torrents-on-leech');
 
         return $this->responseFactory->view(
             'user-torrents.show-peers',

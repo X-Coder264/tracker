@@ -38,7 +38,7 @@ class TorrentCommentRequest extends FormRequest
         $translator = $this->container->make(Translator::class);
 
         return [
-            'comment.required' => $translator->trans('messages.validation.torrent-comment-required'),
+            'comment.required' => $translator->get('messages.validation.torrent-comment-required'),
         ];
     }
 }

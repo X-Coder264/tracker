@@ -48,13 +48,13 @@ class UpdateUserRequest extends FormRequest
         $translator = $this->container->make(Translator::class);
 
         return [
-            'email.required' => $translator->trans('messages.validation.variable.required', ['var' => 'email']),
-            'email.email' => $translator->trans('messages.validation.variable.email'),
-            'email.unique' => $translator->trans('messages.validation.variable.email', ['var' => 'email']),
-            'locale_id.required' => $translator->trans('messages.validation.variable.required', ['var' => 'language']),
-            'locale_id.in' => $translator->trans('messages.validation.variable.invalid_value', ['var' => 'language']),
-            'timezone.required' => $translator->trans('messages.validation.variable.required', ['var' => 'timezone']),
-            'timezone.timezone' => $translator->trans('messages.validation.variable.invalid_value', ['var' => 'timezone']),
+            'email.required' => $translator->get('messages.validation.variable.required', ['var' => 'email']),
+            'email.email' => $translator->get('messages.validation.variable.email'),
+            'email.unique' => $translator->get('messages.validation.variable.email', ['var' => 'email']),
+            'locale_id.required' => $translator->get('messages.validation.variable.required', ['var' => 'language']),
+            'locale_id.in' => $translator->get('messages.validation.variable.invalid_value', ['var' => 'language']),
+            'timezone.required' => $translator->get('messages.validation.variable.required', ['var' => 'timezone']),
+            'timezone.timezone' => $translator->get('messages.validation.variable.invalid_value', ['var' => 'timezone']),
         ];
     }
 }

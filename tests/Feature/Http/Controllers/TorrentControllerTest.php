@@ -302,7 +302,7 @@ class TorrentControllerTest extends TestCase
         $response->assertRedirect($urlGenerator->route('torrents.index'));
         $response->assertSessionHas(
             'error',
-            $this->app->make(Translator::class)->trans('messages.torrent.not_allowed_to_edit')
+            $this->app->make(Translator::class)->get('messages.torrent.not_allowed_to_edit')
         );
     }
 
@@ -341,7 +341,7 @@ class TorrentControllerTest extends TestCase
         $response->assertRedirect($urlGenerator->route('torrents.edit', $torrent));
         $response->assertSessionHas(
             'success',
-            $this->app->make(Translator::class)->trans('messages.torrent.successfully_updated')
+            $this->app->make(Translator::class)->get('messages.torrent.successfully_updated')
         );
 
         $torrent->refresh();
@@ -491,7 +491,7 @@ class TorrentControllerTest extends TestCase
         $response->assertRedirect($urlGenerator->route('torrents.index'));
         $response->assertSessionHas(
             'error',
-            $this->app->make(Translator::class)->trans('messages.torrent.not_allowed_to_edit')
+            $this->app->make(Translator::class)->get('messages.torrent.not_allowed_to_edit')
         );
 
         $freshTorrent = $torrent->fresh();
@@ -536,7 +536,7 @@ class TorrentControllerTest extends TestCase
         $response->assertRedirect($urlGenerator->route('torrents.edit', $torrent));
         $response->assertSessionHas(
             'success',
-            $this->app->make(Translator::class)->trans('messages.torrent.successfully_updated')
+            $this->app->make(Translator::class)->get('messages.torrent.successfully_updated')
         );
 
         $torrent->refresh();

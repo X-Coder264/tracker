@@ -42,6 +42,6 @@ final class EnableController
         $user->save();
 
         return $this->responseFactory->redirectToRoute('2fa.status')
-            ->with('success', $this->translator->trans('messages.2fa.successfully_enabled.message'));
+            ->with('success', $this->translator->get('messages.2fa.successfully_enabled.message'));
     }
 }

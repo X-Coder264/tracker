@@ -60,7 +60,7 @@ final class EditController
             $this->gate->authorize('update', $torrent);
         } catch (AuthorizationException $exception) {
             return $this->responseFactory->redirectToRoute('torrents.index')
-                ->with('error', $this->translator->trans('messages.torrent.not_allowed_to_edit'));
+                ->with('error', $this->translator->get('messages.torrent.not_allowed_to_edit'));
         }
 
         $categories = $this->torrentCategoryRepository->getAllCategories();

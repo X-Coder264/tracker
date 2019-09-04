@@ -50,17 +50,17 @@ final class ScrapeController
         $passkey = $request->input('passkey');
 
         if (empty($passkey) || 64 !== strlen($passkey)) {
-            return $this->getErrorResponse($this->translator->trans('messages.announce.invalid_passkey'));
+            return $this->getErrorResponse($this->translator->get('messages.announce.invalid_passkey'));
         }
 
         $user = $this->announceManager->getUser($passkey);
 
         if (null === $user) {
-            return $this->getErrorResponse($this->translator->trans('messages.announce.invalid_passkey'));
+            return $this->getErrorResponse($this->translator->get('messages.announce.invalid_passkey'));
         }
 
         if (true === (bool) $user->banned) {
-            return $this->getErrorResponse($this->translator->trans('messages.announce.banned_user'));
+            return $this->getErrorResponse($this->translator->get('messages.announce.banned_user'));
         }
 
         $queryParameters = explode('&', $request->server->get('QUERY_STRING'));

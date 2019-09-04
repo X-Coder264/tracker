@@ -58,6 +58,6 @@ final class StoreController
         $this->cache->delete('torrent.' . $torrent->id . '.comments');
 
         return $this->responseFactory->redirectToRoute('torrents.show', $torrent)
-            ->with('torrentCommentSuccess', $this->translator->trans('messages.torrent-comments.create-success-message'));
+            ->with('torrentCommentSuccess', $this->translator->get('messages.torrent-comments.create-success-message'));
     }
 }

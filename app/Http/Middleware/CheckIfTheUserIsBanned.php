@@ -50,7 +50,7 @@ class CheckIfTheUserIsBanned
             $this->guard->logout();
 
             return $this->responseFactory->redirectToRoute('login')
-                ->with('error', $this->translator->trans('messages.user.banned'));
+                ->with('error', $this->translator->get('messages.user.banned'));
         }
 
         return $next($request);
