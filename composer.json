@@ -16,7 +16,7 @@
         "cviebrock/eloquent-sluggable": "^6.0",
         "fideloper/proxy": "^4.2",
         "guzzlehttp/guzzle": "^6.3",
-        "imdbphp/imdbphp": "^6.2",
+        "imdbphp/imdbphp": "^6.3",
         "laravel/framework": "^6.0",
         "laravel/passport": "^7.4",
         "laravel/tinker": "^1.0",
