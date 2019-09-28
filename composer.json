@@ -18,7 +18,7 @@
         "guzzlehttp/guzzle": "^6.3",
         "imdbphp/imdbphp": "^6.3",
         "laravel/framework": "^6.0",
-        "laravel/passport": "^7.4",
+        "laravel/passport": "^7.5",
         "laravel/tinker": "^1.0",
         "nesbot/carbon": "^2.24",
         "pragmarx/google2fa": "^5.0",
@@ -29,7 +29,7 @@
     "require-dev": {
         "ext-simplexml": "*",
         "barryvdh/laravel-debugbar": "^3.2",
-        "facade/ignition": "^1.8",
+        "facade/ignition": "^1.9",
         "friendsofphp/php-cs-fixer": "^2.15",
         "fzaninotto/faker": "^1.8",
         "mockery/mockery": "^1.2",
