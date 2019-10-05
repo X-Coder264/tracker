@@ -17,10 +17,10 @@
         "fideloper/proxy": "^4.2",
         "guzzlehttp/guzzle": "^6.3",
         "imdbphp/imdbphp": "^6.3",
-        "laravel/framework": "^6.0",
+        "laravel/framework": "^6.1",
         "laravel/passport": "^7.5",
         "laravel/tinker": "^1.0",
-        "nesbot/carbon": "^2.24",
+        "nesbot/carbon": "^2.25",
         "pragmarx/google2fa": "^5.0",
         "pragmarx/google2fa-qrcode": "^1.0",
         "predis/predis": "^1.1.1",
@@ -34,7 +34,7 @@
         "fzaninotto/faker": "^1.8",
         "mockery/mockery": "^1.2",
         "nunomaduro/collision": "^3.0",
-        "phpunit/phpunit": "^8.3"
+        "phpunit/phpunit": "^8.4"
     },
     "config": {
         "optimize-autoloader": true,
