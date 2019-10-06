@@ -121,8 +121,10 @@ return [
     'user.profile_last_seen_at' => 'Last seen',
     'user.profile_last_seen_at_never' => 'This user was never seen.',
     'user.profile_snatches' => 'Snatches',
+    'download_snatches_archive.caption' => 'Download ZIP file which contains the .torrent file of all your snatched torrents',
     'user.profile_count_of_uploaded_torrents' => 'Number of uploaded torrents',
     'user.profile_invited_by' => 'Invited by',
+    'download_seeding_torrents_archive.caption' => 'Download ZIP file which contains the .torrent file of all the torrents that you are currently seeding',
     'common.seeding' => 'Seeding',
     'common.leeching' => 'Leeching',
     'common.imdb-title' => 'Title',
@@ -167,4 +169,6 @@ return [
     '2fa.successfully_enabled.message' => 'You have successfully enabled two-factor authentication for your account.',
     '2fa.successfully_disabled.message' => 'You have successfully disabled two-factor authentication for your account.',
     '2fa_code.caption' => 'Two-factor authentication code',
+    'no_snatches_for_zip_archive.message' => 'You do not have any snatches.',
+    'no_seeding_torrents_for_zip_archive.message' => 'You do not seed any torrents.',
 ];

@@ -6,37 +6,18 @@ namespace App\Http\Controllers\Torrents;
 
 use App\Models\User;
 use App\Models\Torrent;
-use App\Services\Bdecoder;
-use App\Services\Bencoder;
-use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Contracts\Auth\Guard;
+use App\Services\TorrentDownloadManipulator;
 use Illuminate\Auth\AuthenticationException;
-use Illuminate\Contracts\Routing\UrlGenerator;
 use Illuminate\Contracts\Translation\Translator;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
-use Illuminate\Contracts\Filesystem\Factory as FilesystemManager;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 final class DownloadController
 {
-    /**
-     * @var Bencoder
-     */
-    private $encoder;
-
-    /**
-     * @var Bdecoder
-     */
-    private $decoder;
-
-    /**
-     * @var UrlGenerator
-     */
-    private $urlGenerator;
-
     /**
      * @var Guard
      */
@@ -48,24 +29,18 @@ final class DownloadController
     private $translator;
 
     /**
-     * @var FilesystemManager
+     * @var TorrentDownloadManipulator
      */
-    private $filesystemManager;
+    private $torrentDownloadManipulator;
 
     public function __construct(
-        Bencoder $encoder,
-        Bdecoder $decoder,
-        UrlGenerator $urlGenerator,
         Guard $guard,
         Translator $translator,
-        FilesystemManager $filesystemManager
+        TorrentDownloadManipulator $torrentDownloadManipulator
     ) {
-        $this->encoder = $encoder;
-        $this->decoder = $decoder;
-        $this->urlGenerator = $urlGenerator;
         $this->guard = $guard;
         $this->translator = $translator;
-        $this->filesystemManager = $filesystemManager;
+        $this->torrentDownloadManipulator = $torrentDownloadManipulator;
     }
 
     public function __invoke(Request $request, Torrent $torrent): Response
@@ -87,25 +62,18 @@ final class DownloadController
         }
 
         try {
-            $torrentFile = $this->filesystemManager->disk('torrents')->get("{$torrent->id}.torrent");
+            $torrentContent = $this->torrentDownloadManipulator->getTorrentContent($torrent->id, $user->passkey);
         } catch (FileNotFoundException $e) {
             throw new NotFoundHttpException($this->translator->get('messages.torrent-file-missing.error-message'));
         }
 
-        $decodedTorrent = $this->decoder->decode($torrentFile);
-
-        $passkey = $user->passkey;
-
-        $decodedTorrent['announce'] = $this->urlGenerator->route('announce', ['passkey' => $passkey]);
-
-        $response = new Response($this->encoder->encode($decodedTorrent));
+        $response = new Response($torrentContent);
         $response->headers->set('Content-Type', 'application/x-bittorrent');
-        // TODO: add support for adding a prefix (or suffix) to the name of the file
-        $fileName = str_replace(['/', '\\'], '', $torrent->name . '.torrent');
+
         $dispositionHeader = $response->headers->makeDisposition(
             ResponseHeaderBag::DISPOSITION_ATTACHMENT,
-            $fileName,
-            str_replace('%', '', Str::ascii($fileName))
+            $this->torrentDownloadManipulator->getTorrentName($torrent->name),
+            $this->torrentDownloadManipulator->getFallBackTorrentName($torrent->name)
         );
 
         $response->headers->set('Content-Disposition', $dispositionHeader);

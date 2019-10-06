@@ -28,7 +28,9 @@ use App\Http\Controllers\Invites\CreateController as InviteCreateController;
 use App\Http\Controllers\Torrents\IndexController as TorrentIndexController;
 use App\Http\Controllers\Torrents\StoreController as TorrentStoreController;
 use App\Http\Controllers\Torrents\CreateController as TorrentCreateController;
+use App\Http\Controllers\Torrents\DownloadSeedingTorrentsZipArchiveController;
 use App\Http\Controllers\Torrents\UpdateController as TorrentUpdateController;
+use App\Http\Controllers\Torrents\DownloadSnatchedTorrentsZipArchiveController;
 use App\Http\Controllers\TorrentComments\EditController as TorrentCommentEditController;
 use App\Http\Controllers\TorrentComments\StoreController as TorrentCommentStoreController;
 use App\Http\Controllers\TorrentComments\CreateController as TorrentCommentCreateController;
@@ -92,6 +94,9 @@ $router->group(['middleware' => [Authenticate::class]], function (Registrar $rou
     $router->get('torrents/{torrent}/edit', TorrentEditController::class)->name('torrents.edit');
     $router->put('torrents/{torrent}', TorrentUpdateController::class)->name('torrents.update');
     $router->post('torrents', TorrentStoreController::class)->name('torrents.store');
+
+    $router->get('torrents-snatched-archive-download', DownloadSnatchedTorrentsZipArchiveController::class)->name('torrents.download-snatched-archive');
+    $router->get('torrents-seeding-archive-download', DownloadSeedingTorrentsZipArchiveController::class)->name('torrents.download-seeding-archive');
 
     $router->get('torrent-comments/{torrent}/create', TorrentCommentCreateController::class)->name('torrent-comments.create');
     $router->get('torrent-comments/{torrentComment}', TorrentCommentEditController::class)->name('torrent-comments.edit');
