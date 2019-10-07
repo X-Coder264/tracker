@@ -21,6 +21,7 @@ use Cviebrock\EloquentSluggable\SluggableScopeHelpers;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
 /**
+ * @property string $passkey
  * @property Collection|Torrent[] $torrents
  * @property Locale $language
  * @property Collection|Snatch[] $snatches

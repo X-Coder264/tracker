@@ -121,8 +121,10 @@ return [
     'user.profile_last_seen_at' => 'Zadnji put online',
     'user.profile_last_seen_at_never' => 'Ovaj korisnik nije nikada bio online.',
     'user.profile_snatches' => 'Snatchevi',
+    'download_snatches_archive.caption' => 'Skini ZIP datoteku koja sadrži sve .torrent datoteke tvojih snatchanih torrenta',
     'user.profile_count_of_uploaded_torrents' => 'Broj uploadanih torrenta',
     'user.profile_invited_by' => 'Pozvao',
+    'download_seeding_torrents_archive.caption' => 'Skini ZIP datoteku koja sadrži sve .torrent datoteke torrenta koje trenutno seedaš',
     'common.seeding' => 'Torrenti na seedu',
     'common.leeching' => 'Torrenti na leechu',
     'common.imdb-title' => 'Naziv',
@@ -167,4 +169,6 @@ return [
     '2fa.successfully_enabled.message' => 'Uspješno ste uključili autentifikaciju u dva koraka za Vaš račun.',
     '2fa.successfully_disabled.message' => 'Uspješno ste isključili autentifikaciju u dva koraka za Vaš račun.',
     '2fa_code.caption' => 'Kod za autentifikaciju u dva koraka',
+    'no_snatches_for_zip_archive.message' => 'Nemate niti jedan snatch.',
+    'no_seeding_torrents_for_zip_archive.message' => 'Ne seedate niti jedan torrent.',
 ];

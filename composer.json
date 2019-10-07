@@ -12,6 +12,7 @@
         "ext-imagick": "*",
         "ext-json": "*",
         "ext-pdo": "*",
+        "ext-zip": "*",
         "cloudcreativity/laravel-json-api": "^1.4",
         "cviebrock/eloquent-sluggable": "^6.0",
         "fideloper/proxy": "^4.2",

@@ -18,6 +18,8 @@ use Illuminate\Contracts\Container\Container;
 use App\Repositories\PrivateMessages\ThreadParticipantRepository;
 use App\Repositories\PrivateMessages\CachedThreadParticipantRepository;
 use App\Repositories\PrivateMessages\ThreadParticipantRepositoryInterface;
+use App\Http\Controllers\Torrents\DownloadSeedingTorrentsZipArchiveController;
+use App\Http\Controllers\Torrents\DownloadSnatchedTorrentsZipArchiveController;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -35,5 +37,16 @@ class AppServiceProvider extends ServiceProvider
                 $container->make(ThreadParticipantRepository::class)
             );
         });
+
+        $this->app->when(
+            [
+                DownloadSnatchedTorrentsZipArchiveController::class,
+                DownloadSeedingTorrentsZipArchiveController::class,
+            ]
+        )
+            ->needs('$storagePath')
+            ->give(function (): string {
+                return $this->app->make('path.storage');
+            });
     }
 }
