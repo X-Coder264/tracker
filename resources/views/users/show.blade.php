@@ -51,7 +51,9 @@
                                         0
                                     @else
                                         <a href="{{ route('user-torrents.show-seeding-torrents', $user) }}">{{ $seedingTorrentPeersCount }}</a>
-                                        <a class="btn btn-primary" href="{{ route('torrents.download-seeding-archive') }}">{{ trans('messages.download_seeding_torrents_archive.caption') }}</a>
+                                        @if ($user->is(auth()->user()))
+                                            <a class="btn btn-primary" href="{{ route('torrents.download-seeding-archive') }}">{{ trans('messages.download_seeding_torrents_archive.caption') }}</a>
+                                        @endif
                                     @endif
                                 </td>
                             </tr>
@@ -72,7 +74,9 @@
                                         0
                                     @else
                                         <a href="{{ route('user-snatches.show', $user) }}">{{ $snatchesCount }}</a>
-                                        <a class="btn btn-primary" href="{{ route('torrents.download-snatched-archive') }}">{{ trans('messages.download_snatches_archive.caption') }}</a>
+                                        @if ($user->is(auth()->user()))
+                                            <a class="btn btn-primary" href="{{ route('torrents.download-snatched-archive') }}">{{ trans('messages.download_snatches_archive.caption') }}</a>
+                                        @endif
                                     @endif
                                 </td>
                             </tr>
