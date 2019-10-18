@@ -13,19 +13,19 @@
         "ext-json": "*",
         "ext-pdo": "*",
         "ext-zip": "*",
-        "cloudcreativity/laravel-json-api": "^1.4",
+        "cloudcreativity/laravel-json-api": "^1.5",
         "cviebrock/eloquent-sluggable": "^6.0",
         "fideloper/proxy": "^4.2",
         "guzzlehttp/guzzle": "^6.3",
         "imdbphp/imdbphp": "^6.3",
-        "laravel/framework": "^6.2",
+        "laravel/framework": "^6.3",
         "laravel/passport": "^7.5",
         "laravel/tinker": "^1.0",
         "nesbot/carbon": "^2.25",
         "pragmarx/google2fa": "^5.0",
         "pragmarx/google2fa-qrcode": "^1.0",
         "predis/predis": "^1.1.1",
-        "spatie/laravel-permission": "^3.0"
+        "spatie/laravel-permission": "^3.2"
     },
     "require-dev": {
         "ext-simplexml": "*",
