@@ -6,6 +6,7 @@ namespace App\Exceptions;
 
 use Exception;
 use Illuminate\Http\Request;
+use Sentry\State\HubInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Neomerx\JsonApi\Exceptions\JsonApiException;
 use CloudCreativity\LaravelJsonApi\Exceptions\HandlesErrors;
@@ -34,14 +35,14 @@ class Handler extends ExceptionHandler
         'password_confirmation',
     ];
 
-    /**
-     * Report or log an exception.
-     *
-     *
-     * @return mixed|void
-     */
     public function report(Exception $exception)
     {
+        if ($this->container->bound('sentry') && $this->shouldReport($exception)) {
+            /** @var HubInterface $sentry */
+            $sentry = $this->container->make('sentry');
+            $sentry->captureException($exception);
+        }
+
         parent::report($exception);
     }
 

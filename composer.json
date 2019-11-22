@@ -25,6 +25,7 @@
         "pragmarx/google2fa": "^5.0",
         "pragmarx/google2fa-qrcode": "^1.0",
         "predis/predis": "^1.1.1",
+        "sentry/sentry-laravel": "^1.5",
         "spatie/laravel-permission": "^3.3"
     },
     "require-dev": {

@@ -35,3 +35,6 @@ MAIL_FROM_NAME=Tracker
 PUSHER_APP_ID=
 PUSHER_APP_KEY=
 PUSHER_APP_SECRET=
+
+# if the DSN entry is empty Sentry reporting is disabled
+SENTRY_LARAVEL_DSN=
