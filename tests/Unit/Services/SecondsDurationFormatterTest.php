@@ -5,14 +5,13 @@ declare(strict_types=1);
 namespace Tests\Unit\Services;
 
 use App\Services\SecondsDurationFormatter;
-use Tests\TestCase;
+use PHPUnit\Framework\TestCase;
 
 class SecondsDurationFormatterTest extends TestCase
 {
     public function testFormatting(): void
     {
-        /** @var SecondsDurationFormatter $formatter */
-        $formatter = $this->app->make(SecondsDurationFormatter::class);
+        $formatter = new SecondsDurationFormatter();
 
         $this->assertSame('-', $formatter->format(0));
         $this->assertSame('0:05', $formatter->format(5));

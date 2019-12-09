@@ -7,8 +7,8 @@ namespace Tests\Unit\Services;
 use App\Models\User;
 use App\Services\PasskeyGenerator;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use ReflectionClass;
-use Tests\TestCase;
 
 class PasskeyGeneratorTest extends TestCase
 {

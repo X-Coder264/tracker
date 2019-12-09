@@ -6,14 +6,14 @@ namespace Tests\Unit\Services;
 
 use App\Services\Bdecoder;
 use Exception;
-use Tests\TestCase;
+use PHPUnit\Framework\TestCase;
 
-class BdecoderTest extends TestCase
+final class BdecoderTest extends TestCase
 {
     /**
      * @var Bdecoder
      */
-    protected $decoder;
+    private $decoder;
 
     protected function setUp(): void
     {

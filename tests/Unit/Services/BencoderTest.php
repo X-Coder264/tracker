@@ -6,14 +6,14 @@ namespace Tests\Unit\Services;
 
 use App\Services\Bencoder;
 use Exception;
-use Tests\TestCase;
+use PHPUnit\Framework\TestCase;
 
-class BencoderTest extends TestCase
+final class BencoderTest extends TestCase
 {
     /**
      * @var Bencoder
      */
-    protected $encoder;
+    private $encoder;
 
     protected function setUp(): void
     {
