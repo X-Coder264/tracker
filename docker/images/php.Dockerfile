@@ -1,4 +1,4 @@
-FROM php:7.3-fpm-alpine
+FROM php:7.4-fpm-alpine
 
 ARG HOST_USER_ID
 ARG HOST_GROUP_ID
@@ -9,6 +9,7 @@ RUN set -xe && \
     apk add --no-cache --upgrade apk-tools zlib && \
     apk add --no-cache --update --virtual .phpize-deps $PHPIZE_DEPS && \
     apk add --no-cache \
+        oniguruma-dev \
         curl-dev \
         libxml2-dev \
         git \
