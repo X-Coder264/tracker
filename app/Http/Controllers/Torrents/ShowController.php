@@ -21,40 +21,13 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 final class ShowController
 {
-    /**
-     * @var TorrentInfoService
-     */
-    private $torrentInfoService;
-
-    /**
-     * @var FileSizeCollectionFormatter
-     */
-    private $fileSizeCollectionFormatter;
-
-    /**
-     * @var Repository
-     */
-    private $cache;
-
-    /**
-     * @var FilesystemManager
-     */
-    private $filesystemManager;
-
-    /**
-     * @var Guard
-     */
-    private $guard;
-
-    /**
-     * @var Translator
-     */
-    private $translator;
-
-    /**
-     * @var ResponseFactory
-     */
-    private $responseFactory;
+    private TorrentInfoService $torrentInfoService;
+    private FileSizeCollectionFormatter $fileSizeCollectionFormatter;
+    private Repository $cache;
+    private FilesystemManager $filesystemManager;
+    private Guard $guard;
+    private Translator $translator;
+    private ResponseFactory $responseFactory;
 
     public function __construct(
         TorrentInfoService $torrentInfoService,

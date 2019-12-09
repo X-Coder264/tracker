@@ -15,30 +15,11 @@ use Symfony\Component\HttpFoundation\Response;
 
 final class EditController
 {
-    /**
-     * @var Gate
-     */
-    private $gate;
-
-    /**
-     * @var TorrentCategoryRepository
-     */
-    private $torrentCategoryRepository;
-
-    /**
-     * @var UrlGenerator
-     */
-    private $urlGenerator;
-
-    /**
-     * @var Translator
-     */
-    private $translator;
-
-    /**
-     * @var ResponseFactory
-     */
-    private $responseFactory;
+    private Gate $gate;
+    private TorrentCategoryRepository $torrentCategoryRepository;
+    private UrlGenerator $urlGenerator;
+    private Translator $translator;
+    private ResponseFactory $responseFactory;
 
     public function __construct(
         Gate $gate,

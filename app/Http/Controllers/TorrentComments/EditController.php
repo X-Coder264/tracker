@@ -10,10 +10,7 @@ use Illuminate\Http\Response;
 
 final class EditController
 {
-    /**
-     * @var ResponseFactory
-     */
-    private $responseFactory;
+    private ResponseFactory $responseFactory;
 
     public function __construct(ResponseFactory $responseFactory)
     {

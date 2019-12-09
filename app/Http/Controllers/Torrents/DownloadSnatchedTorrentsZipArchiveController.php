@@ -16,30 +16,11 @@ use ZipArchive;
 
 final class DownloadSnatchedTorrentsZipArchiveController
 {
-    /**
-     * @var Guard
-     */
-    private $guard;
-
-    /**
-     * @var TorrentDownloadManipulator
-     */
-    private $torrentDownloadManipulator;
-
-    /**
-     * @var string
-     */
-    private $storagePath;
-
-    /**
-     * @var Translator
-     */
-    private $translator;
-
-    /**
-     * @var ResponseFactory
-     */
-    private $responseFactory;
+    private Guard $guard;
+    private TorrentDownloadManipulator $torrentDownloadManipulator;
+    private string $storagePath;
+    private Translator $translator;
+    private ResponseFactory $responseFactory;
 
     public function __construct(
         Guard $guard,

@@ -18,30 +18,11 @@ use Illuminate\Http\Request;
 
 final class UpdateController
 {
-    /**
-     * @var Gate
-     */
-    private $gate;
-
-    /**
-     * @var Factory
-     */
-    private $validatorFactory;
-
-    /**
-     * @var Translator
-     */
-    private $translator;
-
-    /**
-     * @var IMDBManager
-     */
-    private $IMDBManager;
-
-    /**
-     * @var ResponseFactory
-     */
-    private $responseFactory;
+    private Gate $gate;
+    private Factory $validatorFactory;
+    private Translator $translator;
+    private IMDBManager $IMDBManager;
+    private ResponseFactory $responseFactory;
 
     public function __construct(
         Gate $gate,

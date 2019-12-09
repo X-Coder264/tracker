@@ -10,15 +10,8 @@ use Illuminate\Support\Collection;
 
 class CachedThreadParticipantRepository implements ThreadParticipantRepositoryInterface
 {
-    /**
-     * @var Repository
-     */
-    private $cache;
-
-    /**
-     * @var ThreadParticipantRepositoryInterface
-     */
-    private $threadParticipantRepository;
+    private Repository $cache;
+    private ThreadParticipantRepositoryInterface $threadParticipantRepository;
 
     public function __construct(Repository $cache, ThreadParticipantRepositoryInterface $threadParticipantRepository)
     {

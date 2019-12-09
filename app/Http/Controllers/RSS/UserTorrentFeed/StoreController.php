@@ -14,20 +14,9 @@ use Illuminate\Support\Collection;
 
 final class StoreController
 {
-    /**
-     * @var UrlGenerator
-     */
-    private $urlGenerator;
-
-    /**
-     * @var Guard
-     */
-    private $guard;
-
-    /**
-     * @var ResponseFactory
-     */
-    private $responseFactory;
+    private UrlGenerator $urlGenerator;
+    private Guard $guard;
+    private ResponseFactory $responseFactory;
 
     public function __construct(UrlGenerator $urlGenerator, Guard $guard, ResponseFactory $responseFactory)
     {

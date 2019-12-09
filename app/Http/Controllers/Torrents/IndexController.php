@@ -16,20 +16,9 @@ use Illuminate\Http\Response;
 
 final class IndexController
 {
-    /**
-     * @var Guard
-     */
-    private $guard;
-
-    /**
-     * @var Repository
-     */
-    private $cache;
-
-    /**
-     * @var ResponseFactory
-     */
-    private $responseFactory;
+    private Guard $guard;
+    private Repository $cache;
+    private ResponseFactory $responseFactory;
 
     public function __construct(Guard $guard, Repository $cache, ResponseFactory $responseFactory)
     {

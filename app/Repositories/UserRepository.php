@@ -12,10 +12,7 @@ use Illuminate\Database\ConnectionInterface;
 
 class UserRepository
 {
-    /**
-     * @var ConnectionInterface
-     */
-    private $connection;
+    private ConnectionInterface $connection;
 
     public function __construct(ConnectionInterface $connection)
     {

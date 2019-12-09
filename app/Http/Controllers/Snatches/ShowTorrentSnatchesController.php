@@ -15,15 +15,8 @@ use Illuminate\Http\Response;
 
 final class ShowTorrentSnatchesController
 {
-    /**
-     * @var Repository
-     */
-    private $cache;
-
-    /**
-     * @var ResponseFactory
-     */
-    private $responseFactory;
+    private Repository $cache;
+    private ResponseFactory $responseFactory;
 
     public function __construct(Repository $cache, ResponseFactory $responseFactory)
     {

@@ -15,20 +15,9 @@ use Illuminate\Http\Request;
 
 final class StoreController
 {
-    /**
-     * @var Guard
-     */
-    private $guard;
-
-    /**
-     * @var Repository
-     */
-    private $cache;
-
-    /**
-     * @var ResponseFactory
-     */
-    private $responseFactory;
+    private Guard $guard;
+    private Repository $cache;
+    private ResponseFactory $responseFactory;
 
     public function __construct(Guard $guard, Repository $cache, ResponseFactory $responseFactory)
     {

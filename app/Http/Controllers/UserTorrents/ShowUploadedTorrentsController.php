@@ -13,25 +13,10 @@ use Illuminate\Http\Response;
 
 final class ShowUploadedTorrentsController
 {
-    /**
-     * @var Guard
-     */
-    private $guard;
-
-    /**
-     * @var Translator
-     */
-    private $translator;
-
-    /**
-     * @var UserRepository
-     */
-    private $userRepository;
-
-    /**
-     * @var ResponseFactory
-     */
-    private $responseFactory;
+    private Guard $guard;
+    private Translator $translator;
+    private UserRepository $userRepository;
+    private ResponseFactory $responseFactory;
 
     public function __construct(
         Guard $guard,

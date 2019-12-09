@@ -12,20 +12,9 @@ use Illuminate\Http\Response;
 
 final class ShowLeechingTorrentsController
 {
-    /**
-     * @var UserRepository
-     */
-    private $userRepository;
-
-    /**
-     * @var Translator
-     */
-    private $translator;
-
-    /**
-     * @var ResponseFactory
-     */
-    private $responseFactory;
+    private UserRepository $userRepository;
+    private Translator $translator;
+    private ResponseFactory $responseFactory;
 
     public function __construct(UserRepository $userRepository, Translator $translator, ResponseFactory $responseFactory)
     {

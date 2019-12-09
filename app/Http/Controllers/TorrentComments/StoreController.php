@@ -15,25 +15,10 @@ use Illuminate\Http\RedirectResponse;
 
 final class StoreController
 {
-    /**
-     * @var Guard
-     */
-    private $guard;
-
-    /**
-     * @var Repository
-     */
-    private $cache;
-
-    /**
-     * @var Translator
-     */
-    private $translator;
-
-    /**
-     * @var ResponseFactory
-     */
-    private $responseFactory;
+    private Guard $guard;
+    private Repository $cache;
+    private Translator $translator;
+    private ResponseFactory $responseFactory;
 
     public function __construct(
         Guard $guard,

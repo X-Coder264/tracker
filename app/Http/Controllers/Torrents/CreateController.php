@@ -12,20 +12,9 @@ use Illuminate\Http\Response;
 
 final class CreateController
 {
-    /**
-     * @var TorrentCategoryRepository
-     */
-    private $torrentCategoryRepository;
-
-    /**
-     * @var UrlGenerator
-     */
-    private $urlGenerator;
-
-    /**
-     * @var ResponseFactory
-     */
-    private $responseFactory;
+    private TorrentCategoryRepository $torrentCategoryRepository;
+    private UrlGenerator $urlGenerator;
+    private ResponseFactory $responseFactory;
 
     public function __construct(
         TorrentCategoryRepository $torrentCategoryRepository,

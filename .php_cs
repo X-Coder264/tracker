@@ -94,7 +94,7 @@ return PhpCsFixer\Config::create()
         'is_null' => true,
         'modernize_types_casting' => true,
         'native_function_casing' => true,
-        'class_attributes_separation' => true,
+        'class_attributes_separation' => ['elements' => []],
         'trailing_comma_in_multiline_array' => true,
         'trim_array_spaces' => true,
         'no_alias_functions' => true,

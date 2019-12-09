@@ -10,15 +10,8 @@ use Imdb\Title;
 
 class IMDBManager
 {
-    /**
-     * @var IMDBLinkParser
-     */
-    private $IMDBLinkParser;
-
-    /**
-     * @var Repository
-     */
-    private $cache;
+    private IMDBLinkParser $IMDBLinkParser;
+    private Repository $cache;
 
     public function __construct(IMDBLinkParser $IMDBLinkParser, Repository $cache)
     {

@@ -21,10 +21,7 @@ class Adapter extends AbstractAdapter
 
     protected $includePaths = ['locale' => 'language'];
 
-    /**
-     * @var Hasher
-     */
-    private $hasher;
+    private Hasher $hasher;
 
     public function __construct(StandardStrategy $paging, Hasher $hasher)
     {

@@ -11,10 +11,7 @@ use Illuminate\Database\Eloquent\Collection;
 
 class TorrentCategoryRepository
 {
-    /**
-     * @var Repository
-     */
-    private $cache;
+    private Repository $cache;
 
     public function __construct(Repository $cache)
     {

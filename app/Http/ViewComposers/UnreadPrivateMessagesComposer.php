@@ -10,15 +10,8 @@ use Illuminate\Contracts\View\View;
 
 class UnreadPrivateMessagesComposer
 {
-    /**
-     * @var Guard
-     */
-    private $guard;
-
-    /**
-     * @var ThreadParticipantRepositoryInterface
-     */
-    private $threadParticipantRepository;
+    private Guard $guard;
+    private ThreadParticipantRepositoryInterface $threadParticipantRepository;
 
     public function __construct(Guard $guard, ThreadParticipantRepositoryInterface $threadParticipantRepository)
     {

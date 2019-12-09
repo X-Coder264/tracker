@@ -10,10 +10,7 @@ use Illuminate\Contracts\Routing\UrlGenerator;
 
 class Authenticate extends Middleware
 {
-    /**
-     * @var UrlGenerator
-     */
-    private $urlGenerator;
+    private UrlGenerator $urlGenerator;
 
     public function __construct(Auth $auth, UrlGenerator $urlGenerator)
     {

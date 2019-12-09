@@ -9,15 +9,8 @@ use Illuminate\Contracts\View\Factory;
 
 class Feed
 {
-    /**
-     * @var array
-     */
-    private $items = [];
-
-    /**
-     * @var Factory
-     */
-    private $viewFactory;
+    private array $items = [];
+    private Factory $viewFactory;
 
     public function __construct(Factory $viewFactory)
     {

@@ -12,20 +12,9 @@ use Illuminate\Http\RedirectResponse;
 
 final class EnableController
 {
-    /**
-     * @var Guard
-     */
-    private $guard;
-
-    /**
-     * @var Translator
-     */
-    private $translator;
-
-    /**
-     * @var ResponseFactory
-     */
-    private $responseFactory;
+    private Guard $guard;
+    private Translator $translator;
+    private ResponseFactory $responseFactory;
 
     public function __construct(Guard $guard, Translator $translator, ResponseFactory $responseFactory)
     {

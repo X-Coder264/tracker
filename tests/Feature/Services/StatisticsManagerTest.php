@@ -16,15 +16,8 @@ class StatisticsManagerTest extends TestCase
 {
     use DatabaseTransactions;
 
-    /**
-     * @var StatisticsManager
-     */
-    private $statisticsManager;
-
-    /**
-     * @var Connection
-     */
-    private $connection;
+    private StatisticsManager $statisticsManager;
+    private Connection $connection;
 
     protected function setUp(): void
     {

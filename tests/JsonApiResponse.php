@@ -8,15 +8,8 @@ use Illuminate\Foundation\Testing\TestResponse;
 
 final class JsonApiResponse
 {
-    /**
-     * @var TestResponse
-     */
-    private $response;
-
-    /**
-     * @var array|null
-     */
-    private $jsonResponse;
+    private TestResponse $response;
+    private ?array $jsonResponse;
 
     public function __construct(TestResponse $response)
     {

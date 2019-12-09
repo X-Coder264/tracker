@@ -10,10 +10,7 @@ use Illuminate\Support\Collection;
 
 class ThreadParticipantRepository implements ThreadParticipantRepositoryInterface
 {
-    /**
-     * @var ConnectionInterface
-     */
-    private $connection;
+    private ConnectionInterface $connection;
 
     public function __construct(ConnectionInterface $connection)
     {

@@ -13,10 +13,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 class UpdateUserLastSeenAtInfo
 {
-    /**
-     * @var Guard
-     */
-    private $guard;
+    private Guard $guard;
 
     /**
      * @var int

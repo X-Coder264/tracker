@@ -12,15 +12,8 @@ use Symfony\Component\HttpFoundation\Response;
 
 final class EditController
 {
-    /**
-     * @var Guard
-     */
-    private $guard;
-
-    /**
-     * @var ResponseFactory
-     */
-    private $responseFactory;
+    private Guard $guard;
+    private ResponseFactory $responseFactory;
 
     public function __construct(Guard $guard, ResponseFactory $responseFactory)
     {

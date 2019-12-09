@@ -19,30 +19,11 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 final class ShowController
 {
-    /**
-     * @var Guard
-     */
-    private $guard;
-
-    /**
-     * @var ThreadParticipantRepositoryInterface
-     */
-    private $threadParticipantRepository;
-
-    /**
-     * @var Repository
-     */
-    private $cache;
-
-    /**
-     * @var UrlGenerator
-     */
-    private $urlGenerator;
-
-    /**
-     * @var ResponseFactory
-     */
-    private $responseFactory;
+    private Guard $guard;
+    private ThreadParticipantRepositoryInterface $threadParticipantRepository;
+    private Repository $cache;
+    private UrlGenerator $urlGenerator;
+    private ResponseFactory $responseFactory;
 
     public function __construct(
         Guard $guard,

@@ -2452,6 +2452,8 @@ class AnnounceManagerTest extends TestCase
 
     public function testPasskeyMustBeValid()
     {
+        $this->withoutExceptionHandling();
+
         $response = $this->get(
             route('announce', $this->validParams([
                 'passkey' => bin2hex(random_bytes(32)),
@@ -2468,6 +2470,8 @@ class AnnounceManagerTest extends TestCase
 
     public function testBannedUserCannotAnnounce()
     {
+        $this->withoutExceptionHandling();
+
         $bannedUser = factory(User::class)->states('banned')->create();
         $response = $this->get(
             route('announce', $this->validParams([
@@ -2520,6 +2524,8 @@ class AnnounceManagerTest extends TestCase
 
     public function testInfoHashMustBeValid()
     {
+        $this->withoutExceptionHandling();
+
         $response = $this->get(
             route('announce', $this->validParams([
                 'info_hash' => hex2bin('ccd285bd6d7fc749e9ed34d8b1e8a0f1b582d978'),

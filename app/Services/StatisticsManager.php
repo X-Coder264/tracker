@@ -12,10 +12,7 @@ use Illuminate\Contracts\Cache\Repository;
 
 class StatisticsManager
 {
-    /**
-     * @var Repository
-     */
-    private $cache;
+    private Repository $cache;
 
     public function __construct(Repository $cache)
     {

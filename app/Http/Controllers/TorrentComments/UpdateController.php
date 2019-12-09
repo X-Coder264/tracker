@@ -13,20 +13,9 @@ use Illuminate\Http\RedirectResponse;
 
 final class UpdateController
 {
-    /**
-     * @var Repository
-     */
-    private $cache;
-
-    /**
-     * @var Translator
-     */
-    private $translator;
-
-    /**
-     * @var ResponseFactory
-     */
-    private $responseFactory;
+    private Repository $cache;
+    private Translator $translator;
+    private ResponseFactory $responseFactory;
 
     public function __construct(Repository $cache, Translator $translator, ResponseFactory $responseFactory)
     {

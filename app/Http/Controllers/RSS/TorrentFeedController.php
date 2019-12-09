@@ -22,40 +22,13 @@ use Illuminate\Support\Collection;
 
 final class TorrentFeedController
 {
-    /**
-     * @var TorrentFeedItemFactory
-     */
-    private $torrentFeedItemFactory;
-
-    /**
-     * @var UrlGenerator
-     */
-    private $urlGenerator;
-
-    /**
-     * @var Factory
-     */
-    private $viewFactory;
-
-    /**
-     * @var TorrentRepository
-     */
-    private $torrentRepository;
-
-    /**
-     * @var Feed
-     */
-    private $feed;
-
-    /**
-     * @var Repository
-     */
-    private $cache;
-
-    /**
-     * @var ResponseFactory
-     */
-    private $responseFactory;
+    private TorrentFeedItemFactory $torrentFeedItemFactory;
+    private UrlGenerator $urlGenerator;
+    private Factory $viewFactory;
+    private TorrentRepository $torrentRepository;
+    private Feed $feed;
+    private Repository $cache;
+    private ResponseFactory $responseFactory;
 
     public function __construct(
         TorrentFeedItemFactory $torrentFeedItemFactory,

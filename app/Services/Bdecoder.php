@@ -10,24 +10,18 @@ class Bdecoder
 {
     /**
      * The encoded string.
-     *
-     * @var string
      */
-    private $encodedString;
+    private string $encodedString;
 
     /**
      * The length of the encoded source string.
-     *
-     * @var int
      */
-    private $length;
+    private int $length;
 
     /**
      * The current position of the parser.
-     *
-     * @var int
      */
-    private $position;
+    private int $position;
 
     /**
      * @throws Exception

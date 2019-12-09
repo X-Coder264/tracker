@@ -13,25 +13,10 @@ use PragmaRX\Google2FAQRCode\Google2FA;
 
 final class StatusController
 {
-    /**
-     * @var Google2FA
-     */
-    private $google2FA;
-
-    /**
-     * @var Guard
-     */
-    private $guard;
-
-    /**
-     * @var Repository
-     */
-    private $config;
-
-    /**
-     * @var ResponseFactory
-     */
-    private $responseFactory;
+    private Google2FA $google2FA;
+    private Guard $guard;
+    private Repository $config;
+    private ResponseFactory $responseFactory;
 
     public function __construct(Google2FA $google2FA, Guard $guard, Repository $config, ResponseFactory $responseFactory)
     {

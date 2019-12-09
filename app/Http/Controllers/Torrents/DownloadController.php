@@ -18,20 +18,9 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 final class DownloadController
 {
-    /**
-     * @var Guard
-     */
-    private $guard;
-
-    /**
-     * @var Translator
-     */
-    private $translator;
-
-    /**
-     * @var TorrentDownloadManipulator
-     */
-    private $torrentDownloadManipulator;
+    private Guard $guard;
+    private Translator $translator;
+    private TorrentDownloadManipulator $torrentDownloadManipulator;
 
     public function __construct(
         Guard $guard,

@@ -35,25 +35,10 @@ class RegisterController extends Controller
 
     use RegistersUsers;
 
-    /**
-     * @var ValidatorFactory
-     */
-    private $validatorFactory;
-
-    /**
-     * @var UrlGenerator
-     */
-    private $urlGenerator;
-
-    /**
-     * @var Hasher
-     */
-    private $hasher;
-
-    /**
-     * @var ResponseFactory
-     */
-    private $responseFactory;
+    private ValidatorFactory $validatorFactory;
+    private UrlGenerator $urlGenerator;
+    private Hasher $hasher;
+    private ResponseFactory $responseFactory;
 
     public function __construct(
         ValidatorFactory $validatorFactory,

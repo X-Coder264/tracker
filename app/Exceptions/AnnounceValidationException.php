@@ -9,10 +9,7 @@ use Throwable;
 
 class AnnounceValidationException extends Exception
 {
-    /**
-     * @var array
-     */
-    private $validationMessages;
+    private array $validationMessages;
 
     public function __construct(string $message = '', array $validationMessages = [], int $code = 0, Throwable $previous = null)
     {

@@ -12,20 +12,9 @@ use Illuminate\Http\Response;
 
 final class ShowController
 {
-    /**
-     * @var SizeFormatter
-     */
-    private $sizeFormatter;
-
-    /**
-     * @var UserRepository
-     */
-    private $userRepository;
-
-    /**
-     * @var ResponseFactory
-     */
-    private $responseFactory;
+    private SizeFormatter $sizeFormatter;
+    private UserRepository $userRepository;
+    private ResponseFactory $responseFactory;
 
     public function __construct(SizeFormatter $sizeFormatter, UserRepository $userRepository, ResponseFactory $responseFactory)
     {

@@ -8,10 +8,7 @@ use Generator;
 
 class FileSizeCollectionFormatter
 {
-    /**
-     * @var SizeFormatter
-     */
-    private $sizeFormatter;
+    private SizeFormatter $sizeFormatter;
 
     public function __construct(SizeFormatter $sizeFormatter)
     {

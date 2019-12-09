@@ -10,10 +10,7 @@ use PHPUnit\Framework\TestCase;
 
 final class BdecoderTest extends TestCase
 {
-    /**
-     * @var Bdecoder
-     */
-    private $decoder;
+    private Bdecoder $decoder;
 
     protected function setUp(): void
     {

@@ -14,25 +14,10 @@ use Illuminate\Http\Response;
 
 final class HomeController
 {
-    /**
-     * @var StatisticsManager
-     */
-    private $statisticsManager;
-
-    /**
-     * @var SizeFormatter
-     */
-    private $sizeFormatter;
-
-    /**
-     * @var Repository
-     */
-    private $cache;
-
-    /**
-     * @var ResponseFactory
-     */
-    private $responseFactory;
+    private StatisticsManager $statisticsManager;
+    private SizeFormatter $sizeFormatter;
+    private Repository $cache;
+    private ResponseFactory $responseFactory;
 
     public function __construct(
         StatisticsManager $statisticsManager,

@@ -14,20 +14,9 @@ use Illuminate\Support\Carbon;
 
 class SetUserLocale
 {
-    /**
-     * @var Guard
-     */
-    private $guard;
-
-    /**
-     * @var Repository
-     */
-    private $cache;
-
-    /**
-     * @var Application
-     */
-    private $application;
+    private Guard $guard;
+    private Repository $cache;
+    private Application $application;
 
     public function __construct(Guard $guard, Repository $cache, Application $application)
     {

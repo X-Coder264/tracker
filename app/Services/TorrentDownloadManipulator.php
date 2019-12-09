@@ -11,25 +11,10 @@ use Illuminate\Support\Str;
 
 final class TorrentDownloadManipulator
 {
-    /**
-     * @var UrlGenerator
-     */
-    private $urlGenerator;
-
-    /**
-     * @var Factory
-     */
-    private $filesystemFactory;
-
-    /**
-     * @var Bencoder
-     */
-    private $bencoder;
-
-    /**
-     * @var Bdecoder
-     */
-    private $bdecoder;
+    private UrlGenerator $urlGenerator;
+    private Factory $filesystemFactory;
+    private Bencoder $bencoder;
+    private Bdecoder $bdecoder;
 
     public function __construct(
         UrlGenerator $urlGenerator,

@@ -8,25 +8,10 @@ use Carbon\CarbonInterface;
 
 class FeedItem
 {
-    /**
-     * @var string
-     */
-    private $title;
-
-    /**
-     * @var string
-     */
-    private $link;
-
-    /**
-     * @var string
-     */
-    private $guid;
-
-    /**
-     * @var CarbonInterface
-     */
-    private $pubDate;
+    private string $title;
+    private string $link;
+    private string $guid;
+    private CarbonInterface $pubDate;
 
     public function __construct(string $title, string $link, string $guid, CarbonInterface $pubDate)
     {

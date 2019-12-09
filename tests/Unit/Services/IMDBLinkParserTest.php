@@ -10,14 +10,8 @@ use Tests\TestCase;
 
 class IMDBLinkParserTest extends TestCase
 {
-    /**
-     * @var IMDBLinkParser
-     */
-    private $IMDBLinkParser;
+    private IMDBLinkParser $IMDBLinkParser;
 
-    /**
-     * Setup the test environment.
-     */
     protected function setUp(): void
     {
         parent::setUp();

@@ -12,15 +12,8 @@ use Symfony\Component\HttpFoundation\Response;
 
 class RedirectIfAuthenticated
 {
-    /**
-     * @var AuthManager
-     */
-    private $authManager;
-
-    /**
-     * @var ResponseFactory
-     */
-    private $responseFactory;
+    private AuthManager $authManager;
+    private ResponseFactory $responseFactory;
 
     public function __construct(AuthManager $authManager, ResponseFactory $responseFactory)
     {

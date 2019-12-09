@@ -10,10 +10,7 @@ use PHPUnit\Framework\TestCase;
 
 final class BencoderTest extends TestCase
 {
-    /**
-     * @var Bencoder
-     */
-    private $encoder;
+    private Bencoder $encoder;
 
     protected function setUp(): void
     {

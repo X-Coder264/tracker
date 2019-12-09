@@ -15,25 +15,10 @@ use Illuminate\Http\RedirectResponse;
 
 final class StoreController
 {
-    /**
-     * @var Repository
-     */
-    private $cache;
-
-    /**
-     * @var TorrentUploadManager
-     */
-    private $torrentUploadManager;
-
-    /**
-     * @var Translator
-     */
-    private $translator;
-
-    /**
-     * @var ResponseFactory
-     */
-    private $responseFactory;
+    private Repository $cache;
+    private TorrentUploadManager $torrentUploadManager;
+    private Translator $translator;
+    private ResponseFactory $responseFactory;
 
     public function __construct(
         Repository $cache,

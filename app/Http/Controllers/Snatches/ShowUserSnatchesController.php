@@ -11,15 +11,8 @@ use Illuminate\Http\Response;
 
 final class ShowUserSnatchesController
 {
-    /**
-     * @var UserRepository
-     */
-    private $userRepository;
-
-    /**
-     * @var ResponseFactory
-     */
-    private $responseFactory;
+    private UserRepository $userRepository;
+    private ResponseFactory $responseFactory;
 
     public function __construct(UserRepository $userRepository, ResponseFactory $responseFactory)
     {

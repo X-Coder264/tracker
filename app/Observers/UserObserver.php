@@ -10,15 +10,8 @@ use PragmaRX\Google2FA\Google2FA;
 
 class UserObserver
 {
-    /**
-     * @var PasskeyGenerator
-     */
-    private $passkeyGenerator;
-
-    /**
-     * @var Google2FA
-     */
-    private $google2FA;
+    private PasskeyGenerator $passkeyGenerator;
+    private Google2FA $google2FA;
 
     public function __construct(PasskeyGenerator $passkeyGenerator, Google2FA $google2FA)
     {

@@ -9,10 +9,7 @@ use Illuminate\Contracts\Cache\Repository;
 
 class NewsObserver
 {
-    /**
-     * @var Repository
-     */
-    private $cache;
+    private Repository $cache;
 
     public function __construct(Repository $cache)
     {

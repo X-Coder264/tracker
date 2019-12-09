@@ -20,10 +20,7 @@ class Adapter extends AbstractAdapter
 
     protected $defaultSort = ['-id'];
 
-    /**
-     * @var Guard
-     */
-    private $guard;
+    private Guard $guard;
 
     public function __construct(StandardStrategy $paging, Guard $guard)
     {

@@ -11,15 +11,8 @@ use Illuminate\Http\Response;
 
 final class AnnounceController
 {
-    /**
-     * @var AnnounceManager
-     */
-    private $announceManager;
-
-    /**
-     * @var ResponseFactory
-     */
-    private $responseFactory;
+    private AnnounceManager $announceManager;
+    private ResponseFactory $responseFactory;
 
     public function __construct(AnnounceManager $announceManager, ResponseFactory $responseFactory)
     {

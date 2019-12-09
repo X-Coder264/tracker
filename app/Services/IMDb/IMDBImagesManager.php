@@ -11,25 +11,10 @@ use Psr\Log\LoggerInterface;
 
 class IMDBImagesManager
 {
-    /**
-     * @var IMDBManager
-     */
-    private $IMDBManager;
-
-    /**
-     * @var Client
-     */
-    private $client;
-
-    /**
-     * @var FilesystemManager
-     */
-    private $filesystemManager;
-
-    /**
-     * @var LoggerInterface
-     */
-    private $logger;
+    private IMDBManager $IMDBManager;
+    private Client $client;
+    private FilesystemManager $filesystemManager;
+    private LoggerInterface $logger;
 
     public function __construct(IMDBManager $IMDBManager, Client $client, FilesystemManager $filesystemManager, LoggerInterface $logger)
     {

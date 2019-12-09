@@ -16,35 +16,12 @@ use Illuminate\Contracts\Filesystem\FileNotFoundException;
 
 class TorrentInfoService
 {
-    /**
-     * @var SizeFormatter
-     */
-    private $sizeFormatter;
-
-    /**
-     * @var Bdecoder
-     */
-    private $bdecoder;
-
-    /**
-     * @var Repository
-     */
-    private $cache;
-
-    /**
-     * @var FilesystemManager
-     */
-    private $filesystemManager;
-
-    /**
-     * @var IMDBManager
-     */
-    private $IMDBManager;
-
-    /**
-     * @var TitleFactory
-     */
-    private $IMDbTitleFactory;
+    private SizeFormatter $sizeFormatter;
+    private Bdecoder $bdecoder;
+    private Repository $cache;
+    private FilesystemManager $filesystemManager;
+    private IMDBManager $IMDBManager;
+    private TitleFactory $IMDbTitleFactory;
 
     public function __construct(
         SizeFormatter $sizeFormatter,

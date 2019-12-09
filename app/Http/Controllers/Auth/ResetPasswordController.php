@@ -37,15 +37,8 @@ class ResetPasswordController extends Controller
      */
     protected $redirectTo = '/';
 
-    /**
-     * @var Dispatcher
-     */
-    private $dispatcher;
-
-    /**
-     * @var Hasher
-     */
-    private $hasher;
+    private Dispatcher $dispatcher;
+    private Hasher $hasher;
 
     public function __construct(Dispatcher $dispatcher, Hasher $hasher)
     {

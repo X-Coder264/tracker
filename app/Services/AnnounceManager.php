@@ -22,120 +22,29 @@ use stdClass;
  */
 class AnnounceManager
 {
-    /**
-     * @var Request
-     */
-    private $request;
-
-    /**
-     * @var Bencoder
-     */
-    private $encoder;
-
-    /**
-     * @var ConnectionInterface
-     */
-    private $connection;
-
-    /**
-     * @var CacheRepository
-     */
-    private $cache;
-
-    /**
-     * @var ValidationFactory
-     */
-    private $validationFactory;
-
-    /**
-     * @var Translator
-     */
-    private $translator;
-
-    /**
-     * @var Repository
-     */
-    private $config;
-
-    /**
-     * @var stdClass
-     */
-    private $user;
-
-    /**
-     * @var null|stdClass
-     */
-    private $peer = null;
-
-    /**
-     * @var string
-     */
-    private $peerID;
-
-    /**
-     * @var stdClass
-     */
-    private $torrent;
-
-    /**
-     * @var bool
-     */
-    private $seeder;
-
-    /**
-     * @var string|null
-     */
-    private $event;
-
-    /**
-     * @var null|stdClass
-     */
-    private $snatch;
-
-    /**
-     * @var int
-     */
-    private $numberOfWantedPeers = 50;
-
-    /**
-     * @var null|string
-     */
-    private $ipv4Address = null;
-
-    /**
-     * @var null|string
-     */
-    private $ipv6Address = null;
-
-    /**
-     * @var null|int
-     */
-    private $ipv4Port = null;
-
-    /**
-     * @var null|int
-     */
-    private $ipv6Port = null;
-
-    /**
-     * @var int
-     */
-    private $seedTime = 0;
-
-    /**
-     * @var int
-     */
-    private $leechTime = 0;
-
-    /**
-     * @var int
-     */
-    private $downloadedInThisAnnounceCycle = 0;
-
-    /**
-     * @var int
-     */
-    private $uploadedInThisAnnounceCycle = 0;
+    private Request $request;
+    private Bencoder $encoder;
+    private ConnectionInterface $connection;
+    private CacheRepository $cache;
+    private ValidationFactory $validationFactory;
+    private Translator $translator;
+    private Repository $config;
+    private ?stdClass $user;
+    private ?stdClass $peer = null;
+    private string $peerID;
+    private ?stdClass $torrent;
+    private bool $seeder;
+    private ?string $event;
+    private ?stdClass $snatch;
+    private int $numberOfWantedPeers = 50;
+    private ?string $ipv4Address = null;
+    private ?string $ipv6Address = null;
+    private ?int $ipv4Port = null;
+    private ?int $ipv6Port = null;
+    private int $seedTime = 0;
+    private int $leechTime = 0;
+    private int $downloadedInThisAnnounceCycle = 0;
+    private int $uploadedInThisAnnounceCycle = 0;
 
     public function __construct(
         Bencoder $encoder,
@@ -223,8 +132,8 @@ class AnnounceManager
         }
 
         $timeNow = Carbon::now();
-        $downloaded = $this->request->input('downloaded');
-        $uploaded = $this->request->input('uploaded');
+        $downloaded = (int) $this->request->input('downloaded');
+        $uploaded = (int) $this->request->input('uploaded');
 
         if (null === $this->peer) {
             $this->downloadedInThisAnnounceCycle = $downloaded;
@@ -389,8 +298,10 @@ class AnnounceManager
      */
     private function validateAndSetIPAddress(): void
     {
-        $this->ipv4Port = $this->request->input('port');
-        $this->ipv6Port = $this->request->input('port');
+        if ($this->request->filled('port')) {
+            $this->ipv4Port = (int) $this->request->input('port');
+            $this->ipv6Port = (int) $this->request->input('port');
+        }
 
         if ($this->request->filled('ip')) {
             $IP = $this->request->input('ip');

@@ -11,10 +11,7 @@ use Illuminate\Http\Response;
 
 final class CreateController
 {
-    /**
-     * @var ResponseFactory
-     */
-    private $responseFactory;
+    private ResponseFactory $responseFactory;
 
     public function __construct(ResponseFactory $responseFactory)
     {

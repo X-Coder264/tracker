@@ -38,15 +38,8 @@ class TorrentControllerTest extends TestCase
 {
     use DatabaseTransactions;
 
-    /**
-     * @var User
-     */
-    private $user;
-
-    /**
-     * @var int
-     */
-    private $torrentsPerPage = 3;
+    private User $user;
+    private int $torrentsPerPage = 3;
 
     protected function setUp(): void
     {

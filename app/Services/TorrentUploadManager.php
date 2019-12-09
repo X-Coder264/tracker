@@ -22,55 +22,16 @@ use Illuminate\Validation\ValidationException;
 
 class TorrentUploadManager
 {
-    /**
-     * @var Bencoder
-     */
-    private $encoder;
-
-    /**
-     * @var Bdecoder
-     */
-    private $decoder;
-
-    /**
-     * @var TorrentInfoService
-     */
-    private $torrentInfoService;
-
-    /**
-     * @var Guard
-     */
-    private $guard;
-
-    /**
-     * @var Filesystem
-     */
-    private $filesystem;
-
-    /**
-     * @var FilesystemManager
-     */
-    private $filesystemManager;
-
-    /**
-     * @var UrlGenerator
-     */
-    private $urlGenerator;
-
-    /**
-     * @var Translator
-     */
-    private $translator;
-
-    /**
-     * @var IMDBManager
-     */
-    private $IMDBManager;
-
-    /**
-     * @var IMDBImagesManager
-     */
-    private $IMDBImagesManager;
+    private Bencoder $encoder;
+    private Bdecoder $decoder;
+    private TorrentInfoService $torrentInfoService;
+    private Guard $guard;
+    private Filesystem $filesystem;
+    private FilesystemManager $filesystemManager;
+    private UrlGenerator $urlGenerator;
+    private Translator $translator;
+    private IMDBManager $IMDBManager;
+    private IMDBImagesManager $IMDBImagesManager;
 
     public function __construct(
         Bencoder $encoder,

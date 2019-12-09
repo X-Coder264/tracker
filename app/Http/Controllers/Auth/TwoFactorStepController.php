@@ -23,34 +23,14 @@ final class TwoFactorStepController
     use AuthenticatesUsers;
 
     /**
-     * @var StatefulGuard
+     * @var Guard|StatefulGuard
      */
-    private $guard;
-
-    /**
-     * @var Factory
-     */
-    private $validatorFactory;
-
-    /**
-     * @var Google2FA
-     */
-    private $google2FA;
-
-    /**
-     * @var Encrypter
-     */
-    private $encrypter;
-
-    /**
-     * @var UrlGenerator
-     */
-    private $urlGenerator;
-
-    /**
-     * @var ResponseFactory
-     */
-    private $responseFactory;
+    private Guard $guard;
+    private Factory $validatorFactory;
+    private Google2FA $google2FA;
+    private Encrypter $encrypter;
+    private UrlGenerator $urlGenerator;
+    private ResponseFactory $responseFactory;
 
     public function __construct(
         Guard $guard,

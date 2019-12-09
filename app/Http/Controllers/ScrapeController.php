@@ -13,25 +13,10 @@ use Illuminate\Http\Response;
 
 final class ScrapeController
 {
-    /**
-     * @var Bencoder
-     */
-    private $encoder;
-
-    /**
-     * @var ResponseFactory
-     */
-    private $responseFactory;
-
-    /**
-     * @var Translator
-     */
-    private $translator;
-
-    /**
-     * @var AnnounceManager
-     */
-    private $announceManager;
+    private Bencoder $encoder;
+    private ResponseFactory $responseFactory;
+    private Translator $translator;
+    private AnnounceManager $announceManager;
 
     public function __construct(
         Bencoder $encoder,

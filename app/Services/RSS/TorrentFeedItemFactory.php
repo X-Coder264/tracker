@@ -10,10 +10,7 @@ use Illuminate\Contracts\Routing\UrlGenerator;
 
 class TorrentFeedItemFactory
 {
-    /**
-     * @var UrlGenerator
-     */
-    private $urlGenerator;
+    private UrlGenerator $urlGenerator;
 
     public function __construct(UrlGenerator $urlGenerator)
     {

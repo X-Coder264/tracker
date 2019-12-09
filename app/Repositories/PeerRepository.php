@@ -11,15 +11,8 @@ use Illuminate\Database\Query\Builder;
 
 class PeerRepository
 {
-    /**
-     * @var ConnectionInterface
-     */
-    private $connection;
-
-    /**
-     * @var Repository
-     */
-    private $config;
+    private ConnectionInterface $connection;
+    private Repository $config;
 
     public function __construct(ConnectionInterface $connection, Repository $config)
     {

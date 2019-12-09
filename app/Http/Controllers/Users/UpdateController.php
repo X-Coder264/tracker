@@ -14,25 +14,10 @@ use Illuminate\Routing\Redirector;
 
 final class UpdateController
 {
-    /**
-     * @var Repository
-     */
-    private $cache;
-
-    /**
-     * @var Translator
-     */
-    private $translator;
-
-    /**
-     * @var Application
-     */
-    private $application;
-
-    /**
-     * @var Redirector
-     */
-    private $redirector;
+    private Repository $cache;
+    private Translator $translator;
+    private Application $application;
+    private Redirector $redirector;
 
     public function __construct(Repository $cache, Translator $translator, Application $application, Redirector $redirector)
     {

@@ -16,19 +16,11 @@ use Illuminate\Http\Response;
 class CheckIfTheUserIsBanned
 {
     /**
-     * @var StatefulGuard
+     * @var StatefulGuard|Guard
      */
-    private $guard;
-
-    /**
-     * @var ResponseFactory
-     */
-    private $responseFactory;
-
-    /**
-     * @var Translator
-     */
-    private $translator;
+    private Guard $guard;
+    private ResponseFactory $responseFactory;
+    private Translator $translator;
 
     public function __construct(Guard $guard, ResponseFactory $responseFactory, Translator $translator)
     {

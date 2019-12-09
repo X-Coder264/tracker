@@ -13,15 +13,8 @@ use Illuminate\Database\Eloquent\Collection;
 
 class UserStatsComposer
 {
-    /**
-     * @var Guard
-     */
-    private $guard;
-
-    /**
-     * @var Repository
-     */
-    private $cache;
+    private Guard $guard;
+    private Repository $cache;
 
     public function __construct(Guard $guard, Repository $cache)
     {

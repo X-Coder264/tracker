@@ -11,15 +11,8 @@ use Illuminate\Http\Response;
 
 final class CreateController
 {
-    /**
-     * @var Guard
-     */
-    private $guard;
-
-    /**
-     * @var ResponseFactory
-     */
-    private $responseFactory;
+    private Guard $guard;
+    private ResponseFactory $responseFactory;
 
     public function __construct(Guard $guard, ResponseFactory $responseFactory)
     {

@@ -24,30 +24,11 @@ class LoginController extends Controller
 {
     use AuthenticatesUsers;
 
-    /**
-     * @var UrlGenerator
-     */
-    private $urlGenerator;
-
-    /**
-     * @var AuthManager
-     */
-    private $authManager;
-
-    /**
-     * @var Translator
-     */
-    private $translator;
-
-    /**
-     * @var Encrypter
-     */
-    private $encrypter;
-
-    /**
-     * @var ResponseFactory
-     */
-    private $responseFactory;
+    private UrlGenerator $urlGenerator;
+    private AuthManager $authManager;
+    private Translator $translator;
+    private Encrypter $encrypter;
+    private ResponseFactory $responseFactory;
 
     public function __construct(
         UrlGenerator $urlGenerator,

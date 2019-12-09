@@ -10,14 +10,8 @@ use Tests\TestCase;
 
 class IMDBManagerTest extends TestCase
 {
-    /**
-     * @var IMDBManager
-     */
-    private $IMDBManager;
+    private IMDBManager $IMDBManager;
 
-    /**
-     * Setup the test environment.
-     */
     protected function setUp(): void
     {
         parent::setUp();
