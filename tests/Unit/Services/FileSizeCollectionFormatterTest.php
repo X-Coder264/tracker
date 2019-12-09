@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Tests\Unit\Services;
 
+use App\Services\FileSizeCollectionFormatter;
 use Generator;
 use Tests\TestCase;
-use App\Services\FileSizeCollectionFormatter;
 
 class FileSizeCollectionFormatterTest extends TestCase
 {

@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\PrivateMessages\ThreadMessages;
 
-use App\Models\User;
-use Illuminate\Http\Request;
-use Illuminate\Contracts\Auth\Guard;
-use Illuminate\Http\RedirectResponse;
 use App\Models\PrivateMessages\Thread;
-use Illuminate\Contracts\Cache\Repository;
 use App\Models\PrivateMessages\ThreadParticipant;
+use App\Models\User;
+use Illuminate\Contracts\Auth\Guard;
+use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Contracts\Routing\ResponseFactory;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 
 final class StoreController
 {

@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Http\Controllers\RSS;
 
-use Tests\TestCase;
-use App\Models\User;
 use App\Models\Torrent;
 use App\Models\TorrentCategory;
+use App\Models\User;
 use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Tests\TestCase;
 
 class TorrentFeedControllerTest extends TestCase
 {

@@ -4,19 +4,19 @@ declare(strict_types=1);
 
 namespace Tests\Unit\Services;
 
-use Tests\TestCase;
-use GuzzleHttp\Client;
-use GuzzleHttp\Middleware;
-use GuzzleHttp\HandlerStack;
-use GuzzleHttp\Psr7\Request;
-use Psr\Log\LoggerInterface;
-use GuzzleHttp\Psr7\Response;
-use App\Services\IMDb\IMDBManager;
-use GuzzleHttp\Handler\MockHandler;
-use Illuminate\Support\Facades\Storage;
 use App\Services\IMDb\IMDBImagesManager;
-use PHPUnit\Framework\MockObject\MockObject;
+use App\Services\IMDb\IMDBManager;
+use GuzzleHttp\Client;
+use GuzzleHttp\Handler\MockHandler;
+use GuzzleHttp\HandlerStack;
+use GuzzleHttp\Middleware;
+use GuzzleHttp\Psr7\Request;
+use GuzzleHttp\Psr7\Response;
 use Illuminate\Contracts\Filesystem\Factory as FilesystemManager;
+use Illuminate\Support\Facades\Storage;
+use PHPUnit\Framework\MockObject\MockObject;
+use Psr\Log\LoggerInterface;
+use Tests\TestCase;
 
 class IMDBImagesManagerTest extends TestCase
 {

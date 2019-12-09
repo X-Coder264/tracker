@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\PrivateMessages\Threads;
 
-use Illuminate\Http\Response;
-use Illuminate\Contracts\Auth\Guard;
 use App\Models\PrivateMessages\Thread;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Contracts\Routing\ResponseFactory;
 use App\Repositories\PrivateMessages\ThreadParticipantRepositoryInterface;
+use Illuminate\Contracts\Auth\Guard;
+use Illuminate\Contracts\Routing\ResponseFactory;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Http\Response;
 
 final class IndexController
 {

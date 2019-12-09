@@ -4,18 +4,18 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\PrivateMessages\Threads;
 
-use Carbon\CarbonImmutable;
-use Illuminate\Http\Response;
-use Illuminate\Contracts\Auth\Guard;
 use App\Models\PrivateMessages\Thread;
-use Illuminate\Contracts\Cache\Repository;
-use Illuminate\Database\Eloquent\Collection;
 use App\Models\PrivateMessages\ThreadMessage;
-use Illuminate\Contracts\Routing\UrlGenerator;
 use App\Models\PrivateMessages\ThreadParticipant;
-use Illuminate\Contracts\Routing\ResponseFactory;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use App\Repositories\PrivateMessages\ThreadParticipantRepositoryInterface;
+use Carbon\CarbonImmutable;
+use Illuminate\Contracts\Auth\Guard;
+use Illuminate\Contracts\Cache\Repository;
+use Illuminate\Contracts\Routing\ResponseFactory;
+use Illuminate\Contracts\Routing\UrlGenerator;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Http\Response;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 final class ShowController
 {

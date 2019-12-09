@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace App\Services\IMDb;
 
 use GuzzleHttp\Client;
-use Psr\Log\LoggerInterface;
 use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Contracts\Filesystem\Factory as FilesystemManager;
+use Psr\Log\LoggerInterface;
 
 class IMDBImagesManager
 {

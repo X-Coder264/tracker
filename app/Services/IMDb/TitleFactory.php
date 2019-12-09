@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Services\IMDb;
 
-use Imdb\Title as IMDbTitle;
 use App\Presenters\IMDb\Title;
+use Imdb\Title as IMDbTitle;
 
 class TitleFactory
 {

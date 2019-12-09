@@ -3,9 +3,9 @@
 declare(strict_types=1);
 
 use App\Models\Locale;
-use Illuminate\Support\Str;
 use Faker\Generator as Faker;
 use Illuminate\Database\Eloquent\Factory;
+use Illuminate\Support\Str;
 
 /** @var Factory $factory */
 $factory->define(Locale::class, function (Faker $faker) {

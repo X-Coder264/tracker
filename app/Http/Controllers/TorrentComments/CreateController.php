@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace App\Http\Controllers\TorrentComments;
 
 use App\Models\Torrent;
-use Illuminate\Http\Response;
 use App\Models\TorrentComment;
 use Illuminate\Contracts\Routing\ResponseFactory;
+use Illuminate\Http\Response;
 
 final class CreateController
 {

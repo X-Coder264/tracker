@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Http\Controllers\PrivateMessages;
 
-use Carbon\Carbon;
-use Tests\TestCase;
-use App\Models\User;
 use App\Models\PrivateMessages\Thread;
-use Illuminate\Contracts\Cache\Repository;
 use App\Models\PrivateMessages\ThreadMessage;
 use App\Models\PrivateMessages\ThreadParticipant;
+use App\Models\User;
+use Carbon\Carbon;
+use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Tests\TestCase;
 
 class ThreadMessageControllerTest extends TestCase
 {

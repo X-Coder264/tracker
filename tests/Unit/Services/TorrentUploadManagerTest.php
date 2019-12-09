@@ -4,20 +4,20 @@ declare(strict_types=1);
 
 namespace Tests\Unit\Services;
 
-use Tests\TestCase;
-use ReflectionClass;
 use App\Services\Bdecoder;
 use App\Services\Bencoder;
+use App\Services\IMDb\IMDBImagesManager;
 use App\Services\IMDb\IMDBManager;
 use App\Services\TorrentInfoService;
-use Illuminate\Contracts\Auth\Guard;
-use Illuminate\Filesystem\Filesystem;
 use App\Services\TorrentUploadManager;
-use App\Services\IMDb\IMDBImagesManager;
-use PHPUnit\Framework\MockObject\MockObject;
+use Illuminate\Contracts\Auth\Guard;
+use Illuminate\Contracts\Filesystem\Factory as FilesystemManager;
 use Illuminate\Contracts\Routing\UrlGenerator;
 use Illuminate\Contracts\Translation\Translator;
-use Illuminate\Contracts\Filesystem\Factory as FilesystemManager;
+use Illuminate\Filesystem\Filesystem;
+use PHPUnit\Framework\MockObject\MockObject;
+use ReflectionClass;
+use Tests\TestCase;
 
 class TorrentUploadManagerTest extends TestCase
 {

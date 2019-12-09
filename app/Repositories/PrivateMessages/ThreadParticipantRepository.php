@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Repositories\PrivateMessages;
 
-use Illuminate\Support\Collection;
-use Illuminate\Database\Query\Builder;
 use Illuminate\Database\ConnectionInterface;
+use Illuminate\Database\Query\Builder;
+use Illuminate\Support\Collection;
 
 class ThreadParticipantRepository implements ThreadParticipantRepositoryInterface
 {

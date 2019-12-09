@@ -6,9 +6,9 @@ namespace App\Http\Controllers\TwoFactorAuth;
 
 use App\Models\User;
 use Illuminate\Contracts\Auth\Guard;
-use Illuminate\Http\RedirectResponse;
-use Illuminate\Contracts\Translation\Translator;
 use Illuminate\Contracts\Routing\ResponseFactory;
+use Illuminate\Contracts\Translation\Translator;
+use Illuminate\Http\RedirectResponse;
 
 final class EnableController
 {

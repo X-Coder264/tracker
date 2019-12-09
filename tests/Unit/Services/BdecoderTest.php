@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Tests\Unit\Services;
 
+use App\Services\Bdecoder;
 use Exception;
 use Tests\TestCase;
-use App\Services\Bdecoder;
 
 class BdecoderTest extends TestCase
 {

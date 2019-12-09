@@ -7,8 +7,8 @@ namespace App\Repositories;
 use App\Models\Peer;
 use App\Models\Snatch;
 use App\Models\Torrent;
-use Illuminate\Database\ConnectionInterface;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Database\ConnectionInterface;
 
 class UserRepository
 {

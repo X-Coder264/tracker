@@ -4,17 +4,17 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Torrents;
 
-use Exception;
 use App\Models\Torrent;
-use Illuminate\Http\Request;
 use App\Models\TorrentCategory;
 use App\Services\IMDb\IMDBManager;
-use Illuminate\Http\RedirectResponse;
-use Illuminate\Contracts\Auth\Access\Gate;
-use Illuminate\Contracts\Validation\Factory;
-use Illuminate\Contracts\Translation\Translator;
-use Illuminate\Contracts\Routing\ResponseFactory;
+use Exception;
 use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Contracts\Auth\Access\Gate;
+use Illuminate\Contracts\Routing\ResponseFactory;
+use Illuminate\Contracts\Translation\Translator;
+use Illuminate\Contracts\Validation\Factory;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 
 final class UpdateController
 {

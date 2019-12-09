@@ -4,21 +4,21 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Auth;
 
-use App\Models\User;
+use App\Enumerations\ConfigurationOptions;
+use App\Http\Middleware\RedirectIfAuthenticated;
+use App\Models\Configuration;
 use App\Models\Invite;
 use App\Models\Locale;
-use App\Models\Configuration;
-use Illuminate\Http\Response;
-use Illuminate\Validation\Rule;
-use Illuminate\Routing\Controller;
+use App\Models\User;
 use Illuminate\Contracts\Hashing\Hasher;
-use App\Enumerations\ConfigurationOptions;
+use Illuminate\Contracts\Routing\ResponseFactory;
 use Illuminate\Contracts\Routing\UrlGenerator;
+use Illuminate\Contracts\Validation\Factory as ValidatorFactory;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Auth\RegistersUsers;
-use App\Http\Middleware\RedirectIfAuthenticated;
-use Illuminate\Contracts\Routing\ResponseFactory;
-use Illuminate\Contracts\Validation\Factory as ValidatorFactory;
+use Illuminate\Http\Response;
+use Illuminate\Routing\Controller;
+use Illuminate\Validation\Rule;
 
 class RegisterController extends Controller
 {

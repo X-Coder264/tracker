@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Torrents;
 
-use Illuminate\Http\RedirectResponse;
+use App\Exceptions\FileNotWritableException;
+use App\Http\Requests\TorrentUploadRequest;
 use App\Services\TorrentUploadManager;
 use Illuminate\Contracts\Cache\Repository;
-use App\Http\Requests\TorrentUploadRequest;
-use App\Exceptions\FileNotWritableException;
-use Illuminate\Contracts\Translation\Translator;
-use Illuminate\Contracts\Routing\ResponseFactory;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
+use Illuminate\Contracts\Routing\ResponseFactory;
+use Illuminate\Contracts\Translation\Translator;
+use Illuminate\Http\RedirectResponse;
 
 final class StoreController
 {

@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Http\Controllers\Admin;
 
-use Tests\TestCase;
 use App\Models\User;
-use Illuminate\Http\Response;
 use Illuminate\Contracts\Config\Repository;
 use Illuminate\Contracts\Routing\UrlGenerator;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Http\Response;
+use Tests\TestCase;
 
 class IndexControllerTest extends TestCase
 {

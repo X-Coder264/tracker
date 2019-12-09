@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Services;
 
-use Tests\TestCase;
 use App\Models\Peer;
-use App\Models\User;
 use App\Models\Torrent;
+use App\Models\User;
 use App\Services\StatisticsManager;
 use Illuminate\Database\Connection;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Tests\TestCase;
 
 class StatisticsManagerTest extends TestCase
 {

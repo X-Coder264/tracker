@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace App\JsonApi\Locales;
 
 use App\Models\Locale;
-use Illuminate\Support\Collection;
 use CloudCreativity\LaravelJsonApi\Eloquent\AbstractAdapter;
 use CloudCreativity\LaravelJsonApi\Pagination\StandardStrategy;
+use Illuminate\Support\Collection;
 
 class Adapter extends AbstractAdapter
 {

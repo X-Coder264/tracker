@@ -4,16 +4,16 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Auth;
 
+use App\Http\Middleware\RedirectIfAuthenticated;
 use App\Models\User;
-use Illuminate\Support\Str;
-use Illuminate\Routing\Controller;
-use Illuminate\Contracts\Hashing\Hasher;
 use Illuminate\Auth\Events\PasswordReset;
-use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Contracts\Auth\CanResetPassword;
+use Illuminate\Contracts\Events\Dispatcher;
+use Illuminate\Contracts\Hashing\Hasher;
 use Illuminate\Foundation\Auth\ResetsPasswords;
-use App\Http\Middleware\RedirectIfAuthenticated;
+use Illuminate\Routing\Controller;
+use Illuminate\Support\Str;
 
 class ResetPasswordController extends Controller
 {

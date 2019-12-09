@@ -4,19 +4,19 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Torrents;
 
-use App\Models\Torrent;
 use App\Enumerations\Cache;
-use Illuminate\Http\Request;
-use Illuminate\Http\Response;
+use App\Models\Torrent;
+use App\Services\FileSizeCollectionFormatter;
 use App\Services\TorrentInfoService;
 use Illuminate\Contracts\Auth\Guard;
 use Illuminate\Contracts\Cache\Repository;
-use App\Services\FileSizeCollectionFormatter;
-use Illuminate\Contracts\Translation\Translator;
-use Illuminate\Contracts\Routing\ResponseFactory;
-use Illuminate\Contracts\Pagination\LengthAwarePaginator;
-use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Contracts\Filesystem\Factory as FilesystemManager;
+use Illuminate\Contracts\Filesystem\FileNotFoundException;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Contracts\Routing\ResponseFactory;
+use Illuminate\Contracts\Translation\Translator;
+use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 final class ShowController

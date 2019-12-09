@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Http\Requests;
 
-use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Contracts\Translation\Translator;
+use Illuminate\Foundation\Http\FormRequest;
 
 class TorrentCommentRequest extends FormRequest
 {

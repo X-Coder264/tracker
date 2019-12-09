@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Users;
 
-use App\Models\User;
-use Illuminate\Routing\Redirector;
-use Illuminate\Http\RedirectResponse;
 use App\Http\Requests\UpdateUserRequest;
+use App\Models\User;
 use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\Translation\Translator;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Routing\Redirector;
 
 final class UpdateController
 {

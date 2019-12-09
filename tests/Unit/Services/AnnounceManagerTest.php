@@ -4,16 +4,16 @@ declare(strict_types=1);
 
 namespace Tests\Unit\Services;
 
-use Tests\TestCase;
-use ReflectionClass;
-use App\Services\Bencoder;
 use App\Services\AnnounceManager;
+use App\Services\Bencoder;
+use Illuminate\Cache\Repository as CacheRepository;
 use Illuminate\Contracts\Config\Repository;
+use Illuminate\Contracts\Translation\Translator;
+use Illuminate\Contracts\Validation\Factory as ValidationFactory;
 use Illuminate\Database\ConnectionInterface;
 use PHPUnit\Framework\MockObject\MockObject;
-use Illuminate\Contracts\Translation\Translator;
-use Illuminate\Cache\Repository as CacheRepository;
-use Illuminate\Contracts\Validation\Factory as ValidationFactory;
+use ReflectionClass;
+use Tests\TestCase;
 
 class AnnounceManagerTest extends TestCase
 {

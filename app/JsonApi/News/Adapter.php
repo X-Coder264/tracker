@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace App\JsonApi\News;
 
 use App\Models\News;
-use Illuminate\Support\Collection;
-use Illuminate\Contracts\Auth\Guard;
-use Illuminate\Database\Eloquent\Builder;
 use CloudCreativity\LaravelJsonApi\Document\ResourceObject;
 use CloudCreativity\LaravelJsonApi\Eloquent\AbstractAdapter;
 use CloudCreativity\LaravelJsonApi\Pagination\StandardStrategy;
+use Illuminate\Contracts\Auth\Guard;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Collection;
 
 class Adapter extends AbstractAdapter
 {

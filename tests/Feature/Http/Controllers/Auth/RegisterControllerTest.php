@@ -4,19 +4,19 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Http\Controllers\Auth;
 
-use Tests\TestCase;
-use App\Models\User;
+use App\Models\Configuration;
 use App\Models\Invite;
 use App\Models\Locale;
-use App\Models\Configuration;
+use App\Models\User;
+use Illuminate\Auth\Events\Registered;
+use Illuminate\Contracts\Events\Dispatcher;
+use Illuminate\Contracts\Hashing\Hasher;
+use Illuminate\Contracts\Routing\UrlGenerator;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Event;
-use Illuminate\Auth\Events\Registered;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Contracts\Hashing\Hasher;
-use Illuminate\Contracts\Events\Dispatcher;
-use Illuminate\Contracts\Routing\UrlGenerator;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Tests\TestCase;
 
 class RegisterControllerTest extends TestCase
 {

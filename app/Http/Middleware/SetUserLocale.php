@@ -6,11 +6,11 @@ namespace App\Http\Middleware;
 
 use App\Models\User;
 use Carbon\CarbonImmutable;
-use Illuminate\Http\Request;
-use Illuminate\Support\Carbon;
 use Illuminate\Contracts\Auth\Guard;
 use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 
 class SetUserLocale
 {

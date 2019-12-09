@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Models\PrivateMessages;
 
-use Tests\TestCase;
-use App\Models\User;
 use App\Models\PrivateMessages\Thread;
 use App\Models\PrivateMessages\ThreadMessage;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Tests\TestCase;
 
 class ThreadMessageTest extends TestCase
 {

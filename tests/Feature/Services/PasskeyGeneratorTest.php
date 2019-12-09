@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Services;
 
-use Tests\TestCase;
 use App\Models\User;
-use ReflectionClass;
 use App\Services\PasskeyGenerator;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use ReflectionClass;
+use Tests\TestCase;
 
 class PasskeyGeneratorTest extends TestCase
 {

@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Repositories\PrivateMessages;
 
-use Tests\TestCase;
-use App\Models\User;
-use Illuminate\Database\Connection;
 use App\Models\PrivateMessages\Thread;
-use Illuminate\Contracts\Cache\Repository;
 use App\Models\PrivateMessages\ThreadParticipant;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
+use App\Models\User;
 use App\Repositories\PrivateMessages\CachedThreadParticipantRepository;
+use Illuminate\Contracts\Cache\Repository;
+use Illuminate\Database\Connection;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Tests\TestCase;
 
 class CachedThreadParticipantRepositoryTest extends TestCase
 {

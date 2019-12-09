@@ -4,33 +4,33 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Services;
 
-use Exception;
-use Tests\TestCase;
-use App\Models\User;
-use ReflectionClass;
 use App\Models\Torrent;
-use App\Services\Bdecoder;
-use App\Services\Bencoder;
-use Illuminate\Support\Str;
-use Illuminate\Http\Response;
 use App\Models\TorrentCategory;
 use App\Models\TorrentInfoHash;
-use App\Services\SizeFormatter;
-use Illuminate\Http\Testing\File;
-use Illuminate\Http\UploadedFile;
-use App\Services\IMDb\IMDBManager;
-use Illuminate\Cache\CacheManager;
-use App\Services\TorrentInfoService;
-use Illuminate\Contracts\Auth\Guard;
-use Illuminate\Filesystem\Filesystem;
-use App\Services\TorrentUploadManager;
-use Illuminate\Support\Facades\Storage;
+use App\Models\User;
+use App\Services\Bdecoder;
+use App\Services\Bencoder;
 use App\Services\IMDb\IMDBImagesManager;
+use App\Services\IMDb\IMDBManager;
+use App\Services\SizeFormatter;
+use App\Services\TorrentInfoService;
+use App\Services\TorrentUploadManager;
+use Exception;
+use Illuminate\Cache\CacheManager;
+use Illuminate\Contracts\Auth\Guard;
+use Illuminate\Contracts\Filesystem\Factory as FilesystemManager;
 use Illuminate\Contracts\Routing\UrlGenerator;
 use Illuminate\Contracts\Translation\Translator;
-use PHPUnit\Framework\ExpectationFailedException;
+use Illuminate\Filesystem\Filesystem;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
-use Illuminate\Contracts\Filesystem\Factory as FilesystemManager;
+use Illuminate\Http\Response;
+use Illuminate\Http\Testing\File;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
+use PHPUnit\Framework\ExpectationFailedException;
+use ReflectionClass;
+use Tests\TestCase;
 
 class TorrentUploadManagerTest extends TestCase
 {

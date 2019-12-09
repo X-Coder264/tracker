@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Services\IMDb;
 
-use Imdb\Title;
-use Imdb\Config;
 use Illuminate\Contracts\Cache\Repository;
+use Imdb\Config;
+use Imdb\Title;
 
 class IMDBManager
 {

@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\TorrentComments;
 
-use App\Models\TorrentComment;
-use Illuminate\Http\RedirectResponse;
-use Illuminate\Contracts\Cache\Repository;
 use App\Http\Requests\TorrentCommentRequest;
-use Illuminate\Contracts\Translation\Translator;
+use App\Models\TorrentComment;
+use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Contracts\Routing\ResponseFactory;
+use Illuminate\Contracts\Translation\Translator;
+use Illuminate\Http\RedirectResponse;
 
 final class UpdateController
 {

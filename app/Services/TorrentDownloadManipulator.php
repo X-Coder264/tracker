@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace App\Services;
 
-use Illuminate\Support\Str;
 use Illuminate\Contracts\Filesystem\Factory;
-use Illuminate\Contracts\Routing\UrlGenerator;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
+use Illuminate\Contracts\Routing\UrlGenerator;
+use Illuminate\Support\Str;
 
 final class TorrentDownloadManipulator
 {

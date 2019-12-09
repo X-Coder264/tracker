@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Models;
 
-use Tests\TestCase;
-use App\Models\User;
 use App\Models\Snatch;
 use App\Models\Torrent;
-use Facades\App\Services\SizeFormatter;
+use App\Models\User;
 use Facades\App\Services\SecondsDurationFormatter;
+use Facades\App\Services\SizeFormatter;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Tests\TestCase;
 
 class SnatchTest extends TestCase
 {

@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Http\Middleware;
 
-use Carbon\Carbon;
-use Tests\TestCase;
-use App\Models\User;
 use App\Models\Locale;
-use Illuminate\Support\Facades\Route;
+use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Support\Facades\Route;
+use Tests\TestCase;
 
 class SetUserLocaleTest extends TestCase
 {

@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-use App\Models\User;
 use App\Models\Torrent;
 use App\Models\TorrentCategory;
 use App\Models\TorrentInfoHash;
+use App\Models\User;
 use Illuminate\Database\Seeder;
 
 class TorrentSeeder extends Seeder

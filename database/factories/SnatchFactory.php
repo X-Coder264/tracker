@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-use Carbon\Carbon;
-use App\Models\User;
 use App\Models\Snatch;
 use App\Models\Torrent;
+use App\Models\User;
+use Carbon\Carbon;
 use Faker\Generator as Faker;
 use Illuminate\Database\Eloquent\Factory;
 

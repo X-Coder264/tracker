@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Tests\Unit\Services;
 
-use Tests\TestCase;
 use App\Models\User;
-use ReflectionClass;
 use App\Services\PasskeyGenerator;
 use PHPUnit\Framework\MockObject\MockObject;
+use ReflectionClass;
+use Tests\TestCase;
 
 class PasskeyGeneratorTest extends TestCase
 {

@@ -4,22 +4,22 @@ declare(strict_types=1);
 
 namespace App\Providers;
 
-use App\Models\News;
-use App\Models\User;
-use Carbon\CarbonImmutable;
-use App\Models\TorrentCategory;
-use App\Observers\NewsObserver;
-use App\Observers\UserObserver;
-use Illuminate\Support\DateFactory;
-use Illuminate\Support\ServiceProvider;
-use App\Observers\TorrentCategoryObserver;
-use Illuminate\Contracts\Cache\Repository;
-use Illuminate\Contracts\Container\Container;
-use App\Repositories\PrivateMessages\ThreadParticipantRepository;
-use App\Repositories\PrivateMessages\CachedThreadParticipantRepository;
-use App\Repositories\PrivateMessages\ThreadParticipantRepositoryInterface;
 use App\Http\Controllers\Torrents\DownloadSeedingTorrentsZipArchiveController;
 use App\Http\Controllers\Torrents\DownloadSnatchedTorrentsZipArchiveController;
+use App\Models\News;
+use App\Models\TorrentCategory;
+use App\Models\User;
+use App\Observers\NewsObserver;
+use App\Observers\TorrentCategoryObserver;
+use App\Observers\UserObserver;
+use App\Repositories\PrivateMessages\CachedThreadParticipantRepository;
+use App\Repositories\PrivateMessages\ThreadParticipantRepository;
+use App\Repositories\PrivateMessages\ThreadParticipantRepositoryInterface;
+use Carbon\CarbonImmutable;
+use Illuminate\Contracts\Cache\Repository;
+use Illuminate\Contracts\Container\Container;
+use Illuminate\Support\DateFactory;
+use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
 {

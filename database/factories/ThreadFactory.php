@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
+use App\Models\PrivateMessages\Thread;
 use App\Models\User;
 use Faker\Generator as Faker;
-use App\Models\PrivateMessages\Thread;
 use Illuminate\Database\Eloquent\Factory;
 
 /** @var Factory $factory */

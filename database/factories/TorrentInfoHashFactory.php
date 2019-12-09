@@ -3,10 +3,10 @@
 declare(strict_types=1);
 
 use App\Models\Torrent;
-use Illuminate\Support\Str;
-use Faker\Generator as Faker;
 use App\Models\TorrentInfoHash;
+use Faker\Generator as Faker;
 use Illuminate\Database\Eloquent\Factory;
+use Illuminate\Support\Str;
 
 /** @var Factory $factory */
 $factory->define(TorrentInfoHash::class, function (Faker $faker) {

@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Models;
 
-use Tests\TestCase;
-use App\Models\User;
 use App\Models\Invite;
+use App\Models\User;
 use Carbon\CarbonImmutable;
-use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Foundation\Testing\WithFaker;
+use Tests\TestCase;
 
 final class InviteTest extends TestCase
 {

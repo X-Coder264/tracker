@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Http\Controllers;
 
-use Tests\TestCase;
 use App\Models\Snatch;
 use App\Models\Torrent;
 use Illuminate\Contracts\Cache\Repository;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Contracts\Routing\UrlGenerator;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
-use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Tests\TestCase;
 
 class SnatchControllerTest extends TestCase
 {

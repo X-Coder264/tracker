@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Torrents;
 
 use App\Models\Torrent;
-use Illuminate\Http\Response;
-use Illuminate\Contracts\Routing\UrlGenerator;
 use App\Repositories\TorrentCategoryRepository;
 use Illuminate\Contracts\Routing\ResponseFactory;
+use Illuminate\Contracts\Routing\UrlGenerator;
+use Illuminate\Http\Response;
 
 final class CreateController
 {

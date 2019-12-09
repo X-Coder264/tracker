@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Users;
 
 use App\Models\User;
-use Illuminate\Http\Response;
-use App\Services\SizeFormatter;
 use App\Repositories\UserRepository;
+use App\Services\SizeFormatter;
 use Illuminate\Contracts\Routing\ResponseFactory;
+use Illuminate\Http\Response;
 
 final class ShowController
 {

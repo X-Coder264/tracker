@@ -4,16 +4,16 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Http\Controllers\Admin;
 
-use App\Models\User;
+use App\JsonApi\ResourceTypes;
 use App\Models\Locale;
 use App\Models\Torrent;
-use Tests\AdminApiTestCase;
-use Illuminate\Http\Response;
-use App\JsonApi\ResourceTypes;
-use Illuminate\Support\Carbon;
-use Laravel\Passport\Passport;
+use App\Models\User;
 use Illuminate\Contracts\Hashing\Hasher;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Http\Response;
+use Illuminate\Support\Carbon;
+use Laravel\Passport\Passport;
+use Tests\AdminApiTestCase;
 
 class UsersControllerTest extends AdminApiTestCase
 {

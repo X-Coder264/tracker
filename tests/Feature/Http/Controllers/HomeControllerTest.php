@@ -4,15 +4,15 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Http\Controllers;
 
-use Tests\TestCase;
 use App\Models\News;
 use App\Models\Peer;
-use App\Models\User;
 use App\Models\Torrent;
-use Illuminate\Http\Response;
+use App\Models\User;
 use App\Services\SizeFormatter;
 use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Http\Response;
+use Tests\TestCase;
 
 class HomeControllerTest extends TestCase
 {

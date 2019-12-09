@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Console;
 
+use App\Console\Commands\DeleteExpiredInvitesCommand;
 use App\Console\Commands\DeletePeers;
 use Illuminate\Console\Scheduling\Schedule;
-use App\Console\Commands\DeleteExpiredInvitesCommand;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 
 class Kernel extends ConsoleKernel

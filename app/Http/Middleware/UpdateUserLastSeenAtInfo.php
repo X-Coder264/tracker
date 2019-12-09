@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace App\Http\Middleware;
 
-use Closure;
 use App\Models\User;
 use Carbon\CarbonImmutable;
-use Illuminate\Http\Request;
+use Closure;
 use Illuminate\Contracts\Auth\Guard;
+use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 class UpdateUserLastSeenAtInfo

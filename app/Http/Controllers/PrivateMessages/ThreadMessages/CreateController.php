@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\PrivateMessages\ThreadMessages;
 
-use Illuminate\Http\Response;
 use App\Models\PrivateMessages\Thread;
 use App\Models\PrivateMessages\ThreadMessage;
 use Illuminate\Contracts\Routing\ResponseFactory;
+use Illuminate\Http\Response;
 
 final class CreateController
 {

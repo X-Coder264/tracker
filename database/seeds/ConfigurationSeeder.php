@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
+use App\Enumerations\ConfigurationOptions;
 use App\Models\Configuration;
 use Illuminate\Database\Seeder;
-use App\Enumerations\ConfigurationOptions;
 
 class ConfigurationSeeder extends Seeder
 {

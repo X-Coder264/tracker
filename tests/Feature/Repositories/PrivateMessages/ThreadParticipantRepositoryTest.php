@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Repositories\PrivateMessages;
 
-use Carbon\Carbon;
-use Tests\TestCase;
-use App\Models\User;
 use App\Models\PrivateMessages\Thread;
 use App\Models\PrivateMessages\ThreadParticipant;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
+use App\Models\User;
 use App\Repositories\PrivateMessages\ThreadParticipantRepository;
+use Carbon\Carbon;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Tests\TestCase;
 
 class ThreadParticipantRepositoryTest extends TestCase
 {

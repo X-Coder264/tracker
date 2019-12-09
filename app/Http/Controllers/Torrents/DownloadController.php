@@ -4,16 +4,16 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Torrents;
 
-use App\Models\User;
 use App\Models\Torrent;
-use Illuminate\Http\Request;
-use Illuminate\Http\Response;
-use Illuminate\Contracts\Auth\Guard;
+use App\Models\User;
 use App\Services\TorrentDownloadManipulator;
 use Illuminate\Auth\AuthenticationException;
-use Illuminate\Contracts\Translation\Translator;
-use Symfony\Component\HttpFoundation\ResponseHeaderBag;
+use Illuminate\Contracts\Auth\Guard;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
+use Illuminate\Contracts\Translation\Translator;
+use Illuminate\Http\Request;
+use Illuminate\Http\Response;
+use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 final class DownloadController

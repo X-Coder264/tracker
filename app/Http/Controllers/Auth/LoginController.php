@@ -4,20 +4,20 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Auth;
 
+use App\Http\Middleware\RedirectIfAuthenticated;
 use App\Models\User;
+use Illuminate\Auth\AuthManager;
+use Illuminate\Contracts\Encryption\Encrypter;
+use Illuminate\Contracts\Routing\ResponseFactory;
+use Illuminate\Contracts\Routing\UrlGenerator;
+use Illuminate\Contracts\Translation\Translator;
+use Illuminate\Foundation\Auth\AuthenticatesUsers;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use Illuminate\Auth\AuthManager;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Routing\Controller;
-use Illuminate\Http\RedirectResponse;
-use Illuminate\Contracts\Encryption\Encrypter;
-use Illuminate\Contracts\Routing\UrlGenerator;
 use Illuminate\Validation\ValidationException;
-use App\Http\Middleware\RedirectIfAuthenticated;
-use Illuminate\Contracts\Translation\Translator;
-use Illuminate\Contracts\Routing\ResponseFactory;
-use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Symfony\Component\HttpFoundation\Response as BaseResponse;
 
 class LoginController extends Controller

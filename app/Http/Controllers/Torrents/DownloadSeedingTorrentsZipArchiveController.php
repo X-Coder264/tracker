@@ -4,15 +4,15 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Torrents;
 
-use ZipArchive;
-use App\Models\User;
 use App\Models\Torrent;
-use Illuminate\Contracts\Auth\Guard;
-use Illuminate\Database\Eloquent\Builder;
+use App\Models\User;
 use App\Services\TorrentDownloadManipulator;
-use Symfony\Component\HttpFoundation\Response;
-use Illuminate\Contracts\Translation\Translator;
+use Illuminate\Contracts\Auth\Guard;
 use Illuminate\Contracts\Routing\ResponseFactory;
+use Illuminate\Contracts\Translation\Translator;
+use Illuminate\Database\Eloquent\Builder;
+use Symfony\Component\HttpFoundation\Response;
+use ZipArchive;
 
 final class DownloadSeedingTorrentsZipArchiveController
 {

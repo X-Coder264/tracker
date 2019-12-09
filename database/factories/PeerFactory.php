@@ -3,9 +3,9 @@
 declare(strict_types=1);
 
 use App\Models\Peer;
-use App\Models\User;
-use App\Models\Torrent;
 use App\Models\PeerVersion;
+use App\Models\Torrent;
+use App\Models\User;
 use Faker\Generator as Faker;
 use Illuminate\Database\Eloquent\Factory;
 

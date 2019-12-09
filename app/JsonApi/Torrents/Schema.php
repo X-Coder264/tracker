@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\JsonApi\Torrents;
 
-use App\Models\Torrent;
 use App\JsonApi\ResourceTypes;
+use App\Models\Torrent;
 use Neomerx\JsonApi\Schema\SchemaProvider;
 
 class Schema extends SchemaProvider

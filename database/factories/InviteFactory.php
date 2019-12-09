@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-use App\Models\User;
 use App\Models\Invite;
+use App\Models\User;
 use Carbon\CarbonImmutable;
-use Illuminate\Support\Str;
 use Faker\Generator as Faker;
 use Illuminate\Database\Eloquent\Factory;
+use Illuminate\Support\Str;
 
 /*
 |--------------------------------------------------------------------------

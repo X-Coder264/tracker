@@ -4,19 +4,19 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Http\Controllers;
 
-use Tests\TestCase;
-use App\Models\Peer;
-use App\Models\User;
+use App\Http\Middleware\SetUserLocale;
 use App\Models\Locale;
+use App\Models\Peer;
 use App\Models\Snatch;
 use App\Models\Torrent;
-use Illuminate\Http\Response;
+use App\Models\User;
 use App\Services\SizeFormatter;
-use Illuminate\Support\Facades\Cache;
-use App\Http\Middleware\SetUserLocale;
 use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Contracts\Translation\Translator;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Cache;
+use Tests\TestCase;
 
 class UserControllerTest extends TestCase
 {

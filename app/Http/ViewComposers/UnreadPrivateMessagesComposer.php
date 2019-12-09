@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Http\ViewComposers;
 
-use Illuminate\Contracts\View\View;
-use Illuminate\Contracts\Auth\Guard;
 use App\Repositories\PrivateMessages\ThreadParticipantRepositoryInterface;
+use Illuminate\Contracts\Auth\Guard;
+use Illuminate\Contracts\View\View;
 
 class UnreadPrivateMessagesComposer
 {

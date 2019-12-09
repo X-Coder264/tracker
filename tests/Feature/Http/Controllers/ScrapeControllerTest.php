@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Http\Controllers;
 
-use Tests\TestCase;
-use App\Models\User;
 use App\Models\Snatch;
 use App\Models\Torrent;
+use App\Models\TorrentInfoHash;
+use App\Models\User;
 use App\Services\Bdecoder;
 use App\Services\Bencoder;
-use App\Models\TorrentInfoHash;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Tests\TestCase;
 
 class ScrapeControllerTest extends TestCase
 {

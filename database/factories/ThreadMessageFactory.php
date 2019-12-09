@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
+use App\Models\PrivateMessages\Thread;
+use App\Models\PrivateMessages\ThreadMessage;
 use App\Models\User;
 use Faker\Generator as Faker;
-use App\Models\PrivateMessages\Thread;
 use Illuminate\Database\Eloquent\Factory;
-use App\Models\PrivateMessages\ThreadMessage;
 
 /** @var Factory $factory */
 $factory->define(ThreadMessage::class, function (Faker $faker) {

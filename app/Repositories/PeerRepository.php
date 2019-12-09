@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace App\Repositories;
 
 use Carbon\Carbon;
-use Illuminate\Database\Query\Builder;
 use Illuminate\Contracts\Config\Repository;
 use Illuminate\Database\ConnectionInterface;
+use Illuminate\Database\Query\Builder;
 
 class PeerRepository
 {

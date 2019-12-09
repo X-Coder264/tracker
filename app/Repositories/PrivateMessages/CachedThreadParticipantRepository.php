@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\Repositories\PrivateMessages;
 
 use App\Enumerations\Cache;
-use Illuminate\Support\Collection;
 use Illuminate\Contracts\Cache\Repository;
+use Illuminate\Support\Collection;
 
 class CachedThreadParticipantRepository implements ThreadParticipantRepositoryInterface
 {

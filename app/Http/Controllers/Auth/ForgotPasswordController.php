@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Auth;
 
-use Illuminate\Routing\Controller;
 use App\Http\Middleware\RedirectIfAuthenticated;
 use Illuminate\Foundation\Auth\SendsPasswordResetEmails;
+use Illuminate\Routing\Controller;
 
 class ForgotPasswordController extends Controller
 {

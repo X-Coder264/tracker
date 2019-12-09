@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\JsonApi\Users;
 
-use App\Models\User;
 use App\JsonApi\ResourceTypes;
+use App\Models\User;
 use Neomerx\JsonApi\Schema\SchemaProvider;
 
 class Schema extends SchemaProvider

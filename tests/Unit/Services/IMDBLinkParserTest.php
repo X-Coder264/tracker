@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Tests\Unit\Services;
 
-use Tests\TestCase;
-use InvalidArgumentException;
 use App\Services\IMDb\IMDBLinkParser;
+use InvalidArgumentException;
+use Tests\TestCase;
 
 class IMDBLinkParserTest extends TestCase
 {

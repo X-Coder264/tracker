@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-use Carbon\Carbon;
-use App\Models\User;
-use Illuminate\Database\Seeder;
 use App\Models\PrivateMessages\Thread;
+use App\Models\User;
+use Carbon\Carbon;
+use Illuminate\Database\Seeder;
 
 class ThreadSeeder extends Seeder
 {

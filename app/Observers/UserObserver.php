@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\Observers;
 
 use App\Models\User;
-use PragmaRX\Google2FA\Google2FA;
 use App\Services\PasskeyGenerator;
+use PragmaRX\Google2FA\Google2FA;
 
 class UserObserver
 {

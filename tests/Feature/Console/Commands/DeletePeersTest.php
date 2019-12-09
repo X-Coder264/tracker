@@ -4,20 +4,20 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Console\Commands;
 
-use Carbon\Carbon;
-use Tests\TestCase;
-use App\Models\Peer;
-use App\Models\User;
-use App\Models\PeerIP;
-use App\Models\Torrent;
-use App\Models\PeerVersion;
-use Illuminate\Support\Collection;
 use App\Console\Commands\DeletePeers;
+use App\Models\Peer;
+use App\Models\PeerIP;
+use App\Models\PeerVersion;
+use App\Models\Torrent;
+use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Console\Scheduling\Event;
-use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Console\Scheduling\Schedule;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Support\Collection;
+use Tests\TestCase;
 
 class DeletePeersTest extends TestCase
 {

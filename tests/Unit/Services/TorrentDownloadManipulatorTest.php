@@ -6,12 +6,12 @@ namespace Tests\Unit\Services;
 
 use App\Services\Bdecoder;
 use App\Services\Bencoder;
-use PHPUnit\Framework\TestCase;
 use App\Services\TorrentDownloadManipulator;
 use Illuminate\Contracts\Filesystem\Factory;
-use Illuminate\Contracts\Routing\UrlGenerator;
-use Illuminate\Contracts\Filesystem\Filesystem;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
+use Illuminate\Contracts\Filesystem\Filesystem;
+use Illuminate\Contracts\Routing\UrlGenerator;
+use PHPUnit\Framework\TestCase;
 
 final class TorrentDownloadManipulatorTest extends TestCase
 {

@@ -4,18 +4,18 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Http\Middleware;
 
-use Carbon\Carbon;
-use Tests\TestCase;
 use App\Models\User;
+use Carbon\Carbon;
 use Firebase\JWT\JWT;
-use Illuminate\Support\Str;
-use Illuminate\Routing\Router;
-use Illuminate\Contracts\Http\Kernel;
-use Illuminate\Contracts\Session\Session;
 use Illuminate\Contracts\Config\Repository;
+use Illuminate\Contracts\Http\Kernel;
 use Illuminate\Contracts\Routing\UrlGenerator;
+use Illuminate\Contracts\Session\Session;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Routing\Router;
+use Illuminate\Support\Str;
 use Laravel\Passport\Http\Middleware\CreateFreshApiToken;
+use Tests\TestCase;
 
 final class GetApiTokenTest extends TestCase
 {

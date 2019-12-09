@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Console\Commands;
 
-use Tests\TestCase;
+use App\Console\Commands\DeleteExpiredInvitesCommand;
 use App\Models\Invite;
-use Illuminate\Support\Collection;
 use Illuminate\Console\Scheduling\Event;
 use Illuminate\Console\Scheduling\Schedule;
-use App\Console\Commands\DeleteExpiredInvitesCommand;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Support\Collection;
+use Tests\TestCase;
 
 class DeleteExpiredInvitesTest extends TestCase
 {

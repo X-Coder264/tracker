@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Models;
 
-use Tests\TestCase;
 use App\Models\Configuration;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Tests\TestCase;
 
 class ConfigurationTest extends TestCase
 {

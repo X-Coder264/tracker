@@ -4,19 +4,19 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Http\Controllers\Torrents;
 
-use ZipArchive;
-use Tests\TestCase;
 use App\Models\Peer;
-use App\Models\User;
-use ReflectionClass;
 use App\Models\Torrent;
+use App\Models\User;
 use App\Services\Bdecoder;
 use App\Services\Bencoder;
 use Illuminate\Contracts\Filesystem\Factory;
 use Illuminate\Contracts\Routing\UrlGenerator;
 use Illuminate\Contracts\Translation\Translator;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use ReflectionClass;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use Tests\TestCase;
+use ZipArchive;
 
 final class DownloadSeedingTorrentsZipArchiveControllerTest extends TestCase
 {

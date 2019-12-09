@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace Tests\Feature\ViewComposers;
 
-use Tests\TestCase;
 use App\Models\Peer;
 use App\Models\User;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Support\Facades\Cache;
+use Tests\TestCase;
 
 class UserStatsComposerTest extends TestCase
 {

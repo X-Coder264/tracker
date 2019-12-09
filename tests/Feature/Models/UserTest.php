@@ -4,21 +4,21 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Models;
 
-use Tests\TestCase;
-use App\Models\News;
-use App\Models\User;
 use App\Models\Invite;
 use App\Models\Locale;
+use App\Models\News;
+use App\Models\PrivateMessages\Thread;
 use App\Models\Snatch;
 use App\Models\Torrent;
+use App\Models\User;
 use Carbon\CarbonImmutable;
-use App\Models\PrivateMessages\Thread;
 use Facades\App\Services\SizeFormatter;
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Database\Eloquent\Relations\HasOne;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Tests\TestCase;
 
 final class UserTest extends TestCase
 {

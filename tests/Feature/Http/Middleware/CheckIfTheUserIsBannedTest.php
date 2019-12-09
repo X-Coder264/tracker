@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Http\Middleware;
 
-use Tests\TestCase;
-use App\Models\User;
-use Illuminate\Routing\Router;
-use Illuminate\Contracts\Http\Kernel;
 use App\Http\Middleware\CheckIfTheUserIsBanned;
+use App\Models\User;
+use Illuminate\Contracts\Http\Kernel;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Routing\Router;
+use Tests\TestCase;
 
 class CheckIfTheUserIsBannedTest extends TestCase
 {

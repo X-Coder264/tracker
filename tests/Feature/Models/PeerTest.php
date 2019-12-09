@@ -4,17 +4,17 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Models;
 
-use Tests\TestCase;
 use App\Models\Peer;
-use App\Models\User;
 use App\Models\PeerIP;
-use App\Models\Torrent;
 use App\Models\PeerVersion;
+use App\Models\Torrent;
+use App\Models\User;
 use Facades\App\Services\SizeFormatter;
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Tests\TestCase;
 
 class PeerTest extends TestCase
 {

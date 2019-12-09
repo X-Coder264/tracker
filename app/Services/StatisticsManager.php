@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace App\Services;
 
-use App\Models\Peer;
-use App\Models\User;
-use App\Models\Torrent;
 use App\Enumerations\Cache;
+use App\Models\Peer;
+use App\Models\Torrent;
+use App\Models\User;
 use Illuminate\Contracts\Cache\Repository;
 
 class StatisticsManager

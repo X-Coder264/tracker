@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Http\Controllers;
 
-use Tests\TestCase;
-use App\Models\User;
 use App\Models\Torrent;
-use Illuminate\Http\Response;
 use App\Models\TorrentComment;
+use App\Models\User;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Http\Response;
+use Tests\TestCase;
 
 class TorrentCommentControllerTest extends TestCase
 {

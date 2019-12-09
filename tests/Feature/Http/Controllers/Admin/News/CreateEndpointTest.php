@@ -6,11 +6,11 @@ namespace Tests\Feature\Http\Controllers\Admin\News;
 
 use App\Models\News;
 use App\Models\User;
-use Tests\AdminApiTestCase;
-use Illuminate\Http\Response;
-use Laravel\Passport\Passport;
 use Illuminate\Contracts\Routing\UrlGenerator;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Http\Response;
+use Laravel\Passport\Passport;
+use Tests\AdminApiTestCase;
 
 final class CreateEndpointTest extends AdminApiTestCase
 {

@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace App\Exceptions;
 
+use CloudCreativity\LaravelJsonApi\Exceptions\HandlesErrors;
 use Exception;
+use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Illuminate\Http\Request;
+use Neomerx\JsonApi\Exceptions\JsonApiException;
 use Sentry\State\HubInterface;
 use Symfony\Component\HttpFoundation\Response;
-use Neomerx\JsonApi\Exceptions\JsonApiException;
-use CloudCreativity\LaravelJsonApi\Exceptions\HandlesErrors;
-use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 
 class Handler extends ExceptionHandler
 {

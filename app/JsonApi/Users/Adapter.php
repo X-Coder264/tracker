@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace App\JsonApi\Users;
 
 use App\Models\User;
-use Illuminate\Support\Collection;
-use Illuminate\Contracts\Hashing\Hasher;
-use CloudCreativity\LaravelJsonApi\Eloquent\BelongsTo;
 use CloudCreativity\LaravelJsonApi\Document\ResourceObject;
 use CloudCreativity\LaravelJsonApi\Eloquent\AbstractAdapter;
+use CloudCreativity\LaravelJsonApi\Eloquent\BelongsTo;
 use CloudCreativity\LaravelJsonApi\Pagination\StandardStrategy;
+use Illuminate\Contracts\Hashing\Hasher;
+use Illuminate\Support\Collection;
 use Neomerx\JsonApi\Contracts\Encoder\Parameters\EncodingParametersInterface;
 
 class Adapter extends AbstractAdapter

@@ -4,19 +4,19 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Models;
 
-use Tests\TestCase;
 use App\Models\Peer;
-use App\Models\User;
 use App\Models\Snatch;
 use App\Models\Torrent;
-use App\Models\TorrentComment;
 use App\Models\TorrentCategory;
+use App\Models\TorrentComment;
 use App\Models\TorrentInfoHash;
+use App\Models\User;
 use Facades\App\Services\SizeFormatter;
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Tests\TestCase;
 
 class TorrentTest extends TestCase
 {

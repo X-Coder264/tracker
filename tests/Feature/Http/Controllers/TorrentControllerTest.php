@@ -4,35 +4,35 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Http\Controllers;
 
-use Tests\TestCase;
 use App\Models\Peer;
-use App\Models\User;
 use App\Models\Torrent;
+use App\Models\TorrentCategory;
+use App\Models\TorrentComment;
+use App\Models\User;
+use App\Presenters\IMDb\Title;
 use App\Services\Bdecoder;
 use App\Services\Bencoder;
-use Illuminate\Http\Response;
-use InvalidArgumentException;
-use App\Models\TorrentComment;
-use App\Presenters\IMDb\Title;
-use App\Models\TorrentCategory;
-use App\Services\SizeFormatter;
-use Illuminate\Http\Testing\File;
-use App\Services\IMDb\IMDBManager;
-use Illuminate\Cache\CacheManager;
-use App\Services\IMDb\TitleFactory;
-use App\Services\TorrentInfoService;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Contracts\Cache\Repository;
-use Illuminate\Database\Eloquent\Collection;
-use PHPUnit\Framework\MockObject\MockObject;
 use App\Services\FileSizeCollectionFormatter;
+use App\Services\IMDb\IMDBManager;
+use App\Services\IMDb\TitleFactory;
+use App\Services\SizeFormatter;
+use App\Services\TorrentInfoService;
+use Illuminate\Cache\CacheManager;
+use Illuminate\Contracts\Cache\Repository;
+use Illuminate\Contracts\Filesystem\Factory as FilesystemManager;
+use Illuminate\Contracts\Filesystem\FileNotFoundException;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Contracts\Routing\UrlGenerator;
 use Illuminate\Contracts\Translation\Translator;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Http\Response;
+use Illuminate\Http\Testing\File;
+use Illuminate\Support\Facades\Storage;
+use InvalidArgumentException;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
-use Illuminate\Contracts\Pagination\LengthAwarePaginator;
-use Illuminate\Contracts\Filesystem\FileNotFoundException;
-use Illuminate\Contracts\Filesystem\Factory as FilesystemManager;
+use Tests\TestCase;
 
 class TorrentControllerTest extends TestCase
 {

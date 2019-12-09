@@ -2,8 +2,8 @@
 
 declare(strict_types=1);
 
-use Faker\Generator as Faker;
 use App\Models\TorrentCategory;
+use Faker\Generator as Faker;
 use Illuminate\Database\Eloquent\Factory;
 
 /** @var Factory $factory */

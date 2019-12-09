@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Tests\Unit\Services;
 
+use App\Services\IMDb\IMDBManager;
 use Imdb\Title;
 use Tests\TestCase;
-use App\Services\IMDb\IMDBManager;
 
 class IMDBManagerTest extends TestCase
 {

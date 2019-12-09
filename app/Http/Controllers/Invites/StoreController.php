@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Invites;
 
-use App\Models\User;
 use App\Models\Invite;
+use App\Models\User;
 use Carbon\CarbonImmutable;
 use Illuminate\Contracts\Auth\Guard;
-use Illuminate\Http\RedirectResponse;
-use Illuminate\Contracts\Translation\Translator;
 use Illuminate\Contracts\Routing\ResponseFactory;
+use Illuminate\Contracts\Translation\Translator;
+use Illuminate\Http\RedirectResponse;
 
 final class StoreController
 {

@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace App\Providers;
 
-use Illuminate\Support\ServiceProvider;
 use App\Http\ViewComposers\TimezoneComposer;
+use App\Http\ViewComposers\UnreadPrivateMessagesComposer;
 use App\Http\ViewComposers\UserStatsComposer;
 use Illuminate\Contracts\View\Factory as ViewFactory;
-use App\Http\ViewComposers\UnreadPrivateMessagesComposer;
+use Illuminate\Support\ServiceProvider;
 
 class ComposerServiceProvider extends ServiceProvider
 {

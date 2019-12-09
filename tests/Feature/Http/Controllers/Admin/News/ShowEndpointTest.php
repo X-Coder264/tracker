@@ -6,10 +6,10 @@ namespace Tests\Feature\Http\Controllers\Admin\News;
 
 use App\Models\News;
 use App\Models\User;
-use Tests\AdminApiTestCase;
-use Laravel\Passport\Passport;
 use Illuminate\Contracts\Routing\UrlGenerator;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Laravel\Passport\Passport;
+use Tests\AdminApiTestCase;
 
 final class ShowEndpointTest extends AdminApiTestCase
 {

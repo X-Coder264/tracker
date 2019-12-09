@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Http\Controllers\TwoFactorAuth;
 
-use Tests\TestCase;
 use App\Models\User;
-use PragmaRX\Google2FAQRCode\Google2FA;
 use Illuminate\Contracts\Config\Repository;
 use Illuminate\Contracts\Routing\UrlGenerator;
 use Illuminate\Contracts\Translation\Translator;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use PragmaRX\Google2FAQRCode\Google2FA;
+use Tests\TestCase;
 
 final class StatusControllerTest extends TestCase
 {

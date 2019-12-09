@@ -4,21 +4,21 @@ declare(strict_types=1);
 
 namespace App\Models;
 
-use Carbon\CarbonImmutable;
-use Laravel\Passport\HasApiTokens;
-use App\Notifications\ResetPassword;
 use App\Models\PrivateMessages\Thread;
-use Spatie\Permission\Traits\HasRoles;
-use Facades\App\Services\SizeFormatter;
-use Illuminate\Notifications\Notifiable;
-use Illuminate\Database\Eloquent\Builder;
+use App\Notifications\ResetPassword;
+use Carbon\CarbonImmutable;
 use Cviebrock\EloquentSluggable\Sluggable;
-use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Database\Eloquent\Relations\HasOne;
-use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Cviebrock\EloquentSluggable\SluggableScopeHelpers;
+use Facades\App\Services\SizeFormatter;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Notifications\Notifiable;
+use Laravel\Passport\HasApiTokens;
+use Spatie\Permission\Traits\HasRoles;
 
 /**
  * @property string $passkey

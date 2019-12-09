@@ -4,23 +4,23 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Services;
 
-use stdClass;
-use Tests\TestCase;
 use App\Models\Peer;
-use App\Models\User;
 use App\Models\PeerIP;
+use App\Models\PeerVersion;
 use App\Models\Snatch;
 use App\Models\Torrent;
-use App\Services\Bdecoder;
-use App\Models\PeerVersion;
-use Carbon\CarbonImmutable;
-use Illuminate\Http\Response;
-use Illuminate\Support\Carbon;
 use App\Models\TorrentInfoHash;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Cache;
+use App\Models\User;
+use App\Services\Bdecoder;
+use Carbon\CarbonImmutable;
 use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Http\Response;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
+use stdClass;
+use Tests\TestCase;
 
 class AnnounceManagerTest extends TestCase
 {

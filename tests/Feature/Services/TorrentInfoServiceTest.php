@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Services;
 
-use Tests\TestCase;
 use App\Models\Torrent;
 use App\Presenters\IMDb\Title;
 use App\Services\TorrentInfoService;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Tests\TestCase;
 
 class TorrentInfoServiceTest extends TestCase
 {

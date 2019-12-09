@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
-use App\Models\News;
 use App\Enumerations\Cache;
-use Illuminate\Http\Response;
+use App\Models\News;
 use App\Services\SizeFormatter;
 use App\Services\StatisticsManager;
 use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Contracts\Routing\ResponseFactory;
+use Illuminate\Http\Response;
 
 final class HomeController
 {

@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use Facades\App\Services\SecondsDurationFormatter;
 use Facades\App\Services\SizeFormatter;
 use Illuminate\Database\Eloquent\Model;
-use Facades\App\Services\SecondsDurationFormatter;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Snatch extends Model

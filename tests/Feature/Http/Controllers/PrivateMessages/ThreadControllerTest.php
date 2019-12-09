@@ -4,16 +4,16 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Http\Controllers\PrivateMessages;
 
-use Carbon\Carbon;
-use Tests\TestCase;
-use App\Models\User;
-use Illuminate\Support\Collection;
 use App\Models\PrivateMessages\Thread;
-use Illuminate\Contracts\Cache\Repository;
 use App\Models\PrivateMessages\ThreadMessage;
 use App\Models\PrivateMessages\ThreadParticipant;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
+use App\Models\User;
+use Carbon\Carbon;
+use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Support\Collection;
+use Tests\TestCase;
 
 class ThreadControllerTest extends TestCase
 {

@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace Tests\Unit\Services;
 
-use Exception;
-use Psr\Log\NullLogger;
 use App\Exceptions\Handler;
-use Psr\Log\LoggerInterface;
-use Sentry\State\HubInterface;
-use PHPUnit\Framework\TestCase;
+use Exception;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use PHPUnit\Framework\TestCase;
+use Psr\Log\LoggerInterface;
+use Psr\Log\NullLogger;
+use Sentry\State\HubInterface;
 
 final class ExceptionHandlerTest extends TestCase
 {

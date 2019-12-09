@@ -5,13 +5,13 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Torrents;
 
 use App\Models\Torrent;
-use Illuminate\Contracts\Auth\Access\Gate;
-use Illuminate\Contracts\Routing\UrlGenerator;
-use Symfony\Component\HttpFoundation\Response;
 use App\Repositories\TorrentCategoryRepository;
-use Illuminate\Contracts\Translation\Translator;
-use Illuminate\Contracts\Routing\ResponseFactory;
 use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Contracts\Auth\Access\Gate;
+use Illuminate\Contracts\Routing\ResponseFactory;
+use Illuminate\Contracts\Routing\UrlGenerator;
+use Illuminate\Contracts\Translation\Translator;
+use Symfony\Component\HttpFoundation\Response;
 
 final class EditController
 {

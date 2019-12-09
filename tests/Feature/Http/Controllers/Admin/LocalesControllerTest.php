@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Http\Controllers\Admin;
 
-use App\Models\User;
 use App\Models\Locale;
-use Tests\AdminApiTestCase;
+use App\Models\User;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Carbon;
 use Laravel\Passport\Passport;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Tests\AdminApiTestCase;
 
 class LocalesControllerTest extends AdminApiTestCase
 {

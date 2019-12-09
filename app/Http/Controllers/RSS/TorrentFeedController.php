@@ -4,21 +4,21 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\RSS;
 
-use App\Models\User;
-use App\Models\Torrent;
-use App\Services\RSS\Feed;
 use App\Enumerations\Cache;
+use App\Models\Torrent;
+use App\Models\User;
+use App\Repositories\TorrentRepository;
+use App\Services\RSS\Feed;
+use App\Services\RSS\TorrentFeedItemFactory;
+use Illuminate\Auth\AuthenticationException;
+use Illuminate\Contracts\Cache\Repository;
+use Illuminate\Contracts\Routing\ResponseFactory;
+use Illuminate\Contracts\Routing\UrlGenerator;
+use Illuminate\Contracts\View\Factory;
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Collection;
-use Illuminate\Contracts\View\Factory;
-use App\Repositories\TorrentRepository;
-use Illuminate\Contracts\Cache\Repository;
-use App\Services\RSS\TorrentFeedItemFactory;
-use Illuminate\Auth\AuthenticationException;
-use Illuminate\Contracts\Routing\UrlGenerator;
-use Illuminate\Contracts\Routing\ResponseFactory;
-use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 
 final class TorrentFeedController
 {

@@ -58,7 +58,7 @@ return PhpCsFixer\Config::create()
         'no_superfluous_phpdoc_tags' => true,
         'normalize_index_brace' => true,
         'object_operator_without_whitespace' => true,
-        'ordered_imports' => ['sortAlgorithm' => 'length'],
+        'ordered_imports' => ['sort_algorithm' => 'alpha'],
         'strict_comparison' => true,
         'yoda_style' => true,
         'php_unit_mock' => true,

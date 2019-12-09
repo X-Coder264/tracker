@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Users;
 
-use App\Models\User;
 use App\Models\Locale;
+use App\Models\User;
 use Illuminate\Contracts\Auth\Guard;
-use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Contracts\Routing\ResponseFactory;
+use Symfony\Component\HttpFoundation\Response;
 
 final class EditController
 {

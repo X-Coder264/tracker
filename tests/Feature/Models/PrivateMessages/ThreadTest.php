@@ -4,15 +4,15 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Models\PrivateMessages;
 
-use Tests\TestCase;
-use App\Models\User;
 use App\Models\PrivateMessages\Thread;
-use Illuminate\Database\Eloquent\Collection;
 use App\Models\PrivateMessages\ThreadMessage;
 use App\Models\PrivateMessages\ThreadParticipant;
-use Illuminate\Database\Eloquent\Relations\HasMany;
+use App\Models\User;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Tests\TestCase;
 
 class ThreadTest extends TestCase
 {

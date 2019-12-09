@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace App\Http\ViewComposers;
 
-use App\Models\Peer;
 use App\Enumerations\Cache;
-use Illuminate\Contracts\View\View;
+use App\Models\Peer;
 use Illuminate\Contracts\Auth\Guard;
 use Illuminate\Contracts\Cache\Repository;
+use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Collection;
 
 class UserStatsComposer

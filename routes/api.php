@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-use Illuminate\Contracts\Routing\Registrar;
 use CloudCreativity\LaravelJsonApi\Facades\JsonApi;
 use CloudCreativity\LaravelJsonApi\Routing\RouteRegistrar;
+use Illuminate\Contracts\Routing\Registrar;
 
 /*
 |--------------------------------------------------------------------------

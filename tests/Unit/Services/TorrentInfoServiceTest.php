@@ -4,20 +4,20 @@ declare(strict_types=1);
 
 namespace Tests\Unit\Services;
 
-use Exception;
-use Generator;
-use Tests\TestCase;
 use App\Models\Torrent;
 use App\Services\Bdecoder;
-use App\Services\SizeFormatter;
 use App\Services\IMDb\IMDBManager;
 use App\Services\IMDb\TitleFactory;
+use App\Services\SizeFormatter;
 use App\Services\TorrentInfoService;
+use Exception;
+use Generator;
+use Illuminate\Contracts\Cache\Repository;
+use Illuminate\Contracts\Filesystem\Factory as FilesystemManager;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Contracts\Cache\Repository;
 use PHPUnit\Framework\MockObject\MockObject;
-use Illuminate\Contracts\Filesystem\Factory as FilesystemManager;
+use Tests\TestCase;
 
 class TorrentInfoServiceTest extends TestCase
 {

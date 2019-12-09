@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Http\Controllers;
 
-use Tests\TestCase;
-use Illuminate\Http\Response;
 use App\Services\AnnounceManager;
+use Illuminate\Http\Response;
+use Tests\TestCase;
 
 class AnnounceControllerTest extends TestCase
 {

@@ -4,15 +4,15 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Http\Controllers\Auth;
 
-use Tests\TestCase;
 use App\Models\User;
-use PragmaRX\Google2FA\Google2FA;
 use Illuminate\Contracts\Auth\Guard;
-use Illuminate\Contracts\Session\Session;
 use Illuminate\Contracts\Encryption\Encrypter;
 use Illuminate\Contracts\Routing\UrlGenerator;
+use Illuminate\Contracts\Session\Session;
 use Illuminate\Contracts\Translation\Translator;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use PragmaRX\Google2FA\Google2FA;
+use Tests\TestCase;
 
 final class TwoFactorStepControllerTest extends TestCase
 {

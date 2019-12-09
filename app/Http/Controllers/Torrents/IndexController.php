@@ -4,15 +4,15 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Torrents;
 
-use App\Models\User;
-use App\Models\Torrent;
 use App\Enumerations\Cache;
-use Illuminate\Http\Request;
-use Illuminate\Http\Response;
+use App\Models\Torrent;
+use App\Models\User;
 use Illuminate\Contracts\Auth\Guard;
 use Illuminate\Contracts\Cache\Repository;
-use Illuminate\Contracts\Routing\ResponseFactory;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Contracts\Routing\ResponseFactory;
+use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 
 final class IndexController
 {

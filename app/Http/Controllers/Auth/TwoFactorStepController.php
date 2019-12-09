@@ -5,18 +5,18 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Auth;
 
 use App\Models\User;
+use Illuminate\Contracts\Auth\Guard;
+use Illuminate\Contracts\Auth\StatefulGuard;
+use Illuminate\Contracts\Encryption\Encrypter;
+use Illuminate\Contracts\Routing\ResponseFactory;
+use Illuminate\Contracts\Routing\UrlGenerator;
+use Illuminate\Contracts\Validation\Factory;
+use Illuminate\Contracts\Validation\Validator;
+use Illuminate\Foundation\Auth\AuthenticatesUsers;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use PragmaRX\Google2FA\Google2FA;
-use Illuminate\Contracts\Auth\Guard;
-use Illuminate\Http\RedirectResponse;
-use Illuminate\Contracts\Auth\StatefulGuard;
-use Illuminate\Contracts\Validation\Factory;
-use Illuminate\Contracts\Encryption\Encrypter;
-use Illuminate\Contracts\Routing\UrlGenerator;
-use Illuminate\Contracts\Validation\Validator;
 use Symfony\Component\HttpFoundation\Response;
-use Illuminate\Contracts\Routing\ResponseFactory;
-use Illuminate\Foundation\Auth\AuthenticatesUsers;
 
 final class TwoFactorStepController
 {

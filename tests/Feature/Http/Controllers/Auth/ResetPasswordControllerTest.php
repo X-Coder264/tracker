@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Http\Controllers\Auth;
 
-use Tests\TestCase;
 use App\Models\User;
+use Illuminate\Auth\Events\PasswordReset;
+use Illuminate\Contracts\Hashing\Hasher;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Event;
-use Illuminate\Contracts\Hashing\Hasher;
 use Illuminate\Support\Facades\Password;
-use Illuminate\Auth\Events\PasswordReset;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Tests\TestCase;
 
 class ResetPasswordControllerTest extends TestCase
 {

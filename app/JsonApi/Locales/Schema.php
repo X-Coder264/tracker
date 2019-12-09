@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\JsonApi\Locales;
 
-use App\Models\Locale;
 use App\JsonApi\ResourceTypes;
+use App\Models\Locale;
 use Neomerx\JsonApi\Schema\SchemaProvider;
 
 class Schema extends SchemaProvider

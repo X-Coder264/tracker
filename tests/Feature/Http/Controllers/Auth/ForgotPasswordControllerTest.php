@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Http\Controllers\Auth;
 
-use Tests\TestCase;
 use App\Models\User;
-use Illuminate\Http\Response;
-use Illuminate\Support\Facades\DB;
 use App\Notifications\ResetPassword;
 use Illuminate\Contracts\Hashing\Hasher;
-use Illuminate\Support\Facades\Notification;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Http\Response;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Notification;
+use Tests\TestCase;
 
 class ForgotPasswordControllerTest extends TestCase
 {

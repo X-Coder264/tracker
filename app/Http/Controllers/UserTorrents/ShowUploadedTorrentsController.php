@@ -5,11 +5,11 @@ declare(strict_types=1);
 namespace App\Http\Controllers\UserTorrents;
 
 use App\Models\User;
-use Illuminate\Http\Response;
 use App\Repositories\UserRepository;
 use Illuminate\Contracts\Auth\Guard;
-use Illuminate\Contracts\Translation\Translator;
 use Illuminate\Contracts\Routing\ResponseFactory;
+use Illuminate\Contracts\Translation\Translator;
+use Illuminate\Http\Response;
 
 final class ShowUploadedTorrentsController
 {

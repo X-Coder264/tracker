@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Snatches;
 
+use App\Enumerations\Cache;
 use App\Models\Snatch;
 use App\Models\Torrent;
-use App\Enumerations\Cache;
+use Illuminate\Contracts\Cache\Repository;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Contracts\Routing\ResponseFactory;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use Illuminate\Contracts\Cache\Repository;
-use Illuminate\Contracts\Routing\ResponseFactory;
-use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 final class ShowTorrentSnatchesController
 {

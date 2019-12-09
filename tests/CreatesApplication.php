@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Tests;
 
-use Illuminate\Contracts\Console\Kernel;
 use Illuminate\Contracts\Cache\Repository;
+use Illuminate\Contracts\Console\Kernel;
 
 trait CreatesApplication
 {

@@ -5,11 +5,11 @@ declare(strict_types=1);
 namespace App\Http\Controllers\TwoFactorAuth;
 
 use App\Models\User;
-use Illuminate\Http\Response;
 use Illuminate\Contracts\Auth\Guard;
-use PragmaRX\Google2FAQRCode\Google2FA;
 use Illuminate\Contracts\Config\Repository;
 use Illuminate\Contracts\Routing\ResponseFactory;
+use Illuminate\Http\Response;
+use PragmaRX\Google2FAQRCode\Google2FA;
 
 final class StatusController
 {

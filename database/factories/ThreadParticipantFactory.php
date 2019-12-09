@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-use Carbon\Carbon;
-use App\Models\User;
-use Faker\Generator as Faker;
 use App\Models\PrivateMessages\Thread;
-use Illuminate\Database\Eloquent\Factory;
 use App\Models\PrivateMessages\ThreadParticipant;
+use App\Models\User;
+use Carbon\Carbon;
+use Faker\Generator as Faker;
+use Illuminate\Database\Eloquent\Factory;
 
 /** @var Factory $factory */
 $factory->define(ThreadParticipant::class, function (Faker $faker) {

@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace App\Http\Requests;
 
 use App\Models\Locale;
-use Illuminate\Validation\Rule;
 use Illuminate\Contracts\Auth\Guard;
-use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Contracts\Translation\Translator;
+use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class UpdateUserRequest extends FormRequest
 {

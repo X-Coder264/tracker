@@ -4,15 +4,15 @@ declare(strict_types=1);
 
 namespace Tests\Unit\Http\Middleware;
 
+use App\Http\Middleware\SetUserLocale;
 use Carbon\Carbon;
-use Tests\TestCase;
+use Illuminate\Contracts\Auth\Guard;
+use Illuminate\Contracts\Cache\Repository;
+use Illuminate\Contracts\Http\Kernel;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Router;
-use Illuminate\Contracts\Auth\Guard;
-use Illuminate\Contracts\Http\Kernel;
-use App\Http\Middleware\SetUserLocale;
-use Illuminate\Contracts\Cache\Repository;
 use PHPUnit\Framework\MockObject\MockObject;
+use Tests\TestCase;
 
 class SetUserLocaleTest extends TestCase
 {

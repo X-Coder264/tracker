@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace App\Http\ViewComposers;
 
-use App\Models\User;
 use App\Enumerations\Cache;
-use Illuminate\Contracts\View\View;
+use App\Models\User;
 use Illuminate\Contracts\Auth\Guard;
 use Illuminate\Contracts\Cache\Repository;
+use Illuminate\Contracts\View\View;
 
 class TimezoneComposer
 {
