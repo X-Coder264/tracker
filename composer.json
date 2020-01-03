@@ -19,7 +19,7 @@
         "guzzlehttp/guzzle": "^6.5",
         "imdbphp/imdbphp": "^6.3",
         "laravel/framework": "^6.9",
-        "laravel/passport": "^8.0",
+        "laravel/passport": "^8.1",
         "laravel/tinker": "^2.0",
         "nesbot/carbon": "^2.28",
         "pragmarx/google2fa": "^7.0",
