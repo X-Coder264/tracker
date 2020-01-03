@@ -111,9 +111,12 @@ class TorrentCommentControllerTest extends TestCase
         $this->actingAs($user);
 
         $response = $this->from(route('torrent-comments.create', $torrent))
-            ->post(route('torrent-comments.store', $torrent), [
-            'comment' => '',
-        ]);
+            ->post(
+                route('torrent-comments.store', $torrent),
+                [
+                    'comment' => '',
+                ]
+            );
 
         $response->assertStatus(Response::HTTP_FOUND);
         $response->assertRedirect(route('torrent-comments.create', $torrent));
@@ -136,9 +139,12 @@ class TorrentCommentControllerTest extends TestCase
         $this->actingAs($user);
 
         $response = $this->from(route('torrent-comments.edit', $torrentComment))
-            ->put(route('torrent-comments.update', $torrentComment), [
-            'comment' => '',
-        ]);
+            ->put(
+                route('torrent-comments.update', $torrentComment),
+                [
+                    'comment' => '',
+                ]
+            );
 
         $response->assertStatus(Response::HTTP_FOUND);
         $response->assertRedirect(route('torrent-comments.edit', $torrentComment));
