@@ -3,6 +3,7 @@
 use Monolog\Handler\NullHandler;
 use Monolog\Handler\StreamHandler;
 use Monolog\Handler\SyslogUdpHandler;
+use Monolog\Logger;
 
 return [
 
@@ -37,7 +38,8 @@ return [
     'channels' => [
         'stack' => [
             'driver' => 'stack',
-            'channels' => ['daily'],
+            'channels' => ['daily', 'sentry'],
+            'ignore_exceptions' => true,
         ],
 
         'single' => [
@@ -51,6 +53,11 @@ return [
             'path' => storage_path('logs/laravel.log'),
             'level' => 'debug',
             'days' => 14,
+        ],
+
+        'sentry' => [
+            'driver' => 'sentry',
+            'level'  => Logger::NOTICE, // The minimum monolog logging level at which this handler will be triggered
         ],
 
         'slack' => [
