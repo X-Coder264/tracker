@@ -69,7 +69,7 @@ final class GetApiTokenTest extends TestCase
             if ('laravel_token' === $cookie->getName()) {
                 $this->assertSame($sessionConfig['path'], $cookie->getPath());
                 $this->assertSame($sessionConfig['domain'], $cookie->getDomain());
-                $this->assertSame($sessionConfig['secure'], $cookie->isSecure());
+                $this->assertSame($sessionConfig['secure'] ?? false, $cookie->isSecure());
                 $this->assertSame($sessionConfig['same_site'], $cookie->getSameSite());
                 $this->assertSame($expiration->getTimestamp(), $cookie->getExpiresTime());
                 $this->assertTrue($cookie->isHttpOnly());
