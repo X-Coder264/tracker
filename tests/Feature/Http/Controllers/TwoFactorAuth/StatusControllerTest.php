@@ -50,8 +50,8 @@ final class StatusControllerTest extends TestCase
         $translator = $this->app->make(Translator::class);
 
         $response->assertSee($translator->get('messages.2fa.info_message'));
-        $response->assertSee($translator->get('messages.2fa.please_scan_barcode_message'));
-        $response->assertSee($translator->get('messages.2fa.use_secret_key_message', ['code' => $user->two_factor_secret_key]));
+        $response->assertSee($translator->get('messages.2fa.please_scan_barcode_message'), false);
+        $response->assertSee($translator->get('messages.2fa.use_secret_key_message', ['code' => $user->two_factor_secret_key]), false);
         $response->assertSee($translator->get('messages.2fa.enable_button.caption'));
         $response->assertDontSee($translator->get('messages.2fa.disable_button.caption'));
     }
