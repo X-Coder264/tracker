@@ -21,6 +21,7 @@
         "laravel/framework": "^7.3",
         "laravel/passport": "^8.4",
         "laravel/tinker": "^2.3",
+        "laravel/ui": "^2.0",
         "nesbot/carbon": "^2.32",
         "pragmarx/google2fa": "^7.0",
         "pragmarx/google2fa-qrcode": "^1.0",
