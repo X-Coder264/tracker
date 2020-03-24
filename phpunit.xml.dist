@@ -8,7 +8,8 @@
          convertNoticesToExceptions="true"
          convertWarningsToExceptions="true"
          processIsolation="false"
-         stopOnFailure="false">
+         stopOnFailure="false"
+         printerClass="NunoMaduro\Collision\Adapters\Phpunit\Printer">
     <testsuites>
         <testsuite name="Unit">
             <directory suffix="Test.php">./tests/Unit</directory>
@@ -35,7 +36,7 @@
         <server name="CACHE_DRIVER" value="redis"/>
         <server name="SESSION_DRIVER" value="array"/>
         <server name="QUEUE_CONNECTION" value="sync"/>
-        <server name="MAIL_DRIVER" value="array"/>
+        <server name="MAIL_MAILER" value="array"/>
         <server name="APP_CONFIG_CACHE" value="bootstrap/cache/config.phpunit.php"/>
         <server name="APP_SERVICES_CACHE" value="bootstrap/cache/services.phpunit.php"/>
         <server name="APP_PACKAGES_CACHE" value="bootstrap/cache/packages.phpunit.php"/>
@@ -44,9 +45,5 @@
         <server name="ANNOUNCE_INTERVAL" value="40"/>
         <server name="MIN_ANNOUNCE_INTERVAL" value="1"/>
     </php>
-
-    <listeners>
-        <listener class="NunoMaduro\Collision\Adapters\Phpunit\Listener" />
-    </listeners>
 
 </phpunit>

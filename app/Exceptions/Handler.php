@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace App\Exceptions;
 
 use CloudCreativity\LaravelJsonApi\Exceptions\HandlesErrors;
-use Exception;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Illuminate\Http\Request;
 use Neomerx\JsonApi\Exceptions\JsonApiException;
 use Sentry\State\HubInterface;
 use Symfony\Component\HttpFoundation\Response;
+use Throwable;
 
 class Handler extends ExceptionHandler
 {
@@ -35,15 +35,15 @@ class Handler extends ExceptionHandler
         'password_confirmation',
     ];
 
-    public function report(Exception $exception)
+    public function report(Throwable $e)
     {
-        if ($this->container->bound('sentry') && $this->shouldReport($exception)) {
+        if ($this->container->bound('sentry') && $this->shouldReport($e)) {
             /** @var HubInterface $sentry */
             $sentry = $this->container->make('sentry');
-            $sentry->captureException($exception);
+            $sentry->captureException($e);
         }
 
-        parent::report($exception);
+        parent::report($e);
     }
 
     /**
@@ -53,12 +53,12 @@ class Handler extends ExceptionHandler
      *
      * @return Response
      */
-    public function render($request, Exception $exception)
+    public function render($request, Throwable $e)
     {
-        if ($this->isJsonApi($request, $exception)) {
-            return $this->renderJsonApi($request, $exception);
+        if ($this->isJsonApi($request, $e)) {
+            return $this->renderJsonApi($request, $e);
         }
 
-        return parent::render($request, $exception);
+        return parent::render($request, $e);
     }
 }
