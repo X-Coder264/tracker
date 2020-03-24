@@ -27,7 +27,7 @@ class TorrentTest extends TestCase
         factory(Torrent::class)->create();
         $torrent = Torrent::firstOrFail();
         $returnValue = '500 MB';
-        SizeFormatter::shouldReceive('getFormattedSize')->once()->with($torrent->getOriginal('size'))->andReturn($returnValue);
+        SizeFormatter::shouldReceive('getFormattedSize')->once()->with($torrent->getRawOriginal('size'))->andReturn($returnValue);
         $this->assertSame($returnValue, $torrent->size);
     }
 

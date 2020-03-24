@@ -58,7 +58,7 @@ final class UserTest extends TestCase
         factory(User::class)->create();
         $user = User::firstOrFail();
         $returnValue = '500 MB';
-        SizeFormatter::shouldReceive('getFormattedSize')->once()->with($user->getOriginal('uploaded'))->andReturn($returnValue);
+        SizeFormatter::shouldReceive('getFormattedSize')->once()->with($user->getRawOriginal('uploaded'))->andReturn($returnValue);
         $this->assertSame($returnValue, $user->uploaded);
     }
 
@@ -67,7 +67,7 @@ final class UserTest extends TestCase
         factory(User::class)->create();
         $user = User::firstOrFail();
         $returnValue = '500 MB';
-        SizeFormatter::shouldReceive('getFormattedSize')->once()->with($user->getOriginal('downloaded'))->andReturn($returnValue);
+        SizeFormatter::shouldReceive('getFormattedSize')->once()->with($user->getRawOriginal('downloaded'))->andReturn($returnValue);
         $this->assertSame($returnValue, $user->downloaded);
     }
 

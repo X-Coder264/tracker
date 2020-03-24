@@ -96,7 +96,7 @@ class TorrentUploadManagerTest extends TestCase
         $this->assertSame(1, $decodedTorrentThatWasActuallyUploaded['info']['private']);
         $this->assertSame(route('announce'), $decodedTorrentThatWasActuallyUploaded['announce']);
 
-        $this->assertSame(5, (int) $torrent->getOriginal('size'));
+        $this->assertSame(5, (int) $torrent->getRawOriginal('size'));
         $this->assertSame($torrentName, $torrent->name);
         $this->assertSame($torrentDescription, $torrent->description);
         $this->assertSame($user->id, $torrent->uploader_id);
@@ -176,7 +176,7 @@ class TorrentUploadManagerTest extends TestCase
         $this->assertSame(2, $decodedTorrentThatWasActuallyUploaded['info']['meta version']);
         $this->assertSame(route('announce'), $decodedTorrentThatWasActuallyUploaded['announce']);
 
-        $this->assertSame(1048576, (int) $torrent->getOriginal('size'));
+        $this->assertSame(1048576, (int) $torrent->getRawOriginal('size'));
         $this->assertSame($torrentName, $torrent->name);
         $this->assertSame($torrentDescription, $torrent->description);
         $this->assertSame($user->id, $torrent->uploader_id);
@@ -255,7 +255,7 @@ class TorrentUploadManagerTest extends TestCase
         $this->assertSame(2, $decodedTorrentThatWasActuallyUploaded['info']['meta version']);
         $this->assertSame(route('announce'), $decodedTorrentThatWasActuallyUploaded['announce']);
 
-        $this->assertSame(65536, (int) $torrent->getOriginal('size'));
+        $this->assertSame(65536, (int) $torrent->getRawOriginal('size'));
         $this->assertSame($torrentName, $torrent->name);
         $this->assertSame($torrentDescription, $torrent->description);
         $this->assertSame($user->id, $torrent->uploader_id);
@@ -382,7 +382,7 @@ class TorrentUploadManagerTest extends TestCase
 
         $formatter = new SizeFormatter();
 
-        $this->assertSame($torrentSize, (int) $torrent->getOriginal('size'));
+        $this->assertSame($torrentSize, (int) $torrent->getRawOriginal('size'));
         $this->assertSame($formatter->getFormattedSize($torrentSize), $torrent->size);
         $this->assertSame($torrentName, $torrent->name);
         $this->assertSame($torrentDescription, $torrent->description);
@@ -466,7 +466,7 @@ class TorrentUploadManagerTest extends TestCase
 
         Storage::disk('imdb-images')->assertMissing('0468569.jpg');
 
-        $this->assertSame(5, (int) $torrent->getOriginal('size'));
+        $this->assertSame(5, (int) $torrent->getRawOriginal('size'));
         $this->assertSame($torrentName, $torrent->name);
         $this->assertSame($torrentDescription, $torrent->description);
         $this->assertSame($user->id, $torrent->uploader_id);
@@ -536,7 +536,7 @@ class TorrentUploadManagerTest extends TestCase
 
         $formatter = new SizeFormatter();
 
-        $this->assertSame($torrentSize, (int) $torrent->getOriginal('size'));
+        $this->assertSame($torrentSize, (int) $torrent->getRawOriginal('size'));
         $this->assertSame($formatter->getFormattedSize($torrentSize), $torrent->size);
         $this->assertSame($torrentName, $torrent->name);
         $this->assertSame($torrentDescription, $torrent->description);
@@ -603,7 +603,7 @@ class TorrentUploadManagerTest extends TestCase
 
         $formatter = new SizeFormatter();
 
-        $this->assertSame($torrentSize, (int) $torrent->getOriginal('size'));
+        $this->assertSame($torrentSize, (int) $torrent->getRawOriginal('size'));
         $this->assertSame($formatter->getFormattedSize($torrentSize), $torrent->size);
         $this->assertSame($torrentName, $torrent->name);
         $this->assertSame($torrentDescription, $torrent->description);
@@ -809,7 +809,7 @@ class TorrentUploadManagerTest extends TestCase
 
         $formatter = new SizeFormatter();
 
-        $this->assertSame($torrentSize, (int) $torrent->getOriginal('size'));
+        $this->assertSame($torrentSize, (int) $torrent->getRawOriginal('size'));
         $this->assertSame($formatter->getFormattedSize($torrentSize), $torrent->size);
         $this->assertSame($torrentName, $torrent->name);
         $this->assertSame($torrentDescription, $torrent->description);

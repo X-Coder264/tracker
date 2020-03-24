@@ -57,7 +57,7 @@ class AnnounceManagerTest extends TestCase
                     'port'       => $port,
                     'downloaded' => 0,
                     'uploaded'   => 0,
-                    'left'       => $torrent->getOriginal('size'),
+                    'left'       => $torrent->getRawOriginal('size'),
                 ]
             ),
             [
@@ -77,8 +77,8 @@ class AnnounceManagerTest extends TestCase
         $this->assertSame($peerId, $peer->peer_id);
         $this->assertSame($user->id, (int) $peer->user_id);
         $this->assertSame($torrent->id, (int) $peer->torrent_id);
-        $this->assertSame(0, (int) $peer->getOriginal('uploaded'));
-        $this->assertSame(0, (int) $peer->getOriginal('downloaded'));
+        $this->assertSame(0, (int) $peer->getRawOriginal('uploaded'));
+        $this->assertSame(0, (int) $peer->getRawOriginal('downloaded'));
         $this->assertSame($peer->created_at->format('Y-m-d H:is'), $peer->updated_at->format('Y-m-d H:is'));
         $this->assertLessThanOrEqual(2, Carbon::now()->diffInSeconds($peer->updated_at));
         $this->assertFalse((bool) $peer->seeder);
@@ -100,9 +100,9 @@ class AnnounceManagerTest extends TestCase
         $snatch = Snatch::firstOrFail();
         $this->assertSame($user->id, (int) $snatch->user_id);
         $this->assertSame($torrent->id, (int) $snatch->torrent_id);
-        $this->assertSame(0, (int) $snatch->getOriginal('uploaded'));
-        $this->assertSame(0, (int) $snatch->getOriginal('downloaded'));
-        $this->assertSame($torrent->getOriginal('size'), (int) $snatch->getOriginal('left'));
+        $this->assertSame(0, (int) $snatch->getRawOriginal('uploaded'));
+        $this->assertSame(0, (int) $snatch->getRawOriginal('downloaded'));
+        $this->assertSame($torrent->getRawOriginal('size'), (int) $snatch->getRawOriginal('left'));
         $this->assertSame(0, (int) $snatch->seedTime);
         $this->assertSame(0, (int) $snatch->leechTime);
         $this->assertSame(1, (int) $snatch->timesAnnounced);
@@ -112,11 +112,11 @@ class AnnounceManagerTest extends TestCase
         $this->assertSame(1, (int) $torrent->leechers);
         $this->assertSame(0, (int) $torrent->seeders);
         $freshUser = $user->fresh();
-        $this->assertSame($user->getOriginal('uploaded'), (int) $freshUser->getOriginal('uploaded'));
-        $this->assertSame($user->getOriginal('downloaded'), (int) $freshUser->getOriginal('downloaded'));
+        $this->assertSame($user->getRawOriginal('uploaded'), (int) $freshUser->getRawOriginal('uploaded'));
+        $this->assertSame($user->getRawOriginal('downloaded'), (int) $freshUser->getRawOriginal('downloaded'));
         $this->assertInstanceOf(stdClass::class, Cache::get('user.' . $freshUser->passkey));
-        $this->assertSame((int) $freshUser->getOriginal('uploaded'), Cache::get('user.' . $freshUser->passkey)->uploaded);
-        $this->assertSame((int) $freshUser->getOriginal('downloaded'), Cache::get('user.' . $freshUser->passkey)->downloaded);
+        $this->assertSame((int) $freshUser->getRawOriginal('uploaded'), Cache::get('user.' . $freshUser->passkey)->uploaded);
+        $this->assertSame((int) $freshUser->getRawOriginal('downloaded'), Cache::get('user.' . $freshUser->passkey)->downloaded);
 
         $this->assertFalse($cache->has('user.' . $user->id . '.peers'));
     }
@@ -149,7 +149,7 @@ class AnnounceManagerTest extends TestCase
                     'port'       => $port,
                     'downloaded' => 0,
                     'uploaded'   => 0,
-                    'left'       => $torrent->getOriginal('size'),
+                    'left'       => $torrent->getRawOriginal('size'),
                 ]
             ),
             [
@@ -169,8 +169,8 @@ class AnnounceManagerTest extends TestCase
         $this->assertSame($peerId, $peer->peer_id);
         $this->assertSame($user->id, (int) $peer->user_id);
         $this->assertSame($torrent->id, (int) $peer->torrent_id);
-        $this->assertSame(0, (int) $peer->getOriginal('uploaded'));
-        $this->assertSame(0, (int) $peer->getOriginal('downloaded'));
+        $this->assertSame(0, (int) $peer->getRawOriginal('uploaded'));
+        $this->assertSame(0, (int) $peer->getRawOriginal('downloaded'));
         $this->assertSame($peer->created_at->format('Y-m-d H:is'), $peer->updated_at->format('Y-m-d H:is'));
         $this->assertLessThanOrEqual(2, Carbon::now()->diffInSeconds($peer->updated_at));
         $this->assertFalse((bool) $peer->seeder);
@@ -192,9 +192,9 @@ class AnnounceManagerTest extends TestCase
         $snatch = Snatch::firstOrFail();
         $this->assertSame($user->id, (int) $snatch->user_id);
         $this->assertSame($torrent->id, (int) $snatch->torrent_id);
-        $this->assertSame(0, (int) $snatch->getOriginal('uploaded'));
-        $this->assertSame(0, (int) $snatch->getOriginal('downloaded'));
-        $this->assertSame($torrent->getOriginal('size'), (int) $snatch->getOriginal('left'));
+        $this->assertSame(0, (int) $snatch->getRawOriginal('uploaded'));
+        $this->assertSame(0, (int) $snatch->getRawOriginal('downloaded'));
+        $this->assertSame($torrent->getRawOriginal('size'), (int) $snatch->getRawOriginal('left'));
         $this->assertSame(0, (int) $snatch->seedTime);
         $this->assertSame(0, (int) $snatch->leechTime);
         $this->assertSame(1, (int) $snatch->timesAnnounced);
@@ -204,11 +204,11 @@ class AnnounceManagerTest extends TestCase
         $this->assertSame(1, (int) $torrent->leechers);
         $this->assertSame(0, (int) $torrent->seeders);
         $freshUser = $user->fresh();
-        $this->assertSame($user->getOriginal('uploaded'), (int) $freshUser->getOriginal('uploaded'));
-        $this->assertSame($user->getOriginal('downloaded'), (int) $freshUser->getOriginal('downloaded'));
+        $this->assertSame($user->getRawOriginal('uploaded'), (int) $freshUser->getRawOriginal('uploaded'));
+        $this->assertSame($user->getRawOriginal('downloaded'), (int) $freshUser->getRawOriginal('downloaded'));
         $this->assertInstanceOf(stdClass::class, Cache::get('user.' . $freshUser->passkey));
-        $this->assertSame((int) $freshUser->getOriginal('uploaded'), Cache::get('user.' . $freshUser->passkey)->uploaded);
-        $this->assertSame((int) $freshUser->getOriginal('downloaded'), Cache::get('user.' . $freshUser->passkey)->downloaded);
+        $this->assertSame((int) $freshUser->getRawOriginal('uploaded'), Cache::get('user.' . $freshUser->passkey)->uploaded);
+        $this->assertSame((int) $freshUser->getRawOriginal('downloaded'), Cache::get('user.' . $freshUser->passkey)->downloaded);
     }
 
     public function testV2PeerStartsLeechingWithNoOtherV2PeersPresentOnTheTorrent(): void
@@ -244,7 +244,7 @@ class AnnounceManagerTest extends TestCase
                     'port'       => $port,
                     'downloaded' => 0,
                     'uploaded'   => 0,
-                    'left'       => $torrent->getOriginal('size'),
+                    'left'       => $torrent->getRawOriginal('size'),
                 ]
             ),
             [
@@ -264,8 +264,8 @@ class AnnounceManagerTest extends TestCase
         $this->assertSame($peerId, $peer->peer_id);
         $this->assertSame($user->id, (int) $peer->user_id);
         $this->assertSame($torrent->id, (int) $peer->torrent_id);
-        $this->assertSame(0, (int) $peer->getOriginal('uploaded'));
-        $this->assertSame(0, (int) $peer->getOriginal('downloaded'));
+        $this->assertSame(0, (int) $peer->getRawOriginal('uploaded'));
+        $this->assertSame(0, (int) $peer->getRawOriginal('downloaded'));
         $this->assertSame($peer->created_at->format('Y-m-d H:is'), $peer->updated_at->format('Y-m-d H:is'));
         $this->assertLessThanOrEqual(2, Carbon::now()->diffInSeconds($peer->updated_at));
         $this->assertFalse((bool) $peer->seeder);
@@ -287,9 +287,9 @@ class AnnounceManagerTest extends TestCase
         $snatch = Snatch::firstOrFail();
         $this->assertSame($user->id, (int) $snatch->user_id);
         $this->assertSame($torrent->id, (int) $snatch->torrent_id);
-        $this->assertSame(0, (int) $snatch->getOriginal('uploaded'));
-        $this->assertSame(0, (int) $snatch->getOriginal('downloaded'));
-        $this->assertSame($torrent->getOriginal('size'), (int) $snatch->getOriginal('left'));
+        $this->assertSame(0, (int) $snatch->getRawOriginal('uploaded'));
+        $this->assertSame(0, (int) $snatch->getRawOriginal('downloaded'));
+        $this->assertSame($torrent->getRawOriginal('size'), (int) $snatch->getRawOriginal('left'));
         $this->assertSame(0, (int) $snatch->seedTime);
         $this->assertSame(0, (int) $snatch->leechTime);
         $this->assertSame(1, (int) $snatch->timesAnnounced);
@@ -299,11 +299,11 @@ class AnnounceManagerTest extends TestCase
         $this->assertSame(1, (int) $torrent->leechers);
         $this->assertSame(1, (int) $torrent->seeders);
         $freshUser = $user->fresh();
-        $this->assertSame($user->getOriginal('uploaded'), (int) $freshUser->getOriginal('uploaded'));
-        $this->assertSame($user->getOriginal('downloaded'), (int) $freshUser->getOriginal('downloaded'));
+        $this->assertSame($user->getRawOriginal('uploaded'), (int) $freshUser->getRawOriginal('uploaded'));
+        $this->assertSame($user->getRawOriginal('downloaded'), (int) $freshUser->getRawOriginal('downloaded'));
         $this->assertInstanceOf(stdClass::class, Cache::get('user.' . $freshUser->passkey));
-        $this->assertSame((int) $freshUser->getOriginal('uploaded'), Cache::get('user.' . $freshUser->passkey)->uploaded);
-        $this->assertSame((int) $freshUser->getOriginal('downloaded'), Cache::get('user.' . $freshUser->passkey)->downloaded);
+        $this->assertSame((int) $freshUser->getRawOriginal('uploaded'), Cache::get('user.' . $freshUser->passkey)->uploaded);
+        $this->assertSame((int) $freshUser->getRawOriginal('downloaded'), Cache::get('user.' . $freshUser->passkey)->downloaded);
     }
 
     public function testV1PeerStartsLeechingWithNoOtherV1PeersPresentOnTheTorrent(): void
@@ -339,7 +339,7 @@ class AnnounceManagerTest extends TestCase
                     'port'       => $port,
                     'downloaded' => 0,
                     'uploaded'   => 0,
-                    'left'       => $torrent->getOriginal('size'),
+                    'left'       => $torrent->getRawOriginal('size'),
                 ]
             ),
             [
@@ -359,8 +359,8 @@ class AnnounceManagerTest extends TestCase
         $this->assertSame($peerId, $peer->peer_id);
         $this->assertSame($user->id, (int) $peer->user_id);
         $this->assertSame($torrent->id, (int) $peer->torrent_id);
-        $this->assertSame(0, (int) $peer->getOriginal('uploaded'));
-        $this->assertSame(0, (int) $peer->getOriginal('downloaded'));
+        $this->assertSame(0, (int) $peer->getRawOriginal('uploaded'));
+        $this->assertSame(0, (int) $peer->getRawOriginal('downloaded'));
         $this->assertSame($peer->created_at->format('Y-m-d H:is'), $peer->updated_at->format('Y-m-d H:is'));
         $this->assertLessThanOrEqual(2, Carbon::now()->diffInSeconds($peer->updated_at));
         $this->assertFalse((bool) $peer->seeder);
@@ -382,9 +382,9 @@ class AnnounceManagerTest extends TestCase
         $snatch = Snatch::firstOrFail();
         $this->assertSame($user->id, (int) $snatch->user_id);
         $this->assertSame($torrent->id, (int) $snatch->torrent_id);
-        $this->assertSame(0, (int) $snatch->getOriginal('uploaded'));
-        $this->assertSame(0, (int) $snatch->getOriginal('downloaded'));
-        $this->assertSame($torrent->getOriginal('size'), (int) $snatch->getOriginal('left'));
+        $this->assertSame(0, (int) $snatch->getRawOriginal('uploaded'));
+        $this->assertSame(0, (int) $snatch->getRawOriginal('downloaded'));
+        $this->assertSame($torrent->getRawOriginal('size'), (int) $snatch->getRawOriginal('left'));
         $this->assertSame(0, (int) $snatch->seedTime);
         $this->assertSame(0, (int) $snatch->leechTime);
         $this->assertSame(1, (int) $snatch->timesAnnounced);
@@ -394,11 +394,11 @@ class AnnounceManagerTest extends TestCase
         $this->assertSame(1, (int) $torrent->leechers);
         $this->assertSame(1, (int) $torrent->seeders);
         $freshUser = $user->fresh();
-        $this->assertSame($user->getOriginal('uploaded'), (int) $freshUser->getOriginal('uploaded'));
-        $this->assertSame($user->getOriginal('downloaded'), (int) $freshUser->getOriginal('downloaded'));
+        $this->assertSame($user->getRawOriginal('uploaded'), (int) $freshUser->getRawOriginal('uploaded'));
+        $this->assertSame($user->getRawOriginal('downloaded'), (int) $freshUser->getRawOriginal('downloaded'));
         $this->assertInstanceOf(stdClass::class, Cache::get('user.' . $freshUser->passkey));
-        $this->assertSame((int) $freshUser->getOriginal('uploaded'), Cache::get('user.' . $freshUser->passkey)->uploaded);
-        $this->assertSame((int) $freshUser->getOriginal('downloaded'), Cache::get('user.' . $freshUser->passkey)->downloaded);
+        $this->assertSame((int) $freshUser->getRawOriginal('uploaded'), Cache::get('user.' . $freshUser->passkey)->uploaded);
+        $this->assertSame((int) $freshUser->getRawOriginal('downloaded'), Cache::get('user.' . $freshUser->passkey)->downloaded);
     }
 
     public function testV1PeerStartsLeechingWithOtherPeersPresentOnTheTorrent(): void
@@ -436,7 +436,7 @@ class AnnounceManagerTest extends TestCase
                     'port'       => $port,
                     'downloaded' => 0,
                     'uploaded'   => 0,
-                    'left'       => $torrent->getOriginal('size'),
+                    'left'       => $torrent->getRawOriginal('size'),
                 ]
             ),
             [
@@ -484,8 +484,8 @@ class AnnounceManagerTest extends TestCase
         $this->assertSame($peerId, $peer->peer_id);
         $this->assertSame($user->id, (int) $peer->user_id);
         $this->assertSame($torrent->id, (int) $peer->torrent_id);
-        $this->assertSame(0, (int) $peer->getOriginal('uploaded'));
-        $this->assertSame(0, (int) $peer->getOriginal('downloaded'));
+        $this->assertSame(0, (int) $peer->getRawOriginal('uploaded'));
+        $this->assertSame(0, (int) $peer->getRawOriginal('downloaded'));
         $this->assertFalse((bool) $peer->seeder);
         $this->assertSame($userAgent, $peer->userAgent);
         $this->assertInstanceOf(CarbonImmutable::class, $peer->created_at);
@@ -503,9 +503,9 @@ class AnnounceManagerTest extends TestCase
         $snatch = Snatch::firstOrFail();
         $this->assertSame($user->id, (int) $snatch->user_id);
         $this->assertSame($torrent->id, (int) $snatch->torrent_id);
-        $this->assertSame(0, (int) $snatch->getOriginal('uploaded'));
-        $this->assertSame(0, (int) $snatch->getOriginal('downloaded'));
-        $this->assertSame($torrent->getOriginal('size'), (int) $snatch->getOriginal('left'));
+        $this->assertSame(0, (int) $snatch->getRawOriginal('uploaded'));
+        $this->assertSame(0, (int) $snatch->getRawOriginal('downloaded'));
+        $this->assertSame($torrent->getRawOriginal('size'), (int) $snatch->getRawOriginal('left'));
         $this->assertSame(0, (int) $snatch->seedTime);
         $this->assertSame(0, (int) $snatch->leechTime);
         $this->assertSame(1, (int) $snatch->timesAnnounced);
@@ -515,11 +515,11 @@ class AnnounceManagerTest extends TestCase
         $this->assertSame(2, (int) $torrent->leechers);
         $this->assertSame(1, (int) $torrent->seeders);
         $freshUser = $user->fresh();
-        $this->assertSame($user->getOriginal('uploaded'), (int) $freshUser->getOriginal('uploaded'));
-        $this->assertSame($user->getOriginal('downloaded'), (int) $freshUser->getOriginal('downloaded'));
+        $this->assertSame($user->getRawOriginal('uploaded'), (int) $freshUser->getRawOriginal('uploaded'));
+        $this->assertSame($user->getRawOriginal('downloaded'), (int) $freshUser->getRawOriginal('downloaded'));
         $this->assertInstanceOf(stdClass::class, Cache::get('user.' . $freshUser->passkey));
-        $this->assertSame((int) $freshUser->getOriginal('uploaded'), Cache::get('user.' . $freshUser->passkey)->uploaded);
-        $this->assertSame((int) $freshUser->getOriginal('downloaded'), Cache::get('user.' . $freshUser->passkey)->downloaded);
+        $this->assertSame((int) $freshUser->getRawOriginal('uploaded'), Cache::get('user.' . $freshUser->passkey)->uploaded);
+        $this->assertSame((int) $freshUser->getRawOriginal('downloaded'), Cache::get('user.' . $freshUser->passkey)->downloaded);
     }
 
     public function testStartSeedingWithNoOtherPeersPresentOnTheTorrent()
@@ -570,8 +570,8 @@ class AnnounceManagerTest extends TestCase
         $this->assertSame($peerId, $peer->peer_id);
         $this->assertSame($user->id, (int) $peer->user_id);
         $this->assertSame($torrent->id, (int) $peer->torrent_id);
-        $this->assertSame(0, (int) $peer->getOriginal('uploaded'));
-        $this->assertSame(0, (int) $peer->getOriginal('downloaded'));
+        $this->assertSame(0, (int) $peer->getRawOriginal('uploaded'));
+        $this->assertSame(0, (int) $peer->getRawOriginal('downloaded'));
         $this->assertTrue((bool) $peer->seeder);
         $this->assertSame($userAgent, $peer->userAgent);
         $this->assertInstanceOf(CarbonImmutable::class, $peer->created_at);
@@ -590,11 +590,11 @@ class AnnounceManagerTest extends TestCase
         $this->assertSame(0, (int) $torrent->leechers);
         $this->assertSame(1, (int) $torrent->seeders);
         $freshUser = $user->fresh();
-        $this->assertSame($user->getOriginal('uploaded'), (int) $freshUser->getOriginal('uploaded'));
-        $this->assertSame($user->getOriginal('downloaded'), (int) $freshUser->getOriginal('downloaded'));
+        $this->assertSame($user->getRawOriginal('uploaded'), (int) $freshUser->getRawOriginal('uploaded'));
+        $this->assertSame($user->getRawOriginal('downloaded'), (int) $freshUser->getRawOriginal('downloaded'));
         $this->assertInstanceOf(stdClass::class, Cache::get('user.' . $freshUser->passkey));
-        $this->assertSame((int) $freshUser->getOriginal('uploaded'), Cache::get('user.' . $freshUser->passkey)->uploaded);
-        $this->assertSame((int) $freshUser->getOriginal('downloaded'), Cache::get('user.' . $freshUser->passkey)->downloaded);
+        $this->assertSame((int) $freshUser->getRawOriginal('uploaded'), Cache::get('user.' . $freshUser->passkey)->uploaded);
+        $this->assertSame((int) $freshUser->getRawOriginal('downloaded'), Cache::get('user.' . $freshUser->passkey)->downloaded);
 
         $this->assertFalse($cache->has('user.' . $user->id . '.peers'));
     }
@@ -622,7 +622,7 @@ class AnnounceManagerTest extends TestCase
                 'peer_id'    => $peerId,
                 'user_id'    => $user->id,
                 'uploaded'   => 2000,
-                'downloaded' => $torrent->getOriginal('size'),
+                'downloaded' => $torrent->getRawOriginal('size'),
                 'created_at' => Carbon::now()->subMinutes(300),
                 'updated_at' => Carbon::now()->subMinutes(40),
             ]
@@ -637,7 +637,7 @@ class AnnounceManagerTest extends TestCase
                 'leechTime'      => 1200,
                 'timesAnnounced' => 2,
                 'uploaded'       => 2000,
-                'downloaded'     => $torrent->getOriginal('size'),
+                'downloaded'     => $torrent->getRawOriginal('size'),
                 'finished_at'    => Carbon::yesterday(),
             ]
         );
@@ -676,11 +676,11 @@ class AnnounceManagerTest extends TestCase
         $freshSnatch = $snatch->fresh();
         $this->assertSame($user->id, (int) $freshSnatch->user_id);
         $this->assertSame($torrent->id, (int) $freshSnatch->torrent_id);
-        $this->assertSame(3000, (int) $freshSnatch->getOriginal('uploaded'));
-        $this->assertSame($torrent->getOriginal('size'), (int) $freshSnatch->getOriginal('downloaded'));
-        $this->assertSame(0, (int) $freshSnatch->getOriginal('left'));
-        $this->assertGreaterThanOrEqual(2900, (int) $freshSnatch->getOriginal('seedTime'));
-        $this->assertSame(1200, (int) $freshSnatch->getOriginal('leechTime'));
+        $this->assertSame(3000, (int) $freshSnatch->getRawOriginal('uploaded'));
+        $this->assertSame($torrent->getRawOriginal('size'), (int) $freshSnatch->getRawOriginal('downloaded'));
+        $this->assertSame(0, (int) $freshSnatch->getRawOriginal('left'));
+        $this->assertGreaterThanOrEqual(2900, (int) $freshSnatch->getRawOriginal('seedTime'));
+        $this->assertSame(1200, (int) $freshSnatch->getRawOriginal('leechTime'));
         $this->assertSame(3, (int) $freshSnatch->timesAnnounced);
         $this->assertSame($snatch->finished_at->toDateTimeString(), $freshSnatch->finished_at->toDateTimeString());
         $this->assertSame($userAgent, $freshSnatch->userAgent);
@@ -688,11 +688,11 @@ class AnnounceManagerTest extends TestCase
         $this->assertSame(0, (int) $torrent->leechers);
         $this->assertSame(0, (int) $torrent->seeders);
         $freshUser = $user->fresh();
-        $this->assertSame($user->getOriginal('uploaded') + 1000, (int) $freshUser->getOriginal('uploaded'));
-        $this->assertSame($user->getOriginal('downloaded'), (int) $freshUser->getOriginal('downloaded'));
+        $this->assertSame($user->getRawOriginal('uploaded') + 1000, (int) $freshUser->getRawOriginal('uploaded'));
+        $this->assertSame($user->getRawOriginal('downloaded'), (int) $freshUser->getRawOriginal('downloaded'));
         $this->assertInstanceOf(stdClass::class, $cache->get('user.' . $freshUser->passkey));
-        $this->assertSame((int) $freshUser->getOriginal('uploaded'), $cache->get('user.' . $freshUser->passkey)->uploaded);
-        $this->assertSame((int) $freshUser->getOriginal('downloaded'), $cache->get('user.' . $freshUser->passkey)->downloaded);
+        $this->assertSame((int) $freshUser->getRawOriginal('uploaded'), $cache->get('user.' . $freshUser->passkey)->uploaded);
+        $this->assertSame((int) $freshUser->getRawOriginal('downloaded'), $cache->get('user.' . $freshUser->passkey)->downloaded);
 
         $this->assertFalse($cache->has('user.' . $user->id . '.peers'));
     }
@@ -779,11 +779,11 @@ class AnnounceManagerTest extends TestCase
         $freshSnatch = $snatch->fresh();
         $this->assertSame($user->id, (int) $freshSnatch->user_id);
         $this->assertSame($torrent->id, (int) $freshSnatch->torrent_id);
-        $this->assertSame(3000, (int) $freshSnatch->getOriginal('uploaded'));
-        $this->assertSame(2200, (int) $freshSnatch->getOriginal('downloaded'));
-        $this->assertSame(800, (int) $freshSnatch->getOriginal('left'));
-        $this->assertSame(0, (int) $freshSnatch->getOriginal('seedTime'));
-        $this->assertGreaterThanOrEqual(3600, (int) $freshSnatch->getOriginal('leechTime'));
+        $this->assertSame(3000, (int) $freshSnatch->getRawOriginal('uploaded'));
+        $this->assertSame(2200, (int) $freshSnatch->getRawOriginal('downloaded'));
+        $this->assertSame(800, (int) $freshSnatch->getRawOriginal('left'));
+        $this->assertSame(0, (int) $freshSnatch->getRawOriginal('seedTime'));
+        $this->assertGreaterThanOrEqual(3600, (int) $freshSnatch->getRawOriginal('leechTime'));
         $this->assertSame(3, (int) $freshSnatch->timesAnnounced);
         $this->assertNull($freshSnatch->finished_at);
         $this->assertSame($userAgent, $freshSnatch->userAgent);
@@ -791,11 +791,11 @@ class AnnounceManagerTest extends TestCase
         $this->assertSame(0, (int) $torrent->leechers);
         $this->assertSame(0, (int) $torrent->seeders);
         $freshUser = $user->fresh();
-        $this->assertSame($user->getOriginal('uploaded') + 1000, (int) $freshUser->getOriginal('uploaded'));
-        $this->assertSame($user->getOriginal('downloaded') + 1200, (int) $freshUser->getOriginal('downloaded'));
+        $this->assertSame($user->getRawOriginal('uploaded') + 1000, (int) $freshUser->getRawOriginal('uploaded'));
+        $this->assertSame($user->getRawOriginal('downloaded') + 1200, (int) $freshUser->getRawOriginal('downloaded'));
         $this->assertInstanceOf(stdClass::class, $cache->get('user.' . $freshUser->passkey));
-        $this->assertSame((int) $freshUser->getOriginal('uploaded'), $cache->get('user.' . $freshUser->passkey)->uploaded);
-        $this->assertSame((int) $freshUser->getOriginal('downloaded'), $cache->get('user.' . $freshUser->passkey)->downloaded);
+        $this->assertSame((int) $freshUser->getRawOriginal('uploaded'), $cache->get('user.' . $freshUser->passkey)->uploaded);
+        $this->assertSame((int) $freshUser->getRawOriginal('downloaded'), $cache->get('user.' . $freshUser->passkey)->downloaded);
 
         $this->assertFalse($cache->has('user.' . $user->id . '.peers'));
     }
@@ -900,8 +900,8 @@ class AnnounceManagerTest extends TestCase
         $this->assertSame($peerId, $peer->peer_id);
         $this->assertSame($user->id, (int) $peer->user_id);
         $this->assertSame($torrent->id, (int) $peer->torrent_id);
-        $this->assertSame(2000, (int) $peer->getOriginal('uploaded'));
-        $this->assertSame(5000, (int) $peer->getOriginal('downloaded'));
+        $this->assertSame(2000, (int) $peer->getRawOriginal('uploaded'));
+        $this->assertSame(5000, (int) $peer->getRawOriginal('downloaded'));
         $this->assertTrue((bool) $peer->seeder);
         $this->assertSame($userAgent, $peer->userAgent);
         $this->assertInstanceOf(CarbonImmutable::class, $peer->created_at);
@@ -919,11 +919,11 @@ class AnnounceManagerTest extends TestCase
         $snatch = $snatch->fresh();
         $this->assertSame($user->id, (int) $snatch->user_id);
         $this->assertSame($torrent->id, (int) $snatch->torrent_id);
-        $this->assertSame(2000, (int) $snatch->getOriginal('uploaded'));
-        $this->assertSame(5000, (int) $snatch->getOriginal('downloaded'));
-        $this->assertSame(0, (int) $snatch->getOriginal('left'));
-        $this->assertSame(0, (int) $snatch->getOriginal('seedTime'));
-        $this->assertGreaterThanOrEqual(3400, (int) $snatch->getOriginal('leechTime'));
+        $this->assertSame(2000, (int) $snatch->getRawOriginal('uploaded'));
+        $this->assertSame(5000, (int) $snatch->getRawOriginal('downloaded'));
+        $this->assertSame(0, (int) $snatch->getRawOriginal('left'));
+        $this->assertSame(0, (int) $snatch->getRawOriginal('seedTime'));
+        $this->assertGreaterThanOrEqual(3400, (int) $snatch->getRawOriginal('leechTime'));
         $this->assertSame(3, (int) $snatch->timesAnnounced);
         $this->assertNotNull($snatch->finished_at);
         $this->assertLessThanOrEqual(10, Carbon::now()->diffInSeconds($snatch->finished_at));
@@ -932,11 +932,11 @@ class AnnounceManagerTest extends TestCase
         $this->assertSame(1, (int) $torrent->leechers);
         $this->assertSame(2, (int) $torrent->seeders);
         $freshUser = $user->fresh();
-        $this->assertSame($user->getOriginal('uploaded'), (int) $freshUser->getOriginal('uploaded'));
-        $this->assertSame($user->getOriginal('downloaded') + 4000, (int) $freshUser->getOriginal('downloaded'));
+        $this->assertSame($user->getRawOriginal('uploaded'), (int) $freshUser->getRawOriginal('uploaded'));
+        $this->assertSame($user->getRawOriginal('downloaded') + 4000, (int) $freshUser->getRawOriginal('downloaded'));
         $this->assertInstanceOf(stdClass::class, $cache->get('user.' . $freshUser->passkey));
-        $this->assertSame((int) $freshUser->getOriginal('uploaded'), $cache->get('user.' . $freshUser->passkey)->uploaded);
-        $this->assertSame((int) $freshUser->getOriginal('downloaded'), $cache->get('user.' . $freshUser->passkey)->downloaded);
+        $this->assertSame((int) $freshUser->getRawOriginal('uploaded'), $cache->get('user.' . $freshUser->passkey)->uploaded);
+        $this->assertSame((int) $freshUser->getRawOriginal('downloaded'), $cache->get('user.' . $freshUser->passkey)->downloaded);
 
         $this->assertFalse($cache->has('user.' . $user->id . '.peers'));
     }
@@ -1017,8 +1017,8 @@ class AnnounceManagerTest extends TestCase
         $this->assertSame($peerId, $peer->peer_id);
         $this->assertSame($user->id, (int) $peer->user_id);
         $this->assertSame($torrent->id, (int) $peer->torrent_id);
-        $this->assertSame(3000, (int) $peer->getOriginal('uploaded'));
-        $this->assertSame(1000, (int) $peer->getOriginal('downloaded'));
+        $this->assertSame(3000, (int) $peer->getRawOriginal('uploaded'));
+        $this->assertSame(1000, (int) $peer->getRawOriginal('downloaded'));
         $this->assertTrue((bool) $peer->seeder);
         $this->assertSame($userAgent, $peer->userAgent);
         $this->assertInstanceOf(CarbonImmutable::class, $peer->created_at);
@@ -1036,11 +1036,11 @@ class AnnounceManagerTest extends TestCase
         $freshSnatch = $snatch->fresh();
         $this->assertSame($user->id, (int) $freshSnatch->user_id);
         $this->assertSame($torrent->id, (int) $freshSnatch->torrent_id);
-        $this->assertSame(3000, (int) $freshSnatch->getOriginal('uploaded'));
-        $this->assertSame(1000, (int) $freshSnatch->getOriginal('downloaded'));
-        $this->assertSame(0, (int) $freshSnatch->getOriginal('left'));
-        $this->assertGreaterThanOrEqual(3400, (int) $freshSnatch->getOriginal('seedTime'));
-        $this->assertSame($snatch->getOriginal('leechTime'), (int) $freshSnatch->getOriginal('leechTime'));
+        $this->assertSame(3000, (int) $freshSnatch->getRawOriginal('uploaded'));
+        $this->assertSame(1000, (int) $freshSnatch->getRawOriginal('downloaded'));
+        $this->assertSame(0, (int) $freshSnatch->getRawOriginal('left'));
+        $this->assertGreaterThanOrEqual(3400, (int) $freshSnatch->getRawOriginal('seedTime'));
+        $this->assertSame($snatch->getRawOriginal('leechTime'), (int) $freshSnatch->getRawOriginal('leechTime'));
         $this->assertSame(6, (int) $freshSnatch->timesAnnounced);
         $this->assertNotNull($freshSnatch->finished_at);
         $this->assertSame($snatch->finished_at->toDateTimeString(), $freshSnatch->finished_at->toDateTimeString());
@@ -1049,11 +1049,11 @@ class AnnounceManagerTest extends TestCase
         $this->assertSame(0, (int) $torrent->leechers);
         $this->assertSame(1, (int) $torrent->seeders);
         $freshUser = $user->fresh();
-        $this->assertSame($user->getOriginal('uploaded') + 1000, (int) $freshUser->getOriginal('uploaded'));
-        $this->assertSame($user->getOriginal('downloaded'), (int) $freshUser->getOriginal('downloaded'));
+        $this->assertSame($user->getRawOriginal('uploaded') + 1000, (int) $freshUser->getRawOriginal('uploaded'));
+        $this->assertSame($user->getRawOriginal('downloaded'), (int) $freshUser->getRawOriginal('downloaded'));
         $this->assertInstanceOf(stdClass::class, Cache::get('user.' . $freshUser->passkey));
-        $this->assertSame((int) $freshUser->getOriginal('uploaded'), Cache::get('user.' . $freshUser->passkey)->uploaded);
-        $this->assertSame((int) $freshUser->getOriginal('downloaded'), Cache::get('user.' . $freshUser->passkey)->downloaded);
+        $this->assertSame((int) $freshUser->getRawOriginal('uploaded'), Cache::get('user.' . $freshUser->passkey)->uploaded);
+        $this->assertSame((int) $freshUser->getRawOriginal('downloaded'), Cache::get('user.' . $freshUser->passkey)->downloaded);
     }
 
     public function testLeecherContinuingToLeech()
@@ -1131,8 +1131,8 @@ class AnnounceManagerTest extends TestCase
         $this->assertSame($peerId, $peer->peer_id);
         $this->assertSame($user->id, (int) $peer->user_id);
         $this->assertSame($torrent->id, (int) $peer->torrent_id);
-        $this->assertSame(2500, (int) $peer->getOriginal('uploaded'));
-        $this->assertSame(1800, (int) $peer->getOriginal('downloaded'));
+        $this->assertSame(2500, (int) $peer->getRawOriginal('uploaded'));
+        $this->assertSame(1800, (int) $peer->getRawOriginal('downloaded'));
         $this->assertFalse((bool) $peer->seeder);
         $this->assertSame($userAgent, $peer->userAgent);
         $this->assertInstanceOf(CarbonImmutable::class, $peer->created_at);
@@ -1150,11 +1150,11 @@ class AnnounceManagerTest extends TestCase
         $freshSnatch = $snatch->fresh();
         $this->assertSame($user->id, (int) $freshSnatch->user_id);
         $this->assertSame($torrent->id, (int) $freshSnatch->torrent_id);
-        $this->assertSame(2500, (int) $freshSnatch->getOriginal('uploaded'));
-        $this->assertSame(1800, (int) $freshSnatch->getOriginal('downloaded'));
-        $this->assertSame(3200, (int) $freshSnatch->getOriginal('left'));
-        $this->assertSame(0, (int) $freshSnatch->getOriginal('seedTime'));
-        $this->assertGreaterThanOrEqual(3400, (int) $freshSnatch->getOriginal('leechTime'));
+        $this->assertSame(2500, (int) $freshSnatch->getRawOriginal('uploaded'));
+        $this->assertSame(1800, (int) $freshSnatch->getRawOriginal('downloaded'));
+        $this->assertSame(3200, (int) $freshSnatch->getRawOriginal('left'));
+        $this->assertSame(0, (int) $freshSnatch->getRawOriginal('seedTime'));
+        $this->assertGreaterThanOrEqual(3400, (int) $freshSnatch->getRawOriginal('leechTime'));
         $this->assertSame(6, (int) $freshSnatch->timesAnnounced);
         $this->assertNull($freshSnatch->finished_at);
         $this->assertSame($userAgent, $freshSnatch->userAgent);
@@ -1162,11 +1162,11 @@ class AnnounceManagerTest extends TestCase
         $this->assertSame(1, (int) $torrent->leechers);
         $this->assertSame(0, (int) $torrent->seeders);
         $freshUser = $user->fresh();
-        $this->assertSame($user->getOriginal('uploaded') + 500, (int) $freshUser->getOriginal('uploaded'));
-        $this->assertSame($user->getOriginal('downloaded') + 800, (int) $freshUser->getOriginal('downloaded'));
+        $this->assertSame($user->getRawOriginal('uploaded') + 500, (int) $freshUser->getRawOriginal('uploaded'));
+        $this->assertSame($user->getRawOriginal('downloaded') + 800, (int) $freshUser->getRawOriginal('downloaded'));
         $this->assertInstanceOf(stdClass::class, Cache::get('user.' . $freshUser->passkey));
-        $this->assertSame((int) $freshUser->getOriginal('uploaded'), Cache::get('user.' . $freshUser->passkey)->uploaded);
-        $this->assertSame((int) $freshUser->getOriginal('downloaded'), Cache::get('user.' . $freshUser->passkey)->downloaded);
+        $this->assertSame((int) $freshUser->getRawOriginal('uploaded'), Cache::get('user.' . $freshUser->passkey)->uploaded);
+        $this->assertSame((int) $freshUser->getRawOriginal('downloaded'), Cache::get('user.' . $freshUser->passkey)->downloaded);
     }
 
     public function testRecordingOfTheTrafficWhenAnnouncingOnTheV2HashImmediatelyAfterTheV1HashAnnounce(): void
@@ -1252,8 +1252,8 @@ class AnnounceManagerTest extends TestCase
         $this->assertSame($peerId, $peer->peer_id);
         $this->assertSame($user->id, (int) $peer->user_id);
         $this->assertSame($torrent->id, (int) $peer->torrent_id);
-        $this->assertSame(2010, (int) $peer->getOriginal('uploaded'));
-        $this->assertSame(1000, (int) $peer->getOriginal('downloaded'));
+        $this->assertSame(2010, (int) $peer->getRawOriginal('uploaded'));
+        $this->assertSame(1000, (int) $peer->getRawOriginal('downloaded'));
         $this->assertTrue((bool) $peer->seeder);
         $this->assertSame($userAgent, $peer->userAgent);
         $this->assertInstanceOf(CarbonImmutable::class, $peer->created_at);
@@ -1271,12 +1271,12 @@ class AnnounceManagerTest extends TestCase
         $freshSnatch = $snatch->fresh();
         $this->assertSame($user->id, (int) $freshSnatch->user_id);
         $this->assertSame($torrent->id, (int) $freshSnatch->torrent_id);
-        $this->assertSame(2010, (int) $freshSnatch->getOriginal('uploaded'));
-        $this->assertSame(1000, (int) $freshSnatch->getOriginal('downloaded'));
-        $this->assertSame(0, (int) $freshSnatch->getOriginal('left'));
-        $this->assertGreaterThanOrEqual(3060, (int) $freshSnatch->getOriginal('seedTime'));
-        $this->assertLessThanOrEqual(3065, (int) $freshSnatch->getOriginal('seedTime'));
-        $this->assertSame($snatch->getOriginal('leechTime'), (int) $freshSnatch->getOriginal('leechTime'));
+        $this->assertSame(2010, (int) $freshSnatch->getRawOriginal('uploaded'));
+        $this->assertSame(1000, (int) $freshSnatch->getRawOriginal('downloaded'));
+        $this->assertSame(0, (int) $freshSnatch->getRawOriginal('left'));
+        $this->assertGreaterThanOrEqual(3060, (int) $freshSnatch->getRawOriginal('seedTime'));
+        $this->assertLessThanOrEqual(3065, (int) $freshSnatch->getRawOriginal('seedTime'));
+        $this->assertSame($snatch->getRawOriginal('leechTime'), (int) $freshSnatch->getRawOriginal('leechTime'));
         $this->assertSame(6, (int) $freshSnatch->timesAnnounced);
         $this->assertNotNull($freshSnatch->finished_at);
         $this->assertSame($snatch->finished_at->toDateTimeString(), $freshSnatch->finished_at->toDateTimeString());
@@ -1285,11 +1285,11 @@ class AnnounceManagerTest extends TestCase
         $this->assertSame(0, (int) $torrent->leechers);
         $this->assertSame(1, (int) $torrent->seeders);
         $freshUser = $user->fresh();
-        $this->assertSame($user->getOriginal('uploaded') + 10, (int) $freshUser->getOriginal('uploaded'));
-        $this->assertSame($user->getOriginal('downloaded'), (int) $freshUser->getOriginal('downloaded'));
+        $this->assertSame($user->getRawOriginal('uploaded') + 10, (int) $freshUser->getRawOriginal('uploaded'));
+        $this->assertSame($user->getRawOriginal('downloaded'), (int) $freshUser->getRawOriginal('downloaded'));
         $this->assertInstanceOf(stdClass::class, Cache::get('user.' . $freshUser->passkey));
-        $this->assertSame((int) $freshUser->getOriginal('uploaded'), Cache::get('user.' . $freshUser->passkey)->uploaded);
-        $this->assertSame((int) $freshUser->getOriginal('downloaded'), Cache::get('user.' . $freshUser->passkey)->downloaded);
+        $this->assertSame((int) $freshUser->getRawOriginal('uploaded'), Cache::get('user.' . $freshUser->passkey)->uploaded);
+        $this->assertSame((int) $freshUser->getRawOriginal('downloaded'), Cache::get('user.' . $freshUser->passkey)->downloaded);
     }
 
     public function testEventStartedWithThePeerAlreadyInTheDB()
@@ -1356,8 +1356,8 @@ class AnnounceManagerTest extends TestCase
         $this->assertSame($peerId, $peer->peer_id);
         $this->assertSame($user->id, (int) $peer->user_id);
         $this->assertSame($torrent->id, (int) $peer->torrent_id);
-        $this->assertSame(2500, (int) $peer->getOriginal('uploaded'));
-        $this->assertSame(1800, (int) $peer->getOriginal('downloaded'));
+        $this->assertSame(2500, (int) $peer->getRawOriginal('uploaded'));
+        $this->assertSame(1800, (int) $peer->getRawOriginal('downloaded'));
         $this->assertFalse((bool) $peer->seeder);
         $this->assertSame($userAgent, $peer->userAgent);
         $this->assertInstanceOf(CarbonImmutable::class, $peer->created_at);
@@ -1376,11 +1376,11 @@ class AnnounceManagerTest extends TestCase
         $this->assertSame(1, (int) $torrent->leechers);
         $this->assertSame(0, (int) $torrent->seeders);
         $freshUser = $user->fresh();
-        $this->assertSame($user->getOriginal('uploaded') + 500, (int) $freshUser->getOriginal('uploaded'));
-        $this->assertSame($user->getOriginal('downloaded') + 800, (int) $freshUser->getOriginal('downloaded'));
+        $this->assertSame($user->getRawOriginal('uploaded') + 500, (int) $freshUser->getRawOriginal('uploaded'));
+        $this->assertSame($user->getRawOriginal('downloaded') + 800, (int) $freshUser->getRawOriginal('downloaded'));
         $this->assertInstanceOf(stdClass::class, Cache::get('user.' . $freshUser->passkey));
-        $this->assertSame((int) $freshUser->getOriginal('uploaded'), Cache::get('user.' . $freshUser->passkey)->uploaded);
-        $this->assertSame((int) $freshUser->getOriginal('downloaded'), Cache::get('user.' . $freshUser->passkey)->downloaded);
+        $this->assertSame((int) $freshUser->getRawOriginal('uploaded'), Cache::get('user.' . $freshUser->passkey)->uploaded);
+        $this->assertSame((int) $freshUser->getRawOriginal('downloaded'), Cache::get('user.' . $freshUser->passkey)->downloaded);
     }
 
     public function testStartingToLeechAPreviouslySnatchedTorrentUpdatesTheExistingSnatch()
@@ -1446,8 +1446,8 @@ class AnnounceManagerTest extends TestCase
         $this->assertSame($peerId, $peer->peer_id);
         $this->assertSame($user->id, (int) $peer->user_id);
         $this->assertSame($torrent->id, (int) $peer->torrent_id);
-        $this->assertSame(2500, (int) $peer->getOriginal('uploaded'));
-        $this->assertSame(1800, (int) $peer->getOriginal('downloaded'));
+        $this->assertSame(2500, (int) $peer->getRawOriginal('uploaded'));
+        $this->assertSame(1800, (int) $peer->getRawOriginal('downloaded'));
         $this->assertFalse((bool) $peer->seeder);
         $this->assertSame($userAgent, $peer->userAgent);
         $this->assertInstanceOf(CarbonImmutable::class, $peer->created_at);
@@ -1465,11 +1465,11 @@ class AnnounceManagerTest extends TestCase
         $freshSnatch = $snatch->fresh();
         $this->assertSame($user->id, (int) $freshSnatch->user_id);
         $this->assertSame($torrent->id, (int) $freshSnatch->torrent_id);
-        $this->assertSame(4500, (int) $freshSnatch->getOriginal('uploaded'));
-        $this->assertSame(6800, (int) $freshSnatch->getOriginal('downloaded'));
-        $this->assertSame(3200, (int) $freshSnatch->getOriginal('left'));
-        $this->assertSame(0, (int) $freshSnatch->getOriginal('seedTime'));
-        $this->assertSame(1000, (int) $freshSnatch->getOriginal('leechTime'));
+        $this->assertSame(4500, (int) $freshSnatch->getRawOriginal('uploaded'));
+        $this->assertSame(6800, (int) $freshSnatch->getRawOriginal('downloaded'));
+        $this->assertSame(3200, (int) $freshSnatch->getRawOriginal('left'));
+        $this->assertSame(0, (int) $freshSnatch->getRawOriginal('seedTime'));
+        $this->assertSame(1000, (int) $freshSnatch->getRawOriginal('leechTime'));
         $this->assertSame(6, (int) $freshSnatch->timesAnnounced);
         $this->assertNull($freshSnatch->finished_at);
         $this->assertSame($userAgent, $freshSnatch->userAgent);
@@ -1477,11 +1477,11 @@ class AnnounceManagerTest extends TestCase
         $this->assertSame(1, (int) $torrent->leechers);
         $this->assertSame(0, (int) $torrent->seeders);
         $freshUser = $user->fresh();
-        $this->assertSame($user->getOriginal('uploaded') + 2500, (int) $freshUser->getOriginal('uploaded'));
-        $this->assertSame($user->getOriginal('downloaded') + 1800, (int) $freshUser->getOriginal('downloaded'));
+        $this->assertSame($user->getRawOriginal('uploaded') + 2500, (int) $freshUser->getRawOriginal('uploaded'));
+        $this->assertSame($user->getRawOriginal('downloaded') + 1800, (int) $freshUser->getRawOriginal('downloaded'));
         $this->assertInstanceOf(stdClass::class, Cache::get('user.' . $freshUser->passkey));
-        $this->assertSame((int) $freshUser->getOriginal('uploaded'), Cache::get('user.' . $freshUser->passkey)->uploaded);
-        $this->assertSame((int) $freshUser->getOriginal('downloaded'), Cache::get('user.' . $freshUser->passkey)->downloaded);
+        $this->assertSame((int) $freshUser->getRawOriginal('uploaded'), Cache::get('user.' . $freshUser->passkey)->uploaded);
+        $this->assertSame((int) $freshUser->getRawOriginal('downloaded'), Cache::get('user.' . $freshUser->passkey)->downloaded);
     }
 
     public function testNoEventWithTheLeecherNotPresentInTheDB()
@@ -1534,8 +1534,8 @@ class AnnounceManagerTest extends TestCase
         $this->assertSame($peerId, $peer->peer_id);
         $this->assertSame($user->id, (int) $peer->user_id);
         $this->assertSame($torrent->id, (int) $peer->torrent_id);
-        $this->assertSame(2500, (int) $peer->getOriginal('uploaded'));
-        $this->assertSame(1800, (int) $peer->getOriginal('downloaded'));
+        $this->assertSame(2500, (int) $peer->getRawOriginal('uploaded'));
+        $this->assertSame(1800, (int) $peer->getRawOriginal('downloaded'));
         $this->assertFalse((bool) $peer->seeder);
         $this->assertSame($userAgent, $peer->userAgent);
         $this->assertInstanceOf(CarbonImmutable::class, $peer->created_at);
@@ -1554,11 +1554,11 @@ class AnnounceManagerTest extends TestCase
         $this->assertSame(1, (int) $torrent->leechers);
         $this->assertSame(0, (int) $torrent->seeders);
         $freshUser = $user->fresh();
-        $this->assertSame($user->getOriginal('uploaded') + 2500, (int) $freshUser->getOriginal('uploaded'));
-        $this->assertSame($user->getOriginal('downloaded') + 1800, (int) $freshUser->getOriginal('downloaded'));
+        $this->assertSame($user->getRawOriginal('uploaded') + 2500, (int) $freshUser->getRawOriginal('uploaded'));
+        $this->assertSame($user->getRawOriginal('downloaded') + 1800, (int) $freshUser->getRawOriginal('downloaded'));
         $this->assertInstanceOf(stdClass::class, Cache::get('user.' . $freshUser->passkey));
-        $this->assertSame((int) $freshUser->getOriginal('uploaded'), Cache::get('user.' . $freshUser->passkey)->uploaded);
-        $this->assertSame((int) $freshUser->getOriginal('downloaded'), Cache::get('user.' . $freshUser->passkey)->downloaded);
+        $this->assertSame((int) $freshUser->getRawOriginal('uploaded'), Cache::get('user.' . $freshUser->passkey)->uploaded);
+        $this->assertSame((int) $freshUser->getRawOriginal('downloaded'), Cache::get('user.' . $freshUser->passkey)->downloaded);
     }
 
     public function testNoEventWithTheSeederNotPresentInTheDB()
@@ -1611,8 +1611,8 @@ class AnnounceManagerTest extends TestCase
         $this->assertSame($peerId, $peer->peer_id);
         $this->assertSame($user->id, (int) $peer->user_id);
         $this->assertSame($torrent->id, (int) $peer->torrent_id);
-        $this->assertSame(2500, (int) $peer->getOriginal('uploaded'));
-        $this->assertSame(0, (int) $peer->getOriginal('downloaded'));
+        $this->assertSame(2500, (int) $peer->getRawOriginal('uploaded'));
+        $this->assertSame(0, (int) $peer->getRawOriginal('downloaded'));
         $this->assertTrue((bool) $peer->seeder);
         $this->assertSame($userAgent, $peer->userAgent);
         $this->assertInstanceOf(CarbonImmutable::class, $peer->created_at);
@@ -1631,11 +1631,11 @@ class AnnounceManagerTest extends TestCase
         $this->assertSame(0, (int) $torrent->leechers);
         $this->assertSame(1, (int) $torrent->seeders);
         $freshUser = $user->fresh();
-        $this->assertSame($user->getOriginal('uploaded') + 2500, (int) $freshUser->getOriginal('uploaded'));
-        $this->assertSame($user->getOriginal('downloaded'), (int) $freshUser->getOriginal('downloaded'));
+        $this->assertSame($user->getRawOriginal('uploaded') + 2500, (int) $freshUser->getRawOriginal('uploaded'));
+        $this->assertSame($user->getRawOriginal('downloaded'), (int) $freshUser->getRawOriginal('downloaded'));
         $this->assertInstanceOf(stdClass::class, Cache::get('user.' . $freshUser->passkey));
-        $this->assertSame((int) $freshUser->getOriginal('uploaded'), Cache::get('user.' . $freshUser->passkey)->uploaded);
-        $this->assertSame((int) $freshUser->getOriginal('downloaded'), Cache::get('user.' . $freshUser->passkey)->downloaded);
+        $this->assertSame((int) $freshUser->getRawOriginal('uploaded'), Cache::get('user.' . $freshUser->passkey)->uploaded);
+        $this->assertSame((int) $freshUser->getRawOriginal('downloaded'), Cache::get('user.' . $freshUser->passkey)->downloaded);
     }
 
     public function testPeerWithIPv4AndIPv6Address()
@@ -1676,7 +1676,7 @@ class AnnounceManagerTest extends TestCase
                     'port'       => $port,
                     'downloaded' => 0,
                     'uploaded'   => 0,
-                    'left'       => $torrent->getOriginal('size'),
+                    'left'       => $torrent->getRawOriginal('size'),
                 ]
             ),
             [
@@ -1712,8 +1712,8 @@ class AnnounceManagerTest extends TestCase
         $this->assertSame($peerId, $peer->peer_id);
         $this->assertSame($user->id, (int) $peer->user_id);
         $this->assertSame($torrent->id, (int) $peer->torrent_id);
-        $this->assertSame(0, (int) $peer->getOriginal('uploaded'));
-        $this->assertSame(0, (int) $peer->getOriginal('downloaded'));
+        $this->assertSame(0, (int) $peer->getRawOriginal('uploaded'));
+        $this->assertSame(0, (int) $peer->getRawOriginal('downloaded'));
         $this->assertFalse((bool) $peer->seeder);
         $this->assertSame($userAgent, $peer->userAgent);
         $this->assertInstanceOf(CarbonImmutable::class, $peer->created_at);
@@ -1735,9 +1735,9 @@ class AnnounceManagerTest extends TestCase
         $snatch = Snatch::firstOrFail();
         $this->assertSame($user->id, (int) $snatch->user_id);
         $this->assertSame($torrent->id, (int) $snatch->torrent_id);
-        $this->assertSame(0, (int) $snatch->getOriginal('uploaded'));
-        $this->assertSame(0, (int) $snatch->getOriginal('downloaded'));
-        $this->assertSame($torrent->getOriginal('size'), (int) $snatch->getOriginal('left'));
+        $this->assertSame(0, (int) $snatch->getRawOriginal('uploaded'));
+        $this->assertSame(0, (int) $snatch->getRawOriginal('downloaded'));
+        $this->assertSame($torrent->getRawOriginal('size'), (int) $snatch->getRawOriginal('left'));
         $this->assertSame(0, (int) $snatch->seedTime);
         $this->assertSame(0, (int) $snatch->leechTime);
         $this->assertSame(1, (int) $snatch->timesAnnounced);
@@ -1747,11 +1747,11 @@ class AnnounceManagerTest extends TestCase
         $this->assertSame(1, (int) $torrent->leechers);
         $this->assertSame(2, (int) $torrent->seeders);
         $freshUser = $user->fresh();
-        $this->assertSame($user->getOriginal('uploaded'), (int) $freshUser->getOriginal('uploaded'));
-        $this->assertSame($user->getOriginal('downloaded'), (int) $freshUser->getOriginal('downloaded'));
+        $this->assertSame($user->getRawOriginal('uploaded'), (int) $freshUser->getRawOriginal('uploaded'));
+        $this->assertSame($user->getRawOriginal('downloaded'), (int) $freshUser->getRawOriginal('downloaded'));
         $this->assertInstanceOf(stdClass::class, Cache::get('user.' . $freshUser->passkey));
-        $this->assertSame((int) $freshUser->getOriginal('uploaded'), Cache::get('user.' . $freshUser->passkey)->uploaded);
-        $this->assertSame((int) $freshUser->getOriginal('downloaded'), Cache::get('user.' . $freshUser->passkey)->downloaded);
+        $this->assertSame((int) $freshUser->getRawOriginal('uploaded'), Cache::get('user.' . $freshUser->passkey)->uploaded);
+        $this->assertSame((int) $freshUser->getRawOriginal('downloaded'), Cache::get('user.' . $freshUser->passkey)->downloaded);
     }
 
     public function testPeerWithIPv6AddressBEP7()
@@ -1790,7 +1790,7 @@ class AnnounceManagerTest extends TestCase
                     'port'       => $port,
                     'downloaded' => 0,
                     'uploaded'   => 0,
-                    'left'       => $torrent->getOriginal('size'),
+                    'left'       => $torrent->getRawOriginal('size'),
                 ]
             ),
             [
@@ -1826,8 +1826,8 @@ class AnnounceManagerTest extends TestCase
         $this->assertSame($peerId, $peer->peer_id);
         $this->assertSame($user->id, (int) $peer->user_id);
         $this->assertSame($torrent->id, (int) $peer->torrent_id);
-        $this->assertSame(0, (int) $peer->getOriginal('uploaded'));
-        $this->assertSame(0, (int) $peer->getOriginal('downloaded'));
+        $this->assertSame(0, (int) $peer->getRawOriginal('uploaded'));
+        $this->assertSame(0, (int) $peer->getRawOriginal('downloaded'));
         $this->assertFalse((bool) $peer->seeder);
         $this->assertSame($userAgent, $peer->userAgent);
         $this->assertInstanceOf(CarbonImmutable::class, $peer->created_at);
@@ -1845,9 +1845,9 @@ class AnnounceManagerTest extends TestCase
         $snatch = Snatch::firstOrFail();
         $this->assertSame($user->id, (int) $snatch->user_id);
         $this->assertSame($torrent->id, (int) $snatch->torrent_id);
-        $this->assertSame(0, (int) $snatch->getOriginal('uploaded'));
-        $this->assertSame(0, (int) $snatch->getOriginal('downloaded'));
-        $this->assertSame($torrent->getOriginal('size'), (int) $snatch->getOriginal('left'));
+        $this->assertSame(0, (int) $snatch->getRawOriginal('uploaded'));
+        $this->assertSame(0, (int) $snatch->getRawOriginal('downloaded'));
+        $this->assertSame($torrent->getRawOriginal('size'), (int) $snatch->getRawOriginal('left'));
         $this->assertSame(0, (int) $snatch->seedTime);
         $this->assertSame(0, (int) $snatch->leechTime);
         $this->assertSame(1, (int) $snatch->timesAnnounced);
@@ -1857,11 +1857,11 @@ class AnnounceManagerTest extends TestCase
         $this->assertSame(1, (int) $torrent->leechers);
         $this->assertSame(2, (int) $torrent->seeders);
         $freshUser = $user->fresh();
-        $this->assertSame($user->getOriginal('uploaded'), (int) $freshUser->getOriginal('uploaded'));
-        $this->assertSame($user->getOriginal('downloaded'), (int) $freshUser->getOriginal('downloaded'));
+        $this->assertSame($user->getRawOriginal('uploaded'), (int) $freshUser->getRawOriginal('uploaded'));
+        $this->assertSame($user->getRawOriginal('downloaded'), (int) $freshUser->getRawOriginal('downloaded'));
         $this->assertInstanceOf(stdClass::class, Cache::get('user.' . $freshUser->passkey));
-        $this->assertSame((int) $freshUser->getOriginal('uploaded'), Cache::get('user.' . $freshUser->passkey)->uploaded);
-        $this->assertSame((int) $freshUser->getOriginal('downloaded'), Cache::get('user.' . $freshUser->passkey)->downloaded);
+        $this->assertSame((int) $freshUser->getRawOriginal('uploaded'), Cache::get('user.' . $freshUser->passkey)->uploaded);
+        $this->assertSame((int) $freshUser->getRawOriginal('downloaded'), Cache::get('user.' . $freshUser->passkey)->downloaded);
     }
 
     public function testPeerWithIPv6Address()
@@ -1900,7 +1900,7 @@ class AnnounceManagerTest extends TestCase
                     'port'       => $port,
                     'downloaded' => 0,
                     'uploaded'   => 0,
-                    'left'       => $torrent->getOriginal('size'),
+                    'left'       => $torrent->getRawOriginal('size'),
                 ]
             ),
             [
@@ -1936,8 +1936,8 @@ class AnnounceManagerTest extends TestCase
         $this->assertSame($peerId, $peer->peer_id);
         $this->assertSame($user->id, (int) $peer->user_id);
         $this->assertSame($torrent->id, (int) $peer->torrent_id);
-        $this->assertSame(0, (int) $peer->getOriginal('uploaded'));
-        $this->assertSame(0, (int) $peer->getOriginal('downloaded'));
+        $this->assertSame(0, (int) $peer->getRawOriginal('uploaded'));
+        $this->assertSame(0, (int) $peer->getRawOriginal('downloaded'));
         $this->assertFalse((bool) $peer->seeder);
         $this->assertSame($userAgent, $peer->userAgent);
         $this->assertInstanceOf(CarbonImmutable::class, $peer->created_at);
@@ -1955,9 +1955,9 @@ class AnnounceManagerTest extends TestCase
         $snatch = Snatch::firstOrFail();
         $this->assertSame($user->id, (int) $snatch->user_id);
         $this->assertSame($torrent->id, (int) $snatch->torrent_id);
-        $this->assertSame(0, (int) $snatch->getOriginal('uploaded'));
-        $this->assertSame(0, (int) $snatch->getOriginal('downloaded'));
-        $this->assertSame($torrent->getOriginal('size'), (int) $snatch->getOriginal('left'));
+        $this->assertSame(0, (int) $snatch->getRawOriginal('uploaded'));
+        $this->assertSame(0, (int) $snatch->getRawOriginal('downloaded'));
+        $this->assertSame($torrent->getRawOriginal('size'), (int) $snatch->getRawOriginal('left'));
         $this->assertSame(0, (int) $snatch->seedTime);
         $this->assertSame(0, (int) $snatch->leechTime);
         $this->assertSame(1, (int) $snatch->timesAnnounced);
@@ -1967,11 +1967,11 @@ class AnnounceManagerTest extends TestCase
         $this->assertSame(1, (int) $torrent->leechers);
         $this->assertSame(2, (int) $torrent->seeders);
         $freshUser = $user->fresh();
-        $this->assertSame($user->getOriginal('uploaded'), (int) $freshUser->getOriginal('uploaded'));
-        $this->assertSame($user->getOriginal('downloaded'), (int) $freshUser->getOriginal('downloaded'));
+        $this->assertSame($user->getRawOriginal('uploaded'), (int) $freshUser->getRawOriginal('uploaded'));
+        $this->assertSame($user->getRawOriginal('downloaded'), (int) $freshUser->getRawOriginal('downloaded'));
         $this->assertInstanceOf(stdClass::class, Cache::get('user.' . $freshUser->passkey));
-        $this->assertSame((int) $freshUser->getOriginal('uploaded'), Cache::get('user.' . $freshUser->passkey)->uploaded);
-        $this->assertSame((int) $freshUser->getOriginal('downloaded'), Cache::get('user.' . $freshUser->passkey)->downloaded);
+        $this->assertSame((int) $freshUser->getRawOriginal('uploaded'), Cache::get('user.' . $freshUser->passkey)->uploaded);
+        $this->assertSame((int) $freshUser->getRawOriginal('downloaded'), Cache::get('user.' . $freshUser->passkey)->downloaded);
     }
 
     public function testPeerWithIPv6Endpoint()
@@ -2012,7 +2012,7 @@ class AnnounceManagerTest extends TestCase
                     'port'       => $port,
                     'downloaded' => 0,
                     'uploaded'   => 0,
-                    'left'       => $torrent->getOriginal('size'),
+                    'left'       => $torrent->getRawOriginal('size'),
                 ]
             ),
             [
@@ -2048,8 +2048,8 @@ class AnnounceManagerTest extends TestCase
         $this->assertSame($peerId, $peer->peer_id);
         $this->assertSame($user->id, (int) $peer->user_id);
         $this->assertSame($torrent->id, (int) $peer->torrent_id);
-        $this->assertSame(0, (int) $peer->getOriginal('uploaded'));
-        $this->assertSame(0, (int) $peer->getOriginal('downloaded'));
+        $this->assertSame(0, (int) $peer->getRawOriginal('uploaded'));
+        $this->assertSame(0, (int) $peer->getRawOriginal('downloaded'));
         $this->assertFalse((bool) $peer->seeder);
         $this->assertSame($userAgent, $peer->userAgent);
         $this->assertInstanceOf(CarbonImmutable::class, $peer->created_at);
@@ -2067,9 +2067,9 @@ class AnnounceManagerTest extends TestCase
         $snatch = Snatch::firstOrFail();
         $this->assertSame($user->id, (int) $snatch->user_id);
         $this->assertSame($torrent->id, (int) $snatch->torrent_id);
-        $this->assertSame(0, (int) $snatch->getOriginal('uploaded'));
-        $this->assertSame(0, (int) $snatch->getOriginal('downloaded'));
-        $this->assertSame($torrent->getOriginal('size'), (int) $snatch->getOriginal('left'));
+        $this->assertSame(0, (int) $snatch->getRawOriginal('uploaded'));
+        $this->assertSame(0, (int) $snatch->getRawOriginal('downloaded'));
+        $this->assertSame($torrent->getRawOriginal('size'), (int) $snatch->getRawOriginal('left'));
         $this->assertSame(0, (int) $snatch->seedTime);
         $this->assertSame(0, (int) $snatch->leechTime);
         $this->assertSame(1, (int) $snatch->timesAnnounced);
@@ -2079,11 +2079,11 @@ class AnnounceManagerTest extends TestCase
         $this->assertSame(1, (int) $torrent->leechers);
         $this->assertSame(2, (int) $torrent->seeders);
         $freshUser = $user->fresh();
-        $this->assertSame($user->getOriginal('uploaded'), (int) $freshUser->getOriginal('uploaded'));
-        $this->assertSame($user->getOriginal('downloaded'), (int) $freshUser->getOriginal('downloaded'));
+        $this->assertSame($user->getRawOriginal('uploaded'), (int) $freshUser->getRawOriginal('uploaded'));
+        $this->assertSame($user->getRawOriginal('downloaded'), (int) $freshUser->getRawOriginal('downloaded'));
         $this->assertInstanceOf(stdClass::class, Cache::get('user.' . $freshUser->passkey));
-        $this->assertSame((int) $freshUser->getOriginal('uploaded'), Cache::get('user.' . $freshUser->passkey)->uploaded);
-        $this->assertSame((int) $freshUser->getOriginal('downloaded'), Cache::get('user.' . $freshUser->passkey)->downloaded);
+        $this->assertSame((int) $freshUser->getRawOriginal('uploaded'), Cache::get('user.' . $freshUser->passkey)->uploaded);
+        $this->assertSame((int) $freshUser->getRawOriginal('downloaded'), Cache::get('user.' . $freshUser->passkey)->downloaded);
     }
 
     public function testPeerWithIPv4Endpoint()
@@ -2124,7 +2124,7 @@ class AnnounceManagerTest extends TestCase
                     'port'       => $port,
                     'downloaded' => 0,
                     'uploaded'   => 0,
-                    'left'       => $torrent->getOriginal('size'),
+                    'left'       => $torrent->getRawOriginal('size'),
                 ]
             ),
             [
@@ -2160,8 +2160,8 @@ class AnnounceManagerTest extends TestCase
         $this->assertSame($peerId, $peer->peer_id);
         $this->assertSame($user->id, (int) $peer->user_id);
         $this->assertSame($torrent->id, (int) $peer->torrent_id);
-        $this->assertSame(0, (int) $peer->getOriginal('uploaded'));
-        $this->assertSame(0, (int) $peer->getOriginal('downloaded'));
+        $this->assertSame(0, (int) $peer->getRawOriginal('uploaded'));
+        $this->assertSame(0, (int) $peer->getRawOriginal('downloaded'));
         $this->assertFalse((bool) $peer->seeder);
         $this->assertSame($userAgent, $peer->userAgent);
         $this->assertInstanceOf(CarbonImmutable::class, $peer->created_at);
@@ -2179,9 +2179,9 @@ class AnnounceManagerTest extends TestCase
         $snatch = Snatch::firstOrFail();
         $this->assertSame($user->id, (int) $snatch->user_id);
         $this->assertSame($torrent->id, (int) $snatch->torrent_id);
-        $this->assertSame(0, (int) $snatch->getOriginal('uploaded'));
-        $this->assertSame(0, (int) $snatch->getOriginal('downloaded'));
-        $this->assertSame($torrent->getOriginal('size'), (int) $snatch->getOriginal('left'));
+        $this->assertSame(0, (int) $snatch->getRawOriginal('uploaded'));
+        $this->assertSame(0, (int) $snatch->getRawOriginal('downloaded'));
+        $this->assertSame($torrent->getRawOriginal('size'), (int) $snatch->getRawOriginal('left'));
         $this->assertSame(0, (int) $snatch->seedTime);
         $this->assertSame(0, (int) $snatch->leechTime);
         $this->assertSame(1, (int) $snatch->timesAnnounced);
@@ -2191,11 +2191,11 @@ class AnnounceManagerTest extends TestCase
         $this->assertSame(1, (int) $torrent->leechers);
         $this->assertSame(2, (int) $torrent->seeders);
         $freshUser = $user->fresh();
-        $this->assertSame($user->getOriginal('uploaded'), (int) $freshUser->getOriginal('uploaded'));
-        $this->assertSame($user->getOriginal('downloaded'), (int) $freshUser->getOriginal('downloaded'));
+        $this->assertSame($user->getRawOriginal('uploaded'), (int) $freshUser->getRawOriginal('uploaded'));
+        $this->assertSame($user->getRawOriginal('downloaded'), (int) $freshUser->getRawOriginal('downloaded'));
         $this->assertInstanceOf(stdClass::class, Cache::get('user.' . $freshUser->passkey));
-        $this->assertSame((int) $freshUser->getOriginal('uploaded'), Cache::get('user.' . $freshUser->passkey)->uploaded);
-        $this->assertSame((int) $freshUser->getOriginal('downloaded'), Cache::get('user.' . $freshUser->passkey)->downloaded);
+        $this->assertSame((int) $freshUser->getRawOriginal('uploaded'), Cache::get('user.' . $freshUser->passkey)->uploaded);
+        $this->assertSame((int) $freshUser->getRawOriginal('downloaded'), Cache::get('user.' . $freshUser->passkey)->downloaded);
     }
 
     public function testNonCompactResponse()
@@ -2226,7 +2226,7 @@ class AnnounceManagerTest extends TestCase
                     'port'       => $port,
                     'downloaded' => 0,
                     'uploaded'   => 0,
-                    'left'       => $torrent->getOriginal('size'),
+                    'left'       => $torrent->getRawOriginal('size'),
                     'compact'    => 0,
                 ]
             ),
@@ -2262,8 +2262,8 @@ class AnnounceManagerTest extends TestCase
         $this->assertSame($peerId, $peer->peer_id);
         $this->assertSame($user->id, (int) $peer->user_id);
         $this->assertSame($torrent->id, (int) $peer->torrent_id);
-        $this->assertSame(0, (int) $peer->getOriginal('uploaded'));
-        $this->assertSame(0, (int) $peer->getOriginal('downloaded'));
+        $this->assertSame(0, (int) $peer->getRawOriginal('uploaded'));
+        $this->assertSame(0, (int) $peer->getRawOriginal('downloaded'));
         $this->assertFalse((bool) $peer->seeder);
         $this->assertSame($userAgent, $peer->userAgent);
         $this->assertInstanceOf(CarbonImmutable::class, $peer->created_at);
@@ -2281,9 +2281,9 @@ class AnnounceManagerTest extends TestCase
         $snatch = Snatch::firstOrFail();
         $this->assertSame($user->id, (int) $snatch->user_id);
         $this->assertSame($torrent->id, (int) $snatch->torrent_id);
-        $this->assertSame(0, (int) $snatch->getOriginal('uploaded'));
-        $this->assertSame(0, (int) $snatch->getOriginal('downloaded'));
-        $this->assertSame($torrent->getOriginal('size'), (int) $snatch->getOriginal('left'));
+        $this->assertSame(0, (int) $snatch->getRawOriginal('uploaded'));
+        $this->assertSame(0, (int) $snatch->getRawOriginal('downloaded'));
+        $this->assertSame($torrent->getRawOriginal('size'), (int) $snatch->getRawOriginal('left'));
         $this->assertSame(0, (int) $snatch->seedTime);
         $this->assertSame(0, (int) $snatch->leechTime);
         $this->assertSame(1, (int) $snatch->timesAnnounced);
@@ -2293,11 +2293,11 @@ class AnnounceManagerTest extends TestCase
         $this->assertSame(2, (int) $torrent->leechers);
         $this->assertSame(1, (int) $torrent->seeders);
         $freshUser = $user->fresh();
-        $this->assertSame($user->getOriginal('uploaded'), (int) $freshUser->getOriginal('uploaded'));
-        $this->assertSame($user->getOriginal('downloaded'), (int) $freshUser->getOriginal('downloaded'));
+        $this->assertSame($user->getRawOriginal('uploaded'), (int) $freshUser->getRawOriginal('uploaded'));
+        $this->assertSame($user->getRawOriginal('downloaded'), (int) $freshUser->getRawOriginal('downloaded'));
         $this->assertInstanceOf(stdClass::class, Cache::get('user.' . $freshUser->passkey));
-        $this->assertSame((int) $freshUser->getOriginal('uploaded'), Cache::get('user.' . $freshUser->passkey)->uploaded);
-        $this->assertSame((int) $freshUser->getOriginal('downloaded'), Cache::get('user.' . $freshUser->passkey)->downloaded);
+        $this->assertSame((int) $freshUser->getRawOriginal('uploaded'), Cache::get('user.' . $freshUser->passkey)->uploaded);
+        $this->assertSame((int) $freshUser->getRawOriginal('downloaded'), Cache::get('user.' . $freshUser->passkey)->downloaded);
     }
 
     public function testNumWantParameterIsRespected()
@@ -2331,7 +2331,7 @@ class AnnounceManagerTest extends TestCase
                     'port'       => $port,
                     'downloaded' => 0,
                     'uploaded'   => 0,
-                    'left'       => $torrent->getOriginal('size'),
+                    'left'       => $torrent->getRawOriginal('size'),
                     'numwant'    => 1,
                 ]
             ),
@@ -2380,8 +2380,8 @@ class AnnounceManagerTest extends TestCase
         $this->assertSame($peerId, $peer->peer_id);
         $this->assertSame($user->id, (int) $peer->user_id);
         $this->assertSame($torrent->id, (int) $peer->torrent_id);
-        $this->assertSame(0, (int) $peer->getOriginal('uploaded'));
-        $this->assertSame(0, (int) $peer->getOriginal('downloaded'));
+        $this->assertSame(0, (int) $peer->getRawOriginal('uploaded'));
+        $this->assertSame(0, (int) $peer->getRawOriginal('downloaded'));
         $this->assertFalse((bool) $peer->seeder);
         $this->assertSame($userAgent, $peer->userAgent);
         $this->assertInstanceOf(CarbonImmutable::class, $peer->created_at);
@@ -2399,9 +2399,9 @@ class AnnounceManagerTest extends TestCase
         $snatch = Snatch::firstOrFail();
         $this->assertSame($user->id, (int) $snatch->user_id);
         $this->assertSame($torrent->id, (int) $snatch->torrent_id);
-        $this->assertSame(0, (int) $snatch->getOriginal('uploaded'));
-        $this->assertSame(0, (int) $snatch->getOriginal('downloaded'));
-        $this->assertSame($torrent->getOriginal('size'), (int) $snatch->getOriginal('left'));
+        $this->assertSame(0, (int) $snatch->getRawOriginal('uploaded'));
+        $this->assertSame(0, (int) $snatch->getRawOriginal('downloaded'));
+        $this->assertSame($torrent->getRawOriginal('size'), (int) $snatch->getRawOriginal('left'));
         $this->assertSame(0, (int) $snatch->seedTime);
         $this->assertSame(0, (int) $snatch->leechTime);
         $this->assertSame(1, (int) $snatch->timesAnnounced);
@@ -2411,11 +2411,11 @@ class AnnounceManagerTest extends TestCase
         $this->assertSame(2, (int) $torrent->leechers);
         $this->assertSame(1, (int) $torrent->seeders);
         $freshUser = $user->fresh();
-        $this->assertSame($user->getOriginal('uploaded'), (int) $freshUser->getOriginal('uploaded'));
-        $this->assertSame($user->getOriginal('downloaded'), (int) $freshUser->getOriginal('downloaded'));
+        $this->assertSame($user->getRawOriginal('uploaded'), (int) $freshUser->getRawOriginal('uploaded'));
+        $this->assertSame($user->getRawOriginal('downloaded'), (int) $freshUser->getRawOriginal('downloaded'));
         $this->assertInstanceOf(stdClass::class, Cache::get('user.' . $freshUser->passkey));
-        $this->assertSame((int) $freshUser->getOriginal('uploaded'), Cache::get('user.' . $freshUser->passkey)->uploaded);
-        $this->assertSame((int) $freshUser->getOriginal('downloaded'), Cache::get('user.' . $freshUser->passkey)->downloaded);
+        $this->assertSame((int) $freshUser->getRawOriginal('uploaded'), Cache::get('user.' . $freshUser->passkey)->uploaded);
+        $this->assertSame((int) $freshUser->getRawOriginal('downloaded'), Cache::get('user.' . $freshUser->passkey)->downloaded);
     }
 
     public function testPasskeyIsRequired()
@@ -2857,7 +2857,7 @@ class AnnounceManagerTest extends TestCase
             'port'       => 65535,
             'downloaded' => 0,
             'uploaded'   => 0,
-            'left'       => $torrent->getOriginal('size'),
+            'left'       => $torrent->getRawOriginal('size'),
             'event'      => 'started',
         ], $overrides);
     }

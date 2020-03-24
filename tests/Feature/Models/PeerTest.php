@@ -25,7 +25,7 @@ class PeerTest extends TestCase
         factory(Peer::class)->create();
         $peer = Peer::firstOrFail();
         $returnValue = '500 MB';
-        SizeFormatter::shouldReceive('getFormattedSize')->once()->with($peer->getOriginal('uploaded'))->andReturn($returnValue);
+        SizeFormatter::shouldReceive('getFormattedSize')->once()->with($peer->getRawOriginal('uploaded'))->andReturn($returnValue);
         $this->assertSame($returnValue, $peer->uploaded);
     }
 
@@ -34,7 +34,7 @@ class PeerTest extends TestCase
         factory(Peer::class)->create();
         $peer = Peer::firstOrFail();
         $returnValue = '500 MB';
-        SizeFormatter::shouldReceive('getFormattedSize')->once()->with($peer->getOriginal('downloaded'))->andReturn($returnValue);
+        SizeFormatter::shouldReceive('getFormattedSize')->once()->with($peer->getRawOriginal('downloaded'))->andReturn($returnValue);
         $this->assertSame($returnValue, $peer->downloaded);
     }
 

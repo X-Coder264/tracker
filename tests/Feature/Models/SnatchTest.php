@@ -22,7 +22,7 @@ class SnatchTest extends TestCase
         factory(Snatch::class)->create();
         $snatch = Snatch::firstOrFail();
         $returnValue = '500 MB';
-        SizeFormatter::shouldReceive('getFormattedSize')->once()->with($snatch->getOriginal('uploaded'))->andReturn($returnValue);
+        SizeFormatter::shouldReceive('getFormattedSize')->once()->with($snatch->getRawOriginal('uploaded'))->andReturn($returnValue);
         $this->assertSame($returnValue, $snatch->uploaded);
     }
 
@@ -31,7 +31,7 @@ class SnatchTest extends TestCase
         factory(Snatch::class)->create();
         $snatch = Snatch::firstOrFail();
         $returnValue = '500 MB';
-        SizeFormatter::shouldReceive('getFormattedSize')->once()->with($snatch->getOriginal('downloaded'))->andReturn($returnValue);
+        SizeFormatter::shouldReceive('getFormattedSize')->once()->with($snatch->getRawOriginal('downloaded'))->andReturn($returnValue);
         $this->assertSame($returnValue, $snatch->downloaded);
     }
 
@@ -40,7 +40,7 @@ class SnatchTest extends TestCase
         factory(Snatch::class)->create();
         $snatch = Snatch::firstOrFail();
         $returnValue = '500 MB';
-        SizeFormatter::shouldReceive('getFormattedSize')->once()->with($snatch->getOriginal('left'))->andReturn($returnValue);
+        SizeFormatter::shouldReceive('getFormattedSize')->once()->with($snatch->getRawOriginal('left'))->andReturn($returnValue);
         $this->assertSame($returnValue, $snatch->left);
     }
 
@@ -49,7 +49,7 @@ class SnatchTest extends TestCase
         factory(Snatch::class)->create();
         $snatch = Snatch::firstOrFail();
         $returnValue = '500 MB';
-        SecondsDurationFormatter::shouldReceive('format')->once()->with($snatch->getOriginal('seedTime'))->andReturn($returnValue);
+        SecondsDurationFormatter::shouldReceive('format')->once()->with($snatch->getRawOriginal('seedTime'))->andReturn($returnValue);
         $this->assertSame($returnValue, $snatch->seedTime);
     }
 
@@ -58,7 +58,7 @@ class SnatchTest extends TestCase
         factory(Snatch::class)->create();
         $snatch = Snatch::firstOrFail();
         $returnValue = '500 MB';
-        SecondsDurationFormatter::shouldReceive('format')->once()->with($snatch->getOriginal('leechTime'))->andReturn($returnValue);
+        SecondsDurationFormatter::shouldReceive('format')->once()->with($snatch->getRawOriginal('leechTime'))->andReturn($returnValue);
         $this->assertSame($returnValue, $snatch->leechTime);
     }
 

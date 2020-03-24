@@ -51,10 +51,10 @@
                                         <td>{{ $snatch->torrent->leechers }}</td>
                                         <td>{{ $snatch->uploaded }}</td>
                                         <td>{{ $snatch->downloaded }}</td>
-                                        @if (0 === (int) $snatch->getOriginal('downloaded'))
+                                        @if (0 === (int) $snatch->getRawOriginal('downloaded'))
                                             <td>Inf.</td>
                                         @else
-                                            <td>{{ number_format((int) $snatch->getOriginal('uploaded') / (int) $snatch->getOriginal('downloaded'), 2) }}</td>
+                                            <td>{{ number_format((int) $snatch->getRawOriginal('uploaded') / (int) $snatch->getRawOriginal('downloaded'), 2) }}</td>
                                         @endif
                                         <td>{{ $snatch->seedTime }}</td>
                                         <td>{{ $snatch->leechTime }}</td>
