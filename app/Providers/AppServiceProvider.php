@@ -20,9 +20,18 @@ use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Support\DateFactory;
 use Illuminate\Support\ServiceProvider;
+use Laravel\Telescope\TelescopeServiceProvider as LaravelTelescopeServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
 {
+    public function register(): void
+    {
+        if ($this->app->isLocal()) {
+            $this->app->register(LaravelTelescopeServiceProvider::class);
+            $this->app->register(TelescopeServiceProvider::class);
+        }
+    }
+
     public function boot(): void
     {
         DateFactory::useClass(CarbonImmutable::class);

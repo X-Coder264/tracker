@@ -38,3 +38,5 @@ PUSHER_APP_SECRET=
 
 # if the DSN entry is empty Sentry reporting is disabled
 SENTRY_LARAVEL_DSN=
+
+TELESCOPE_LIGHT_THEME=false
