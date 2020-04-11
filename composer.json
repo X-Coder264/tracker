@@ -23,7 +23,7 @@
         "laravel/tinker": "^2.4",
         "laravel/ui": "^2.0",
         "nesbot/carbon": "^2.32",
-        "pragmarx/google2fa": "^7.0",
+        "pragmarx/google2fa": "^8.0",
         "pragmarx/google2fa-qrcode": "^1.0",
         "predis/predis": "^1.1.1",
         "sentry/sentry-laravel": "^1.7",
