@@ -38,7 +38,7 @@ module.exports = function(env) {
             rules: [
                 {
                     test: /\.vue$/,
-                    loader: 'vue-loader',
+                    loader: 'vue-loader'
                 },
                 {
                     test: /\.(js|vue)$/,
@@ -138,16 +138,12 @@ module.exports = function(env) {
                 }
             }),
 
-            new CopyWebpackPlugin([
-                {
-                    from: `${paths.cmfSrc}font/icons/fonts`,
-                    to: path.resolve(__dirname, 'public') + '/src/font/icons/fonts'
-                },
-                {
-                    from: `${paths.cmfSrc}font/webFonts`,
-                    to: path.resolve(__dirname, 'public') + '/src/font/webFonts'
-                }
-            ])
+            new CopyWebpackPlugin({
+                patterns: [
+                    {from: `${paths.cmfSrc}font/icons/fonts/**/*`, to: path.resolve(__dirname, 'public') + '/src/font/icons/fonts'},
+                    {from: `${paths.cmfSrc}font/webFonts/**/*`, to: path.resolve(__dirname, 'public') + '/src/font/webFonts'}
+                ]
+            })
         ],
 
         stats: {
