@@ -31,11 +31,10 @@
     },
     "require-dev": {
         "ext-simplexml": "*",
+        "barryvdh/laravel-debugbar": "^3.4",
         "facade/ignition": "^2.3",
         "friendsofphp/php-cs-fixer": "^2.16",
-        "fruitcake/laravel-telescope-toolbar": "^1.2",
         "fzaninotto/faker": "^1.9",
-        "laravel/telescope": "^3.5",
         "mockery/mockery": "^1.4",
         "nunomaduro/collision": "^4.2",
         "phpunit/phpunit": "^9.3"
@@ -47,9 +46,7 @@
     },
     "extra": {
         "laravel": {
-            "dont-discover": [
-                "laravel/telescope"
-            ]
+            "dont-discover": []
         }
     },
     "autoload": {
