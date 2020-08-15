@@ -1,7 +1,5 @@
 <p align="center">
-<a href="https://travis-ci.org/X-Coder264/tracker">
-<img src="https://travis-ci.org/X-Coder264/tracker.svg?branch=master" alt="Build Status">
-</a>
+<img src="https://github.com/X-Coder264/tracker/workflows/tests/badge.svg" alt="Build Status">
 <a href="https://codecov.io/gh/X-Coder264/tracker">
   <img src="https://codecov.io/gh/X-Coder264/tracker/branch/master/graph/badge.svg" />
 </a>
