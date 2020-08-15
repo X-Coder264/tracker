@@ -1,0 +1,23 @@
+name: tests
+on: [push, pull_request]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: 'recursive'
+      - name: Build the stack
+        run: docker/env dev on
+      - name: Install dependencies
+        run: cp .env.testing .env && docker/run dev:php composer install
+      - name: Setup env
+        run: docker/run dev:php ./artisan storage:link && docker/run dev:php ./artisan migrate --env=testing
+      - name: Execute lint
+        run: docker/run dev:php vendor/bin/php-cs-fixer fix --no-interaction --dry-run --diff --using-cache=no -v
+      - name: Execute tests
+        run: docker/run dev:php vendor/bin/phpunit --verbose --coverage-text --coverage-clover=build/logs/clover.xml
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v1
+        with:
+          file: build/logs/clover.xml

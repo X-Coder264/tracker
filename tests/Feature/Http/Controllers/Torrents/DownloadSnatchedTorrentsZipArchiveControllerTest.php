@@ -64,7 +64,14 @@ final class DownloadSnatchedTorrentsZipArchiveControllerTest extends TestCase
 
             $file = $binaryFileResponse->getFile();
 
-            $fileListInStorageFolder = glob($this->app->make('path.storage') . DIRECTORY_SEPARATOR . '*.{zip,torrent}', GLOB_BRACE);
+            if (defined('GLOB_BRACE')) {
+                $fileListInStorageFolder = glob($this->app->make('path.storage') . DIRECTORY_SEPARATOR . '*.{zip,torrent}', GLOB_BRACE);
+            } else {
+                $fileListInStorageFolder = array_merge(
+                    glob($this->app->make('path.storage') . DIRECTORY_SEPARATOR . '*.zip'),
+                    glob($this->app->make('path.storage') . DIRECTORY_SEPARATOR . '*.torrent')
+                );
+            }
 
             if (! empty($fileListInStorageFolder)) {
                 foreach ($fileListInStorageFolder as $filePath) {
@@ -100,7 +107,14 @@ final class DownloadSnatchedTorrentsZipArchiveControllerTest extends TestCase
                 $filesystem->disk('torrents')->delete($torrent->id . '.torrent');
             }
 
-            $fileListInStorageFolder = glob($this->app->make('path.storage') . DIRECTORY_SEPARATOR . '*.{zip,torrent}', GLOB_BRACE);
+            if (defined('GLOB_BRACE')) {
+                $fileListInStorageFolder = glob($this->app->make('path.storage') . DIRECTORY_SEPARATOR . '*.{zip,torrent}', GLOB_BRACE);
+            } else {
+                $fileListInStorageFolder = array_merge(
+                    glob($this->app->make('path.storage') . DIRECTORY_SEPARATOR . '*.zip'),
+                    glob($this->app->make('path.storage') . DIRECTORY_SEPARATOR . '*.torrent')
+                );
+            }
 
             foreach ($fileListInStorageFolder as $filePath) {
                 unlink($filePath);
@@ -130,10 +144,24 @@ final class DownloadSnatchedTorrentsZipArchiveControllerTest extends TestCase
                 $this->app->make(Translator::class)->get('messages.no_snatches_for_zip_archive.message')
             );
 
-            $fileListInStorageFolder = glob($this->app->make('path.storage') . DIRECTORY_SEPARATOR . '*.{zip,torrent}', GLOB_BRACE);
+            if (defined('GLOB_BRACE')) {
+                $fileListInStorageFolder = glob($this->app->make('path.storage') . DIRECTORY_SEPARATOR . '*.{zip,torrent}', GLOB_BRACE);
+            } else {
+                $fileListInStorageFolder = array_merge(
+                    glob($this->app->make('path.storage') . DIRECTORY_SEPARATOR . '*.zip'),
+                    glob($this->app->make('path.storage') . DIRECTORY_SEPARATOR . '*.torrent')
+                );
+            }
             $this->assertEmpty($fileListInStorageFolder);
         } finally {
-            $fileListInStorageFolder = glob($this->app->make('path.storage') . DIRECTORY_SEPARATOR . '*.{zip,torrent}', GLOB_BRACE);
+            if (defined('GLOB_BRACE')) {
+                $fileListInStorageFolder = glob($this->app->make('path.storage') . DIRECTORY_SEPARATOR . '*.{zip,torrent}', GLOB_BRACE);
+            } else {
+                $fileListInStorageFolder = array_merge(
+                    glob($this->app->make('path.storage') . DIRECTORY_SEPARATOR . '*.zip'),
+                    glob($this->app->make('path.storage') . DIRECTORY_SEPARATOR . '*.torrent')
+                );
+            }
 
             foreach ($fileListInStorageFolder as $filePath) {
                 unlink($filePath);
