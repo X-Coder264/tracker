@@ -51,8 +51,7 @@ class IMDBManager
     private function getIMDBConfig(): Config
     {
         $config = new Config();
-        // number of minutes to cache IMDB data (Laravel's cache stores take minutes, not seconds!)
-        $config->cache_expire = 60 * 24;
+        $config->cache_expire = 60 * 60 * 24; // cache the imdb data for one day
 
         return $config;
     }

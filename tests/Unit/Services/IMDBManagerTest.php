@@ -24,7 +24,7 @@ class IMDBManagerTest extends TestCase
         $title = $this->IMDBManager->getTitleFromFullURL('https://www.imdb.com/title/tt0468569/');
         $this->assertInstanceOf(Title::class, $title);
         $this->assertSame('0468569', $title->imdbid());
-        $this->assertSame(60 * 24, $title->cache_expire);
+        $this->assertSame(60 * 60 * 24, $title->cache_expire);
     }
 
     public function testGetTitleFromIMDBId(): void
@@ -32,7 +32,7 @@ class IMDBManagerTest extends TestCase
         $title = $this->IMDBManager->getTitleFromIMDBId('0468569');
         $this->assertInstanceOf(Title::class, $title);
         $this->assertSame('0468569', $title->imdbid());
-        $this->assertSame(60 * 24, $title->cache_expire);
+        $this->assertSame(60 * 60 * 24, $title->cache_expire);
     }
 
     public function testGetIMDBIdFromFullURL(): void
