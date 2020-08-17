@@ -6,25 +6,23 @@ namespace Tests\Unit\Services;
 
 use App\Services\IMDb\IMDBImagesManager;
 use App\Services\IMDb\IMDBManager;
-use GuzzleHttp\Client;
-use GuzzleHttp\Handler\MockHandler;
-use GuzzleHttp\HandlerStack;
-use GuzzleHttp\Middleware;
-use GuzzleHttp\Psr7\Request;
-use GuzzleHttp\Psr7\Response;
 use Illuminate\Contracts\Filesystem\Factory as FilesystemManager;
 use Illuminate\Support\Facades\Storage;
 use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\HttpClient\Exception\TransportException;
+use Symfony\Component\HttpClient\MockHttpClient;
+use Symfony\Component\HttpClient\Response\MockResponse;
+use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Tests\TestCase;
 
-class IMDBImagesManagerTest extends TestCase
+final class IMDBImagesManagerTest extends TestCase
 {
     public function testWritePosterToDisk(): void
     {
         $imdbId = '0468569';
         $poster = 'some-data';
-        $url = 'https://some_image.jpg';
+        $url = 'https://www.foo.com/some_image.jpg';
 
         Storage::fake('imdb-images');
         Storage::shouldReceive('disk->exists')->andReturn(false);
@@ -34,12 +32,15 @@ class IMDBImagesManagerTest extends TestCase
         $imdbManager = $this->createPartialMock(IMDBManager::class, ['getPosterURLFromIMDBId']);
         $imdbManager->expects($this->once())->method('getPosterURLFromIMDBId')->with($imdbId)->willReturn($url);
 
-        $mock = new MockHandler([
-            new Response(200, [], $poster),
-        ]);
+        $callback = function (string $method, string $requestedUrl) use ($poster, $url): MockResponse {
+            if ('GET' === $method && $requestedUrl === $url) {
+                return new MockResponse($poster);
+            }
 
-        $handler = HandlerStack::create($mock);
-        $client = new Client(['handler' => $handler]);
+            $this->fail('This should not have happened');
+        };
+
+        $client = new MockHttpClient($callback);
 
         $imdbImagesManager = new IMDBImagesManager(
             $imdbManager,
@@ -47,13 +48,14 @@ class IMDBImagesManagerTest extends TestCase
             $this->app->make(FilesystemManager::class),
             $this->app->make(LoggerInterface::class)
         );
+
         $imdbImagesManager->writePosterToDisk($imdbId);
     }
 
     public function testWritePosterToDiskWhenAnExceptionOccurs(): void
     {
         $imdbId = '0468569';
-        $url = 'https://some_image.jpg';
+        $url = 'https://www.foo.com/some_image.jpg';
 
         Storage::fake('imdb-images');
         Storage::shouldReceive('disk->exists')->andReturn(false);
@@ -63,34 +65,36 @@ class IMDBImagesManagerTest extends TestCase
         $imdbManager = $this->createPartialMock(IMDBManager::class, ['getPosterURLFromIMDBId']);
         $imdbManager->expects($this->once())->method('getPosterURLFromIMDBId')->with($imdbId)->willReturn($url);
 
-        $container = [];
-        $history = Middleware::history($container);
+        $exception = new TransportException();
+        $client = $this->createMock(HttpClientInterface::class);
+        $client->expects($this->once())->method('request')->willThrowException($exception);
 
-        $stack = HandlerStack::create();
-        $stack->push($history);
-
-        $client = new Client(['handler' => $stack]);
+        $logger = $this->createMock(LoggerInterface::class);
+        $logger->expects($this->once())->method('error')->with(
+            'Imdb fetching error',
+            [
+                'exception' => $exception,
+                'extra' => [
+                    'imdbId' => $imdbId,
+                    'url' => $url,
+                ],
+            ]
+        );
 
         $imdbImagesManager = new IMDBImagesManager(
             $imdbManager,
             $client,
             $this->app->make(FilesystemManager::class),
-            $this->app->make(LoggerInterface::class)
+            $logger
         );
-        $imdbImagesManager->writePosterToDisk($imdbId);
 
-        foreach ($container as $transaction) {
-            /** @var Request $request */
-            $request = $transaction['request'];
-            $this->assertSame('GET', $request->getMethod());
-            $this->assertSame($url, sprintf('%s://%s', $request->getUri()->getScheme(), $request->getUri()->getHost()));
-        }
+        $imdbImagesManager->writePosterToDisk($imdbId);
     }
 
     public function testWritePosterToDiskWhenTheResponseIsNotSuccessful(): void
     {
         $imdbId = '0468569';
-        $url = 'https://some_image.jpg';
+        $url = 'https://www.foo.com/some_image.jpg';
 
         Storage::fake('imdb-images');
         Storage::shouldReceive('disk->exists')->andReturn(false);
@@ -100,12 +104,11 @@ class IMDBImagesManagerTest extends TestCase
         $imdbManager = $this->createPartialMock(IMDBManager::class, ['getPosterURLFromIMDBId']);
         $imdbManager->expects($this->once())->method('getPosterURLFromIMDBId')->with($imdbId)->willReturn($url);
 
-        $mock = new MockHandler([
-            new Response(500, []),
-        ]);
+        $callback = function (): MockResponse {
+            return new MockResponse('foo', ['http_code' => 500]);
+        };
 
-        $handler = HandlerStack::create($mock);
-        $client = new Client(['handler' => $handler]);
+        $client = new MockHttpClient($callback);
 
         $imdbImagesManager = new IMDBImagesManager(
             $imdbManager,
@@ -113,13 +116,14 @@ class IMDBImagesManagerTest extends TestCase
             $this->app->make(FilesystemManager::class),
             $this->app->make(LoggerInterface::class)
         );
+
         $imdbImagesManager->writePosterToDisk($imdbId);
     }
 
     public function testDoNotSendARequestIfTheFileIsAlreadyOnTheDisk(): void
     {
         $imdbId = '0468569';
-        $url = 'https://some_image.jpg';
+        $url = 'https://www.foo.com/some_image.jpg';
 
         Storage::fake('imdb-images');
         Storage::shouldReceive('disk->exists')->andReturn(true);
@@ -129,13 +133,8 @@ class IMDBImagesManagerTest extends TestCase
         $imdbManager = $this->createPartialMock(IMDBManager::class, ['getPosterURLFromIMDBId']);
         $imdbManager->expects($this->once())->method('getPosterURLFromIMDBId')->with($imdbId)->willReturn($url);
 
-        $container = [];
-        $history = Middleware::history($container);
-
-        $stack = HandlerStack::create();
-        $stack->push($history);
-
-        $client = new Client(['handler' => $stack]);
+        $client = $this->createMock(HttpClientInterface::class);
+        $client->expects($this->never())->method('request');
 
         $imdbImagesManager = new IMDBImagesManager(
             $imdbManager,
@@ -143,8 +142,7 @@ class IMDBImagesManagerTest extends TestCase
             $this->app->make(FilesystemManager::class),
             $this->app->make(LoggerInterface::class)
         );
-        $imdbImagesManager->writePosterToDisk($imdbId);
 
-        $this->assertSame([], $container);
+        $imdbImagesManager->writePosterToDisk($imdbId);
     }
 }

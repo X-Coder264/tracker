@@ -9,6 +9,7 @@
     "license": "MIT",
     "require": {
         "php": "^7.4",
+        "ext-curl": "*",
         "ext-imagick": "*",
         "ext-json": "*",
         "ext-pdo": "*",
@@ -16,7 +17,6 @@
         "cloudcreativity/laravel-json-api": "^2.0",
         "cviebrock/eloquent-sluggable": "^7.0",
         "fideloper/proxy": "^4.4",
-        "guzzlehttp/guzzle": "^6.5",
         "imdbphp/imdbphp": "^6.4",
         "laravel/framework": "^7.25",
         "laravel/passport": "^9.3",
@@ -27,7 +27,8 @@
         "pragmarx/google2fa-qrcode": "^1.0",
         "predis/predis": "^1.1.2",
         "sentry/sentry-laravel": "^1.8",
-        "spatie/laravel-permission": "^3.13"
+        "spatie/laravel-permission": "^3.13",
+        "symfony/http-client": "^5.1"
     },
     "require-dev": {
         "ext-simplexml": "*",

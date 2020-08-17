@@ -20,6 +20,8 @@ use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Support\DateFactory;
 use Illuminate\Support\ServiceProvider;
+use Symfony\Component\HttpClient\HttpClient;
+use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -30,6 +32,10 @@ class AppServiceProvider extends ServiceProvider
         User::observe(UserObserver::class);
         TorrentCategory::observe(TorrentCategoryObserver::class);
         News::observe(NewsObserver::class);
+
+        $this->app->bind(HttpClientInterface::class, function () {
+            return HttpClient::create();
+        });
 
         $this->app->singleton(ThreadParticipantRepositoryInterface::class, function (Container $container) {
             return new CachedThreadParticipantRepository(
