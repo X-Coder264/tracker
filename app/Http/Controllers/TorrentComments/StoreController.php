@@ -7,6 +7,7 @@ namespace App\Http\Controllers\TorrentComments;
 use App\Http\Requests\TorrentCommentRequest;
 use App\Models\Torrent;
 use App\Models\TorrentComment;
+use Illuminate\Cache\TaggedCache;
 use Illuminate\Contracts\Auth\Guard;
 use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Contracts\Routing\ResponseFactory;
@@ -40,7 +41,9 @@ final class StoreController
 
         $torrent->comments()->save($torrentComment);
 
-        $this->cache->delete('torrent.' . $torrent->id . '.comments');
+        /** @var TaggedCache $taggedCache */
+        $taggedCache = $this->cache->tags([sprintf('torrent.%d', $torrentComment->torrent_id)]);
+        $taggedCache->flush();
 
         return $this->responseFactory->redirectToRoute('torrents.show', $torrent)
             ->with('torrentCommentSuccess', $this->translator->get('messages.torrent-comments.create-success-message'));

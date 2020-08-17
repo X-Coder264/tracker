@@ -18,6 +18,7 @@ use App\Services\IMDb\TitleFactory;
 use App\Services\SizeFormatter;
 use App\Services\TorrentInfoService;
 use Illuminate\Cache\CacheManager;
+use Illuminate\Cache\TaggedCache;
 use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Contracts\Filesystem\Factory as FilesystemManager;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
@@ -183,6 +184,12 @@ class TorrentControllerTest extends TestCase
         $torrentInfo->method('getTorrentFileNamesAndSizes')->willReturn($returnValue);
         $this->app->instance(TorrentInfoService::class, $torrentInfo);
 
+        $cache = $this->app->make(Repository::class);
+
+        /** @var TaggedCache $taggedCache */
+        $taggedCache = $cache->tags([sprintf('torrent.%d', $torrent->id)]);
+        $this->assertFalse($taggedCache->has(sprintf('comments.page.%d', 1)));
+
         $response = $this->get($this->app->make(UrlGenerator::class)->route('torrents.show', $torrent));
         $response->assertOk();
         $response->assertViewIs('torrents.show');
@@ -197,8 +204,6 @@ class TorrentControllerTest extends TestCase
         $response->assertViewHas('user', $this->user);
         $response->assertViewHas('timezone', $this->user->timezone);
 
-        $cache = $this->app->make(Repository::class);
-
         $cachedTorrent = $cache->get('torrent.' . $torrent->id);
         $this->assertInstanceOf(Torrent::class, $torrent);
         $this->assertTrue($torrent->is($cachedTorrent));
@@ -209,8 +214,10 @@ class TorrentControllerTest extends TestCase
         $this->assertSame(1, $response->viewData('torrentComments')->currentPage());
         $this->assertTrue($torrentComment->is($response->original->torrentComments[0]));
 
+        $this->assertTrue($taggedCache->has(sprintf('comments.page.%d', 1)));
+
         /** @var LengthAwarePaginator $cachedTorrentComments */
-        $cachedTorrentComments = $cache->get(sprintf('torrent.%d.comments.page.%d', $torrent->id, 1));
+        $cachedTorrentComments = $taggedCache->get(sprintf('comments.page.%d', 1));
         $this->assertInstanceOf(LengthAwarePaginator::class, $cachedTorrentComments);
         $this->assertSame(10, $cachedTorrentComments->perPage());
         $this->assertSame(1, $cachedTorrentComments->total());

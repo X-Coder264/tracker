@@ -7,6 +7,8 @@ namespace Tests\Feature\Http\Controllers;
 use App\Models\Torrent;
 use App\Models\TorrentComment;
 use App\Models\User;
+use Illuminate\Cache\TaggedCache;
+use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Http\Response;
 use Tests\TestCase;
@@ -41,6 +43,15 @@ class TorrentCommentControllerTest extends TestCase
         $torrent = factory(Torrent::class)->create(['uploader_id' => $user->id]);
         $this->actingAs($user);
 
+        $cache = $this->app->make(Repository::class);
+
+        /** @var TaggedCache $taggedCache */
+        $taggedCache = $cache->tags([sprintf('torrent.%d', $torrent->id)]);
+        $taggedCache->put(sprintf('comments.page.%d', 1), 'foo');
+        $taggedCache->put(sprintf('comments.page.%d', 9999), 'bar');
+        $this->assertTrue($taggedCache->has(sprintf('comments.page.%d', 1)));
+        $this->assertTrue($taggedCache->has(sprintf('comments.page.%d', 9999)));
+
         $comment = 'test comment';
 
         $response = $this->post(route('torrent-comments.store', $torrent), [
@@ -55,6 +66,9 @@ class TorrentCommentControllerTest extends TestCase
         $this->assertSame($user->id, (int) $torrentComment->user_id);
         $this->assertSame($torrent->id, (int) $torrentComment->torrent_id);
         $this->assertSame($comment, $torrentComment->comment);
+
+        $this->assertFalse($taggedCache->has(sprintf('comments.page.%d', 1)));
+        $this->assertFalse($taggedCache->has(sprintf('comments.page.%d', 9999)));
     }
 
     public function testEdit()
@@ -88,6 +102,15 @@ class TorrentCommentControllerTest extends TestCase
         );
         $this->actingAs($user);
 
+        $cache = $this->app->make(Repository::class);
+
+        /** @var TaggedCache $taggedCache */
+        $taggedCache = $cache->tags([sprintf('torrent.%d', $torrent->id)]);
+        $taggedCache->put(sprintf('comments.page.%d', 1), 'foo');
+        $taggedCache->put(sprintf('comments.page.%d', 9999), 'bar');
+        $this->assertTrue($taggedCache->has(sprintf('comments.page.%d', 1)));
+        $this->assertTrue($taggedCache->has(sprintf('comments.page.%d', 9999)));
+
         $comment = 'test comment';
 
         $response = $this->put(route('torrent-comments.update', $torrentComment), [
@@ -102,6 +125,9 @@ class TorrentCommentControllerTest extends TestCase
         $this->assertSame($user->id, (int) $torrentComment->user_id);
         $this->assertSame($torrent->id, (int) $torrentComment->torrent_id);
         $this->assertSame($comment, $torrentComment->comment);
+
+        $this->assertFalse($taggedCache->has(sprintf('comments.page.%d', 1)));
+        $this->assertFalse($taggedCache->has(sprintf('comments.page.%d', 9999)));
     }
 
     public function testCommentIsRequiredOnCreate()

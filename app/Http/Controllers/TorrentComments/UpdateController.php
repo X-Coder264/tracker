@@ -6,6 +6,7 @@ namespace App\Http\Controllers\TorrentComments;
 
 use App\Http\Requests\TorrentCommentRequest;
 use App\Models\TorrentComment;
+use Illuminate\Cache\TaggedCache;
 use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Contracts\Routing\ResponseFactory;
 use Illuminate\Contracts\Translation\Translator;
@@ -28,7 +29,9 @@ final class UpdateController
     {
         $torrentComment->update(['comment' => $request->input('comment')]);
 
-        $this->cache->delete('torrent.' . $torrentComment->torrent_id . '.comments');
+        /** @var TaggedCache $taggedCache */
+        $taggedCache = $this->cache->tags([sprintf('torrent.%d', $torrentComment->torrent_id)]);
+        $taggedCache->flush();
 
         return $this->responseFactory->redirectToRoute('torrents.show', $torrentComment->torrent)
             ->with('torrentCommentSuccess', $this->translator->get('messages.torrent-comments.update-success-message'));

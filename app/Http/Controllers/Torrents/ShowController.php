@@ -8,6 +8,7 @@ use App\Enumerations\Cache;
 use App\Models\Torrent;
 use App\Services\FileSizeCollectionFormatter;
 use App\Services\TorrentInfoService;
+use Illuminate\Cache\TaggedCache;
 use Illuminate\Contracts\Auth\Guard;
 use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Contracts\Filesystem\Factory as FilesystemManager;
@@ -68,8 +69,11 @@ final class ShowController
 
         $page = (int) $request->input('page', 1);
 
+        /** @var TaggedCache $taggedCache */
+        $taggedCache = $this->cache->tags([sprintf('torrent.%d', $torrent->id)]);
+
         /** @var LengthAwarePaginator $torrentComments */
-        $torrentComments = $this->cache->remember(sprintf('torrent.%d.comments.page.%d', $torrent->id, $page), Cache::ONE_DAY, function () use ($torrent): LengthAwarePaginator {
+        $torrentComments = $taggedCache->remember(sprintf('comments.page.%d', $page), Cache::ONE_DAY, function () use ($torrent): LengthAwarePaginator {
             return $torrent->comments()->with('user')->paginate(10);
         });
 
