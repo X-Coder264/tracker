@@ -9,6 +9,8 @@ jobs:
           submodules: 'recursive'
       - name: Build the stack
         run: docker/env dev on
+      - name: Validate composer.lock
+        run: docker/run dev:php composer validate --strict --no-cache
       - name: Install dependencies
         run: cp .env.testing .env && docker/run dev:php composer install
       - name: Setup env
