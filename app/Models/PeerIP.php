@@ -23,9 +23,11 @@ class PeerIP extends Model
     protected $guarded = [];
 
     /**
-     * Indicates if the model should be timestamped.
+     * The attributes that should be cast to native types.
      *
-     * @var bool
+     * @var array
      */
-    public $timestamps = false;
+    protected $casts = [
+        'is_ipv6' => 'bool',
+    ];
 }

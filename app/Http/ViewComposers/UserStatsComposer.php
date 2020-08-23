@@ -24,18 +24,18 @@ class UserStatsComposer
 
     public function compose(View $view): void
     {
-        if (true === $this->guard->check()) {
+        if ($this->guard->check()) {
             /** @var Collection $peers */
             $peers = $this->cache->remember('user.' . $this->guard->id() . '.peers', Cache::THIRTY_MINUTES, function (): Collection {
                 return Peer::where('user_id', '=', $this->guard->id())->get();
             });
 
-            if (true === $peers->isEmpty()) {
+            if ($peers->isEmpty()) {
                 $numberOfSeedingTorrents = 0;
                 $numberOfLeechingTorrents = 0;
             } else {
                 $numberOfSeedingTorrents = $peers->filter(function (Peer $peer): bool {
-                    return true === $peer->seeder;
+                    return 0 === $peer->left;
                 })->count();
 
                 $numberOfLeechingTorrents = $peers->count() - $numberOfSeedingTorrents;

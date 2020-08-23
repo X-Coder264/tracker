@@ -21,19 +21,20 @@ $factory->define(Peer::class, function (Faker $faker) {
         },
         'uploaded' => $faker->numberBetween(0, 10000000),
         'downloaded' => $faker->numberBetween(0, 1000000),
-        'seeder' => $faker->boolean(),
-        'userAgent' => $faker->text(255),
+        'left' => $faker->numberBetween(0, \PHP_INT_MAX),
+        'user_agent' => $faker->userAgent,
+        'key' => null,
     ];
 });
 
 $factory->state(Peer::class, 'seeder', [
-    'seeder' => true,
+    'left' => 0,
     'downloaded' => 400,
     'uploaded' => 200,
 ]);
 
 $factory->state(Peer::class, 'leecher', [
-    'seeder' => false,
+    'left' => 300,
     'downloaded' => 100,
     'uploaded' => 20,
 ]);

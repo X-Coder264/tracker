@@ -53,7 +53,7 @@ final class DownloadSeedingTorrentsZipArchiveController
         /** @var Builder $torrentQuery */
         $torrentQuery = Torrent::whereHas('peers', function (Builder $query) {
             $query->where('user_id', '=', $this->guard->id())
-                ->where('seeder', '=', true);
+                ->where('left', '=', 0);
         });
 
         $seedingTorrentsFound = false;

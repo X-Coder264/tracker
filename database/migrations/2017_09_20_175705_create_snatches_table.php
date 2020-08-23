@@ -23,11 +23,11 @@ class CreateSnatchesTable extends Migration
             $table->unsignedBigInteger('uploaded')->default(0);
             $table->unsignedBigInteger('downloaded')->default(0);
             $table->unsignedBigInteger('left')->index();
-            $table->integer('seedTime')->unsigned()->default(0);
-            $table->integer('leechTime')->unsigned()->default(0);
-            $table->integer('timesAnnounced')->unsigned()->default(0);
+            $table->integer('seed_time')->unsigned()->default(0);
+            $table->integer('leech_time')->unsigned()->default(0);
+            $table->integer('times_announced')->unsigned()->default(0);
             $table->timestamp('finished_at')->nullable();
-            $table->string('userAgent');
+            $table->string('user_agent');
             $table->timestamps();
         });
     }

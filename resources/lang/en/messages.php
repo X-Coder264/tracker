@@ -95,7 +95,6 @@ return [
     'announce.banned_user' => 'Your user account is banned.',
     'announce.invalid_info_hash' => 'Invalid info_hash.',
     'announce.invalid_peer_id' => 'Invalid peer_id.',
-    'announce.invalid_ip_or_port' => 'A valid IP or port was not sent.',
     'scrape.no_torrents' => 'There are no torrents with the provided info_hashes.',
     'common.torrent_table_username' => 'Username',
     'common.updated_at' => 'Last updated at',

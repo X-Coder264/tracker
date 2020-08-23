@@ -73,12 +73,12 @@ class PeerTest extends TestCase
 
         $IP = PeerIP::firstOrFail();
         $peer = Peer::firstOrFail();
-        $this->assertInstanceOf(HasMany::class, $peer->IPs());
-        $this->assertInstanceOf(Collection::class, $peer->IPs);
-        $this->assertSame($peer->IPs[0]->id, $IP->id);
-        $this->assertSame($peer->IPs[0]->IP, $IP->IP);
-        $this->assertSame($peer->IPs[0]->port, $IP->port);
-        $this->assertSame($peer->IPs[0]->isIPv6, $IP->isIPv6);
+        $this->assertInstanceOf(HasMany::class, $peer->ips());
+        $this->assertInstanceOf(Collection::class, $peer->ips);
+        $this->assertSame($peer->ips[0]->id, $IP->id);
+        $this->assertSame($peer->ips[0]->ip, $IP->ip);
+        $this->assertSame($peer->ips[0]->port, $IP->port);
+        $this->assertSame($peer->ips[0]->is_ipv6, $IP->is_ipv6);
     }
 
     public function testVersionsRelationship(): void
@@ -90,6 +90,6 @@ class PeerTest extends TestCase
         $this->assertInstanceOf(HasMany::class, $peer->versions());
         $this->assertInstanceOf(Collection::class, $peer->versions);
         $this->assertSame($peerVersion->id, $peer->versions[0]->id);
-        $this->assertSame($peerVersion->peerID, $peer->versions[0]->peerID);
+        $this->assertSame($peerVersion->peer_id, $peer->versions[0]->peer_id);
     }
 }

@@ -31,7 +31,7 @@ final class DeletePeers extends Command
         foreach ($peerRepository->getObsoletePeersQuery()->cursor() as $obsoletePeer) {
             $connection->table('peers')->where('id', '=', $obsoletePeer->id)->delete();
             $count++;
-            if ($obsoletePeer->seeder) {
+            if (0 === $obsoletePeer->left) {
                 $connection->table('torrents')->where('id', '=', $obsoletePeer->torrent_id)->decrement('seeders');
             } else {
                 $connection->table('torrents')->where('id', '=', $obsoletePeer->torrent_id)->decrement('leechers');

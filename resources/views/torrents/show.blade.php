@@ -137,7 +137,7 @@
                                                             <td>{{ number_format((int) $peer->getRawOriginal('uploaded') / (int) $peer->getRawOriginal('downloaded'), 2) }}</td>
                                                         @endif
                                                         <td>{{ $peer->updated_at->diffForHumans() }}</td>
-                                                        <td>{{ $peer->userAgent }}</td>
+                                                        <td>{{ $peer->user_agent }}</td>
                                                     </tr>
                                                 @endforeach
                                             </tbody>

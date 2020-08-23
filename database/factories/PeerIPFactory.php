@@ -10,11 +10,11 @@ use Illuminate\Database\Eloquent\Factory;
 /** @var Factory $factory */
 $factory->define(PeerIP::class, function (Faker $faker) {
     return [
-        'peerID' => function () {
+        'peer_id' => function () {
             return factory(Peer::class)->create()->id;
         },
-        'IP' => $faker->ipv4,
-        'isIPv6' => false,
+        'ip' => $faker->ipv4,
+        'is_ipv6' => false,
         'port' => $faker->numberBetween(50000, 60000),
     ];
 });

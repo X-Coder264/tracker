@@ -56,10 +56,10 @@
                                         @else
                                             <td>{{ number_format((int) $snatch->getRawOriginal('uploaded') / (int) $snatch->getRawOriginal('downloaded'), 2) }}</td>
                                         @endif
-                                        <td>{{ $snatch->seedTime }}</td>
-                                        <td>{{ $snatch->leechTime }}</td>
+                                        <td>{{ $snatch->seed_time }}</td>
+                                        <td>{{ $snatch->leech_time }}</td>
                                         <td>{{ $snatch->updated_at->diffForHumans() }}</td>
-                                        <td>{{ $snatch->userAgent }}</td>
+                                        <td>{{ $snatch->user_agent }}</td>
                                         <td>
                                             @if (null !== $snatch->finished_at)
                                                 {{ $snatch->finished_at->timezone($timezone) }}

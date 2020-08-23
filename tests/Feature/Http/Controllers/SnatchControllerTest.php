@@ -50,10 +50,10 @@ class SnatchControllerTest extends TestCase
         $response->assertSee($snatch->user->name);
         $response->assertSee($snatch->uploaded);
         $response->assertSee($snatch->downloaded);
-        $response->assertSee($snatch->seedTime);
-        $response->assertSee($snatch->leechTime);
+        $response->assertSee($snatch->seed_time);
+        $response->assertSee($snatch->leech_time);
         $response->assertSee($snatch->left);
-        $response->assertSee($snatch->userAgent);
+        $response->assertSee($snatch->user_agent);
         $response->assertSee($snatch->finished_at->timezone($user->timezone));
         $response->assertSee($snatch->updated_at->timezone($user->timezone));
 

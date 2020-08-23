@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\Factory;
 /** @var Factory $factory */
 $factory->define(PeerVersion::class, function (Faker $faker) {
     return [
-        'peerID' => function () {
+        'peer_id' => function () {
             return factory(Peer::class)->create()->id;
         },
         'version' => 1,

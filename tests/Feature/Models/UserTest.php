@@ -108,10 +108,10 @@ final class UserTest extends TestCase
         $this->assertSame($user->snatches[0]->uploaded, $snatch->uploaded);
         $this->assertSame($user->snatches[0]->downloaded, $snatch->downloaded);
         $this->assertSame($user->snatches[0]->left, $snatch->left);
-        $this->assertSame($user->snatches[0]->seedTime, $snatch->seedTime);
-        $this->assertSame($user->snatches[0]->leechTime, $snatch->leechTime);
-        $this->assertSame($user->snatches[0]->timesAnnounced, $snatch->timesAnnounced);
-        $this->assertSame($user->snatches[0]->userAgent, $snatch->userAgent);
+        $this->assertSame($user->snatches[0]->seed_time, $snatch->seed_time);
+        $this->assertSame($user->snatches[0]->leech_time, $snatch->leech_time);
+        $this->assertSame($user->snatches[0]->times_announced, $snatch->times_announced);
+        $this->assertSame($user->snatches[0]->user_agent, $snatch->user_agent);
         $this->assertSame($user->snatches[0]->seeder, $snatch->seeder);
         $this->assertSame($user->snatches[0]->created_at->format('Y-m-d H:i:s'), $snatch->created_at->format('Y-m-d H:i:s'));
         $this->assertSame($user->snatches[0]->updated_at->format('Y-m-d H:i:s'), $snatch->updated_at->format('Y-m-d H:i:s'));

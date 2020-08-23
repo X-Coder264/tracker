@@ -49,8 +49,8 @@ class SnatchTest extends TestCase
         factory(Snatch::class)->create();
         $snatch = Snatch::firstOrFail();
         $returnValue = '500 MB';
-        SecondsDurationFormatter::shouldReceive('format')->once()->with($snatch->getRawOriginal('seedTime'))->andReturn($returnValue);
-        $this->assertSame($returnValue, $snatch->seedTime);
+        SecondsDurationFormatter::shouldReceive('format')->once()->with($snatch->getRawOriginal('seed_time'))->andReturn($returnValue);
+        $this->assertSame($returnValue, $snatch->seed_time);
     }
 
     public function testLeechTimeAccessor(): void
@@ -58,8 +58,8 @@ class SnatchTest extends TestCase
         factory(Snatch::class)->create();
         $snatch = Snatch::firstOrFail();
         $returnValue = '500 MB';
-        SecondsDurationFormatter::shouldReceive('format')->once()->with($snatch->getRawOriginal('leechTime'))->andReturn($returnValue);
-        $this->assertSame($returnValue, $snatch->leechTime);
+        SecondsDurationFormatter::shouldReceive('format')->once()->with($snatch->getRawOriginal('leech_time'))->andReturn($returnValue);
+        $this->assertSame($returnValue, $snatch->leech_time);
     }
 
     public function testTorrentRelationship(): void

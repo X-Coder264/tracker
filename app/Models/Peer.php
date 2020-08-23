@@ -20,15 +20,6 @@ class Peer extends Model
     protected $guarded = [];
 
     /**
-     * The attributes that should be cast to native types.
-     *
-     * @var array
-     */
-    protected $casts = [
-        'seeder' => 'bool',
-    ];
-
-    /**
      * Get the peer's uploaded attribute.
      *
      * @param $value
@@ -53,7 +44,7 @@ class Peer extends Model
      */
     public function scopeSeeders(Builder $query): Builder
     {
-        return $query->where('seeder', '=', true);
+        return $query->where('left', '=', 0);
     }
 
     /**
@@ -61,7 +52,7 @@ class Peer extends Model
      */
     public function scopeLeechers(Builder $query): Builder
     {
-        return $query->where('seeder', '=', false);
+        return $query->where('left', '!=', 0);
     }
 
     public function user(): BelongsTo
@@ -74,13 +65,13 @@ class Peer extends Model
         return $this->belongsTo(Torrent::class);
     }
 
-    public function IPs(): HasMany
+    public function ips(): HasMany
     {
-        return $this->hasMany(PeerIP::class, 'peerID');
+        return $this->hasMany(PeerIP::class, 'peer_id');
     }
 
     public function versions(): HasMany
     {
-        return $this->hasMany(PeerVersion::class, 'peerID');
+        return $this->hasMany(PeerVersion::class, 'peer_id');
     }
 }

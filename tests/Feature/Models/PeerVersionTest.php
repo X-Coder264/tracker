@@ -28,6 +28,6 @@ class PeerVersionTest extends TestCase
         $this->assertSame($peer->uploaded, $peerVersion->peer->uploaded);
         $this->assertSame($peer->downloaded, $peerVersion->peer->downloaded);
         $this->assertSame($peer->seeder, $peerVersion->peer->seeder);
-        $this->assertSame($peer->userAgent, $peerVersion->peer->userAgent);
+        $this->assertSame($peer->user_agent, $peerVersion->peer->user_agent);
     }
 }

@@ -118,8 +118,8 @@ class UserTorrentsControllerTest extends TestCase
         $response->assertSee($peerTwo->uploaded);
         $response->assertSee($peerOne->downloaded);
         $response->assertSee($peerTwo->downloaded);
-        $response->assertSee($peerOne->userAgent);
-        $response->assertSee($peerTwo->userAgent);
+        $response->assertSee($peerOne->user_agent);
+        $response->assertSee($peerTwo->user_agent);
         $response->assertSee($peerOne->torrent->created_at->timezone($user->timezone));
         $response->assertSee($peerTwo->torrent->created_at->timezone($user->timezone));
         $response->assertSee(trans('messages.common.currently-seeding'));
@@ -165,8 +165,8 @@ class UserTorrentsControllerTest extends TestCase
         $response->assertSee($peerTwo->uploaded);
         $response->assertSee($peerOne->downloaded);
         $response->assertSee($peerTwo->downloaded);
-        $response->assertSee($peerOne->userAgent);
-        $response->assertSee($peerTwo->userAgent);
+        $response->assertSee($peerOne->user_agent);
+        $response->assertSee($peerTwo->user_agent);
         $response->assertSee($peerOne->torrent->created_at->timezone($user->timezone));
         $response->assertSee($peerTwo->torrent->created_at->timezone($user->timezone));
         $response->assertSee(trans('messages.common.currently-leeching'));

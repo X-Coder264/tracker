@@ -51,8 +51,8 @@
                                             </td>
                                             <td>{{ $snatch->uploaded }}</td>
                                             <td>{{ $snatch->downloaded }}</td>
-                                            <td>{{ $snatch->seedTime }}</td>
-                                            <td>{{ $snatch->leechTime }}</td>
+                                            <td>{{ $snatch->seed_time }}</td>
+                                            <td>{{ $snatch->leech_time }}</td>
                                             <td>{{ $snatch->left }}</td>
                                             <td>
                                                 @if (null === $snatch->finished_at)
@@ -62,7 +62,7 @@
                                                     ({{ $snatch->finished_at->diffForHumans() }})
                                                 @endif
                                             </td>
-                                            <td>{{ $snatch->userAgent }}</td>
+                                            <td>{{ $snatch->user_agent }}</td>
                                             <td>
                                                 {{ $snatch->updated_at->timezone($timezone) }}
                                                 ({{ $snatch->updated_at->diffForHumans() }})

@@ -70,8 +70,8 @@ class TorrentTest extends TestCase
         $this->assertSame($torrent->peers[0]->user_id, $peer->user_id);
         $this->assertSame($torrent->peers[0]->uploaded, $peer->uploaded);
         $this->assertSame($torrent->peers[0]->downloaded, $peer->downloaded);
-        $this->assertSame($torrent->peers[0]->userAgent, $peer->userAgent);
-        $this->assertSame($torrent->peers[0]->seeder, $peer->seeder);
+        $this->assertSame($torrent->peers[0]->user_agent, $peer->user_agent);
+        $this->assertSame($torrent->peers[0]->left, $peer->left);
         $this->assertSame($torrent->peers[0]->updated_at->format('Y-m-d H:i:s'), $peer->updated_at->format('Y-m-d H:i:s'));
     }
 
@@ -133,11 +133,11 @@ class TorrentTest extends TestCase
         $this->assertSame($torrent->snatches[0]->uploaded, $snatch->uploaded);
         $this->assertSame($torrent->snatches[0]->downloaded, $snatch->downloaded);
         $this->assertSame($torrent->snatches[0]->left, $snatch->left);
-        $this->assertSame($torrent->snatches[0]->seedTime, $snatch->seedTime);
-        $this->assertSame($torrent->snatches[0]->leechTime, $snatch->leechTime);
-        $this->assertSame($torrent->snatches[0]->timesAnnounced, $snatch->timesAnnounced);
-        $this->assertSame($torrent->snatches[0]->userAgent, $snatch->userAgent);
-        $this->assertSame($torrent->snatches[0]->seeder, $snatch->seeder);
+        $this->assertSame($torrent->snatches[0]->seed_time, $snatch->seed_time);
+        $this->assertSame($torrent->snatches[0]->leech_time, $snatch->leech_time);
+        $this->assertSame($torrent->snatches[0]->times_announced, $snatch->times_announced);
+        $this->assertSame($torrent->snatches[0]->user_agent, $snatch->user_agent);
+        $this->assertSame($torrent->snatches[0]->left, $snatch->left);
         $this->assertSame($torrent->snatches[0]->created_at->format('Y-m-d H:i:s'), $snatch->created_at->format('Y-m-d H:i:s'));
         $this->assertSame($torrent->snatches[0]->updated_at->format('Y-m-d H:i:s'), $snatch->updated_at->format('Y-m-d H:i:s'));
         $this->assertSame($torrent->snatches[0]->finished_at->format('Y-m-d H:i:s'), $snatch->finished_at->format('Y-m-d H:i:s'));

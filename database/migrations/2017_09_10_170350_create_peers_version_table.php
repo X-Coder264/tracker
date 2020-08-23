@@ -6,26 +6,20 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreatePeersVersionTable extends Migration
+final class CreatePeersVersionTable extends Migration
 {
-    /**
-     * Run the migrations.
-     */
-    public function up()
+    public function up(): void
     {
         Schema::create('peers_version', function (Blueprint $table) {
             $table->increments('id');
             $table->tinyInteger('version');
-            $table->integer('peerID')->unsigned()->index();
-            $table->foreign('peerID')->references('id')->on('peers')->onUpdate('cascade')->onDelete('cascade');
+            $table->integer('peer_id')->unsigned()->index();
+            $table->foreign('peer_id')->references('id')->on('peers')->onUpdate('cascade')->onDelete('cascade');
             $table->timestamps();
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
-    public function down()
+    public function down(): void
     {
         Schema::dropIfExists('peers_version');
     }

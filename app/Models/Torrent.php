@@ -84,7 +84,7 @@ class Torrent extends Model
     public function peers(): HasMany
     {
         return $this->hasMany(Peer::class)->select(
-            ['id', 'torrent_id', 'user_id', 'uploaded', 'downloaded', 'userAgent', 'seeder', 'updated_at']
+            ['id', 'torrent_id', 'user_id', 'uploaded', 'downloaded', 'user_agent', 'left', 'updated_at']
         );
     }
 

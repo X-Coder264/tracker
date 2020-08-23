@@ -25,6 +25,6 @@ class PeerVersion extends Model
 
     public function peer(): BelongsTo
     {
-        return $this->belongsTo(Peer::class, 'peerID');
+        return $this->belongsTo(Peer::class, 'peer_id');
     }
 }

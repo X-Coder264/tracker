@@ -247,7 +247,7 @@ class TorrentControllerTest extends TestCase
         $response->assertSee('6.00 KiB');
         // peer ratio
         $response->assertSee('3.00');
-        $response->assertSee($peer->userAgent);
+        $response->assertSee($peer->user_agent);
         $response->assertSee('953.67 MiB');
         $response->assertSee('Test.txt');
         $torrent->refresh();

@@ -23,8 +23,8 @@ class UserStatsComposerTest extends TestCase
         $user = factory(User::class)->create();
         $this->actingAs($user);
 
-        $seedingPeers = factory(Peer::class, 2)->create(['user_id' => $user->id, 'seeder' => true]);
-        $leechingPeer = factory(Peer::class)->create(['user_id' => $user->id, 'seeder' => false]);
+        $seedingPeers = factory(Peer::class, 2)->create(['user_id' => $user->id, 'left' => 0]);
+        $leechingPeer = factory(Peer::class)->create(['user_id' => $user->id, 'left' => 500]);
 
         $viewFactory = $this->app->make(Factory::class);
         $view = $viewFactory->make('partials.user-statistics');
@@ -62,8 +62,8 @@ class UserStatsComposerTest extends TestCase
 
     public function testDataForNonLoggedInUser(): void
     {
-        factory(Peer::class, 2)->create(['seeder' => true]);
-        factory(Peer::class)->create(['seeder' => false]);
+        factory(Peer::class, 2)->create(['left' => 0]);
+        factory(Peer::class)->create(['left' => 800]);
 
         $viewFactory = $this->app->make(Factory::class);
         $view = $viewFactory->make('layouts.app');

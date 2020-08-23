@@ -10,7 +10,7 @@ use App\Models\PeerIP;
 use App\Models\PeerVersion;
 use App\Models\Torrent;
 use App\Models\User;
-use Carbon\Carbon;
+use Carbon\CarbonImmutable;
 use Illuminate\Console\Scheduling\Event;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Contracts\Cache\Repository;
@@ -43,40 +43,39 @@ class DeletePeersTest extends TestCase
             [
                 'torrent_id' => $torrent->id,
                 'user_id' => $userOne->id,
-                'updated_at' => Carbon::now()->subMinutes(config('tracker.announce_interval') + 11),
+                'updated_at' => CarbonImmutable::now()->subMinutes(config('tracker.announce_interval') + 11),
             ]
         );
-        factory(PeerIP::class)->create(['peerID' => $obsoletePeerOne->id]);
+        factory(PeerIP::class)->create(['peer_id' => $obsoletePeerOne->id]);
 
         $obsoletePeerOne = factory(Peer::class)->states('v1', 'leecher')->create(
             [
                 'torrent_id' => $torrent->id,
                 'user_id' => $userTwo->id,
-                'updated_at' => Carbon::now()->subMinutes(config('tracker.announce_interval') + 11),
+                'updated_at' => CarbonImmutable::now()->subMinutes(config('tracker.announce_interval') + 11),
             ]
         );
-        factory(PeerIP::class)->create(['peerID' => $obsoletePeerOne->id]);
+        factory(PeerIP::class)->create(['peer_id' => $obsoletePeerOne->id]);
 
         $nonObsoletePeerOne = factory(Peer::class)->states('v1', 'seeder')->create(
             [
                 'torrent_id' => $torrent->id,
                 'user_id' => $userTwo->id,
-                'updated_at' => Carbon::now()->subMinutes(config('tracker.announce_interval') + 9),
+                'updated_at' => CarbonImmutable::now()->subMinutes(config('tracker.announce_interval') + 9),
             ]
         );
-        factory(PeerIP::class)->create(['peerID' => $nonObsoletePeerOne->id]);
+        factory(PeerIP::class)->create(['peer_id' => $nonObsoletePeerOne->id]);
 
         $nonObsoletePeerTwo = factory(Peer::class)->states('v1', 'leecher')->create(
             [
                 'torrent_id' => $torrent->id,
                 'user_id' => $userOne->id,
-                'updated_at' => Carbon::now()->subMinutes(config('tracker.announce_interval') + 9),
+                'updated_at' => CarbonImmutable::now()->subMinutes(config('tracker.announce_interval') + 9),
             ]
         );
-        factory(PeerIP::class)->create(['peerID' => $nonObsoletePeerTwo->id]);
+        factory(PeerIP::class)->create(['peer_id' => $nonObsoletePeerTwo->id]);
 
-        $this->artisan(DeletePeers::class)
-            ->expectsOutput('Deleted obsolete peers: 2');
+        $this->artisan(DeletePeers::class)->expectsOutput('Deleted obsolete peers: 2');
 
         $this->assertSame(2, Peer::count());
         $this->assertSame(2, PeerVersion::count());
@@ -88,11 +87,11 @@ class DeletePeersTest extends TestCase
 
         try {
             Peer::findOrFail($nonObsoletePeerOne->id);
-            PeerVersion::where('peerID', '=', $nonObsoletePeerOne->id)->firstOrFail();
-            PeerIP::where('peerID', '=', $nonObsoletePeerOne->id)->firstOrFail();
+            PeerVersion::where('peer_id', '=', $nonObsoletePeerOne->id)->firstOrFail();
+            PeerIP::where('peer_id', '=', $nonObsoletePeerOne->id)->firstOrFail();
             Peer::findOrFail($nonObsoletePeerTwo->id);
-            PeerVersion::where('peerID', '=', $nonObsoletePeerTwo->id)->firstOrFail();
-            PeerIP::where('peerID', '=', $nonObsoletePeerTwo->id)->firstOrFail();
+            PeerVersion::where('peer_id', '=', $nonObsoletePeerTwo->id)->firstOrFail();
+            PeerIP::where('peer_id', '=', $nonObsoletePeerTwo->id)->firstOrFail();
         } catch (ModelNotFoundException $exception) {
             $this->fail('This peer and its related data should not have been deleted.');
         }
