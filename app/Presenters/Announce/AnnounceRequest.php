@@ -97,7 +97,6 @@ final class AnnounceRequest
                 'uploaded'   => 'required|integer|min:0',
                 'downloaded' => 'required|integer|min:0',
                 'left'       => 'required|integer|min:0',
-                'numwant'    => 'sometimes|integer|min:1',
             ],
             [
                 'passkey.required'    => $translator->get('messages.validation.variable.required', ['var' => 'passkey']),
@@ -116,7 +115,6 @@ final class AnnounceRequest
                 'left.required'       => $translator->get('messages.validation.variable.required', ['var' => 'left']),
                 'left.integer'        => $translator->get('messages.validation.variable.integer', ['var' => 'left']),
                 'left.min'            => $translator->get('messages.validation.variable.left', ['left' => $request->query('left')]),
-                'numwant.integer'     => $translator->get('messages.validation.variable.integer', ['var' => 'numwant']),
             ]
         );
 
@@ -145,15 +143,36 @@ final class AnnounceRequest
         }
 
         try {
+            $event = new AnnounceEvent($request->query('event'));
+        } catch (InvalidArgumentException $e) {
+            throw new AnnounceValidationException($e->getMessage(), [], 0, $e);
+        }
+
+        try {
             $ip = new IpAddress($clientIp);
         } catch (InvalidArgumentException $e) {
             throw new AnnounceValidationException($e->getMessage(), [], 0, $e);
         }
 
+        // validate numwant only if the event is not "stopped" since it won't be used then and some clients
+        // send numwant=0 on the "stopped" event while we require it to be at least 1 if it's sent
+        if (! $event->isStopped()) {
+            $validator = $validationFactory->make(
+                $request->query(),
+                [
+                    'numwant'    => 'sometimes|integer|min:1',
+                ]
+            );
+
+            if ($validator->fails()) {
+                throw new AnnounceValidationException($validator->errors()->first());
+            }
+        }
+
         return new self(
             $request->query('info_hash'),
             $request->query('peer_id'),
-            new AnnounceEvent($request->query('event')),
+            $event,
             $request->query('passkey'),
             $ip,
             (int) $request->query('port'),

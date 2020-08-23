@@ -25,7 +25,7 @@ abstract class AbstractHandler implements EventAnnounceHandlerInterface
     protected TorrentRepositoryInterface $torrentRepository;
     protected PeerRepositoryInterface $peerRepository;
     protected SnatchRepositoryInterface $snatchRepository;
-    private SuccessResponseFactory $successResponseFactory;
+    protected SuccessResponseFactory $successResponseFactory;
 
     public function __construct(
         UserRepositoryInterface $userRepository,
@@ -193,6 +193,14 @@ abstract class AbstractHandler implements EventAnnounceHandlerInterface
 
         $peersCount = $this->getPeersCount($request, $torrent, $peer);
 
+        return $this->getAnnounceResponse($request, $peers, $peersCount);
+    }
+
+    /**
+     * @param ResponsePeer[] $peers
+     */
+    protected function getAnnounceResponse(AnnounceRequest $request, array $peers, PeersCount $peersCount): string
+    {
         if ($request->isCompactResponseExpected()) {
             return $this->successResponseFactory->getCompactResponse($peers, $peersCount);
         }
@@ -200,7 +208,7 @@ abstract class AbstractHandler implements EventAnnounceHandlerInterface
         return $this->successResponseFactory->getNonCompactResponse($peers, $peersCount);
     }
 
-    private function updateUserUploadedAndDownloadedStats(
+    protected function updateUserUploadedAndDownloadedStats(
         AnnounceRequest $request,
         User $user,
         int $uploadedInThisAnnounceCycle,

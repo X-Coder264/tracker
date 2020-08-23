@@ -6,6 +6,7 @@ namespace App\Services\Announce\Handlers;
 
 use App\Presenters\Announce\AnnounceRequest;
 use App\Presenters\Announce\Peer;
+use App\Presenters\Announce\Response\PeersCount;
 use App\Presenters\Announce\Snatch;
 use App\Presenters\Announce\Torrent;
 use App\Presenters\Announce\User;
@@ -64,6 +65,22 @@ final class StoppedEventAnnounceHandler extends AbstractHandler
 
         $this->updateSnatchIfItExists($snatch, $peer, $request, $uploadedInThisAnnounceCycle, $downloadedInThisAnnounceCycle);
 
-        return $this->announceSuccessResponse($request, $user, $torrent, $peer, $uploadedInThisAnnounceCycle, $downloadedInThisAnnounceCycle);
+        return $this->announceEmptySuccessResponse($request, $user, $uploadedInThisAnnounceCycle, $downloadedInThisAnnounceCycle);
+    }
+
+    private function announceEmptySuccessResponse(
+        AnnounceRequest $request,
+        User $user,
+        int $uploadedInThisAnnounceCycle,
+        int $downloadedInThisAnnounceCycle
+    ): string {
+        $this->updateUserUploadedAndDownloadedStats(
+            $request,
+            $user,
+            $uploadedInThisAnnounceCycle,
+            $downloadedInThisAnnounceCycle
+        );
+
+        return $this->getAnnounceResponse($request, [], new PeersCount(0, 0));
     }
 }

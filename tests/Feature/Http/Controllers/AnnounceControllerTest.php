@@ -2155,6 +2155,142 @@ final class AnnounceControllerTest extends TestCase
         $this->assertSame((int) $freshUser->getRawOriginal('downloaded'), $cachedUser->getDownloaded());
     }
 
+    public function testInvalidNumWantIsIgnoredOnStoppedEvent(): void
+    {
+        $this->withoutExceptionHandling();
+
+        $infoHash = 'ccd285bd6d7fc749e9ed34d8b1e8a0f1b582d977';
+        $peerId = '2d7142333345302d64354e334474384672517776';
+        $IP = '98.165.38.50';
+        $port = 60000;
+        $userAgent = 'my test user agent';
+        $torrent = factory(Torrent::class)->create(['seeders' => 0, 'leechers' => 1]);
+        factory(TorrentInfoHash::class)->create(['info_hash' => $infoHash, 'torrent_id' => $torrent->id]);
+        $user = factory(User::class)->create();
+        $peerOne = factory(Peer::class)->states('v1')->create(
+            [
+                'torrent_id' => $torrent->id,
+                'left'       => 500,
+                'peer_id'    => $peerId,
+                'user_id'    => $user->id,
+                'downloaded' => 200,
+                'uploaded'   => 100,
+            ]
+        );
+        factory(PeerIP::class)->create(
+            ['peer_id' => $peerOne->id, 'ip' => '98.165.38.51', 'is_ipv6' => false, 'port' => 55555]
+        );
+
+        $response = $this->get(
+            $this->app->make(UrlGenerator::class)->route(
+                'announce',
+                [
+                    'info_hash'  => hex2bin($infoHash),
+                    'passkey'    => $user->passkey,
+                    'peer_id'    => hex2bin($peerId),
+                    'event'      => 'stopped',
+                    'port'       => $port,
+                    'downloaded' => 250,
+                    'uploaded'   => 120,
+                    'left'       => 250,
+                    'numwant'    => 0,
+                ]
+            ),
+            [
+                'REMOTE_ADDR'     => $IP,
+                'HTTP_USER_AGENT' => $userAgent,
+            ]
+        );
+
+        $response->assertStatus(Response::HTTP_OK);
+        $response->assertHeader('Content-Type', 'text/plain; charset=UTF-8');
+        $this->assertSame(
+            'd8:completei0e10:incompletei0e8:intervali2400e12:min intervali60e5:peers0:6:peers60:e',
+            $response->getContent()
+        );
+        $this->assertSame(0, Peer::count());
+        $this->assertSame(0, PeerIP::count());
+        $this->assertSame(0, PeerVersion::count());
+        $torrent = $torrent->fresh();
+        $this->assertSame(0, (int) $torrent->leechers);
+        $this->assertSame(0, (int) $torrent->seeders);
+        $freshUser = $user->fresh();
+        $this->assertSame($user->getRawOriginal('uploaded') + 20, (int) $freshUser->getRawOriginal('uploaded'));
+        $this->assertSame($user->getRawOriginal('downloaded') + 50, (int) $freshUser->getRawOriginal('downloaded'));
+
+        /** @var AnnounceUserModel $cachedUser */
+        $cachedUser = $this->app->make(Repository::class)->get('user.' . $freshUser->passkey);
+        $this->assertInstanceOf(AnnounceUserModel::class, $cachedUser);
+        $this->assertSame((int) $freshUser->getRawOriginal('uploaded'), $cachedUser->getUploaded());
+        $this->assertSame((int) $freshUser->getRawOriginal('downloaded'), $cachedUser->getDownloaded());
+    }
+
+    public function testInvalidNumWantIsNotIgnoredOnNonStoppedEvent(): void
+    {
+        $this->withoutExceptionHandling();
+
+        $infoHash = 'ccd285bd6d7fc749e9ed34d8b1e8a0f1b582d977';
+        $peerId = '2d7142333345302d64354e334474384672517776';
+        $IP = '98.165.38.50';
+        $port = 60000;
+        $userAgent = 'my test user agent';
+        $torrent = factory(Torrent::class)->create(['seeders' => 0, 'leechers' => 1]);
+        factory(TorrentInfoHash::class)->create(['info_hash' => $infoHash, 'torrent_id' => $torrent->id]);
+        $user = factory(User::class)->create();
+        $peerOne = factory(Peer::class)->states('v1')->create(
+            [
+                'torrent_id' => $torrent->id,
+                'left'       => 500,
+                'peer_id'    => $peerId,
+                'user_id'    => $user->id,
+                'downloaded' => 200,
+                'uploaded'   => 100,
+            ]
+        );
+        factory(PeerIP::class)->create(
+            ['peer_id' => $peerOne->id, 'ip' => '98.165.38.51', 'is_ipv6' => false, 'port' => 55555]
+        );
+
+        $response = $this->get(
+            $this->app->make(UrlGenerator::class)->route(
+                'announce',
+                [
+                    'info_hash'  => hex2bin($infoHash),
+                    'passkey'    => $user->passkey,
+                    'peer_id'    => hex2bin($peerId),
+                    'port'       => $port,
+                    'downloaded' => 250,
+                    'uploaded'   => 120,
+                    'left'       => 250,
+                    'numwant'    => 0,
+                ]
+            ),
+            [
+                'REMOTE_ADDR'     => $IP,
+                'HTTP_USER_AGENT' => $userAgent,
+            ]
+        );
+
+        $response->assertStatus(Response::HTTP_OK);
+        $response->assertHeader('Content-Type', 'text/plain; charset=UTF-8');
+        $this->assertSame(
+            'd14:failure reason31:The numwant must be at least 1.e',
+            $response->getContent()
+        );
+        $this->assertSame(1, Peer::count());
+        $this->assertSame(1, PeerIP::count());
+        $this->assertSame(1, PeerVersion::count());
+        $torrent = $torrent->fresh();
+        $this->assertSame(1, (int) $torrent->leechers);
+        $this->assertSame(0, (int) $torrent->seeders);
+        $freshUser = $user->fresh();
+        $this->assertSame($user->getRawOriginal('uploaded'), (int) $freshUser->getRawOriginal('uploaded'));
+        $this->assertSame($user->getRawOriginal('downloaded'), (int) $freshUser->getRawOriginal('downloaded'));
+
+        $cachedUser = $this->app->make(Repository::class)->get('user.' . $freshUser->passkey);
+        $this->assertNull($cachedUser);
+    }
+
     public function testPeerKeyGetsWrittenToTheDatabase(): void
     {
         $this->withoutExceptionHandling();
@@ -2420,6 +2556,22 @@ final class AnnounceControllerTest extends TestCase
         );
         $response->assertStatus(Response::HTTP_OK);
         $expectedResponse = ['failure reason' => 'Invalid IP address given - "95.44.22.888"'];
+        $decoder = new Bdecoder();
+        $actualResponse = $decoder->decode($response->getContent());
+        $this->assertSame($expectedResponse, $actualResponse);
+        $this->assertSame(0, Peer::count());
+        $this->assertSame(0, Snatch::count());
+    }
+
+    public function testInvalidEventReturnsValidationError(): void
+    {
+        $this->withoutExceptionHandling();
+
+        $response = $this->get(
+            $this->app->make(UrlGenerator::class)->route('announce', $this->validParams(['event' => 'STARTED'])),
+        );
+        $response->assertStatus(Response::HTTP_OK);
+        $expectedResponse = ['failure reason' => 'The given event name "STARTED" is invalid.'];
         $decoder = new Bdecoder();
         $actualResponse = $decoder->decode($response->getContent());
         $this->assertSame($expectedResponse, $actualResponse);
