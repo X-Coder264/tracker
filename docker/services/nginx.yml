@@ -3,7 +3,7 @@ version: '3.7'
 services:
   nginx:
     hostname: nginx
-    image: nginx:1.16-alpine
+    image: nginx:1.19-alpine
     working_dir: /app
     volumes:
       # configuration

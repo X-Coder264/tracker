@@ -2,7 +2,7 @@ version: '3.7'
 
 services:
   node:
-    image: tracker-node:1.1
+    image: tracker-node:1.2
     hostname: node
     build:
       context: ../
