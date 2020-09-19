@@ -5,8 +5,9 @@ declare(strict_types=1);
 namespace Tests\Feature\Models;
 
 use App\Models\Invite;
-use App\Models\User;
 use Carbon\CarbonImmutable;
+use Database\Factories\InviteFactory;
+use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Foundation\Testing\WithFaker;
@@ -18,7 +19,7 @@ final class InviteTest extends TestCase
 
     public function testUserRelationship(): void
     {
-        $user = factory(User::class)->create();
+        $user = UserFactory::new()->create();
 
         $invite = new Invite();
         $invite->code = $this->faker->unique()->text(255);
@@ -33,7 +34,7 @@ final class InviteTest extends TestCase
     public function testExpiresAtAttributeIsCastedToCarbon(): void
     {
         /** @var Invite $invite */
-        $invite = factory(Invite::class)->create();
+        $invite = InviteFactory::new()->create();
 
         $this->assertInstanceOf(CarbonImmutable::class, $invite->expires_at);
     }

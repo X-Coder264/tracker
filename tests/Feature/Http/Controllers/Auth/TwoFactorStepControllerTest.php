@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Tests\Feature\Http\Controllers\Auth;
 
 use App\Models\User;
+use Database\Factories\UserFactory;
 use Illuminate\Contracts\Auth\Guard;
 use Illuminate\Contracts\Encryption\Encrypter;
 use Illuminate\Contracts\Routing\UrlGenerator;
@@ -32,7 +33,7 @@ final class TwoFactorStepControllerTest extends TestCase
         $this->withoutExceptionHandling();
 
         /** @var User $user */
-        $user = factory(User::class)->create();
+        $user = UserFactory::new()->create();
 
         $this->actingAs($user);
 
@@ -48,7 +49,7 @@ final class TwoFactorStepControllerTest extends TestCase
         $this->withoutExceptionHandling();
 
         /** @var User $user */
-        $user = factory(User::class)->create(['remember_token' => null]);
+        $user = UserFactory::new()->create(['remember_token' => null]);
 
         $secretCode = 'test foo';
 
@@ -94,7 +95,7 @@ final class TwoFactorStepControllerTest extends TestCase
         $this->withoutExceptionHandling();
 
         /** @var User $user */
-        $user = factory(User::class)->create(['remember_token' => null]);
+        $user = UserFactory::new()->create(['remember_token' => null]);
 
         $secretCode = 'test foo';
 
@@ -176,7 +177,7 @@ final class TwoFactorStepControllerTest extends TestCase
         $this->withoutExceptionHandling();
 
         /** @var User $user */
-        $user = factory(User::class)->create();
+        $user = UserFactory::new()->create();
 
         $secretCode = 'test foo';
 

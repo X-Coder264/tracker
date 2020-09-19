@@ -2,63 +2,80 @@
 
 declare(strict_types=1);
 
-use App\Models\Locale;
+namespace Database\Factories;
+
 use App\Models\User;
-use Carbon\Carbon;
-use Faker\Generator as Faker;
-use Illuminate\Database\Eloquent\Factory;
+use Carbon\CarbonImmutable;
+use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
 
-/*
-|--------------------------------------------------------------------------
-| Model Factories
-|--------------------------------------------------------------------------
-|
-| This directory should contain each of the model factory definitions for
-| your application. Factories provide a convenient way to generate new
-| model instances for testing / seeding your application's database.
-|
-*/
+final class UserFactory extends Factory
+{
+    /**
+     * The name of the factory's corresponding model.
+     *
+     * @var string
+     */
+    protected $model = User::class;
 
-/** @var Factory $factory */
-$factory->define(User::class, function (Faker $faker) {
-    return [
-        'name' => $faker->unique()->firstName,
-        'email' => $faker->unique()->safeEmail,
-        'password' => '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', // password
-        'passkey' => bin2hex(random_bytes(32)),
-        'remember_token' => Str::random(10),
-        'locale_id' => function () {
-            return factory(Locale::class)->create()->id;
-        },
-        'timezone' => 'Europe/Zagreb',
-        'uploaded' => $faker->numberBetween(0, 10000000),
-        'downloaded' => $faker->numberBetween(0, 1000000),
-        'torrents_per_page' => $faker->numberBetween(5, 30),
-        'banned' => false,
-        'last_seen_at' => Carbon::now()->subMinutes($faker->numberBetween(1, 100)),
-        'inviter_user_id' => null,
-        'invites_amount' => 0,
-        'is_two_factor_enabled' => false,
-    ];
-});
+    /**
+     * Define the model's default state.
+     *
+     * @return array
+     */
+    public function definition()
+    {
+        return [
+            'name'                  => $this->faker->unique()->firstName,
+            'email'                 => $this->faker->unique()->safeEmail,
+            'password'              => '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', // password
+            'passkey'               => bin2hex(random_bytes(32)),
+            'remember_token'        => Str::random(10),
+            'locale_id'             => LocaleFactory::new(),
+            'timezone'              => 'Europe/Zagreb',
+            'uploaded'              => $this->faker->numberBetween(0, 10000000),
+            'downloaded'            => $this->faker->numberBetween(0, 1000000),
+            'torrents_per_page'     => $this->faker->numberBetween(5, 30),
+            'banned'                => false,
+            'last_seen_at'          => CarbonImmutable::now()->subMinutes($this->faker->numberBetween(1, 100)),
+            'inviter_user_id'       => null,
+            'invites_amount'        => 0,
+            'is_two_factor_enabled' => false,
+        ];
+    }
 
-$factory->state(User::class, 'banned', [
-    'banned' => true,
-]);
+    public function banned(): self
+    {
+        return $this->state([
+            'banned' => true,
+        ]);
+    }
 
-$factory->state(User::class, 'has_available_invites', [
-    'invites_amount' => 5,
-]);
+    public function hasAvailableInvites(): self
+    {
+        return $this->state([
+            'invites_amount' => 5,
+        ]);
+    }
 
-$factory->state(User::class, 'has_no_available_invites', [
-    'invites_amount' => 0,
-]);
+    public function hasNoAvailableInvites(): self
+    {
+        return $this->state([
+            'invites_amount' => 0,
+        ]);
+    }
 
-$factory->state(User::class, '2fa_enabled', [
-    'is_two_factor_enabled' => true,
-]);
+    public function twoFactorAuthEnabled(): self
+    {
+        return $this->state([
+            'is_two_factor_enabled' => true,
+        ]);
+    }
 
-$factory->state(User::class, '2fa_disabled', [
-    'is_two_factor_enabled' => false,
-]);
+    public function twoFactorAuthDisabled(): self
+    {
+        return $this->state([
+            'is_two_factor_enabled' => false,
+        ]);
+    }
+}

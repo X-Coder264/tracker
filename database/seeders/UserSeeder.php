@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+namespace Database\Seeders;
+
 use App\Models\User;
 use Illuminate\Contracts\Hashing\Hasher;
 use Illuminate\Database\Seeder;

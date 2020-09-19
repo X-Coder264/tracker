@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Http\Controllers\Torrents;
 
-use App\Models\Snatch;
-use App\Models\Torrent;
-use App\Models\User;
 use App\Services\Bdecoder;
 use App\Services\Bencoder;
+use Database\Factories\SnatchFactory;
+use Database\Factories\TorrentFactory;
+use Database\Factories\UserFactory;
 use Illuminate\Contracts\Filesystem\Factory;
 use Illuminate\Contracts\Routing\UrlGenerator;
 use Illuminate\Contracts\Translation\Translator;
@@ -26,13 +26,13 @@ final class DownloadSnatchedTorrentsZipArchiveControllerTest extends TestCase
     {
         $this->withoutExceptionHandling();
 
-        $user = factory(User::class)->create();
+        $user = UserFactory::new()->create();
 
         $this->actingAs($user);
 
-        $torrent = factory(Torrent::class)->create(['name' => 'test foo čćšđ % X']);
-        factory(Snatch::class)->create(['torrent_id' => $torrent->id, 'user_id' => $user->id]);
-        factory(Snatch::class)->create();
+        $torrent = TorrentFactory::new()->create(['name' => 'test foo čćšđ % X']);
+        SnatchFactory::new()->create(['torrent_id' => $torrent->id, 'user_id' => $user->id]);
+        SnatchFactory::new()->create();
 
         $torrentFileContent = file_get_contents(
             __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . '..' .
@@ -126,11 +126,11 @@ final class DownloadSnatchedTorrentsZipArchiveControllerTest extends TestCase
     {
         $this->withoutExceptionHandling();
 
-        $user = factory(User::class)->create();
+        $user = UserFactory::new()->create();
 
         $this->actingAs($user);
 
-        factory(Snatch::class)->create();
+        SnatchFactory::new()->create();
 
         $urlGenerator = $this->app->make(UrlGenerator::class);
 

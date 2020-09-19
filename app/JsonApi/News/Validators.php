@@ -25,7 +25,7 @@ class Validators extends AbstractValidators
     /**
      * @param News|null $record
      */
-    protected function rules($record = null): array
+    protected function rules($record, array $data): array
     {
         return [
             'subject' => 'required|string|min:5',

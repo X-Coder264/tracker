@@ -9,6 +9,10 @@ use App\Models\PeerIP;
 use App\Models\PeerVersion;
 use App\Models\Torrent;
 use App\Models\User;
+use Database\Factories\PeerFactory;
+use Database\Factories\PeerIPFactory;
+use Database\Factories\PeerVersionFactory;
+use Database\Factories\UserFactory;
 use Facades\App\Services\SizeFormatter;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -22,7 +26,7 @@ class PeerTest extends TestCase
 
     public function testUploadedAccessor()
     {
-        factory(Peer::class)->create();
+        PeerFactory::new()->create();
         $peer = Peer::firstOrFail();
         $returnValue = '500 MB';
         SizeFormatter::shouldReceive('getFormattedSize')->once()->with($peer->getRawOriginal('uploaded'))->andReturn($returnValue);
@@ -31,7 +35,7 @@ class PeerTest extends TestCase
 
     public function testDownloadedAccessor()
     {
-        factory(Peer::class)->create();
+        PeerFactory::new()->create();
         $peer = Peer::firstOrFail();
         $returnValue = '500 MB';
         SizeFormatter::shouldReceive('getFormattedSize')->once()->with($peer->getRawOriginal('downloaded'))->andReturn($returnValue);
@@ -40,9 +44,9 @@ class PeerTest extends TestCase
 
     public function testUserRelationship()
     {
-        $user = factory(User::class)->create();
+        $user = UserFactory::new()->create();
 
-        factory(Peer::class)->create(['user_id' => $user->id]);
+        PeerFactory::new()->create(['user_id' => $user->id]);
 
         $peer = Peer::firstOrFail();
         $this->assertInstanceOf(BelongsTo::class, $peer->user());
@@ -54,9 +58,9 @@ class PeerTest extends TestCase
 
     public function testTorrentRelationship()
     {
-        $user = factory(User::class)->create();
+        $user = UserFactory::new()->create();
 
-        factory(Peer::class)->create(['user_id' => $user->id]);
+        PeerFactory::new()->create(['user_id' => $user->id]);
 
         $torrent = Torrent::firstOrFail();
         $peer = Peer::firstOrFail();
@@ -69,7 +73,7 @@ class PeerTest extends TestCase
 
     public function testIPsRelationship()
     {
-        factory(PeerIP::class)->create();
+        PeerIPFactory::new()->create();
 
         $IP = PeerIP::firstOrFail();
         $peer = Peer::firstOrFail();
@@ -83,7 +87,7 @@ class PeerTest extends TestCase
 
     public function testVersionsRelationship(): void
     {
-        factory(PeerVersion::class)->create();
+        PeerVersionFactory::new()->create();
 
         $peerVersion = PeerVersion::firstOrFail();
         $peer = Peer::firstOrFail();

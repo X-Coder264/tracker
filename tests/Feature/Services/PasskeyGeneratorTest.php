@@ -6,6 +6,7 @@ namespace Tests\Feature\Services;
 
 use App\Models\User;
 use App\Services\PasskeyGenerator;
+use Database\Factories\UserFactory;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use ReflectionClass;
 use Tests\TestCase;
@@ -16,7 +17,7 @@ class PasskeyGeneratorTest extends TestCase
 
     public function testGetUserWithTheSpecifiedPasskey()
     {
-        $user = factory(User::class)->create();
+        $user = UserFactory::new()->create();
 
         $passkeyService = new PasskeyGenerator();
         $reflectionClass = new ReflectionClass(PasskeyGenerator::class);

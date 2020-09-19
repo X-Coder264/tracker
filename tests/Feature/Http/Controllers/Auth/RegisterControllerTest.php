@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Http\Controllers\Auth;
 
-use App\Models\Configuration;
 use App\Models\Invite;
-use App\Models\Locale;
 use App\Models\User;
+use Database\Factories\ConfigurationFactory;
+use Database\Factories\InviteFactory;
+use Database\Factories\LocaleFactory;
+use Database\Factories\UserFactory;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Hashing\Hasher;
@@ -26,8 +28,8 @@ class RegisterControllerTest extends TestCase
     {
         $this->withoutExceptionHandling();
 
-        factory(Locale::class)->create();
-        factory(Configuration::class)->states('non_invite_only_signup')->create();
+        LocaleFactory::new()->create();
+        ConfigurationFactory::new()->nonInviteOnlySignup()->create();
         $response = $this->get($this->app->make(UrlGenerator::class)->route('register'));
 
         $response->assertStatus(Response::HTTP_OK);
@@ -40,8 +42,8 @@ class RegisterControllerTest extends TestCase
     {
         $this->withoutExceptionHandling();
 
-        factory(Locale::class)->create();
-        factory(Configuration::class)->states('invite_only_signup')->create();
+        LocaleFactory::new()->create();
+        ConfigurationFactory::new()->inviteOnlySignup()->create();
         $response = $this->get($this->app->make(UrlGenerator::class)->route('register'));
 
         $response->assertStatus(Response::HTTP_OK);
@@ -62,14 +64,14 @@ class RegisterControllerTest extends TestCase
         // as the user slug cannot be null
         Model::setEventDispatcher($realDispatcher);
 
-        factory(Configuration::class)->states('non_invite_only_signup')->create();
+        ConfigurationFactory::new()->nonInviteOnlySignup()->create();
 
         $this->assertSame(0, User::count());
 
         $name = 'test name';
         $email = 'test@gmail.com';
         $password = 'test password';
-        $locale = factory(Locale::class)->create();
+        $locale = LocaleFactory::new()->create();
         $timezone = 'Europe/Zagreb';
 
         $response = $this->post($this->app->make(UrlGenerator::class)->route('register'), [
@@ -116,17 +118,17 @@ class RegisterControllerTest extends TestCase
         // as the user slug cannot be null
         Model::setEventDispatcher($realDispatcher);
 
-        factory(Configuration::class)->states('invite_only_signup')->create();
+        ConfigurationFactory::new()->inviteOnlySignup()->create();
 
         /** @var Invite $invite */
-        $invite = factory(Invite::class)->create();
+        $invite = InviteFactory::new()->create();
 
         $this->assertSame(1, User::count());
 
         $name = 'test name';
         $email = 'test@gmail.com';
         $password = 'test password';
-        $locale = factory(Locale::class)->create();
+        $locale = LocaleFactory::new()->create();
         $timezone = 'Europe/Zagreb';
 
         $response = $this->post($this->app->make(UrlGenerator::class)->route('register'), [
@@ -166,7 +168,7 @@ class RegisterControllerTest extends TestCase
 
     public function testNameIsRequired(): void
     {
-        factory(Configuration::class)->states('non_invite_only_signup')->create();
+        ConfigurationFactory::new()->nonInviteOnlySignup()->create();
 
         $response = $this->from($this->app->make(UrlGenerator::class)->route('register'))->post($this->app->make(UrlGenerator::class)->route('register'), $this->validParams([
             'name' => '',
@@ -180,7 +182,7 @@ class RegisterControllerTest extends TestCase
 
     public function testNameMustBeLessThan256CharsLong(): void
     {
-        factory(Configuration::class)->states('non_invite_only_signup')->create();
+        ConfigurationFactory::new()->nonInviteOnlySignup()->create();
 
         $response = $this->from($this->app->make(UrlGenerator::class)->route('register'))->post($this->app->make(UrlGenerator::class)->route('register'), $this->validParams([
             'name' => str_repeat('X', 256),
@@ -195,9 +197,9 @@ class RegisterControllerTest extends TestCase
 
     public function testNameMustBeUnique(): void
     {
-        factory(Configuration::class)->states('non_invite_only_signup')->create();
+        ConfigurationFactory::new()->nonInviteOnlySignup()->create();
 
-        $user = factory(User::class)->create();
+        $user = UserFactory::new()->create();
         $response = $this->from($this->app->make(UrlGenerator::class)->route('register'))->post($this->app->make(UrlGenerator::class)->route('register'), $this->validParams([
             'name' => $user->name,
         ]));
@@ -211,7 +213,7 @@ class RegisterControllerTest extends TestCase
 
     public function testEmailIsRequired(): void
     {
-        factory(Configuration::class)->states('non_invite_only_signup')->create();
+        ConfigurationFactory::new()->nonInviteOnlySignup()->create();
 
         $response = $this->from($this->app->make(UrlGenerator::class)->route('register'))->post($this->app->make(UrlGenerator::class)->route('register'), $this->validParams([
             'email' => '',
@@ -225,7 +227,7 @@ class RegisterControllerTest extends TestCase
 
     public function testEmailMustBeLessThan256CharsLong(): void
     {
-        factory(Configuration::class)->states('non_invite_only_signup')->create();
+        ConfigurationFactory::new()->nonInviteOnlySignup()->create();
 
         $response = $this->from($this->app->make(UrlGenerator::class)->route('register'))->post($this->app->make(UrlGenerator::class)->route('register'), $this->validParams([
             'email' => str_repeat('X', 256),
@@ -240,9 +242,9 @@ class RegisterControllerTest extends TestCase
 
     public function testEmailMustBeUnique(): void
     {
-        factory(Configuration::class)->states('non_invite_only_signup')->create();
+        ConfigurationFactory::new()->nonInviteOnlySignup()->create();
 
-        $user = factory(User::class)->create();
+        $user = UserFactory::new()->create();
         $response = $this->from($this->app->make(UrlGenerator::class)->route('register'))->post($this->app->make(UrlGenerator::class)->route('register'), $this->validParams([
             'email' => $user->name,
         ]));
@@ -256,7 +258,7 @@ class RegisterControllerTest extends TestCase
 
     public function testEmailMustBeAValidEmail(): void
     {
-        factory(Configuration::class)->states('non_invite_only_signup')->create();
+        ConfigurationFactory::new()->nonInviteOnlySignup()->create();
 
         $response = $this->from($this->app->make(UrlGenerator::class)->route('register'))->post($this->app->make(UrlGenerator::class)->route('register'), $this->validParams([
             'email' => 'xyz',
@@ -271,7 +273,7 @@ class RegisterControllerTest extends TestCase
 
     public function testPasswordIsRequired(): void
     {
-        factory(Configuration::class)->states('non_invite_only_signup')->create();
+        ConfigurationFactory::new()->nonInviteOnlySignup()->create();
 
         $response = $this->from($this->app->make(UrlGenerator::class)->route('register'))->post($this->app->make(UrlGenerator::class)->route('register'), $this->validParams([
             'password' => '',
@@ -287,7 +289,7 @@ class RegisterControllerTest extends TestCase
 
     public function testPasswordMustHaveAtLeast8Chars(): void
     {
-        factory(Configuration::class)->states('non_invite_only_signup')->create();
+        ConfigurationFactory::new()->nonInviteOnlySignup()->create();
 
         $response = $this->from($this->app->make(UrlGenerator::class)->route('register'))->post($this->app->make(UrlGenerator::class)->route('register'), $this->validParams([
             'password' => str_repeat('X', 7),
@@ -303,7 +305,7 @@ class RegisterControllerTest extends TestCase
 
     public function testPasswordMustBeConfirmed(): void
     {
-        factory(Configuration::class)->states('non_invite_only_signup')->create();
+        ConfigurationFactory::new()->nonInviteOnlySignup()->create();
 
         $response = $this->from($this->app->make(UrlGenerator::class)->route('register'))->post($this->app->make(UrlGenerator::class)->route('register'), $this->validParams([
             'password_confirmation' => '1234567',
@@ -318,7 +320,7 @@ class RegisterControllerTest extends TestCase
 
     public function testLocaleIsRequired(): void
     {
-        factory(Configuration::class)->states('non_invite_only_signup')->create();
+        ConfigurationFactory::new()->nonInviteOnlySignup()->create();
 
         $response = $this->from($this->app->make(UrlGenerator::class)->route('register'))->post($this->app->make(UrlGenerator::class)->route('register'), $this->validParams([
             'locale' => '',
@@ -333,7 +335,7 @@ class RegisterControllerTest extends TestCase
 
     public function testLocaleMustBeAValidLocale(): void
     {
-        factory(Configuration::class)->states('non_invite_only_signup')->create();
+        ConfigurationFactory::new()->nonInviteOnlySignup()->create();
 
         $response = $this->from($this->app->make(UrlGenerator::class)->route('register'))->post($this->app->make(UrlGenerator::class)->route('register'), $this->validParams([
             'locale' => 2,
@@ -348,7 +350,7 @@ class RegisterControllerTest extends TestCase
 
     public function testTimezoneIsRequired(): void
     {
-        factory(Configuration::class)->states('non_invite_only_signup')->create();
+        ConfigurationFactory::new()->nonInviteOnlySignup()->create();
 
         $response = $this->from($this->app->make(UrlGenerator::class)->route('register'))->post($this->app->make(UrlGenerator::class)->route('register'), $this->validParams([
             'timezone' => '',
@@ -363,7 +365,7 @@ class RegisterControllerTest extends TestCase
 
     public function testTimezoneMustBeAValidTimezone(): void
     {
-        factory(Configuration::class)->states('non_invite_only_signup')->create();
+        ConfigurationFactory::new()->nonInviteOnlySignup()->create();
 
         $response = $this->from($this->app->make(UrlGenerator::class)->route('register'))->post($this->app->make(UrlGenerator::class)->route('register'), $this->validParams([
             'timezone' => 'Europe/Zagre',
@@ -378,7 +380,7 @@ class RegisterControllerTest extends TestCase
 
     public function testInviteIsRequiredIfTheRegistrationIsInviteOnly(): void
     {
-        factory(Configuration::class)->states('invite_only_signup')->create();
+        ConfigurationFactory::new()->inviteOnlySignup()->create();
 
         $response = $this->from($this->app->make(UrlGenerator::class)->route('register'))->post($this->app->make(UrlGenerator::class)->route('register'), $this->validParams([
             'invite' => '',
@@ -393,7 +395,7 @@ class RegisterControllerTest extends TestCase
 
     public function testInviteMustBeValidIfTheRegistrationIsInviteOnly(): void
     {
-        factory(Configuration::class)->states('invite_only_signup')->create();
+        ConfigurationFactory::new()->inviteOnlySignup()->create();
 
         $response = $this->from($this->app->make(UrlGenerator::class)->route('register'))->post($this->app->make(UrlGenerator::class)->route('register'), $this->validParams([
             'invite' => 'foo bar invalid',
@@ -408,7 +410,7 @@ class RegisterControllerTest extends TestCase
 
     public function testLoggedInUserGetsRedirectedToTheHomePage(): void
     {
-        $user = factory(User::class)->create();
+        $user = UserFactory::new()->create();
         $this->actingAs($user);
         $response = $this->get($this->app->make(UrlGenerator::class)->route('register'));
         $response->assertStatus(Response::HTTP_FOUND);
@@ -424,7 +426,7 @@ class RegisterControllerTest extends TestCase
 
     private function validParams(array $overrides = []): array
     {
-        $locale = factory(Locale::class)->create();
+        $locale = LocaleFactory::new()->create();
 
         return array_merge([
             'name'                  => 'test name',

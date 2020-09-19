@@ -5,7 +5,8 @@ declare(strict_types=1);
 namespace Tests\Feature\Http\Controllers;
 
 use App\Models\Snatch;
-use App\Models\Torrent;
+use Database\Factories\SnatchFactory;
+use Database\Factories\TorrentFactory;
 use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Contracts\Routing\UrlGenerator;
@@ -20,11 +21,11 @@ class SnatchControllerTest extends TestCase
     {
         $this->withoutExceptionHandling();
 
-        $torrent = factory(Torrent::class)->create();
-        $snatch = factory(Snatch::class)->states('snatched')->create(['torrent_id' => $torrent->id, 'user_id' => $torrent->uploader]);
+        $torrent = TorrentFactory::new()->create();
+        $snatch = SnatchFactory::new()->snatched()->create(['torrent_id' => $torrent->id, 'user_id' => $torrent->uploader]);
 
-        $nonRelevantTorrent = factory(Torrent::class)->create(['uploader_id' => $torrent->uploader]);
-        factory(Snatch::class)->create(['torrent_id' => $nonRelevantTorrent->id, 'user_id' => $torrent->uploader]);
+        $nonRelevantTorrent = TorrentFactory::new()->create(['uploader_id' => $torrent->uploader]);
+        SnatchFactory::new()->create(['torrent_id' => $nonRelevantTorrent->id, 'user_id' => $torrent->uploader]);
 
         $user = $torrent->uploader->fresh();
         $this->actingAs($user);
@@ -73,12 +74,12 @@ class SnatchControllerTest extends TestCase
     {
         $this->withoutExceptionHandling();
 
-        $torrent = factory(Torrent::class)->create();
+        $torrent = TorrentFactory::new()->create();
         /** @var Snatch[] $snatches */
-        $snatches = factory(Snatch::class, 16)->states('snatched')->create(['torrent_id' => $torrent->id]);
+        $snatches = SnatchFactory::new()->count(16)->snatched()->create(['torrent_id' => $torrent->id]);
 
-        $nonRelevantTorrent = factory(Torrent::class)->create(['uploader_id' => $torrent->uploader]);
-        factory(Snatch::class)->create(['torrent_id' => $nonRelevantTorrent->id, 'user_id' => $torrent->uploader]);
+        $nonRelevantTorrent = TorrentFactory::new()->create(['uploader_id' => $torrent->uploader]);
+        SnatchFactory::new()->create(['torrent_id' => $nonRelevantTorrent->id, 'user_id' => $torrent->uploader]);
 
         $user = $torrent->uploader->fresh();
         $this->actingAs($user);
@@ -114,8 +115,8 @@ class SnatchControllerTest extends TestCase
 
     public function testGuestsCannotSeeTheSnatchPage(): void
     {
-        $torrent = factory(Torrent::class)->create();
-        factory(Snatch::class)->create(['torrent_id' => $torrent->id, 'user_id' => $torrent->uploader]);
+        $torrent = TorrentFactory::new()->create();
+        SnatchFactory::new()->create(['torrent_id' => $torrent->id, 'user_id' => $torrent->uploader]);
 
         $urlGenerator = $this->app->make(UrlGenerator::class);
 

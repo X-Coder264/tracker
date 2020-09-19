@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Tests\Feature\Http\Controllers\Auth;
 
 use App\Models\User;
+use Database\Factories\UserFactory;
 use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Contracts\Hashing\Hasher;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
@@ -21,7 +22,7 @@ class ResetPasswordControllerTest extends TestCase
     {
         $this->withoutExceptionHandling();
 
-        $user = factory(User::class)->create();
+        $user = UserFactory::new()->create();
 
         $eventFake = Event::fake(PasswordReset::class);
 
@@ -57,7 +58,7 @@ class ResetPasswordControllerTest extends TestCase
         $this->withoutExceptionHandling();
 
         $password = 'invalid-123';
-        $user = factory(User::class)->create([
+        $user = UserFactory::new()->create([
             'password' => $this->app->make(Hasher::class)->make($password),
         ]);
 
@@ -77,7 +78,7 @@ class ResetPasswordControllerTest extends TestCase
     public function testUserCannotResetPasswordWithoutProvidingANewPassword(): void
     {
         $password = 'fesfgertgreze';
-        $user = factory(User::class)->create([
+        $user = UserFactory::new()->create([
             'password' => $this->app->make(Hasher::class)->make($password),
         ]);
 
@@ -102,7 +103,7 @@ class ResetPasswordControllerTest extends TestCase
     public function testUserCannotResetPasswordWithoutProvingAnEmail(): void
     {
         $password = 'fesfgertgreze';
-        $user = factory(User::class)->create([
+        $user = UserFactory::new()->create([
             'password' => $this->app->make(Hasher::class)->make($password),
         ]);
 

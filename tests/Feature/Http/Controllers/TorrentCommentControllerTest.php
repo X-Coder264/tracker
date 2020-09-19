@@ -6,7 +6,9 @@ namespace Tests\Feature\Http\Controllers;
 
 use App\Models\Torrent;
 use App\Models\TorrentComment;
-use App\Models\User;
+use Database\Factories\TorrentCommentFactory;
+use Database\Factories\TorrentFactory;
+use Database\Factories\UserFactory;
 use Illuminate\Cache\TaggedCache;
 use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
@@ -21,9 +23,9 @@ class TorrentCommentControllerTest extends TestCase
     {
         $this->withoutExceptionHandling();
 
-        $user = factory(User::class)->create();
+        $user = UserFactory::new()->create();
         /** @var Torrent $torrent */
-        $torrent = factory(Torrent::class)->create(['uploader_id' => $user->id]);
+        $torrent = TorrentFactory::new()->create(['uploader_id' => $user->id]);
         $this->actingAs($user);
         $response = $this->get(route('torrent-comments.create', $torrent));
 
@@ -39,8 +41,8 @@ class TorrentCommentControllerTest extends TestCase
     {
         $this->withoutExceptionHandling();
 
-        $user = factory(User::class)->create();
-        $torrent = factory(Torrent::class)->create(['uploader_id' => $user->id]);
+        $user = UserFactory::new()->create();
+        $torrent = TorrentFactory::new()->create(['uploader_id' => $user->id]);
         $this->actingAs($user);
 
         $cache = $this->app->make(Repository::class);
@@ -75,8 +77,8 @@ class TorrentCommentControllerTest extends TestCase
     {
         $this->withoutExceptionHandling();
 
-        $user = factory(User::class)->create();
-        $torrentComment = factory(TorrentComment::class)->create(['user_id' => $user->id]);
+        $user = UserFactory::new()->create();
+        $torrentComment = TorrentCommentFactory::new()->create(['user_id' => $user->id]);
         $this->actingAs($user);
         $response = $this->get(route('torrent-comments.edit', $torrentComment));
 
@@ -91,9 +93,9 @@ class TorrentCommentControllerTest extends TestCase
     {
         $this->withoutExceptionHandling();
 
-        $user = factory(User::class)->create();
-        $torrent = factory(Torrent::class)->create(['uploader_id' => $user->id]);
-        $torrentComment = factory(TorrentComment::class)->create(
+        $user = UserFactory::new()->create();
+        $torrent = TorrentFactory::new()->create(['uploader_id' => $user->id]);
+        $torrentComment = TorrentCommentFactory::new()->create(
             [
                 'user_id' => $user->id,
                 'torrent_id' => $torrent->id,
@@ -132,8 +134,8 @@ class TorrentCommentControllerTest extends TestCase
 
     public function testCommentIsRequiredOnCreate()
     {
-        $user = factory(User::class)->create();
-        $torrent = factory(Torrent::class)->create(['uploader_id' => $user->id]);
+        $user = UserFactory::new()->create();
+        $torrent = TorrentFactory::new()->create(['uploader_id' => $user->id]);
         $this->actingAs($user);
 
         $response = $this->from(route('torrent-comments.create', $torrent))
@@ -152,10 +154,10 @@ class TorrentCommentControllerTest extends TestCase
 
     public function testCommentIsRequiredOnUpdate()
     {
-        $user = factory(User::class)->create();
-        $torrent = factory(Torrent::class)->create(['uploader_id' => $user->id]);
+        $user = UserFactory::new()->create();
+        $torrent = TorrentFactory::new()->create(['uploader_id' => $user->id]);
         $oldComment = 'test 123';
-        $torrentComment = factory(TorrentComment::class)->create(
+        $torrentComment = TorrentCommentFactory::new()->create(
             [
                 'user_id' => $user->id,
                 'torrent_id' => $torrent->id,

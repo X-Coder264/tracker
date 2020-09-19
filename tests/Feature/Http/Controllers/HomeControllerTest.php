@@ -4,11 +4,12 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Http\Controllers;
 
-use App\Models\News;
-use App\Models\Peer;
 use App\Models\Torrent;
-use App\Models\User;
 use App\Services\SizeFormatter;
+use Database\Factories\NewsFactory;
+use Database\Factories\PeerFactory;
+use Database\Factories\TorrentFactory;
+use Database\Factories\UserFactory;
 use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Http\Response;
@@ -22,19 +23,19 @@ class HomeControllerTest extends TestCase
     {
         $this->withoutExceptionHandling();
 
-        $user = factory(User::class)->create();
+        $user = UserFactory::new()->create();
         $this->actingAs($user);
 
-        factory(User::class, 2)->states('banned')->create();
+        UserFactory::new()->count(2)->banned()->create();
 
-        $torrent = factory(Torrent::class)->states('alive')->create(['uploader_id' => $user->id]);
-        factory(Torrent::class, 3)->states('dead')->create(['uploader_id' => $user->id]);
+        $torrent = TorrentFactory::new()->alive()->create(['uploader_id' => $user->id]);
+        TorrentFactory::new()->count(3)->dead()->create(['uploader_id' => $user->id]);
 
-        factory(Peer::class)->states('seeder')->create(['torrent_id' => $torrent->id, 'user_id' => $user->id]);
-        factory(Peer::class, 2)->states('leecher')->create(['torrent_id' => $torrent->id, 'user_id' => $user->id]);
+        PeerFactory::new()->seeder()->create(['torrent_id' => $torrent->id, 'user_id' => $user->id]);
+        PeerFactory::new()->count(2)->leecher()->create(['torrent_id' => $torrent->id, 'user_id' => $user->id]);
 
-        $newsOne = factory(News::class)->create(['user_id' => $user]);
-        $newsTwo = factory(News::class)->create(['user_id' => $user, 'subject' => 'test foo', 'text' => 'text foobar']);
+        $newsOne = NewsFactory::new()->create(['user_id' => $user]);
+        $newsTwo = NewsFactory::new()->create(['user_id' => $user, 'subject' => 'test foo', 'text' => 'text foobar']);
 
         $response = $this->get(route('home'));
 

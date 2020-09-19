@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Tests\Feature\Models;
 
 use App\Models\Configuration;
+use Database\Factories\ConfigurationFactory;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Tests\TestCase;
 
@@ -14,8 +15,8 @@ class ConfigurationTest extends TestCase
 
     public function testGetConfigurationValueScope(): void
     {
-        factory(Configuration::class)->create(['name' => 'test']);
-        factory(Configuration::class)->create(['name' => 'test1']);
+        ConfigurationFactory::new()->create(['name' => 'test']);
+        ConfigurationFactory::new()->create(['name' => 'test1']);
         $configuration = Configuration::getConfigurationValue('test')->firstOrFail();
         $this->assertSame('test', $configuration->name);
     }

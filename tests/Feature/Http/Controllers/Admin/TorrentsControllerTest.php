@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Http\Controllers\Admin;
 
-use App\Models\Torrent;
-use App\Models\User;
+use Database\Factories\TorrentFactory;
+use Database\Factories\UserFactory;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Carbon;
 use Laravel\Passport\Passport;
@@ -19,8 +19,8 @@ class TorrentsControllerTest extends AdminApiTestCase
     {
         $this->withExceptionHandling();
 
-        $user = factory(User::class)->create();
-        $torrents = factory(Torrent::class, 2)->create();
+        $user = UserFactory::new()->create();
+        $torrents = TorrentFactory::new()->count(2)->create();
         Passport::actingAs($user);
         $response = $this->makeRequest('GET', route('admin.torrents.index'));
         $jsonResponse = $response->getJsonResponse();
@@ -62,8 +62,8 @@ class TorrentsControllerTest extends AdminApiTestCase
     {
         $this->withExceptionHandling();
 
-        $user = factory(User::class)->create();
-        $torrents = factory(Torrent::class, 2)->create();
+        $user = UserFactory::new()->create();
+        $torrents = TorrentFactory::new()->count(2)->create();
         Passport::actingAs($user);
         $response = $this->makeRequest('GET', route('admin.torrents.index', ['filter[name]' => $torrents[1]->name]));
         $jsonResponse = $response->getJsonResponse();
@@ -93,9 +93,9 @@ class TorrentsControllerTest extends AdminApiTestCase
     {
         $this->withExceptionHandling();
 
-        $user = factory(User::class)->create();
-        factory(Torrent::class, 2)->create();
-        $torrent = factory(Torrent::class)->create(['uploader_id' => $user->id]);
+        $user = UserFactory::new()->create();
+        TorrentFactory::new()->count(2)->create();
+        $torrent = TorrentFactory::new()->create(['uploader_id' => $user->id]);
         Passport::actingAs($user);
         $response = $this->makeRequest('GET', route('admin.torrents.index', ['filter[uploader]' => $user->id]));
         $jsonResponse = $response->getJsonResponse();
@@ -125,8 +125,8 @@ class TorrentsControllerTest extends AdminApiTestCase
     {
         $this->withExceptionHandling();
 
-        $user = factory(User::class)->create();
-        $torrents = factory(Torrent::class, 2)->create();
+        $user = UserFactory::new()->create();
+        $torrents = TorrentFactory::new()->count(2)->create();
         Passport::actingAs($user);
         $response = $this->makeRequest('GET', route('admin.torrents.index', ['filter[slug]' => $torrents[1]->slug]));
         $jsonResponse = $response->getJsonResponse();
@@ -156,9 +156,9 @@ class TorrentsControllerTest extends AdminApiTestCase
     {
         $this->withExceptionHandling();
 
-        $user = factory(User::class)->create();
-        $firstTorrent = factory(Torrent::class)->create(['size' => 4194303]);
-        $secondTorrent = factory(Torrent::class)->create(['size' => 4194305]);
+        $user = UserFactory::new()->create();
+        $firstTorrent = TorrentFactory::new()->create(['size' => 4194303]);
+        $secondTorrent = TorrentFactory::new()->create(['size' => 4194305]);
         Passport::actingAs($user);
         $response = $this->makeRequest('GET', route('admin.torrents.index', ['filter[minimumSize]' => 4]));
         $jsonResponse = $response->getJsonResponse();
@@ -188,9 +188,9 @@ class TorrentsControllerTest extends AdminApiTestCase
     {
         $this->withExceptionHandling();
 
-        $user = factory(User::class)->create();
-        $firstTorrent = factory(Torrent::class)->create(['size' => 4194303]);
-        $secondTorrent = factory(Torrent::class)->create(['size' => 4194305]);
+        $user = UserFactory::new()->create();
+        $firstTorrent = TorrentFactory::new()->create(['size' => 4194303]);
+        $secondTorrent = TorrentFactory::new()->create(['size' => 4194305]);
         Passport::actingAs($user);
         $response = $this->makeRequest('GET', route('admin.torrents.index', ['filter[maximumSize]' => 4]));
         $jsonResponse = $response->getJsonResponse();

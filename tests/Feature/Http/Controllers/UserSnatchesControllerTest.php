@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Http\Controllers;
 
-use App\Models\Snatch;
-use App\Models\User;
+use Database\Factories\SnatchFactory;
+use Database\Factories\UserFactory;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Tests\TestCase;
@@ -18,12 +18,12 @@ class UserSnatchesControllerTest extends TestCase
     {
         $this->withoutExceptionHandling();
 
-        $user = factory(User::class)->create();
-        $nonRelevantUser = factory(User::class)->create();
+        $user = UserFactory::new()->create();
+        $nonRelevantUser = UserFactory::new()->create();
 
-        $snatches = factory(Snatch::class, 2)->states('snatched')->create(['user_id' => $user->id]);
-        factory(Snatch::class)->create(['user_id' => $user->id, 'left' => 500]);
-        factory(Snatch::class, 2)->create(['user_id' => $nonRelevantUser->id]);
+        $snatches = SnatchFactory::new()->count(2)->snatched()->create(['user_id' => $user->id]);
+        SnatchFactory::new()->create(['user_id' => $user->id, 'left' => 500]);
+        SnatchFactory::new()->count(2)->create(['user_id' => $nonRelevantUser->id]);
 
         $this->actingAs($user);
 
@@ -57,9 +57,9 @@ class UserSnatchesControllerTest extends TestCase
 
     public function testGuestGetsRedirectedToTheLoginPageWhenTryingToAccessTheSnatchesPage(): void
     {
-        $user = factory(User::class)->create();
+        $user = UserFactory::new()->create();
 
-        factory(Snatch::class)->create(['user_id' => $user->id]);
+        SnatchFactory::new()->create(['user_id' => $user->id]);
 
         $response = $this->get(route('user-snatches.show', $user));
 

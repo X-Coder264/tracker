@@ -6,6 +6,7 @@ namespace Tests\Feature\Console\Commands;
 
 use App\Console\Commands\DeleteExpiredInvitesCommand;
 use App\Models\Invite;
+use Database\Factories\InviteFactory;
 use Illuminate\Console\Scheduling\Event;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
@@ -20,8 +21,8 @@ class DeleteExpiredInvitesTest extends TestCase
     {
         $this->withoutExceptionHandling();
 
-        $invite = factory(Invite::class)->create();
-        $expiredInvite = factory(Invite::class)->states('expired')->create();
+        $invite = InviteFactory::new()->create();
+        $expiredInvite = InviteFactory::new()->expired()->create();
 
         $this->artisan(DeleteExpiredInvitesCommand::class);
 

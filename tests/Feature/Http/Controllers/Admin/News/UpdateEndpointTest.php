@@ -5,7 +5,8 @@ declare(strict_types=1);
 namespace Tests\Feature\Http\Controllers\Admin\News;
 
 use App\Models\News;
-use App\Models\User;
+use Database\Factories\NewsFactory;
+use Database\Factories\UserFactory;
 use Illuminate\Contracts\Routing\UrlGenerator;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Http\Response;
@@ -20,10 +21,10 @@ final class UpdateEndpointTest extends AdminApiTestCase
     {
         $this->withoutExceptionHandling();
 
-        $user = factory(User::class)->create();
+        $user = UserFactory::new()->create();
         Passport::actingAs($user);
 
-        $news = factory(News::class)->create();
+        $news = NewsFactory::new()->create();
         $author = $news->author;
 
         $this->assertSame(1, News::count());
@@ -79,10 +80,10 @@ final class UpdateEndpointTest extends AdminApiTestCase
 
     public function testUpdateWithInvalidSubject(): void
     {
-        $user = factory(User::class)->create();
+        $user = UserFactory::new()->create();
         Passport::actingAs($user);
 
-        $news = factory(News::class)->create();
+        $news = NewsFactory::new()->create();
 
         $this->assertSame(1, News::count());
 
@@ -127,10 +128,10 @@ final class UpdateEndpointTest extends AdminApiTestCase
 
     public function testUpdateWithInvalidText(): void
     {
-        $user = factory(User::class)->create();
+        $user = UserFactory::new()->create();
         Passport::actingAs($user);
 
-        $news = factory(News::class)->create();
+        $news = NewsFactory::new()->create();
 
         $this->assertSame(1, News::count());
 

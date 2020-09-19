@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Tests\Feature\Http\Controllers\TwoFactorAuth;
 
 use App\Models\User;
+use Database\Factories\UserFactory;
 use Illuminate\Contracts\Routing\UrlGenerator;
 use Illuminate\Contracts\Translation\Translator;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
@@ -19,7 +20,7 @@ final class EnableControllerTest extends TestCase
         $this->withoutExceptionHandling();
 
         /** @var User $user */
-        $user = factory(User::class)->states('2fa_disabled')->create();
+        $user = UserFactory::new()->twoFactorAuthDisabled()->create();
 
         $this->actingAs($user);
 

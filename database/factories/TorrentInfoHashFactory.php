@@ -2,24 +2,48 @@
 
 declare(strict_types=1);
 
-use App\Models\Torrent;
+namespace Database\Factories;
+
 use App\Models\TorrentInfoHash;
-use Faker\Generator as Faker;
-use Illuminate\Database\Eloquent\Factory;
+use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
 
-/** @var Factory $factory */
-$factory->define(TorrentInfoHash::class, function (Faker $faker) {
-    return [
-        'info_hash' => sha1(Str::random(200)),
-        'version' => 1,
-        'torrent_id' => function () {
-            return factory(Torrent::class)->create()->id;
-        },
-    ];
-});
+final class TorrentInfoHashFactory extends Factory
+{
+    /**
+     * The name of the factory's corresponding model.
+     *
+     * @var string
+     */
+    protected $model = TorrentInfoHash::class;
 
-$factory->state(TorrentInfoHash::class, 'v2', [
-    'info_hash' => substr(hash('sha256', Str::random(200)), 0, 40),
-    'version' => 2,
-]);
+    /**
+     * Define the model's default state.
+     *
+     * @return array
+     */
+    public function definition()
+    {
+        return [
+            'info_hash'  => sha1(Str::random(200)),
+            'version'    => 1,
+            'torrent_id' => TorrentFactory::new(),
+        ];
+    }
+
+    public function versionOne(): self
+    {
+        return $this->state([
+            'version'   => 1,
+            'info_hash' => sha1(Str::random(200)),
+        ]);
+    }
+
+    public function versionTwo(): self
+    {
+        return $this->state([
+            'version'   => 2,
+            'info_hash' => substr(hash('sha256', Str::random(200)), 0, 40),
+        ]);
+    }
+}

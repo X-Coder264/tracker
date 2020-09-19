@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Http\Controllers;
 
-use App\Models\Peer;
-use App\Models\Torrent;
-use App\Models\User;
+use Database\Factories\PeerFactory;
+use Database\Factories\TorrentFactory;
+use Database\Factories\UserFactory;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Tests\TestCase;
@@ -19,12 +19,12 @@ class UserTorrentsControllerTest extends TestCase
     {
         $this->withoutExceptionHandling();
 
-        $user = factory(User::class)->create();
-        $nonRelevantUser = factory(User::class)->create();
+        $user = UserFactory::new()->create();
+        $nonRelevantUser = UserFactory::new()->create();
 
-        $torrents = factory(Torrent::class, 2)->create(['uploader_id' => $user->id]);
-        $torrents[] = factory(Torrent::class)->states('dead')->create(['uploader_id' => $user->id]);
-        factory(Torrent::class, 2)->create(['uploader_id' => $nonRelevantUser->id]);
+        $torrents = TorrentFactory::new()->count(2)->create(['uploader_id' => $user->id]);
+        $torrents[] = TorrentFactory::new()->dead()->create(['uploader_id' => $user->id]);
+        TorrentFactory::new()->count(2)->create(['uploader_id' => $nonRelevantUser->id]);
 
         $this->actingAs($user);
 
@@ -52,12 +52,12 @@ class UserTorrentsControllerTest extends TestCase
     {
         $this->withoutExceptionHandling();
 
-        $loggedUser = factory(User::class)->create();
-        $user = factory(User::class)->create();
+        $loggedUser = UserFactory::new()->create();
+        $user = UserFactory::new()->create();
 
-        factory(Torrent::class, 2)->create(['uploader_id' => $loggedUser->id]);
-        factory(Torrent::class)->states('dead')->create(['uploader_id' => $loggedUser->id]);
-        $torrents = factory(Torrent::class, 2)->create(['uploader_id' => $user->id]);
+        TorrentFactory::new()->count(2)->create(['uploader_id' => $loggedUser->id]);
+        TorrentFactory::new()->dead()->create(['uploader_id' => $loggedUser->id]);
+        $torrents = TorrentFactory::new()->count(2)->create(['uploader_id' => $user->id]);
 
         $this->actingAs($loggedUser);
 
@@ -83,18 +83,18 @@ class UserTorrentsControllerTest extends TestCase
     {
         $this->withoutExceptionHandling();
 
-        $user = factory(User::class)->create();
-        $nonRelevantUser = factory(User::class)->create();
+        $user = UserFactory::new()->create();
+        $nonRelevantUser = UserFactory::new()->create();
 
-        $torrents = factory(Torrent::class, 2)->create(['uploader_id' => $user->id]);
-        $torrents[] = factory(Torrent::class)->states('dead')->create(['uploader_id' => $user->id]);
-        factory(Torrent::class, 2)->create(['uploader_id' => $nonRelevantUser->id]);
+        $torrents = TorrentFactory::new()->count(2)->create(['uploader_id' => $user->id]);
+        $torrents[] = TorrentFactory::new()->dead()->create(['uploader_id' => $user->id]);
+        TorrentFactory::new()->count(2)->create(['uploader_id' => $nonRelevantUser->id]);
 
-        $peerOne = factory(Peer::class)->states('seeder')->create(['user_id' => $user->id, 'torrent_id' => $torrents[0]->id, 'uploaded' => 1000]);
-        $peerTwo = factory(Peer::class)->states('seeder')->create(['user_id' => $user->id, 'torrent_id' => $torrents[2]->id]);
+        $peerOne = PeerFactory::new()->seeder()->create(['user_id' => $user->id, 'torrent_id' => $torrents[0]->id, 'uploaded' => 1000]);
+        $peerTwo = PeerFactory::new()->seeder()->create(['user_id' => $user->id, 'torrent_id' => $torrents[2]->id]);
 
-        factory(Peer::class)->states('leecher')->create(['user_id' => $user->id, 'torrent_id' => $torrents[2]->id]);
-        factory(Peer::class)->states('seeder')->create(['user_id' => $nonRelevantUser->id, 'torrent_id' => $torrents[0]->id]);
+        PeerFactory::new()->leecher()->create(['user_id' => $user->id, 'torrent_id' => $torrents[2]->id]);
+        PeerFactory::new()->seeder()->create(['user_id' => $nonRelevantUser->id, 'torrent_id' => $torrents[0]->id]);
 
         $this->actingAs($user);
 
@@ -130,18 +130,18 @@ class UserTorrentsControllerTest extends TestCase
     {
         $this->withoutExceptionHandling();
 
-        $user = factory(User::class)->create();
-        $nonRelevantUser = factory(User::class)->create();
+        $user = UserFactory::new()->create();
+        $nonRelevantUser = UserFactory::new()->create();
 
-        $torrents = factory(Torrent::class, 2)->create(['uploader_id' => $user->id]);
-        $torrents[] = factory(Torrent::class)->states('dead')->create(['uploader_id' => $user->id]);
-        factory(Torrent::class, 2)->create(['uploader_id' => $nonRelevantUser->id]);
+        $torrents = TorrentFactory::new()->count(2)->create(['uploader_id' => $user->id]);
+        $torrents[] = TorrentFactory::new()->dead()->create(['uploader_id' => $user->id]);
+        TorrentFactory::new()->count(2)->create(['uploader_id' => $nonRelevantUser->id]);
 
-        $peerOne = factory(Peer::class)->states('leecher')->create(['user_id' => $user->id, 'torrent_id' => $torrents[0]->id]);
-        $peerTwo = factory(Peer::class)->states('leecher')->create(['user_id' => $user->id, 'torrent_id' => $torrents[2]->id]);
+        $peerOne = PeerFactory::new()->leecher()->create(['user_id' => $user->id, 'torrent_id' => $torrents[0]->id]);
+        $peerTwo = PeerFactory::new()->leecher()->create(['user_id' => $user->id, 'torrent_id' => $torrents[2]->id]);
 
-        factory(Peer::class)->states('seeder')->create(['user_id' => $user->id, 'torrent_id' => $torrents[2]->id]);
-        factory(Peer::class)->states('leecher')->create(['user_id' => $nonRelevantUser->id, 'torrent_id' => $torrents[0]->id]);
+        PeerFactory::new()->seeder()->create(['user_id' => $user->id, 'torrent_id' => $torrents[2]->id]);
+        PeerFactory::new()->leecher()->create(['user_id' => $nonRelevantUser->id, 'torrent_id' => $torrents[0]->id]);
 
         $this->actingAs($user);
 
@@ -175,9 +175,9 @@ class UserTorrentsControllerTest extends TestCase
 
     public function testGuestGetsRedirectedToTheLoginPageWhenTryingToAccessTheUploadedPage(): void
     {
-        $user = factory(User::class)->create();
+        $user = UserFactory::new()->create();
 
-        factory(Torrent::class, 2)->create(['uploader_id' => $user->id]);
+        TorrentFactory::new()->count(2)->create(['uploader_id' => $user->id]);
 
         $response = $this->get(route('user-torrents.show-uploaded-torrents', $user));
 
@@ -187,9 +187,9 @@ class UserTorrentsControllerTest extends TestCase
 
     public function testGuestGetsRedirectedToTheLoginPageWhenTryingToAccessTheSeedingPage(): void
     {
-        $user = factory(User::class)->create();
+        $user = UserFactory::new()->create();
 
-        factory(Torrent::class, 2)->create(['uploader_id' => $user->id]);
+        TorrentFactory::new()->count(2)->create(['uploader_id' => $user->id]);
 
         $response = $this->get(route('user-torrents.show-seeding-torrents', $user));
 
@@ -199,9 +199,9 @@ class UserTorrentsControllerTest extends TestCase
 
     public function testGuestGetsRedirectedToTheLoginPageWhenTryingToAccessTheLeechingPage(): void
     {
-        $user = factory(User::class)->create();
+        $user = UserFactory::new()->create();
 
-        factory(Torrent::class, 2)->create(['uploader_id' => $user->id]);
+        TorrentFactory::new()->count(2)->create(['uploader_id' => $user->id]);
 
         $response = $this->get(route('user-torrents.show-leeching-torrents', $user));
 

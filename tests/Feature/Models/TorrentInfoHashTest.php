@@ -6,6 +6,7 @@ namespace Tests\Feature\Models;
 
 use App\Models\Torrent;
 use App\Models\TorrentInfoHash;
+use Database\Factories\TorrentInfoHashFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Tests\TestCase;
@@ -16,7 +17,7 @@ class TorrentInfoHashTest extends TestCase
 
     public function testTorrentRelationship(): void
     {
-        factory(TorrentInfoHash::class)->create();
+        TorrentInfoHashFactory::new()->create();
 
         $torrentInfoHash = TorrentInfoHash::firstOrFail();
         $torrent = Torrent::firstOrFail();

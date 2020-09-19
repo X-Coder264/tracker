@@ -8,12 +8,16 @@ use App\Models\Peer;
 use App\Models\PeerIP;
 use App\Models\PeerVersion;
 use App\Models\Snatch;
-use App\Models\Torrent;
-use App\Models\TorrentInfoHash;
-use App\Models\User;
 use App\Presenters\Announce\User as AnnounceUserModel;
 use App\Services\Bdecoder;
 use Carbon\CarbonImmutable;
+use Database\Factories\PeerFactory;
+use Database\Factories\PeerIPFactory;
+use Database\Factories\PeerVersionFactory;
+use Database\Factories\SnatchFactory;
+use Database\Factories\TorrentFactory;
+use Database\Factories\TorrentInfoHashFactory;
+use Database\Factories\UserFactory;
 use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Illuminate\Contracts\Routing\UrlGenerator;
@@ -38,9 +42,10 @@ final class AnnounceControllerTest extends TestCase
         $IP = '98.165.38.50';
         $port = 60000;
         $userAgent = 'my test user agent';
-        $torrent = factory(Torrent::class)->create(['seeders' => 0, 'leechers' => 0]);
-        factory(TorrentInfoHash::class)->create(['info_hash' => $infoHash, 'torrent_id' => $torrent->id]);
-        $user = factory(User::class)->create();
+        $torrent = TorrentFactory::new()
+            ->has(TorrentInfoHashFactory::new()->state(['info_hash' => $infoHash]), 'infoHashes')
+            ->create(['seeders' => 0, 'leechers' => 0]);
+        $user = UserFactory::new()->create();
 
         $cache = $this->app->make(Repository::class);
         $cache->put('user.' . $user->id . '.peers', 'test', 10);
@@ -135,9 +140,10 @@ final class AnnounceControllerTest extends TestCase
         $IP = '98.165.38.50';
         $port = 60000;
         $userAgent = 'my test user agent';
-        $torrent = factory(Torrent::class)->create(['seeders' => 0, 'leechers' => 0]);
-        factory(TorrentInfoHash::class)->create(['info_hash' => $infoHash, 'torrent_id' => $torrent->id, 'version' => 2]);
-        $user = factory(User::class)->create();
+        $torrent = TorrentFactory::new()
+            ->has(TorrentInfoHashFactory::new()->state(['info_hash' => $infoHash, 'version' => 2]), 'infoHashes')
+            ->create(['seeders' => 0, 'leechers' => 0]);
+        $user = UserFactory::new()->create();
 
         $response = $this->get(
             $this->app->make(UrlGenerator::class)->route(
@@ -228,13 +234,16 @@ final class AnnounceControllerTest extends TestCase
         $IP = '98.165.38.50';
         $port = 60000;
         $userAgent = 'my test user agent';
-        $torrent = factory(Torrent::class)->create(['seeders' => 1, 'leechers' => 0]);
-        factory(TorrentInfoHash::class)->create(['info_hash' => $v1InfoHash, 'torrent_id' => $torrent->id, 'version' => 1]);
-        factory(TorrentInfoHash::class)->create(['info_hash' => $v2InfoHash, 'torrent_id' => $torrent->id, 'version' => 2]);
-        $user = factory(User::class)->create();
-        $peer = factory(Peer::class)->states('seeder')->create(['torrent_id' => $torrent->id]);
-        factory(PeerIP::class)->create(['peer_id' => $peer->id, 'ip' => '98.165.38.51', 'is_ipv6' => false, 'port' => 55555]);
-        $peer->versions()->save(new PeerVersion(['version' => 1]));
+        $torrent = TorrentFactory::new()
+            ->has(TorrentInfoHashFactory::new()->state(['info_hash' => $v1InfoHash, 'version' => 1]), 'infoHashes')
+            ->has(TorrentInfoHashFactory::new()->state(['info_hash' => $v2InfoHash, 'version' => 2]), 'infoHashes')
+            ->create(['seeders' => 1, 'leechers' => 0]);
+        $user = UserFactory::new()->create();
+        $peer = PeerFactory::new()
+            ->has(PeerIPFactory::new()->state(['ip' => '98.165.38.51', 'is_ipv6' => false, 'port' => 55555]), 'ips')
+            ->has(PeerVersionFactory::new()->versionOne(), 'versions')
+            ->seeder()
+            ->create(['torrent_id' => $torrent->id]);
 
         $response = $this->get(
             $this->app->make(UrlGenerator::class)->route(
@@ -325,15 +334,16 @@ final class AnnounceControllerTest extends TestCase
         $IP = '98.165.38.50';
         $port = 60000;
         $userAgent = 'my test user agent';
-        $torrent = factory(Torrent::class)->create(['seeders' => 1, 'leechers' => 0]);
-        factory(TorrentInfoHash::class)->create(['info_hash' => $v1InfoHash, 'torrent_id' => $torrent->id, 'version' => 1]);
-        factory(TorrentInfoHash::class)->create(['info_hash' => $v2InfoHash, 'torrent_id' => $torrent->id, 'version' => 2]);
-        $user = factory(User::class)->create();
-        $peer = factory(Peer::class)->states('seeder')->create(['torrent_id' => $torrent->id]);
-        factory(PeerIP::class)->create(
-            ['peer_id' => $peer->id, 'ip' => '98.165.38.51', 'is_ipv6' => false, 'port' => 55555]
-        );
-        $peer->versions()->save(new PeerVersion(['version' => 2]));
+        $torrent = TorrentFactory::new()
+            ->has(TorrentInfoHashFactory::new()->state(['info_hash' => $v1InfoHash, 'version' => 1]), 'infoHashes')
+            ->has(TorrentInfoHashFactory::new()->state(['info_hash' => $v2InfoHash, 'version' => 2]), 'infoHashes')
+            ->create(['seeders' => 1, 'leechers' => 0]);
+        $user = UserFactory::new()->create();
+        $peer = PeerFactory::new()
+            ->has(PeerIPFactory::new()->state(['ip' => '98.165.38.51', 'is_ipv6' => false, 'port' => 55555]), 'ips')
+            ->has(PeerVersionFactory::new()->versionTwo(), 'versions')
+            ->seeder()
+            ->create(['torrent_id' => $torrent->id]);
 
         $response = $this->get(
             $this->app->make(UrlGenerator::class)->route(
@@ -423,24 +433,21 @@ final class AnnounceControllerTest extends TestCase
         $IP = '98.165.38.50';
         $port = 60000;
         $userAgent = 'my test user agent';
-        $torrent = factory(Torrent::class)->create(['seeders' => 1, 'leechers' => 1]);
-        factory(TorrentInfoHash::class)->create(['info_hash' => $v1InfoHash, 'torrent_id' => $torrent->id]);
-        factory(TorrentInfoHash::class)->create(['info_hash' => $v2InfoHash, 'torrent_id' => $torrent->id, 'version' => 2]);
-        $user = factory(User::class)->create();
-        $peerOne = factory(Peer::class)->states('v1')->create(
-            ['torrent_id' => $torrent->id, 'left' => 0, 'peer_id' => $peerIdOne]
-        );
-        factory(PeerVersion::class)->create(['peer_id' => $peerOne->id, 'version' => 2]);
-        $peerOneIP = factory(PeerIP::class)->create(
-            ['peer_id' => $peerOne->id, 'ip' => '98.165.38.51', 'is_ipv6' => false, 'port' => 55555]
-        );
-        $peerTwo = factory(Peer::class)->states('v1')->create(
-            ['torrent_id' => $torrent->id, 'left' => 500, 'peer_id' => $peerIdTwo]
-        );
-        factory(PeerVersion::class)->create(['peer_id' => $peerTwo->id, 'version' => 2]);
-        $peerTwoIP = factory(PeerIP::class)->create(
-            ['peer_id' => $peerTwo->id, 'ip' => '98.165.38.52', 'is_ipv6' => false, 'port' => 55556]
-        );
+        $torrent = TorrentFactory::new()
+            ->has(TorrentInfoHashFactory::new()->state(['info_hash' => $v1InfoHash, 'version' => 1]), 'infoHashes')
+            ->has(TorrentInfoHashFactory::new()->state(['info_hash' => $v2InfoHash, 'version' => 2]), 'infoHashes')
+            ->create(['seeders' => 1, 'leechers' => 1]);
+        $user = UserFactory::new()->create();
+        $peerOne = PeerFactory::new()
+            ->has(PeerIPFactory::new()->state(['ip' => '98.165.38.51', 'is_ipv6' => false, 'port' => 55555]), 'ips')
+            ->hybrid()
+            ->create(['torrent_id' => $torrent->id, 'left' => 0, 'peer_id' => $peerIdOne]);
+        $peerOneIP = $peerOne->ips->first();
+        $peerTwo = PeerFactory::new()
+            ->has(PeerIPFactory::new()->state(['ip' => '98.165.38.52', 'is_ipv6' => false, 'port' => 55556]), 'ips')
+            ->hybrid()
+            ->create(['torrent_id' => $torrent->id, 'left' => 500, 'peer_id' => $peerIdTwo]);
+        $peerTwoIP = $peerTwo->ips->first();
 
         $response = $this->get(
             $this->app->make(UrlGenerator::class)->route(
@@ -551,9 +558,10 @@ final class AnnounceControllerTest extends TestCase
         $IP = '98.165.38.50';
         $port = 60000;
         $userAgent = 'my test user agent';
-        $torrent = factory(Torrent::class)->create(['seeders' => 0, 'leechers' => 0]);
-        factory(TorrentInfoHash::class)->create(['info_hash' => $infoHash, 'torrent_id' => $torrent->id]);
-        $user = factory(User::class)->create();
+        $torrent = TorrentFactory::new()
+            ->has(TorrentInfoHashFactory::new()->state(['info_hash' => $infoHash]), 'infoHashes')
+            ->create(['seeders' => 0, 'leechers' => 0]);
+        $user = UserFactory::new()->create();
 
         $cache = $this->app->make(Repository::class);
         $cache->put('user.' . $user->id . '.peers', 'test', 10);
@@ -630,27 +638,29 @@ final class AnnounceControllerTest extends TestCase
         $IP = '98.165.38.50';
         $port = 60000;
         $userAgent = 'my test user agent';
-        $torrent = factory(Torrent::class)->create(['seeders' => 1, 'leechers' => 0]);
-        factory(TorrentInfoHash::class)->create(['info_hash' => $infoHash, 'torrent_id' => $torrent->id]);
-        $user = factory(User::class)->create();
+        $torrent = TorrentFactory::new()
+            ->has(TorrentInfoHashFactory::new()->state(['info_hash' => $infoHash]), 'infoHashes')
+            ->create(['seeders' => 1, 'leechers' => 0]);
+        $user = UserFactory::new()->create();
 
         $cache = $this->app->make(Repository::class);
         $cache->put('user.' . $user->id . '.peers', 'test', 10);
 
-        $peer = factory(Peer::class)->states('v1')->create(
-            [
-                'torrent_id' => $torrent->id,
-                'left'       => 0,
-                'peer_id'    => $peerId,
-                'user_id'    => $user->id,
-                'uploaded'   => 2000,
-                'downloaded' => $torrent->getRawOriginal('size'),
-                'created_at' => CarbonImmutable::now()->subMinutes(300),
-                'updated_at' => CarbonImmutable::now()->subMinutes(40),
-            ]
-        );
-        factory(PeerIP::class)->create(['peer_id' => $peer->id, 'ip' => $IP, 'is_ipv6' => false, 'port' => $port]);
-        $snatch = factory(Snatch::class)->create(
+        $peer = PeerFactory::new()->versionOne()
+            ->has(PeerIPFactory::new()->state(['ip' => $IP, 'is_ipv6' => false, 'port' => $port]), 'ips')
+            ->create(
+                [
+                    'torrent_id' => $torrent->id,
+                    'left'       => 0,
+                    'peer_id'    => $peerId,
+                    'user_id'    => $user->id,
+                    'uploaded'   => 2000,
+                    'downloaded' => $torrent->getRawOriginal('size'),
+                    'created_at' => CarbonImmutable::now()->subMinutes(300),
+                    'updated_at' => CarbonImmutable::now()->subMinutes(40),
+                ]
+            );
+        $snatch = SnatchFactory::new()->create(
             [
                 'torrent_id'      => $torrent->id,
                 'user_id'         => $user->id,
@@ -730,33 +740,37 @@ final class AnnounceControllerTest extends TestCase
         $IP = '98.165.38.50';
         $port = 60000;
         $userAgent = 'my test user agent';
-        $torrent = factory(Torrent::class)->create(
-            [
-                'seeders'  => 0,
-                'leechers' => 1,
-                'size'     => 3000,
-            ]
-        );
-        factory(TorrentInfoHash::class)->create(['info_hash' => $infoHash, 'torrent_id' => $torrent->id]);
-        $user = factory(User::class)->create();
+        $torrent = TorrentFactory::new()
+            ->has(TorrentInfoHashFactory::new()->state(['info_hash' => $infoHash]), 'infoHashes')
+            ->create(
+                [
+                    'seeders'  => 0,
+                    'leechers' => 1,
+                    'size'     => 3000,
+                ]
+            );
+
+        $user = UserFactory::new()->create();
 
         $cache = $this->app->make(Repository::class);
         $cache->put('user.' . $user->id . '.peers', 'test', 10);
 
-        $peer = factory(Peer::class)->states('v1')->create(
-            [
-                'torrent_id' => $torrent->id,
-                'left'       => 300,
-                'peer_id'    => $peerId,
-                'user_id'    => $user->id,
-                'uploaded'   => 2000,
-                'downloaded' => 1000,
-                'created_at' => CarbonImmutable::now()->subMinutes(300),
-                'updated_at' => CarbonImmutable::now()->subMinutes(40),
-            ]
-        );
-        factory(PeerIP::class)->create(['peer_id' => $peer->id, 'ip' => $IP, 'is_ipv6' => false, 'port' => $port]);
-        $snatch = factory(Snatch::class)->create(
+        $peer = PeerFactory::new()
+            ->has(PeerIPFactory::new()->state(['ip' => $IP, 'is_ipv6' => false, 'port' => $port]), 'ips')
+            ->versionOne()
+            ->create(
+                [
+                    'torrent_id' => $torrent->id,
+                    'left'       => 300,
+                    'peer_id'    => $peerId,
+                    'user_id'    => $user->id,
+                    'uploaded'   => 2000,
+                    'downloaded' => 1000,
+                    'created_at' => CarbonImmutable::now()->subMinutes(300),
+                    'updated_at' => CarbonImmutable::now()->subMinutes(40),
+                ]
+            );
+        $snatch = SnatchFactory::new()->create(
             [
                 'torrent_id'      => $torrent->id,
                 'user_id'         => $user->id,
@@ -837,46 +851,48 @@ final class AnnounceControllerTest extends TestCase
         $IP = '98.165.38.50';
         $port = 60000;
         $userAgent = 'my test user agent';
-        $torrent = factory(Torrent::class)->create(
-            [
-                'seeders'  => 1,
-                'leechers' => 2,
-                'size'     => 5000,
-            ]
-        );
-        factory(TorrentInfoHash::class)->create(['info_hash' => $infoHash, 'torrent_id' => $torrent->id]);
-        $user = factory(User::class)->create();
+        $torrent = TorrentFactory::new()
+            ->has(TorrentInfoHashFactory::new()->state(['info_hash' => $infoHash]), 'infoHashes')
+            ->create(
+                [
+                    'seeders'  => 1,
+                    'leechers' => 2,
+                    'size'     => 5000,
+                ]
+            );
+
+        $user = UserFactory::new()->create();
 
         $cache = $this->app->make(Repository::class);
         $cache->put('user.' . $user->id . '.peers', 'test', 10);
 
-        $peerOne = factory(Peer::class)->states('v1')->create(
-            ['torrent_id' => $torrent->id, 'left' => 0, 'peer_id' => $peerIdOne]
-        );
-        factory(PeerIP::class)->create(
-            ['peer_id' => $peerOne->id, 'ip' => '98.165.38.51', 'is_ipv6' => false, 'port' => 55555]
-        );
-        $peerTwo = factory(Peer::class)->states('v1')->create(
-            ['torrent_id' => $torrent->id, 'left' => 400, 'peer_id' => $peerIdTwo]
-        );
-        $peerTwoIP = factory(PeerIP::class)->create(
-            ['peer_id' => $peerTwo->id, 'ip' => '98.165.38.52', 'is_ipv6' => false, 'port' => 55556]
-        );
+        $peerOne = PeerFactory::new()
+            ->has(PeerIPFactory::new()->state(['ip' => '98.165.38.51', 'is_ipv6' => false, 'port' => 55555]), 'ips')
+            ->versionOne()
+            ->create(['torrent_id' => $torrent->id, 'left' => 0, 'peer_id' => $peerIdOne]);
+        $peerTwo = PeerFactory::new()
+            ->has(PeerIPFactory::new()->state(['ip' => '98.165.38.52', 'is_ipv6' => false, 'port' => 55556]), 'ips')
+            ->versionOne()
+            ->create(['torrent_id' => $torrent->id, 'left' => 400, 'peer_id' => $peerIdTwo]);
 
-        $leecher = factory(Peer::class)->states('v1')->create(
-            [
-                'torrent_id' => $torrent->id,
-                'user_id'    => $user->id,
-                'left'       => 500,
-                'peer_id'    => $peerId,
-                'uploaded'   => 2000,
-                'downloaded' => 1000,
-                'created_at' => CarbonImmutable::now()->subMinutes(300),
-                'updated_at' => CarbonImmutable::now()->subMinutes(40),
-            ]
-        );
-        factory(PeerIP::class)->create(['peer_id' => $leecher->id, 'ip' => $IP, 'is_ipv6' => false, 'port' => $port]);
-        $snatch = factory(Snatch::class)->create(
+        $peerTwoIP = $peerTwo->ips->first();
+
+        $leecher = PeerFactory::new()
+            ->has(PeerIPFactory::new()->state(['ip' => $IP, 'is_ipv6' => false, 'port' => $port]), 'ips')
+            ->versionOne()
+            ->create(
+                [
+                    'torrent_id' => $torrent->id,
+                    'user_id'    => $user->id,
+                    'left'       => 500,
+                    'peer_id'    => $peerId,
+                    'uploaded'   => 2000,
+                    'downloaded' => 1000,
+                    'created_at' => CarbonImmutable::now()->subMinutes(300),
+                    'updated_at' => CarbonImmutable::now()->subMinutes(40),
+                ]
+            );
+        $snatch = SnatchFactory::new()->create(
             [
                 'torrent_id'      => $torrent->id,
                 'user_id'         => $user->id,
@@ -986,29 +1002,32 @@ final class AnnounceControllerTest extends TestCase
         $IP = '98.165.38.50';
         $port = 60000;
         $userAgent = 'my test user agent';
-        $torrent = factory(Torrent::class)->create(
-            [
-                'seeders'  => 1,
-                'leechers' => 0,
-                'size'     => 1000,
-            ]
-        );
-        factory(TorrentInfoHash::class)->create(['info_hash' => $infoHash, 'torrent_id' => $torrent->id]);
-        $user = factory(User::class)->create();
-        $seeder = factory(Peer::class)->states('v1')->create(
-            [
-                'torrent_id' => $torrent->id,
-                'user_id'    => $user->id,
-                'left'       => 0,
-                'peer_id'    => $peerId,
-                'uploaded'   => 2000,
-                'downloaded' => 1000,
-                'created_at' => CarbonImmutable::now()->subMinutes(300),
-                'updated_at' => CarbonImmutable::now()->subMinutes(40),
-            ]
-        );
-        factory(PeerIP::class)->create(['peer_id' => $seeder->id, 'ip' => $IP, 'is_ipv6' => false, 'port' => $port]);
-        $snatch = factory(Snatch::class)->create(
+        $torrent = TorrentFactory::new()
+            ->has(TorrentInfoHashFactory::new()->state(['info_hash' => $infoHash]), 'infoHashes')
+            ->create(
+                [
+                    'seeders'  => 1,
+                    'leechers' => 0,
+                    'size'     => 1000,
+                ]
+            );
+        $user = UserFactory::new()->create();
+        $seeder = PeerFactory::new()
+            ->has(PeerIPFactory::new()->state(['ip' => $IP, 'is_ipv6' => false, 'port' => $port]), 'ips')
+            ->versionOne()
+            ->create(
+                [
+                    'torrent_id' => $torrent->id,
+                    'user_id'    => $user->id,
+                    'left'       => 0,
+                    'peer_id'    => $peerId,
+                    'uploaded'   => 2000,
+                    'downloaded' => 1000,
+                    'created_at' => CarbonImmutable::now()->subMinutes(300),
+                    'updated_at' => CarbonImmutable::now()->subMinutes(40),
+                ]
+            );
+        $snatch = SnatchFactory::new()->create(
             [
                 'torrent_id'      => $torrent->id,
                 'user_id'         => $user->id,
@@ -1103,29 +1122,32 @@ final class AnnounceControllerTest extends TestCase
         $IP = '98.165.38.50';
         $port = 60000;
         $userAgent = 'my test user agent';
-        $torrent = factory(Torrent::class)->create(
-            [
-                'seeders'  => 0,
-                'leechers' => 1,
-                'size'     => 5000,
-            ]
-        );
-        factory(TorrentInfoHash::class)->create(['info_hash' => $infoHash, 'torrent_id' => $torrent->id]);
-        $user = factory(User::class)->create();
-        $leecher = factory(Peer::class)->states('v1')->create(
-            [
-                'torrent_id' => $torrent->id,
-                'user_id'    => $user->id,
-                'left'       => 500,
-                'peer_id'    => $peerId,
-                'uploaded'   => 2000,
-                'downloaded' => 1000,
-                'created_at' => CarbonImmutable::now()->subMinutes(300),
-                'updated_at' => CarbonImmutable::now()->subMinutes(40),
-            ]
-        );
-        factory(PeerIP::class)->create(['peer_id' => $leecher->id, 'ip' => $IP, 'is_ipv6' => false, 'port' => $port]);
-        $snatch = factory(Snatch::class)->create(
+        $torrent = TorrentFactory::new()
+            ->has(TorrentInfoHashFactory::new()->state(['info_hash' => $infoHash]), 'infoHashes')
+            ->create(
+                [
+                    'seeders'  => 0,
+                    'leechers' => 1,
+                    'size'     => 5000,
+                ]
+            );
+        $user = UserFactory::new()->create();
+        $leecher = PeerFactory::new()
+            ->has(PeerIPFactory::new()->state(['ip' => $IP, 'is_ipv6' => false, 'port' => $port]), 'ips')
+            ->versionOne()
+            ->create(
+                [
+                    'torrent_id' => $torrent->id,
+                    'user_id'    => $user->id,
+                    'left'       => 500,
+                    'peer_id'    => $peerId,
+                    'uploaded'   => 2000,
+                    'downloaded' => 1000,
+                    'created_at' => CarbonImmutable::now()->subMinutes(300),
+                    'updated_at' => CarbonImmutable::now()->subMinutes(40),
+                ]
+            );
+        $snatch = SnatchFactory::new()->create(
             [
                 'torrent_id'      => $torrent->id,
                 'user_id'         => $user->id,
@@ -1219,38 +1241,41 @@ final class AnnounceControllerTest extends TestCase
         $IP = '98.165.38.50';
         $port = 60000;
         $userAgent = 'my test user agent';
-        $torrent = factory(Torrent::class)->create(
-            [
-                'seeders'  => 1,
-                'leechers' => 0,
-                'size'     => 1000,
-            ]
-        );
-        factory(TorrentInfoHash::class)->create(['info_hash' => $v1InfoHash, 'torrent_id' => $torrent->id]);
-        factory(TorrentInfoHash::class)->create(['info_hash' => $v2InfoHash, 'torrent_id' => $torrent->id, 'version' => 2]);
-        $user = factory(User::class)->create();
-        $seeder = factory(Peer::class)->states('v1')->create(
-            [
-                'torrent_id' => $torrent->id,
-                'user_id'    => $user->id,
-                'left'       => 0,
-                'peer_id'    => $peerId,
-                'uploaded'   => 2000,
-                'downloaded' => 1000,
-                'created_at' => CarbonImmutable::now()->subMinutes(300),
-                'updated_at' => CarbonImmutable::now()->subSeconds(1),
-            ]
-        );
+        $torrent = TorrentFactory::new()
+            ->has(TorrentInfoHashFactory::new()->state(['info_hash' => $v1InfoHash, 'version' => 1]), 'infoHashes')
+            ->has(TorrentInfoHashFactory::new()->state(['info_hash' => $v2InfoHash, 'version' => 2]), 'infoHashes')
+            ->create(
+                [
+                    'seeders'  => 1,
+                    'leechers' => 0,
+                    'size'     => 1000,
+                ]
+            );
+        $user = UserFactory::new()->create();
+        $seeder = PeerFactory::new()
+            ->has(PeerIPFactory::new()->state(['ip' => $IP, 'is_ipv6' => false, 'port' => $port]), 'ips')
+            ->versionOne()
+            ->create(
+                [
+                    'torrent_id' => $torrent->id,
+                    'user_id'    => $user->id,
+                    'left'       => 0,
+                    'peer_id'    => $peerId,
+                    'uploaded'   => 2000,
+                    'downloaded' => 1000,
+                    'created_at' => CarbonImmutable::now()->subMinutes(300),
+                    'updated_at' => CarbonImmutable::now()->subSeconds(1),
+                ]
+            );
 
         $this->app->make(ConnectionInterface::class)->table('peers_version')
             ->where('peer_id', '=', $seeder->id)
             ->where('version', '=', 1)
             ->update(['updated_at' => CarbonImmutable::now()->subSeconds(1)]);
-        factory(PeerVersion::class)->states('v2')->create(
+        PeerVersionFactory::new()->versionTwo()->create(
             ['peer_id' => $seeder->id, 'updated_at' => CarbonImmutable::now()->subMinutes(40)]
         );
-        factory(PeerIP::class)->create(['peer_id' => $seeder->id, 'ip' => $IP, 'is_ipv6' => false, 'port' => $port]);
-        $snatch = factory(Snatch::class)->create(
+        $snatch = SnatchFactory::new()->create(
             [
                 'torrent_id'      => $torrent->id,
                 'user_id'         => $user->id,
@@ -1346,28 +1371,31 @@ final class AnnounceControllerTest extends TestCase
         $IP = '98.165.38.50';
         $port = 60000;
         $userAgent = 'my test user agent';
-        $torrent = factory(Torrent::class)->create(
-            [
-                'seeders'  => 0,
-                'leechers' => 1,
-                'size'     => 5000,
-            ]
-        );
-        factory(TorrentInfoHash::class)->create(['info_hash' => $infoHash, 'torrent_id' => $torrent->id]);
-        $user = factory(User::class)->create();
-        $leecher = factory(Peer::class)->states('v1')->create(
-            [
-                'torrent_id' => $torrent->id,
-                'user_id'    => $user->id,
-                'left'       => 4000,
-                'peer_id'    => $peerId,
-                'uploaded'   => 2000,
-                'downloaded' => 1000,
-                'created_at' => CarbonImmutable::now()->subMinutes(300),
-                'updated_at' => CarbonImmutable::now()->subMinutes(40),
-            ]
-        );
-        factory(PeerIP::class)->create(['peer_id' => $leecher->id, 'ip' => $IP, 'is_ipv6' => false, 'port' => $port]);
+        $torrent = TorrentFactory::new()
+            ->has(TorrentInfoHashFactory::new()->state(['info_hash' => $infoHash]), 'infoHashes')
+            ->create(
+                [
+                    'seeders'  => 0,
+                    'leechers' => 1,
+                    'size'     => 5000,
+                ]
+            );
+        $user = UserFactory::new()->create();
+        $leecher = PeerFactory::new()
+            ->has(PeerIPFactory::new()->state(['ip' => $IP, 'is_ipv6' => false, 'port' => $port]), 'ips')
+            ->versionOne()
+            ->create(
+                [
+                    'torrent_id' => $torrent->id,
+                    'user_id'    => $user->id,
+                    'left'       => 4000,
+                    'peer_id'    => $peerId,
+                    'uploaded'   => 2000,
+                    'downloaded' => 1000,
+                    'created_at' => CarbonImmutable::now()->subMinutes(300),
+                    'updated_at' => CarbonImmutable::now()->subMinutes(40),
+                ]
+            );
 
         $response = $this->get(
             $this->app->make(UrlGenerator::class)->route(
@@ -1439,16 +1467,17 @@ final class AnnounceControllerTest extends TestCase
         $IP = '98.165.38.50';
         $port = 60000;
         $userAgent = 'my test user agent';
-        $torrent = factory(Torrent::class)->create(
-            [
-                'seeders'  => 0,
-                'leechers' => 0,
-                'size'     => 5000,
-            ]
-        );
-        factory(TorrentInfoHash::class)->create(['info_hash' => $infoHash, 'torrent_id' => $torrent->id]);
-        $user = factory(User::class)->create();
-        $snatch = factory(Snatch::class)->create(
+        $torrent = TorrentFactory::new()
+            ->has(TorrentInfoHashFactory::new()->state(['info_hash' => $infoHash]), 'infoHashes')
+            ->create(
+                [
+                    'seeders'  => 0,
+                    'leechers' => 0,
+                    'size'     => 5000,
+                ]
+            );
+        $user = UserFactory::new()->create();
+        $snatch = SnatchFactory::new()->create(
             [
                 'torrent_id'      => $torrent->id,
                 'user_id'         => $user->id,
@@ -1542,15 +1571,16 @@ final class AnnounceControllerTest extends TestCase
         $IP = '98.165.38.50';
         $port = 60000;
         $userAgent = 'my test user agent';
-        $torrent = factory(Torrent::class)->create(
-            [
-                'seeders'  => 0,
-                'leechers' => 0,
-                'size'     => 5000,
-            ]
-        );
-        factory(TorrentInfoHash::class)->create(['info_hash' => $infoHash, 'torrent_id' => $torrent->id]);
-        $user = factory(User::class)->create();
+        $torrent = TorrentFactory::new()
+            ->has(TorrentInfoHashFactory::new()->state(['info_hash' => $infoHash]), 'infoHashes')
+            ->create(
+                [
+                    'seeders'  => 0,
+                    'leechers' => 0,
+                    'size'     => 5000,
+                ]
+            );
+        $user = UserFactory::new()->create();
 
         $response = $this->get(
             $this->app->make(UrlGenerator::class)->route(
@@ -1621,15 +1651,16 @@ final class AnnounceControllerTest extends TestCase
         $IP = '98.165.38.50';
         $port = 60000;
         $userAgent = 'my test user agent';
-        $torrent = factory(Torrent::class)->create(
-            [
-                'seeders'  => 0,
-                'leechers' => 0,
-                'size'     => 5000,
-            ]
-        );
-        factory(TorrentInfoHash::class)->create(['info_hash' => $infoHash, 'torrent_id' => $torrent->id]);
-        $user = factory(User::class)->create();
+        $torrent = TorrentFactory::new()
+            ->has(TorrentInfoHashFactory::new()->state(['info_hash' => $infoHash]), 'infoHashes')
+            ->create(
+                [
+                    'seeders'  => 0,
+                    'leechers' => 0,
+                    'size'     => 5000,
+                ]
+            );
+        $user = UserFactory::new()->create();
 
         $response = $this->get(
             $this->app->make(UrlGenerator::class)->route(
@@ -1700,22 +1731,24 @@ final class AnnounceControllerTest extends TestCase
         $IPv6 = '2001::53aa:64c:0:7f83:bc43:dec9';
         $port = 60000;
         $userAgent = 'my test user agent';
-        $torrent = factory(Torrent::class)->create(['seeders' => 2, 'leechers' => 0]);
-        factory(TorrentInfoHash::class)->create(['info_hash' => $infoHash, 'torrent_id' => $torrent->id]);
-        $user = factory(User::class)->create();
-        $peerOne = factory(Peer::class)->states('v1')->create(['torrent_id' => $torrent->id, 'left' => 0]);
-        $peerOneIP = factory(PeerIP::class)->create(
-            ['peer_id' => $peerOne->id, 'ip' => '98.165.38.51', 'is_ipv6' => false, 'port' => 55555]
-        );
-        $peerTwo = factory(Peer::class)->states('v1')->create(['torrent_id' => $torrent->id, 'left' => 0]);
-        $peerTwoIP = factory(PeerIP::class)->create(
-            [
-                'peer_id' => $peerTwo->id,
+        $torrent = TorrentFactory::new()
+            ->has(TorrentInfoHashFactory::new()->state(['info_hash' => $infoHash]), 'infoHashes')
+            ->create(['seeders' => 2, 'leechers' => 0]);
+        $user = UserFactory::new()->create();
+        $peerOne = PeerFactory::new()
+            ->has(PeerIPFactory::new()->state(['ip' => '98.165.38.51', 'is_ipv6' => false, 'port' => 55555]), 'ips')
+            ->versionOne()
+            ->create(['torrent_id' => $torrent->id, 'left' => 0]);
+        $peerOneIP = $peerOne->ips->first();
+        $peerTwo = PeerFactory::new()
+            ->has(PeerIPFactory::new()->state([
                 'ip'      => '2001::53aa:64c:0:7f83:bc43:ded9',
                 'is_ipv6' => true,
                 'port'    => 55556,
-            ]
-        );
+            ]), 'ips')
+            ->versionOne()
+            ->create(['torrent_id' => $torrent->id, 'left' => 0]);
+        $peerTwoIP = $peerTwo->ips->first();
 
         $response = $this->get(
             $this->app->make(UrlGenerator::class)->route(
@@ -1814,22 +1847,24 @@ final class AnnounceControllerTest extends TestCase
         $IPv6 = '2001::53aa:64c:0:7f83:bc43:dec9';
         $port = 60000;
         $userAgent = 'my test user agent';
-        $torrent = factory(Torrent::class)->create(['seeders' => 2, 'leechers' => 0]);
-        factory(TorrentInfoHash::class)->create(['info_hash' => $infoHash, 'torrent_id' => $torrent->id]);
-        $user = factory(User::class)->create();
-        $peerOne = factory(Peer::class)->states('v1')->create(['torrent_id' => $torrent->id, 'left' => 0]);
-        $peerOneIP = factory(PeerIP::class)->create(
-            ['peer_id' => $peerOne->id, 'ip' => '98.165.38.51', 'is_ipv6' => false, 'port' => 55555]
-        );
-        $peerTwo = factory(Peer::class)->states('v1')->create(['torrent_id' => $torrent->id, 'left' => 0]);
-        $peerTwoIP = factory(PeerIP::class)->create(
-            [
-                'peer_id' => $peerTwo->id,
+        $torrent = TorrentFactory::new()
+            ->has(TorrentInfoHashFactory::new()->state(['info_hash' => $infoHash]), 'infoHashes')
+            ->create(['seeders' => 2, 'leechers' => 0]);
+        $user = UserFactory::new()->create();
+        $peerOne = PeerFactory::new()
+            ->has(PeerIPFactory::new()->state(['ip' => '98.165.38.51', 'is_ipv6' => false, 'port' => 55555]), 'ips')
+            ->versionOne()
+            ->create(['torrent_id' => $torrent->id, 'left' => 0]);
+        $peerOneIP = $peerOne->ips->first();
+        $peerTwo = PeerFactory::new()
+            ->has(PeerIPFactory::new()->state([
                 'ip'      => '2001::53aa:64c:0:7f83:bc43:ded9',
                 'is_ipv6' => true,
                 'port'    => 55556,
-            ]
-        );
+            ]), 'ips')
+            ->versionOne()
+            ->create(['torrent_id' => $torrent->id, 'left' => 0]);
+        $peerTwoIP = $peerTwo->ips->first();
 
         $response = $this->get(
             $this->app->make(UrlGenerator::class)->route(
@@ -1929,15 +1964,15 @@ final class AnnounceControllerTest extends TestCase
         $IP = '98.165.38.50';
         $port = 60000;
         $userAgent = 'my test user agent';
-        $torrent = factory(Torrent::class)->create(['seeders' => 1, 'leechers' => 1]);
-        factory(TorrentInfoHash::class)->create(['info_hash' => $infoHash, 'torrent_id' => $torrent->id]);
-        $user = factory(User::class)->create();
-        $peerOne = factory(Peer::class)->states('v1')->create(
-            ['torrent_id' => $torrent->id, 'left' => 0, 'peer_id' => $peerIdOne]
-        );
-        $peerOneIP = factory(PeerIP::class)->create(
-            ['peer_id' => $peerOne->id, 'ip' => '98.165.38.51', 'is_ipv6' => false, 'port' => 55555]
-        );
+        $torrent = TorrentFactory::new()
+            ->has(TorrentInfoHashFactory::new()->state(['info_hash' => $infoHash]), 'infoHashes')
+            ->create(['seeders' => 1, 'leechers' => 1]);
+        $user = UserFactory::new()->create();
+        $peerOne = PeerFactory::new()
+            ->has(PeerIPFactory::new()->state(['ip' => '98.165.38.51', 'is_ipv6' => false, 'port' => 55555]), 'ips')
+            ->versionOne()
+            ->create(['torrent_id' => $torrent->id, 'left' => 0, 'peer_id' => $peerIdOne]);
+        $peerOneIP = $peerOne->ips->first();
 
         $response = $this->get(
             $this->app->make(UrlGenerator::class)->route(
@@ -2038,21 +2073,20 @@ final class AnnounceControllerTest extends TestCase
         $IP = '98.165.38.50';
         $port = 60000;
         $userAgent = 'my test user agent';
-        $torrent = factory(Torrent::class)->create(['seeders' => 1, 'leechers' => 1]);
-        factory(TorrentInfoHash::class)->create(['info_hash' => $infoHash, 'torrent_id' => $torrent->id]);
-        $user = factory(User::class)->create();
-        $peerOne = factory(Peer::class)->states('v1')->create(
-            ['torrent_id' => $torrent->id, 'left' => 0, 'peer_id' => $peerIdOne]
-        );
-        $peerOneIP = factory(PeerIP::class)->create(
-            ['peer_id' => $peerOne->id, 'ip' => '98.165.38.51', 'is_ipv6' => false, 'port' => 55555]
-        );
-        $peerTwo = factory(Peer::class)->states('v1')->create(
-            ['torrent_id' => $torrent->id, 'left' => 1000, 'peer_id' => $peerIdTwo]
-        );
-        $peerTwoIP = factory(PeerIP::class)->create(
-            ['peer_id' => $peerTwo->id, 'ip' => '98.165.38.52', 'is_ipv6' => false, 'port' => 55556]
-        );
+        $torrent = TorrentFactory::new()
+            ->has(TorrentInfoHashFactory::new()->state(['info_hash' => $infoHash]), 'infoHashes')
+            ->create(['seeders' => 1, 'leechers' => 1]);
+        $user = UserFactory::new()->create();
+        $peerOne = PeerFactory::new()
+            ->has(PeerIPFactory::new()->state(['ip' => '98.165.38.51', 'is_ipv6' => false, 'port' => 55555]), 'ips')
+            ->versionOne()
+            ->create(['torrent_id' => $torrent->id, 'left' => 0, 'peer_id' => $peerIdOne]);
+        $peerOneIP = $peerOne->ips->first();
+        $peerTwo = PeerFactory::new()
+            ->has(PeerIPFactory::new()->state(['ip' => '98.165.38.52', 'is_ipv6' => false, 'port' => 55556]), 'ips')
+            ->versionOne()
+            ->create(['torrent_id' => $torrent->id, 'left' => 1000, 'peer_id' => $peerIdTwo]);
+        $peerTwoIP = $peerTwo->ips->first();
 
         $response = $this->get(
             $this->app->make(UrlGenerator::class)->route(
@@ -2164,22 +2198,23 @@ final class AnnounceControllerTest extends TestCase
         $IP = '98.165.38.50';
         $port = 60000;
         $userAgent = 'my test user agent';
-        $torrent = factory(Torrent::class)->create(['seeders' => 0, 'leechers' => 1]);
-        factory(TorrentInfoHash::class)->create(['info_hash' => $infoHash, 'torrent_id' => $torrent->id]);
-        $user = factory(User::class)->create();
-        $peerOne = factory(Peer::class)->states('v1')->create(
-            [
-                'torrent_id' => $torrent->id,
-                'left'       => 500,
-                'peer_id'    => $peerId,
-                'user_id'    => $user->id,
-                'downloaded' => 200,
-                'uploaded'   => 100,
-            ]
-        );
-        factory(PeerIP::class)->create(
-            ['peer_id' => $peerOne->id, 'ip' => '98.165.38.51', 'is_ipv6' => false, 'port' => 55555]
-        );
+        $torrent = TorrentFactory::new()
+            ->has(TorrentInfoHashFactory::new()->state(['info_hash' => $infoHash]), 'infoHashes')
+            ->create(['seeders' => 0, 'leechers' => 1]);
+        $user = UserFactory::new()->create();
+        $peerOne = PeerFactory::new()
+            ->has(PeerIPFactory::new()->state(['ip' => '98.165.38.51', 'is_ipv6' => false, 'port' => 55555]), 'ips')
+            ->versionOne()
+            ->create(
+                [
+                    'torrent_id' => $torrent->id,
+                    'left'       => 500,
+                    'peer_id'    => $peerId,
+                    'user_id'    => $user->id,
+                    'downloaded' => 200,
+                    'uploaded'   => 100,
+                ]
+            );
 
         $response = $this->get(
             $this->app->make(UrlGenerator::class)->route(
@@ -2234,22 +2269,23 @@ final class AnnounceControllerTest extends TestCase
         $IP = '98.165.38.50';
         $port = 60000;
         $userAgent = 'my test user agent';
-        $torrent = factory(Torrent::class)->create(['seeders' => 0, 'leechers' => 1]);
-        factory(TorrentInfoHash::class)->create(['info_hash' => $infoHash, 'torrent_id' => $torrent->id]);
-        $user = factory(User::class)->create();
-        $peerOne = factory(Peer::class)->states('v1')->create(
-            [
-                'torrent_id' => $torrent->id,
-                'left'       => 500,
-                'peer_id'    => $peerId,
-                'user_id'    => $user->id,
-                'downloaded' => 200,
-                'uploaded'   => 100,
-            ]
-        );
-        factory(PeerIP::class)->create(
-            ['peer_id' => $peerOne->id, 'ip' => '98.165.38.51', 'is_ipv6' => false, 'port' => 55555]
-        );
+        $torrent = TorrentFactory::new()
+            ->has(TorrentInfoHashFactory::new()->state(['info_hash' => $infoHash]), 'infoHashes')
+            ->create(['seeders' => 0, 'leechers' => 1]);
+        $user = UserFactory::new()->create();
+        $peerOne = PeerFactory::new()
+            ->has(PeerIPFactory::new()->state(['ip' => '98.165.38.51', 'is_ipv6' => false, 'port' => 55555]), 'ips')
+            ->versionOne()
+            ->create(
+                [
+                    'torrent_id' => $torrent->id,
+                    'left'       => 500,
+                    'peer_id'    => $peerId,
+                    'user_id'    => $user->id,
+                    'downloaded' => 200,
+                    'uploaded'   => 100,
+                ]
+            );
 
         $response = $this->get(
             $this->app->make(UrlGenerator::class)->route(
@@ -2304,9 +2340,10 @@ final class AnnounceControllerTest extends TestCase
         $IP = '98.165.38.50';
         $port = 60000;
         $userAgent = 'my test user agent';
-        $torrent = factory(Torrent::class)->create(['seeders' => 0, 'leechers' => 0]);
-        factory(TorrentInfoHash::class)->create(['info_hash' => $infoHash, 'torrent_id' => $torrent->id]);
-        $user = factory(User::class)->create();
+        $torrent = TorrentFactory::new()
+            ->has(TorrentInfoHashFactory::new()->state(['info_hash' => $infoHash]), 'infoHashes')
+            ->create(['seeders' => 0, 'leechers' => 0]);
+        $user = UserFactory::new()->create();
 
         $cache = $this->app->make(Repository::class);
         $cache->put('user.' . $user->id . '.peers', 'test', 10);
@@ -2404,16 +2441,15 @@ final class AnnounceControllerTest extends TestCase
         $IP = '98.165.38.50';
         $port = 60000;
         $userAgent = 'my test user agent';
-        $torrent = factory(Torrent::class)->create(['seeders' => 0, 'leechers' => 0]);
-        factory(TorrentInfoHash::class)->create(['info_hash' => $infoHash, 'torrent_id' => $torrent->id]);
-        $user = factory(User::class)->create();
+        $torrent = TorrentFactory::new()
+            ->has(TorrentInfoHashFactory::new()->state(['info_hash' => $infoHash]), 'infoHashes')
+            ->create(['seeders' => 0, 'leechers' => 0]);
+        $user = UserFactory::new()->create();
 
-        $peer = factory(Peer::class)->states('v1')->create(
-            ['torrent_id' => $torrent->id, 'left' => 0, 'peer_id' => $peerId, 'key' => $key]
-        );
-        factory(PeerIP::class)->create(
-            ['peer_id' => $peer->id, 'ip' => '98.165.38.51', 'is_ipv6' => false, 'port' => 55555]
-        );
+        $peer = PeerFactory::new()
+            ->has(PeerIPFactory::new()->state(['ip' => '98.165.38.51', 'is_ipv6' => false, 'port' => 55555]), 'ips')
+            ->versionOne()
+            ->create(['torrent_id' => $torrent->id, 'left' => 0, 'peer_id' => $peerId, 'key' => $key]);
 
         $this->assertSame(1, Peer::count());
         $this->assertSame(1, PeerIP::count());
@@ -2471,16 +2507,15 @@ final class AnnounceControllerTest extends TestCase
         $IP = '98.165.38.50';
         $port = 60000;
         $userAgent = 'my test user agent';
-        $torrent = factory(Torrent::class)->create(['seeders' => 0, 'leechers' => 0]);
-        factory(TorrentInfoHash::class)->create(['info_hash' => $infoHash, 'torrent_id' => $torrent->id]);
-        $user = factory(User::class)->create();
+        $torrent = TorrentFactory::new()
+            ->has(TorrentInfoHashFactory::new()->state(['info_hash' => $infoHash]), 'infoHashes')
+            ->create(['seeders' => 0, 'leechers' => 0]);
+        $user = UserFactory::new()->create();
 
-        $peer = factory(Peer::class)->states('v1')->create(
-            ['torrent_id' => $torrent->id, 'left' => 500, 'peer_id' => $peerId, 'key' => $key]
-        );
-        factory(PeerIP::class)->create(
-            ['peer_id' => $peer->id, 'ip' => '98.165.38.51', 'is_ipv6' => false, 'port' => 55555]
-        );
+        $peer = PeerFactory::new()
+            ->has(PeerIPFactory::new()->state(['ip' => '98.165.38.51', 'is_ipv6' => false, 'port' => 55555]), 'ips')
+            ->versionOne()
+            ->create(['torrent_id' => $torrent->id, 'left' => 500, 'peer_id' => $peerId, 'key' => $key]);
 
         $this->assertSame(1, Peer::count());
         $this->assertSame(1, PeerIP::count());
@@ -2656,7 +2691,7 @@ final class AnnounceControllerTest extends TestCase
     {
         $this->withoutExceptionHandling();
 
-        $bannedUser = factory(User::class)->states('banned')->create();
+        $bannedUser = UserFactory::new()->banned()->create();
         $response = $this->get(
             $this->app->make(UrlGenerator::class)->route('announce', $this->validParams([
                 'passkey' => $bannedUser->passkey,
@@ -3065,9 +3100,10 @@ final class AnnounceControllerTest extends TestCase
     {
         $infoHash = 'ccd285bd6d7fc749e9ed34d8b1e8a0f1b582d977';
         $peerId = '2d7142333345302d64354e334474384672517776';
-        $user = factory(User::class)->create();
-        $torrent = factory(Torrent::class)->create(['uploader_id' => $user->id]);
-        factory(TorrentInfoHash::class)->create(['info_hash' => $infoHash, 'torrent_id' => $torrent->id]);
+        $user = UserFactory::new()->create();
+        $torrent = TorrentFactory::new()
+            ->has(TorrentInfoHashFactory::new()->state(['info_hash' => $infoHash]), 'infoHashes')
+            ->create(['uploader_id' => $user->id]);
 
         return array_merge([
             'info_hash'  => hex2bin($infoHash),

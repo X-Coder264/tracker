@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Repositories\PrivateMessages;
 
-use App\Models\PrivateMessages\Thread;
-use App\Models\PrivateMessages\ThreadParticipant;
-use App\Models\User;
 use App\Repositories\PrivateMessages\ThreadParticipantRepository;
 use Carbon\Carbon;
+use Database\Factories\ThreadFactory;
+use Database\Factories\ThreadParticipantFactory;
+use Database\Factories\UserFactory;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Tests\TestCase;
 
@@ -18,18 +18,18 @@ class ThreadParticipantRepositoryTest extends TestCase
 
     public function testGetUnreadThreadsForUser(): void
     {
-        $user = factory(User::class)->create();
+        $user = UserFactory::new()->create();
 
         $timeNow = Carbon::now();
-        $threadOne = factory(Thread::class)->create();
-        $threadTwo = factory(Thread::class)->create(['updated_at' => Carbon::now()->subDay()]);
-        $threadThree = factory(Thread::class)->create(['updated_at' => $timeNow]);
-        $threadFour = factory(Thread::class)->create();
-        $threadFive = factory(Thread::class)->create();
+        $threadOne = ThreadFactory::new()->create();
+        $threadTwo = ThreadFactory::new()->create(['updated_at' => Carbon::now()->subDay()]);
+        $threadThree = ThreadFactory::new()->create(['updated_at' => $timeNow]);
+        $threadFour = ThreadFactory::new()->create();
+        $threadFive = ThreadFactory::new()->create();
 
-        $irrelevantUser = factory(User::class)->create();
+        $irrelevantUser = UserFactory::new()->create();
 
-        factory(ThreadParticipant::class)->create(
+        ThreadParticipantFactory::new()->create(
             [
                 'thread_id' => $threadOne->id,
                 'user_id' => $user->id,
@@ -37,7 +37,7 @@ class ThreadParticipantRepositoryTest extends TestCase
             ]
         );
 
-        factory(ThreadParticipant::class)->create(
+        ThreadParticipantFactory::new()->create(
             [
                 'thread_id' => $threadTwo->id,
                 'user_id' => $user->id,
@@ -45,7 +45,7 @@ class ThreadParticipantRepositoryTest extends TestCase
             ]
         );
 
-        factory(ThreadParticipant::class)->create(
+        ThreadParticipantFactory::new()->create(
             [
                 'thread_id' => $threadThree->id,
                 'user_id' => $user->id,
@@ -53,7 +53,7 @@ class ThreadParticipantRepositoryTest extends TestCase
             ]
         );
 
-        factory(ThreadParticipant::class)->create(
+        ThreadParticipantFactory::new()->create(
             [
                 'thread_id' => $threadFour->id,
                 'user_id' => $irrelevantUser->id,
@@ -61,7 +61,7 @@ class ThreadParticipantRepositoryTest extends TestCase
             ]
         );
 
-        factory(ThreadParticipant::class)->create(
+        ThreadParticipantFactory::new()->create(
             [
                 'thread_id' => $threadFive->id,
                 'user_id' => $user->id,

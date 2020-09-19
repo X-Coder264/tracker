@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Http\Middleware;
 
-use App\Models\User;
 use Carbon\Carbon;
+use Database\Factories\UserFactory;
 use Firebase\JWT\JWT;
 use Illuminate\Contracts\Config\Repository;
 use Illuminate\Contracts\Http\Kernel;
@@ -39,7 +39,7 @@ final class GetApiTokenTest extends TestCase
     {
         $this->withoutExceptionHandling();
 
-        $user = factory(User::class)->create();
+        $user = UserFactory::new()->create();
 
         $this->actingAs($user);
 

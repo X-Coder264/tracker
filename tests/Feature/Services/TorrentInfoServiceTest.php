@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Services;
 
-use App\Models\Torrent;
 use App\Presenters\IMDb\Title;
 use App\Services\TorrentInfoService;
+use Database\Factories\TorrentFactory;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Tests\TestCase;
 
@@ -16,7 +16,7 @@ class TorrentInfoServiceTest extends TestCase
 
     public function testGetIMDBData(): void
     {
-        $torrent = factory(Torrent::class)->create(['imdb_id' => '0468569']);
+        $torrent = TorrentFactory::new()->create(['imdb_id' => '0468569']);
 
         $torrentInfoService = $this->app->make(TorrentInfoService::class);
 
@@ -27,7 +27,7 @@ class TorrentInfoServiceTest extends TestCase
 
     public function testGetIMDBDataWhenThereIsNoIMDBId(): void
     {
-        $torrent = factory(Torrent::class)->create(['imdb_id' => null]);
+        $torrent = TorrentFactory::new()->create(['imdb_id' => null]);
 
         $torrentInfoService = $this->app->make(TorrentInfoService::class);
 

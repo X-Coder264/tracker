@@ -8,6 +8,10 @@ use App\Models\PrivateMessages\Thread;
 use App\Models\PrivateMessages\ThreadMessage;
 use App\Models\PrivateMessages\ThreadParticipant;
 use App\Models\User;
+use Database\Factories\ThreadFactory;
+use Database\Factories\ThreadMessageFactory;
+use Database\Factories\ThreadParticipantFactory;
+use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -20,7 +24,7 @@ class ThreadTest extends TestCase
 
     public function testThreadHasSlug(): void
     {
-        $user = factory(User::class)->create();
+        $user = UserFactory::new()->create();
 
         $thread = new Thread();
         $thread->subject = 'test';
@@ -32,7 +36,7 @@ class ThreadTest extends TestCase
 
     public function testCreatorRelationship(): void
     {
-        factory(Thread::class)->create();
+        ThreadFactory::new()->create();
 
         $user = User::firstOrFail();
         $thread = Thread::firstOrFail();
@@ -43,8 +47,8 @@ class ThreadTest extends TestCase
 
     public function testParticipantsRelationship(): void
     {
-        $thread = factory(Thread::class)->create();
-        factory(ThreadParticipant::class)->create(['thread_id' => $thread->id]);
+        $thread = ThreadFactory::new()->create();
+        ThreadParticipantFactory::new()->create(['thread_id' => $thread->id]);
 
         $thread = Thread::firstOrFail();
         $participant = ThreadParticipant::firstOrFail();
@@ -55,8 +59,8 @@ class ThreadTest extends TestCase
 
     public function testMessagesRelationship(): void
     {
-        $thread = factory(Thread::class)->create();
-        factory(ThreadMessage::class)->create(['thread_id' => $thread->id]);
+        $thread = ThreadFactory::new()->create();
+        ThreadMessageFactory::new()->create(['thread_id' => $thread->id]);
 
         $thread = Thread::firstOrFail();
         $message = ThreadMessage::firstOrFail();

@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Tests\Feature\Http\Middleware;
 
 use App\Http\Middleware\UpdateUserLastSeenAtInfo;
-use App\Models\User;
 use Carbon\CarbonImmutable;
+use Database\Factories\UserFactory;
 use Illuminate\Contracts\Http\Kernel;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Routing\Router;
@@ -20,7 +20,7 @@ class UpdateUserLastSeenAtInfoTest extends TestCase
     {
         $this->withoutExceptionHandling();
 
-        $user = factory(User::class)->create(['last_seen_at' => null]);
+        $user = UserFactory::new()->create(['last_seen_at' => null]);
         $this->actingAs($user);
 
         $this->assertNull($user->last_seen_at);
@@ -37,7 +37,7 @@ class UpdateUserLastSeenAtInfoTest extends TestCase
     {
         $this->withoutExceptionHandling();
 
-        $user = factory(User::class)->create(['last_seen_at' => CarbonImmutable::now()->subMinutes(4)]);
+        $user = UserFactory::new()->create(['last_seen_at' => CarbonImmutable::now()->subMinutes(4)]);
         $this->actingAs($user);
 
         $this->get(route('home'));
@@ -51,7 +51,7 @@ class UpdateUserLastSeenAtInfoTest extends TestCase
     {
         $this->withoutExceptionHandling();
 
-        $user = factory(User::class)->create(['last_seen_at' => CarbonImmutable::now()->subSeconds(UpdateUserLastSeenAtInfo::FIVE_MINUTES_IN_SECONDS + 1)]);
+        $user = UserFactory::new()->create(['last_seen_at' => CarbonImmutable::now()->subSeconds(UpdateUserLastSeenAtInfo::FIVE_MINUTES_IN_SECONDS + 1)]);
         $this->actingAs($user);
 
         $this->get(route('home'));

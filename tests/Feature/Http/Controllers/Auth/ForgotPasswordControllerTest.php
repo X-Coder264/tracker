@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Http\Controllers\Auth;
 
-use App\Models\User;
 use App\Notifications\ResetPassword;
+use Database\Factories\UserFactory;
 use Illuminate\Contracts\Hashing\Hasher;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Http\Response;
@@ -29,7 +29,7 @@ class ForgotPasswordControllerTest extends TestCase
 
     public function testUserCannotViewTheEmailPasswordFormWhenAuthenticated(): void
     {
-        $user = factory(User::class)->make();
+        $user = UserFactory::new()->make();
         $response = $this->actingAs($user)->get(route('password.request'));
         $response->assertRedirect(route('home'));
     }
@@ -40,7 +40,7 @@ class ForgotPasswordControllerTest extends TestCase
 
         $notificationFake = Notification::fake();
 
-        $user = factory(User::class)->create();
+        $user = UserFactory::new()->create();
 
         $response = $this->from(route('password.request'))->post(route('password.email'), [
             'email' => $user->email,

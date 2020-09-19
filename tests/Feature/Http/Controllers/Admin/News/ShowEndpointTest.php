@@ -5,7 +5,8 @@ declare(strict_types=1);
 namespace Tests\Feature\Http\Controllers\Admin\News;
 
 use App\Models\News;
-use App\Models\User;
+use Database\Factories\NewsFactory;
+use Database\Factories\UserFactory;
 use Illuminate\Contracts\Routing\UrlGenerator;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Laravel\Passport\Passport;
@@ -19,12 +20,12 @@ final class ShowEndpointTest extends AdminApiTestCase
     {
         $this->withoutExceptionHandling();
 
-        $user = factory(User::class)->create();
+        $user = UserFactory::new()->create();
 
         Passport::actingAs($user);
 
         /** @var News $news */
-        $news = factory(News::class)->create();
+        $news = NewsFactory::new()->create();
 
         $response = $this->makeRequest(
             'GET',

@@ -2,35 +2,40 @@
 
 declare(strict_types=1);
 
+namespace Database\Factories;
+
 use App\Models\Invite;
-use App\Models\User;
 use Carbon\CarbonImmutable;
-use Faker\Generator as Faker;
-use Illuminate\Database\Eloquent\Factory;
+use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
 
-/*
-|--------------------------------------------------------------------------
-| Model Factories
-|--------------------------------------------------------------------------
-|
-| This directory should contain each of the model factory definitions for
-| your application. Factories provide a convenient way to generate new
-| model instances for testing / seeding your application's database.
-|
-*/
+final class InviteFactory extends Factory
+{
+    /**
+     * The name of the factory's corresponding model.
+     *
+     * @var string
+     */
+    protected $model = Invite::class;
 
-/** @var Factory $factory */
-$factory->define(Invite::class, function (Faker $faker) {
-    return [
-        'code' => Str::random(255),
-        'user_id' => function () {
-            return factory(User::class)->create()->id;
-        },
-        'expires_at' => CarbonImmutable::now()->addHour(),
-    ];
-});
+    /**
+     * Define the model's default state.
+     *
+     * @return array
+     */
+    public function definition()
+    {
+        return [
+            'code'       => Str::random(255),
+            'user_id'    => UserFactory::new(),
+            'expires_at' => CarbonImmutable::now()->addHour(),
+        ];
+    }
 
-$factory->state(Invite::class, 'expired', [
-    'expires_at' => CarbonImmutable::now()->subSecond(),
-]);
+    public function expired(): self
+    {
+        return $this->state([
+            'expires_at' => CarbonImmutable::now()->subSecond(),
+        ]);
+    }
+}

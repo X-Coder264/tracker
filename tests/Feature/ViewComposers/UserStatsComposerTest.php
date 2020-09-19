@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Tests\Feature\ViewComposers;
 
-use App\Models\Peer;
-use App\Models\User;
+use Database\Factories\PeerFactory;
+use Database\Factories\UserFactory;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
@@ -20,11 +20,11 @@ class UserStatsComposerTest extends TestCase
     {
         $this->withoutExceptionHandling();
 
-        $user = factory(User::class)->create();
+        $user = UserFactory::new()->create();
         $this->actingAs($user);
 
-        $seedingPeers = factory(Peer::class, 2)->create(['user_id' => $user->id, 'left' => 0]);
-        $leechingPeer = factory(Peer::class)->create(['user_id' => $user->id, 'left' => 500]);
+        $seedingPeers = PeerFactory::new()->count(2)->create(['user_id' => $user->id, 'left' => 0]);
+        $leechingPeer = PeerFactory::new()->create(['user_id' => $user->id, 'left' => 500]);
 
         $viewFactory = $this->app->make(Factory::class);
         $view = $viewFactory->make('partials.user-statistics');
@@ -45,7 +45,7 @@ class UserStatsComposerTest extends TestCase
     {
         $this->withoutExceptionHandling();
 
-        $user = factory(User::class)->create();
+        $user = UserFactory::new()->create();
         $this->actingAs($user);
 
         $viewFactory = $this->app->make(Factory::class);
@@ -62,8 +62,8 @@ class UserStatsComposerTest extends TestCase
 
     public function testDataForNonLoggedInUser(): void
     {
-        factory(Peer::class, 2)->create(['left' => 0]);
-        factory(Peer::class)->create(['left' => 800]);
+        PeerFactory::new()->count(2)->create(['left' => 0]);
+        PeerFactory::new()->create(['left' => 800]);
 
         $viewFactory = $this->app->make(Factory::class);
         $view = $viewFactory->make('layouts.app');

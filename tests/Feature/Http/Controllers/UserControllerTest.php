@@ -5,12 +5,13 @@ declare(strict_types=1);
 namespace Tests\Feature\Http\Controllers;
 
 use App\Http\Middleware\SetUserLocale;
-use App\Models\Locale;
-use App\Models\Peer;
-use App\Models\Snatch;
-use App\Models\Torrent;
 use App\Models\User;
 use App\Services\SizeFormatter;
+use Database\Factories\LocaleFactory;
+use Database\Factories\PeerFactory;
+use Database\Factories\SnatchFactory;
+use Database\Factories\TorrentFactory;
+use Database\Factories\UserFactory;
 use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Contracts\Translation\Translator;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
@@ -26,7 +27,7 @@ class UserControllerTest extends TestCase
     {
         $this->withoutExceptionHandling();
 
-        $user = factory(User::class)->create();
+        $user = UserFactory::new()->create();
         $this->actingAs($user);
         $response = $this->get(route('users.edit', $user));
 
@@ -37,8 +38,8 @@ class UserControllerTest extends TestCase
 
     public function testLoggedInUserCanSeeOnlyHisEditPage(): void
     {
-        $user = factory(User::class)->create();
-        $anotherUser = factory(User::class)->create();
+        $user = UserFactory::new()->create();
+        $anotherUser = UserFactory::new()->create();
         $this->actingAs($user);
         $response = $this->get(route('users.edit', $anotherUser));
 
@@ -48,7 +49,7 @@ class UserControllerTest extends TestCase
 
     public function testNonLoggedInUserCannotSeeAnyUserEditPage(): void
     {
-        $user = factory(User::class)->create();
+        $user = UserFactory::new()->create();
         $response = $this->get(route('users.edit', $user));
 
         $response->assertStatus(Response::HTTP_FOUND);
@@ -59,27 +60,27 @@ class UserControllerTest extends TestCase
     {
         $this->withoutExceptionHandling();
 
-        $user = factory(User::class)->create(['timezone' => 'Europe/Zagreb']);
+        $user = UserFactory::new()->create(['timezone' => 'Europe/Zagreb']);
 
-        $torrentOne = factory(Torrent::class)->create(['size' => 500, 'uploader_id' => $user->id]);
-        $torrentTwo = factory(Torrent::class)->create(['size' => 2500]);
-        $torrentThree = factory(Torrent::class)->create(['size' => 1200, 'uploader_id' => $user->id]);
-        $torrentFour = factory(Torrent::class)->create(['size' => 1800]);
+        $torrentOne = TorrentFactory::new()->create(['size' => 500, 'uploader_id' => $user->id]);
+        $torrentTwo = TorrentFactory::new()->create(['size' => 2500]);
+        $torrentThree = TorrentFactory::new()->create(['size' => 1200, 'uploader_id' => $user->id]);
+        $torrentFour = TorrentFactory::new()->create(['size' => 1800]);
 
-        factory(Peer::class)->states('seeder')->create(['user_id' => $user->id, 'torrent_id' => $torrentOne->id]);
-        factory(Peer::class)->states('seeder')->create(['user_id' => $user->id, 'torrent_id' => $torrentThree->id]);
-        factory(Peer::class)->states('leecher')->create(['user_id' => $user->id, 'torrent_id' => $torrentTwo->id]);
+        PeerFactory::new()->seeder()->create(['user_id' => $user->id, 'torrent_id' => $torrentOne->id]);
+        PeerFactory::new()->seeder()->create(['user_id' => $user->id, 'torrent_id' => $torrentThree->id]);
+        PeerFactory::new()->leecher()->create(['user_id' => $user->id, 'torrent_id' => $torrentTwo->id]);
 
-        factory(Peer::class)->states('seeder')->create();
-        factory(Peer::class)->states('leecher')->create();
+        PeerFactory::new()->seeder()->create();
+        PeerFactory::new()->leecher()->create();
 
-        factory(Snatch::class)->states('snatched')->create(['user_id' => $user->id, 'torrent_id' => $torrentOne->id]);
-        factory(Snatch::class)->create(['user_id' => $user->id, 'torrent_id' => $torrentTwo->id, 'left' => 5]);
-        factory(Snatch::class)->states('snatched')->create(['user_id' => $user->id, 'torrent_id' => $torrentThree->id]);
-        factory(Snatch::class)->states('snatched')->create(['user_id' => $user->id, 'torrent_id' => $torrentFour->id]);
+        SnatchFactory::new()->snatched()->create(['user_id' => $user->id, 'torrent_id' => $torrentOne->id]);
+        SnatchFactory::new()->create(['user_id' => $user->id, 'torrent_id' => $torrentTwo->id, 'left' => 5]);
+        SnatchFactory::new()->snatched()->create(['user_id' => $user->id, 'torrent_id' => $torrentThree->id]);
+        SnatchFactory::new()->snatched()->create(['user_id' => $user->id, 'torrent_id' => $torrentFour->id]);
 
-        factory(Snatch::class)->states('snatched')->create(['torrent_id' => $torrentFour->id]);
-        factory(Snatch::class)->create(['torrent_id' => $torrentFour->id, 'left' => 10005]);
+        SnatchFactory::new()->snatched()->create(['torrent_id' => $torrentFour->id]);
+        SnatchFactory::new()->create(['torrent_id' => $torrentFour->id, 'left' => 10005]);
 
         $this->actingAs($user);
         $response = $this->get(route('users.show', $user));
@@ -108,8 +109,8 @@ class UserControllerTest extends TestCase
     {
         $this->withoutExceptionHandling();
 
-        $user = factory(User::class)->create(['timezone' => 'US/Central']);
-        $anotherUser = factory(User::class)->create(['timezone' => 'Europe/Zagreb']);
+        $user = UserFactory::new()->create(['timezone' => 'US/Central']);
+        $anotherUser = UserFactory::new()->create(['timezone' => 'Europe/Zagreb']);
         $this->actingAs($user);
         $response = $this->get(route('users.show', $anotherUser));
 
@@ -125,7 +126,7 @@ class UserControllerTest extends TestCase
 
     public function testNonLoggedInUserCannotSeeAnyUserProfilePage(): void
     {
-        $user = factory(User::class)->create();
+        $user = UserFactory::new()->create();
         $response = $this->get(route('users.show', $user));
 
         $response->assertStatus(Response::HTTP_FOUND);
@@ -136,8 +137,8 @@ class UserControllerTest extends TestCase
     {
         $this->withoutExceptionHandling();
 
-        $user = factory(User::class)->create(['torrents_per_page' => 20]);
-        $locale = factory(Locale::class)->create();
+        $user = UserFactory::new()->create(['torrents_per_page' => 20]);
+        $locale = LocaleFactory::new()->create();
         $this->actingAs($user);
         $email = 'testtttt@gmail.com';
         $timezone = 'Europe/Paris';
@@ -183,8 +184,8 @@ class UserControllerTest extends TestCase
     {
         $this->withoutMiddleware(SetUserLocale::class);
 
-        $user = factory(User::class)->create(['torrents_per_page' => 20]);
-        $locale = factory(Locale::class)->create();
+        $user = UserFactory::new()->create(['torrents_per_page' => 20]);
+        $locale = LocaleFactory::new()->create();
         $email = 'testtttt@gmail.com';
         $timezone = 'Europe/Paris';
         $torrentsPerPage = 40;
@@ -218,9 +219,9 @@ class UserControllerTest extends TestCase
     {
         $this->withoutMiddleware(SetUserLocale::class);
 
-        $user = factory(User::class)->create();
-        $anotherUser = factory(User::class)->create();
-        $locale = factory(Locale::class)->create();
+        $user = UserFactory::new()->create();
+        $anotherUser = UserFactory::new()->create();
+        $locale = LocaleFactory::new()->create();
         $this->actingAs($user);
         $email = 'testtttt@gmail.com';
         $timezone = 'Europe/Paris';
@@ -252,7 +253,7 @@ class UserControllerTest extends TestCase
 
     public function testEmailIsRequired()
     {
-        $user = factory(User::class)->create();
+        $user = UserFactory::new()->create();
         $this->actingAs($user);
         $response = $this->from(route('users.edit', $user))->put(
             route('users.update', $user),
@@ -267,7 +268,7 @@ class UserControllerTest extends TestCase
 
     public function testEmailMustBeValid()
     {
-        $user = factory(User::class)->create();
+        $user = UserFactory::new()->create();
         $this->actingAs($user);
         $response = $this->from(route('users.edit', $user))->put(
             route('users.update', $user),
@@ -282,7 +283,7 @@ class UserControllerTest extends TestCase
 
     public function testEmailMustBeUnique()
     {
-        $users = factory(User::class, 2)->create();
+        $users = UserFactory::new()->count(2)->create();
         $this->actingAs($users[0]);
         $response = $this->from(route('users.edit', $users[0]))->put(
             route('users.update', $users[0]),
@@ -297,7 +298,7 @@ class UserControllerTest extends TestCase
 
     public function testLocaleIsRequired()
     {
-        $user = factory(User::class)->create();
+        $user = UserFactory::new()->create();
         $this->actingAs($user);
         $response = $this->from(route('users.edit', $user))->put(
             route('users.update', $user),
@@ -312,7 +313,7 @@ class UserControllerTest extends TestCase
 
     public function testLocaleMustBeValid()
     {
-        $user = factory(User::class)->create();
+        $user = UserFactory::new()->create();
         $this->actingAs($user);
         $response = $this->from(route('users.edit', $user))->put(
             route('users.update', $user),
@@ -327,7 +328,7 @@ class UserControllerTest extends TestCase
 
     public function testTimezoneIsRequired()
     {
-        $user = factory(User::class)->create();
+        $user = UserFactory::new()->create();
         $this->actingAs($user);
         $response = $this->from(route('users.edit', $user))->put(
             route('users.update', $user),
@@ -342,7 +343,7 @@ class UserControllerTest extends TestCase
 
     public function testTimezoneMustBeValid()
     {
-        $user = factory(User::class)->create();
+        $user = UserFactory::new()->create();
         $this->actingAs($user);
         $response = $this->from(route('users.edit', $user))->put(
             route('users.update', $user),
@@ -357,7 +358,7 @@ class UserControllerTest extends TestCase
 
     public function testTorrentsPerPageIsRequired()
     {
-        $user = factory(User::class)->create();
+        $user = UserFactory::new()->create();
         $this->actingAs($user);
         $response = $this->from(route('users.edit', $user))->put(
             route('users.update', $user),
@@ -372,7 +373,7 @@ class UserControllerTest extends TestCase
 
     public function testTorrentsPerPageMustBeAValidInteger()
     {
-        $user = factory(User::class)->create();
+        $user = UserFactory::new()->create();
         $this->actingAs($user);
         $response = $this->from(route('users.edit', $user))->put(
             route('users.update', $user),
@@ -387,7 +388,7 @@ class UserControllerTest extends TestCase
 
     public function testTorrentsPerPageMustBeGreaterThanZero(): void
     {
-        $user = factory(User::class)->create();
+        $user = UserFactory::new()->create();
         $this->actingAs($user);
         $response = $this->from(route('users.edit', $user))->put(
             route('users.update', $user),
@@ -402,7 +403,7 @@ class UserControllerTest extends TestCase
 
     public function testTorrentsPerPageMaxIsFifty(): void
     {
-        $user = factory(User::class)->create();
+        $user = UserFactory::new()->create();
         $this->actingAs($user);
         $response = $this->from(route('users.edit', $user))->put(
             route('users.update', $user),
@@ -417,7 +418,7 @@ class UserControllerTest extends TestCase
 
     private function validParams(array $overrides = []): array
     {
-        $locale = factory(Locale::class)->create();
+        $locale = LocaleFactory::new()->create();
 
         return array_merge([
             'email' => 'test@gmail.com',

@@ -12,6 +12,13 @@ use App\Models\Snatch;
 use App\Models\Torrent;
 use App\Models\User;
 use Carbon\CarbonImmutable;
+use Database\Factories\InviteFactory;
+use Database\Factories\LocaleFactory;
+use Database\Factories\NewsFactory;
+use Database\Factories\SnatchFactory;
+use Database\Factories\ThreadFactory;
+use Database\Factories\TorrentFactory;
+use Database\Factories\UserFactory;
 use Facades\App\Services\SizeFormatter;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -26,7 +33,7 @@ final class UserTest extends TestCase
 
     public function testUserHasSlug(): void
     {
-        $locale = factory(Locale::class)->create();
+        $locale = LocaleFactory::new()->create();
         $user = new User();
         $user->email = 'test@gmail.com';
         $user->name = 'test name';
@@ -40,7 +47,7 @@ final class UserTest extends TestCase
 
     public function testUserHasPasskey(): void
     {
-        $locale = factory(Locale::class)->create();
+        $locale = LocaleFactory::new()->create();
         $user = new User();
         $user->email = 'test@gmail.com';
         $user->name = 'test name';
@@ -55,7 +62,7 @@ final class UserTest extends TestCase
 
     public function testUploadedAccessor(): void
     {
-        factory(User::class)->create();
+        UserFactory::new()->create();
         $user = User::firstOrFail();
         $returnValue = '500 MB';
         SizeFormatter::shouldReceive('getFormattedSize')->once()->with($user->getRawOriginal('uploaded'))->andReturn($returnValue);
@@ -64,7 +71,7 @@ final class UserTest extends TestCase
 
     public function testDownloadedAccessor(): void
     {
-        factory(User::class)->create();
+        UserFactory::new()->create();
         $user = User::firstOrFail();
         $returnValue = '500 MB';
         SizeFormatter::shouldReceive('getFormattedSize')->once()->with($user->getRawOriginal('downloaded'))->andReturn($returnValue);
@@ -73,7 +80,7 @@ final class UserTest extends TestCase
 
     public function testTorrentRelationship(): void
     {
-        factory(Torrent::class)->create();
+        TorrentFactory::new()->create();
 
         $user = User::firstOrFail();
         $torrent = Torrent::firstOrFail();
@@ -87,7 +94,7 @@ final class UserTest extends TestCase
 
     public function testLanguageRelationship(): void
     {
-        $user = factory(User::class)->create();
+        $user = UserFactory::new()->create();
 
         $freshUser = $user->fresh();
         $this->assertInstanceOf(BelongsTo::class, $freshUser->language());
@@ -97,7 +104,7 @@ final class UserTest extends TestCase
 
     public function testSnatchesRelationship(): void
     {
-        factory(Snatch::class)->states('snatched')->create();
+        SnatchFactory::new()->snatched()->create();
 
         $user = User::latest('id')->firstOrFail();
         $snatch = Snatch::firstOrFail();
@@ -120,7 +127,7 @@ final class UserTest extends TestCase
 
     public function testThreadsRelationship(): void
     {
-        factory(Thread::class)->create();
+        ThreadFactory::new()->create();
 
         $user = User::firstOrFail();
         $thread = Thread::firstOrFail();
@@ -131,7 +138,7 @@ final class UserTest extends TestCase
 
     public function testNewsRelationship(): void
     {
-        factory(News::class)->create();
+        NewsFactory::new()->create();
 
         $user = User::firstOrFail();
         $news = News::firstOrFail();
@@ -143,9 +150,9 @@ final class UserTest extends TestCase
     public function testInviterRelationshipWhenTheInviterExists(): void
     {
         /** @var User $user */
-        $user = factory(User::class)->create();
+        $user = UserFactory::new()->create();
         /** @var User $invitedUser */
-        $invitedUser = factory(User::class)->create(['inviter_user_id' => $user->id]);
+        $invitedUser = UserFactory::new()->create(['inviter_user_id' => $user->id]);
 
         $this->assertInstanceOf(HasOne::class, $invitedUser->inviter());
         $this->assertInstanceOf(User::class, $invitedUser->inviter);
@@ -155,7 +162,7 @@ final class UserTest extends TestCase
     public function testInviterRelationshipWhenTheInviterDoesNotExist(): void
     {
         /** @var User $user */
-        $user = factory(User::class)->create();
+        $user = UserFactory::new()->create();
 
         $this->assertInstanceOf(HasOne::class, $user->inviter());
         $this->assertNull($user->inviter);
@@ -164,10 +171,10 @@ final class UserTest extends TestCase
     public function testInvitesRelationship(): void
     {
         /** @var User $user */
-        $user = factory(User::class)->create();
+        $user = UserFactory::new()->create();
 
         /** @var Invite[] $invites */
-        $invites = factory(Invite::class, 2)->create(['user_id' => $user->id]);
+        $invites = InviteFactory::new()->count(2)->create(['user_id' => $user->id]);
 
         $this->assertInstanceOf(HasMany::class, $user->invites());
         $this->assertInstanceOf(Collection::class, $user->invites);
@@ -178,7 +185,7 @@ final class UserTest extends TestCase
     public function testLastSeenAtAtAttributeIsCastedToCarbon(): void
     {
         /** @var User $user */
-        $user = factory(User::class)->create();
+        $user = UserFactory::new()->create();
 
         $this->assertInstanceOf(CarbonImmutable::class, $user->last_seen_at);
     }
@@ -186,10 +193,10 @@ final class UserTest extends TestCase
     public function testInviteesRelationship(): void
     {
         /** @var User $user */
-        $user = factory(User::class)->create();
+        $user = UserFactory::new()->create();
 
         /** @var User[] $users */
-        $users = factory(User::class, 2)->create(['inviter_user_id' => $user->id]);
+        $users = UserFactory::new()->count(2)->create(['inviter_user_id' => $user->id]);
 
         $this->assertInstanceOf(HasMany::class, $user->invitees());
         $this->assertInstanceOf(Collection::class, $user->invitees);
@@ -199,7 +206,7 @@ final class UserTest extends TestCase
 
     public function testAUserGets2FASecretKeyWhenCreating(): void
     {
-        $locale = factory(Locale::class)->create();
+        $locale = LocaleFactory::new()->create();
 
         $user = new User();
         $user->email = 'test@gmail.com';
@@ -215,7 +222,7 @@ final class UserTest extends TestCase
 
     public function test2FAIsDisabledByDefault(): void
     {
-        $locale = factory(Locale::class)->create();
+        $locale = LocaleFactory::new()->create();
 
         $user = new User();
         $user->email = 'test@gmail.com';

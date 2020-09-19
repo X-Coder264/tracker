@@ -2,17 +2,30 @@
 
 declare(strict_types=1);
 
-use App\Models\PrivateMessages\Thread;
-use App\Models\User;
-use Faker\Generator as Faker;
-use Illuminate\Database\Eloquent\Factory;
+namespace Database\Factories;
 
-/** @var Factory $factory */
-$factory->define(Thread::class, function (Faker $faker) {
-    return [
-        'subject' => $faker->unique()->firstName,
-        'user_id' => function () {
-            return factory(User::class)->create()->id;
-        },
-    ];
-});
+use App\Models\PrivateMessages\Thread;
+use Illuminate\Database\Eloquent\Factories\Factory;
+
+final class ThreadFactory extends Factory
+{
+    /**
+     * The name of the factory's corresponding model.
+     *
+     * @var string
+     */
+    protected $model = Thread::class;
+
+    /**
+     * Define the model's default state.
+     *
+     * @return array
+     */
+    public function definition()
+    {
+        return [
+            'subject' => $this->faker->unique()->firstName,
+            'user_id' => UserFactory::new(),
+        ];
+    }
+}

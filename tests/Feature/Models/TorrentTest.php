@@ -9,13 +9,20 @@ use App\Models\Snatch;
 use App\Models\Torrent;
 use App\Models\TorrentCategory;
 use App\Models\TorrentComment;
-use App\Models\TorrentInfoHash;
 use App\Models\User;
+use Database\Factories\PeerFactory;
+use Database\Factories\SnatchFactory;
+use Database\Factories\TorrentCategoryFactory;
+use Database\Factories\TorrentCommentFactory;
+use Database\Factories\TorrentFactory;
+use Database\Factories\TorrentInfoHashFactory;
+use Database\Factories\UserFactory;
 use Facades\App\Services\SizeFormatter;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Support\Str;
 use Tests\TestCase;
 
 class TorrentTest extends TestCase
@@ -24,7 +31,7 @@ class TorrentTest extends TestCase
 
     public function testSizeAccessor(): void
     {
-        factory(Torrent::class)->create();
+        TorrentFactory::new()->create();
         $torrent = Torrent::firstOrFail();
         $returnValue = '500 MB';
         SizeFormatter::shouldReceive('getFormattedSize')->once()->with($torrent->getRawOriginal('size'))->andReturn($returnValue);
@@ -33,12 +40,12 @@ class TorrentTest extends TestCase
 
     public function testTorrentHasSlug(): void
     {
-        $user = factory(User::class)->create();
+        $user = UserFactory::new()->create();
         $torrent = new Torrent();
         $torrent->name = 'test name';
         $torrent->size = 34356212;
         $torrent->uploader_id = $user->id;
-        $torrent->category_id = factory(TorrentCategory::class)->create()->id;
+        $torrent->category_id = TorrentCategoryFactory::new()->create()->id;
         $torrent->description = 'test description';
         $torrent->save();
 
@@ -47,7 +54,7 @@ class TorrentTest extends TestCase
 
     public function testUploaderRelationship(): void
     {
-        factory(Torrent::class)->create();
+        TorrentFactory::new()->create();
 
         $user = User::firstOrFail();
         $torrent = Torrent::firstOrFail();
@@ -60,7 +67,7 @@ class TorrentTest extends TestCase
 
     public function testPeersRelationship(): void
     {
-        factory(Peer::class)->create();
+        PeerFactory::new()->create();
 
         $torrent = Torrent::firstOrFail();
         $peer = Peer::firstOrFail();
@@ -77,23 +84,26 @@ class TorrentTest extends TestCase
 
     public function testInfoHashesRelationship(): void
     {
-        $torrent = factory(Torrent::class)->create();
-        $v1InfoHash = factory(TorrentInfoHash::class)->create(['torrent_id' => $torrent->id]);
-        $v2InfoHash = factory(TorrentInfoHash::class)->states('v2')->create(['torrent_id' => $torrent->id]);
+        $v1InfoHash = sha1(Str::random(200));
+        $v2InfoHash = substr(hash('sha256', Str::random(200)), 0, 40);
+
+        TorrentFactory::new()
+            ->has(TorrentInfoHashFactory::new()->state(['version' => 1, 'info_hash' => $v1InfoHash]), 'infoHashes')
+            ->has(TorrentInfoHashFactory::new()->state(['version' => 2, 'info_hash' => $v2InfoHash]), 'infoHashes')
+            ->create();
+
         $torrent = Torrent::firstOrFail();
         $this->assertInstanceOf(HasMany::class, $torrent->infoHashes());
         $this->assertInstanceOf(Collection::class, $torrent->infoHashes);
-        $this->assertSame($v1InfoHash->id, $torrent->infoHashes[0]->id);
-        $this->assertSame($v1InfoHash->version, $torrent->infoHashes[0]->version);
-        $this->assertSame($v1InfoHash->info_hash, $torrent->infoHashes[0]->info_hash);
-        $this->assertSame($v2InfoHash->id, $torrent->infoHashes[1]->id);
-        $this->assertSame($v2InfoHash->version, $torrent->infoHashes[1]->version);
-        $this->assertSame($v2InfoHash->info_hash, $torrent->infoHashes[1]->info_hash);
+        $this->assertSame(1, $torrent->infoHashes[0]->version);
+        $this->assertSame($v1InfoHash, $torrent->infoHashes[0]->info_hash);
+        $this->assertSame(2, $torrent->infoHashes[1]->version);
+        $this->assertSame($v2InfoHash, $torrent->infoHashes[1]->info_hash);
     }
 
     public function testCommentsRelationship(): void
     {
-        factory(TorrentComment::class)->create();
+        TorrentCommentFactory::new()->create();
 
         $torrent = Torrent::firstOrFail();
         $torrentComment = TorrentComment::firstOrFail();
@@ -108,7 +118,7 @@ class TorrentTest extends TestCase
 
     public function testCategoryRelationship(): void
     {
-        factory(Torrent::class)->create();
+        TorrentFactory::new()->create();
 
         $torrentCategory = TorrentCategory::firstOrFail();
         $torrent = Torrent::firstOrFail();
@@ -122,7 +132,7 @@ class TorrentTest extends TestCase
 
     public function testSnatchesRelationship(): void
     {
-        factory(Snatch::class)->states('snatched')->create();
+        SnatchFactory::new()->snatched()->create();
 
         $torrent = Torrent::firstOrFail();
         $snatch = Snatch::firstOrFail();

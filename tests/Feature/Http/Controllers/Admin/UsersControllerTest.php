@@ -5,9 +5,10 @@ declare(strict_types=1);
 namespace Tests\Feature\Http\Controllers\Admin;
 
 use App\JsonApi\ResourceTypes;
-use App\Models\Locale;
-use App\Models\Torrent;
 use App\Models\User;
+use Database\Factories\LocaleFactory;
+use Database\Factories\TorrentFactory;
+use Database\Factories\UserFactory;
 use Illuminate\Contracts\Hashing\Hasher;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Http\Response;
@@ -23,7 +24,7 @@ class UsersControllerTest extends AdminApiTestCase
     {
         $this->withoutExceptionHandling();
 
-        $users = factory(User::class, 2)->create();
+        $users = UserFactory::new()->count(2)->create();
         Passport::actingAs($users[0]);
         $response = $this->makeRequest('GET', route('admin.users.index'));
         $jsonResponse = $response->getJsonResponse();
@@ -61,8 +62,8 @@ class UsersControllerTest extends AdminApiTestCase
     {
         $this->withoutExceptionHandling();
 
-        $users = factory(User::class, 2)->create();
-        $locale = factory(Locale::class)->create();
+        $users = UserFactory::new()->count(2)->create();
+        $locale = LocaleFactory::new()->create();
         Passport::actingAs($users[0]);
 
         $email = 'test@gmail.com';
@@ -116,8 +117,8 @@ class UsersControllerTest extends AdminApiTestCase
 
     public function testInvalidCreate()
     {
-        $users = factory(User::class, 2)->create();
-        $locale = factory(Locale::class)->create();
+        $users = UserFactory::new()->count(2)->create();
+        $locale = LocaleFactory::new()->create();
         Passport::actingAs($users[0]);
 
         $email = 'test@gmail.com';
@@ -157,9 +158,9 @@ class UsersControllerTest extends AdminApiTestCase
     {
         $this->withoutExceptionHandling();
 
-        $locale = factory(Locale::class)->create();
-        $user = factory(User::class)->create(['locale_id' => $locale->id]);
-        $torrent = factory(Torrent::class)->create(['uploader_id' => $user->id]);
+        $locale = LocaleFactory::new()->create();
+        $user = UserFactory::new()->create(['locale_id' => $locale->id]);
+        $torrent = TorrentFactory::new()->create(['uploader_id' => $user->id]);
         Passport::actingAs($user);
 
         $response = $this->makeRequest('GET', route('admin.users.read', $user->id));
@@ -185,8 +186,8 @@ class UsersControllerTest extends AdminApiTestCase
     {
         $this->withoutExceptionHandling();
 
-        $user = factory(User::class)->create();
-        $locale = factory(Locale::class)->create();
+        $user = UserFactory::new()->create();
+        $locale = LocaleFactory::new()->create();
         Passport::actingAs($user);
 
         $name = 'test name 2';
@@ -237,8 +238,8 @@ class UsersControllerTest extends AdminApiTestCase
     {
         $this->withoutExceptionHandling();
 
-        $userJohn = factory(User::class)->create(['name' => 'John']);
-        $userDoe = factory(User::class)->create(['name' => 'Doe']);
+        $userJohn = UserFactory::new()->create(['name' => 'John']);
+        $userDoe = UserFactory::new()->create(['name' => 'Doe']);
         Passport::actingAs($userJohn);
         $response = $this->makeRequest('GET', route('admin.users.index', ['filter[name]' => 'Doe']));
         $jsonResponse = $response->getJsonResponse();
@@ -263,8 +264,8 @@ class UsersControllerTest extends AdminApiTestCase
     {
         $this->withoutExceptionHandling();
 
-        $userJohn = factory(User::class)->create(['slug' => 'john']);
-        $userDoe = factory(User::class)->create(['slug' => 'doe']);
+        $userJohn = UserFactory::new()->create(['slug' => 'john']);
+        $userDoe = UserFactory::new()->create(['slug' => 'doe']);
         Passport::actingAs($userJohn);
         $response = $this->makeRequest('GET', route('admin.users.index', ['filter[slug]' => 'doe']));
         $jsonResponse = $response->getJsonResponse();
@@ -289,8 +290,8 @@ class UsersControllerTest extends AdminApiTestCase
     {
         $this->withoutExceptionHandling();
 
-        $userJohn = factory(User::class)->create(['name' => 'john']);
-        $userDoe = factory(User::class)->create(['name' => 'doe']);
+        $userJohn = UserFactory::new()->create(['name' => 'john']);
+        $userDoe = UserFactory::new()->create(['name' => 'doe']);
         Passport::actingAs($userJohn);
         $response = $this->makeRequest('GET', route('admin.users.index', ['filter[id]' => $userDoe->id]));
         $jsonResponse = $response->getJsonResponse();
@@ -315,8 +316,8 @@ class UsersControllerTest extends AdminApiTestCase
     {
         $this->withoutExceptionHandling();
 
-        $userJohn = factory(User::class)->create(['email' => 'test@gmail.com']);
-        $userDoe = factory(User::class)->create(['email' => 'test@example.com']);
+        $userJohn = UserFactory::new()->create(['email' => 'test@gmail.com']);
+        $userDoe = UserFactory::new()->create(['email' => 'test@example.com']);
         Passport::actingAs($userJohn);
         $response = $this->makeRequest('GET', route('admin.users.index', ['filter[email]' => $userDoe->email]));
         $jsonResponse = $response->getJsonResponse();
@@ -341,8 +342,8 @@ class UsersControllerTest extends AdminApiTestCase
     {
         $this->withoutExceptionHandling();
 
-        $userJohn = factory(User::class)->create(['timezone' => 'Europe/Zagreb']);
-        $userDoe = factory(User::class)->create(['timezone' => 'Europe/Paris']);
+        $userJohn = UserFactory::new()->create(['timezone' => 'Europe/Zagreb']);
+        $userDoe = UserFactory::new()->create(['timezone' => 'Europe/Paris']);
         Passport::actingAs($userJohn);
         $response = $this->makeRequest('GET', route('admin.users.index', ['filter[timezone]' => $userDoe->timezone]));
         $jsonResponse = $response->getJsonResponse();
@@ -367,7 +368,7 @@ class UsersControllerTest extends AdminApiTestCase
     {
         $this->withoutExceptionHandling();
 
-        $users = factory(User::class, 3)->create();
+        $users = UserFactory::new()->count(3)->create();
         Passport::actingAs($users[0]);
         $response = $this->makeRequest('GET', route('admin.users.index', ['page[number]' => 1, 'page[size]' => 2, 'sort' => 'id']));
         $jsonResponse = $response->getJsonResponse();
@@ -382,7 +383,7 @@ class UsersControllerTest extends AdminApiTestCase
     {
         $this->withoutExceptionHandling();
 
-        $users = factory(User::class, 3)->create();
+        $users = UserFactory::new()->count(3)->create();
         Passport::actingAs($users[0]);
 
         $response = $this->makeRequest('GET', route('admin.users.index', ['page[number]' => 2, 'page[size]' => 2, 'sort' => 'id']));
@@ -397,7 +398,7 @@ class UsersControllerTest extends AdminApiTestCase
     {
         $this->withoutExceptionHandling();
 
-        $users = factory(User::class, 3)->create();
+        $users = UserFactory::new()->count(3)->create();
         Passport::actingAs($users[0]);
 
         $response = $this->makeRequest('GET', route('admin.users.index', ['page[number]' => 3, 'page[size]' => 2, 'sort' => 'id']));
@@ -411,9 +412,9 @@ class UsersControllerTest extends AdminApiTestCase
     {
         $this->withoutExceptionHandling();
 
-        $locale = factory(Locale::class)->create();
-        $user = factory(User::class)->create(['locale_id' => $locale->id]);
-        $torrent = factory(Torrent::class)->create(['uploader_id' => $user->id]);
+        $locale = LocaleFactory::new()->create();
+        $user = UserFactory::new()->create(['locale_id' => $locale->id]);
+        $torrent = TorrentFactory::new()->create(['uploader_id' => $user->id]);
         Passport::actingAs($user);
 
         $response = $this->makeRequest('GET', route('admin.users.index', ['filter[id]' => $user->id, 'include' => 'torrents']));
@@ -437,9 +438,9 @@ class UsersControllerTest extends AdminApiTestCase
     {
         $this->withoutExceptionHandling();
 
-        $locale = factory(Locale::class)->create();
-        $user = factory(User::class)->create(['locale_id' => $locale->id]);
-        $torrent = factory(Torrent::class)->create(['uploader_id' => $user->id]);
+        $locale = LocaleFactory::new()->create();
+        $user = UserFactory::new()->create(['locale_id' => $locale->id]);
+        $torrent = TorrentFactory::new()->create(['uploader_id' => $user->id]);
         Passport::actingAs($user);
 
         $response = $this->makeRequest('GET', route('admin.users.index', ['filter[id]' => $user->id, 'include' => 'locale']));

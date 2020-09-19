@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Tests\Feature\Http\Controllers\Admin\News;
 
 use App\Models\News;
-use App\Models\User;
+use Database\Factories\UserFactory;
 use Illuminate\Contracts\Routing\UrlGenerator;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Http\Response;
@@ -20,7 +20,7 @@ final class CreateEndpointTest extends AdminApiTestCase
     {
         $this->withoutExceptionHandling();
 
-        $user = factory(User::class)->create();
+        $user = UserFactory::new()->create();
 
         Passport::actingAs($user);
 
@@ -74,7 +74,7 @@ final class CreateEndpointTest extends AdminApiTestCase
 
     public function testCreateWithInvalidSubject(): void
     {
-        $user = factory(User::class)->create();
+        $user = UserFactory::new()->create();
 
         Passport::actingAs($user);
 
@@ -113,7 +113,7 @@ final class CreateEndpointTest extends AdminApiTestCase
 
     public function testCreateWithInvalidText(): void
     {
-        $user = factory(User::class)->create();
+        $user = UserFactory::new()->create();
 
         Passport::actingAs($user);
 

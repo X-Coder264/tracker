@@ -2,59 +2,88 @@
 
 declare(strict_types=1);
 
+namespace Database\Factories;
+
 use App\Models\Peer;
-use App\Models\PeerVersion;
-use App\Models\Torrent;
-use App\Models\User;
-use Faker\Generator as Faker;
-use Illuminate\Database\Eloquent\Factory;
+use Illuminate\Database\Eloquent\Factories\Factory;
 
-/** @var Factory $factory */
-$factory->define(Peer::class, function (Faker $faker) {
-    return [
-        'peer_id' => bin2hex(random_bytes(20)),
-        'torrent_id' => function () {
-            return factory(Torrent::class)->create()->id;
-        },
-        'user_id' => function () {
-            return factory(User::class)->create()->id;
-        },
-        'uploaded' => $faker->numberBetween(0, 10000000),
-        'downloaded' => $faker->numberBetween(0, 1000000),
-        'left' => $faker->numberBetween(0, \PHP_INT_MAX),
-        'user_agent' => $faker->userAgent,
-        'key' => null,
-    ];
-});
+final class PeerFactory extends Factory
+{
+    /**
+     * The name of the factory's corresponding model.
+     *
+     * @var string
+     */
+    protected $model = Peer::class;
 
-$factory->state(Peer::class, 'seeder', [
-    'left' => 0,
-    'downloaded' => 400,
-    'uploaded' => 200,
-]);
+    /**
+     * Define the model's default state.
+     *
+     * @return array
+     */
+    public function definition()
+    {
+        return [
+            'peer_id'    => bin2hex(random_bytes(20)),
+            'torrent_id' => TorrentFactory::new(),
+            'user_id'    => UserFactory::new(),
+            'uploaded'   => $this->faker->numberBetween(0, 10000000),
+            'downloaded' => $this->faker->numberBetween(0, 1000000),
+            'left'       => $this->faker->numberBetween(0, \PHP_INT_MAX),
+            'user_agent' => $this->faker->userAgent,
+            'key'        => null,
+        ];
+    }
 
-$factory->state(Peer::class, 'leecher', [
-    'left' => 300,
-    'downloaded' => 100,
-    'uploaded' => 20,
-]);
+    public function seeder(): self
+    {
+        return $this->state([
+            'left'       => 0,
+            'downloaded' => 400,
+            'uploaded'   => 200,
+        ]);
+    }
 
-$factory->state(Peer::class, 'v1', [
+    public function leecher(): self
+    {
+        return $this->state([
+            'left'       => 300,
+            'downloaded' => 100,
+            'uploaded'   => 20,
+        ]);
+    }
 
-]);
+    public function versionOne(): self
+    {
+        return $this->has(PeerVersionFactory::new()->versionOne(), 'versions');
+    }
 
-$factory->state(Peer::class, 'v2', [
+    public function versionTwo(): self
+    {
+        return $this->has(PeerVersionFactory::new()->versionTwo(), 'versions');
+    }
 
-]);
+    public function hybrid(): self
+    {
+        return $this->has(PeerVersionFactory::new()->versionOne(), 'versions')
+            ->has(PeerVersionFactory::new()->versionTwo(), 'versions');
+    }
 
-$factory->afterCreatingState(Peer::class, 'v1', function (Peer $peer, Faker $faker) {
-    $peer->timestamps = false;
-    $peer->versions()->save(new PeerVersion(['version' => 1]));
-    $peer->timestamps = true;
-});
+    /**
+     * Configure the model factory.
+     *
+     * @return $this
+     */
+    public function configure()
+    {
+        return $this->afterCreating(function (Peer $peer) {
+            if (! $peer->versions()->exists()) {
+                $peer->versions()->save(PeerVersionFactory::new()->make(['peer_id' => $peer->id]));
+            }
 
-$factory->afterCreatingState(Peer::class, 'v2', function (Peer $peer, Faker $faker) {
-    $peer->timestamps = false;
-    $peer->versions()->save(new PeerVersion(['version' => 2]));
-    $peer->timestamps = true;
-});
+            if (! $peer->ips()->exists()) {
+                $peer->ips()->save(PeerIPFactory::new()->make(['peer_id' => $peer->id]));
+            }
+        });
+    }
+}

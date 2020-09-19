@@ -4,10 +4,8 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Http\Controllers;
 
-use App\Models\Peer;
 use App\Models\Torrent;
 use App\Models\TorrentCategory;
-use App\Models\TorrentComment;
 use App\Models\User;
 use App\Presenters\IMDb\Title;
 use App\Services\Bdecoder;
@@ -17,6 +15,11 @@ use App\Services\IMDb\IMDBManager;
 use App\Services\IMDb\TitleFactory;
 use App\Services\SizeFormatter;
 use App\Services\TorrentInfoService;
+use Database\Factories\PeerFactory;
+use Database\Factories\TorrentCategoryFactory;
+use Database\Factories\TorrentCommentFactory;
+use Database\Factories\TorrentFactory;
+use Database\Factories\UserFactory;
 use Illuminate\Cache\CacheManager;
 use Illuminate\Cache\TaggedCache;
 use Illuminate\Contracts\Cache\Repository;
@@ -46,7 +49,7 @@ class TorrentControllerTest extends TestCase
     {
         parent::setUp();
 
-        $this->user = factory(User::class)->create(['torrents_per_page' => $this->torrentsPerPage]);
+        $this->user = UserFactory::new()->create(['torrents_per_page' => $this->torrentsPerPage]);
         $this->actingAs($this->user);
     }
 
@@ -54,8 +57,8 @@ class TorrentControllerTest extends TestCase
     {
         $this->withoutExceptionHandling();
 
-        $visibleTorrent = factory(Torrent::class)->states('alive')->create(['uploader_id' => $this->user->id, 'name' => 'test']);
-        $deadTorrent = factory(Torrent::class)->states('dead')->create(['uploader_id' => $this->user->id]);
+        $visibleTorrent = TorrentFactory::new()->alive()->create(['uploader_id' => $this->user->id, 'name' => 'test']);
+        $deadTorrent = TorrentFactory::new()->dead()->create(['uploader_id' => $this->user->id]);
 
         $response = $this->get($this->app->make(UrlGenerator::class)->route('torrents.index'));
         $response->assertStatus(Response::HTTP_OK);
@@ -85,8 +88,8 @@ class TorrentControllerTest extends TestCase
     {
         $this->withoutExceptionHandling();
 
-        $visibleTorrent = factory(Torrent::class)->states('alive')->create(['uploader_id' => $this->user->id, 'name' => 'test']);
-        $deadTorrent = factory(Torrent::class)->states('dead')->create(['uploader_id' => $this->user->id]);
+        $visibleTorrent = TorrentFactory::new()->alive()->create(['uploader_id' => $this->user->id, 'name' => 'test']);
+        $deadTorrent = TorrentFactory::new()->dead()->create(['uploader_id' => $this->user->id]);
 
         $response = $this->get($this->app->make(UrlGenerator::class)->route('torrents.index', ['page' => 'invalid-string']));
         $response->assertStatus(Response::HTTP_OK);
@@ -118,7 +121,7 @@ class TorrentControllerTest extends TestCase
         $urlGenerator = $this->app->make(UrlGenerator::class);
 
         /** @var TorrentCategory[] $categories */
-        $categories = factory(TorrentCategory::class, 2)->create();
+        $categories = TorrentCategoryFactory::new()->count(2)->create();
 
         $response = $this->get($urlGenerator->route('torrents.create'));
 
@@ -137,7 +140,7 @@ class TorrentControllerTest extends TestCase
     {
         $this->withoutExceptionHandling();
 
-        $torrent = factory(Torrent::class)->states('hybrid')
+        $torrent = TorrentFactory::new()->alive()->hybrid()
             ->create(
                 [
                     'uploader_id' => $this->user->id,
@@ -148,10 +151,10 @@ class TorrentControllerTest extends TestCase
                 ]
             );
 
-        $torrentComment = factory(TorrentComment::class)->create(
+        $torrentComment = TorrentCommentFactory::new()->create(
             ['torrent_id' => $torrent->id, 'user_id' => $torrent->uploader_id]
         );
-        $peer = factory(Peer::class)->create(
+        $peer = PeerFactory::new()->create(
             [
                 'torrent_id' => $torrent->id,
                 'user_id'    => $this->user->id,
@@ -256,7 +259,7 @@ class TorrentControllerTest extends TestCase
 
     public function testShowWhenTorrentInfoServiceThrowsAnException(): void
     {
-        $torrent = factory(Torrent::class)->create(['uploader_id' => $this->user->id]);
+        $torrent = TorrentFactory::new()->create(['uploader_id' => $this->user->id]);
 
         $torrentInfo = $this->createMock(TorrentInfoService::class);
         $this->app->instance(TorrentInfoService::class, $torrentInfo);
@@ -273,7 +276,7 @@ class TorrentControllerTest extends TestCase
     {
         $this->withoutExceptionHandling();
 
-        $torrent = factory(Torrent::class)->create(['uploader_id' => $this->user->id]);
+        $torrent = TorrentFactory::new()->create(['uploader_id' => $this->user->id]);
 
         $urlGenerator = $this->app->make(UrlGenerator::class);
 
@@ -292,7 +295,7 @@ class TorrentControllerTest extends TestCase
     {
         $this->withoutExceptionHandling();
 
-        $torrent = factory(Torrent::class)->create();
+        $torrent = TorrentFactory::new()->create();
 
         $urlGenerator = $this->app->make(UrlGenerator::class);
 
@@ -310,9 +313,9 @@ class TorrentControllerTest extends TestCase
     {
         $this->withoutExceptionHandling();
 
-        $torrent = factory(Torrent::class)->create(['uploader_id' => $this->user->id]);
+        $torrent = TorrentFactory::new()->create(['uploader_id' => $this->user->id]);
 
-        $category = factory(TorrentCategory::class)->create(['imdb' => true]);
+        $category = TorrentCategoryFactory::new()->hasIMDB()->create();
 
         $imdbManager = $this->createMock(IMDBManager::class);
         $imdbManager->expects($this->once())
@@ -356,9 +359,9 @@ class TorrentControllerTest extends TestCase
     {
         $this->withoutExceptionHandling();
 
-        $torrent = factory(Torrent::class)->create(['uploader_id' => $this->user->id]);
+        $torrent = TorrentFactory::new()->create(['uploader_id' => $this->user->id]);
 
-        factory(TorrentCategory::class)->create(['imdb' => true]);
+        TorrentCategoryFactory::new()->hasIMDB()->create();
 
         $urlGenerator = $this->app->make(UrlGenerator::class);
 
@@ -385,9 +388,9 @@ class TorrentControllerTest extends TestCase
     {
         $this->withoutExceptionHandling();
 
-        $torrent = factory(Torrent::class)->create(['uploader_id' => $this->user->id]);
+        $torrent = TorrentFactory::new()->create(['uploader_id' => $this->user->id]);
 
-        $category = factory(TorrentCategory::class)->create(['imdb' => true]);
+        $category = TorrentCategoryFactory::new()->hasIMDB()->create();
 
         $urlGenerator = $this->app->make(UrlGenerator::class);
 
@@ -414,9 +417,9 @@ class TorrentControllerTest extends TestCase
     {
         $this->withoutExceptionHandling();
 
-        $torrent = factory(Torrent::class)->create(['uploader_id' => $this->user->id]);
+        $torrent = TorrentFactory::new()->create(['uploader_id' => $this->user->id]);
 
-        factory(TorrentCategory::class)->create(['imdb' => true]);
+        TorrentCategoryFactory::new()->hasIMDB()->create();
 
         $urlGenerator = $this->app->make(UrlGenerator::class);
 
@@ -441,9 +444,9 @@ class TorrentControllerTest extends TestCase
     {
         $this->withoutExceptionHandling();
 
-        $torrent = factory(Torrent::class)->create(['uploader_id' => $this->user->id]);
+        $torrent = TorrentFactory::new()->create(['uploader_id' => $this->user->id]);
 
-        factory(TorrentCategory::class)->create(['imdb' => true]);
+        TorrentCategoryFactory::new()->hasIMDB()->create();
 
         $urlGenerator = $this->app->make(UrlGenerator::class);
 
@@ -468,9 +471,9 @@ class TorrentControllerTest extends TestCase
     {
         $this->withoutExceptionHandling();
 
-        $torrent = factory(Torrent::class)->create();
+        $torrent = TorrentFactory::new()->create();
 
-        $category = factory(TorrentCategory::class)->create(['imdb' => true]);
+        $category = TorrentCategoryFactory::new()->hasIMDB()->create();
 
         $urlGenerator = $this->app->make(UrlGenerator::class);
 
@@ -506,9 +509,9 @@ class TorrentControllerTest extends TestCase
     {
         $this->withoutExceptionHandling();
 
-        $torrent = factory(Torrent::class)->create(['uploader_id' => $this->user->id]);
+        $torrent = TorrentFactory::new()->create(['uploader_id' => $this->user->id]);
 
-        $category = factory(TorrentCategory::class)->create(['imdb' => true]);
+        $category = TorrentCategoryFactory::new()->hasIMDB()->create();
 
         $imdbManager = $this->createMock(IMDBManager::class);
         $imdbManager->expects($this->once())
@@ -556,7 +559,7 @@ class TorrentControllerTest extends TestCase
         /** @var Bencoder|MockObject $encoder */
         $encoder = $this->createMock(Bencoder::class);
 
-        $torrent = factory(Torrent::class)->create(['uploader_id' => $this->user->id, 'name' => 'xyz']);
+        $torrent = TorrentFactory::new()->create(['uploader_id' => $this->user->id, 'name' => 'xyz']);
 
         $storageReturnValue = 'something x264';
         Storage::shouldReceive('disk->get')->once()->with("{$torrent->id}.torrent")->andReturn($storageReturnValue);
@@ -593,7 +596,7 @@ class TorrentControllerTest extends TestCase
         /** @var Bencoder|MockObject $encoder */
         $encoder = $this->createMock(Bencoder::class);
 
-        $torrent = factory(Torrent::class)->create(['uploader_id' => $this->user->id, 'name' => 'čćš/đž%']);
+        $torrent = TorrentFactory::new()->create(['uploader_id' => $this->user->id, 'name' => 'čćš/đž%']);
 
         $storageReturnValue = 'something x264';
         Storage::shouldReceive('disk->get')->once()->with("{$torrent->id}.torrent")->andReturn($storageReturnValue);
@@ -630,7 +633,7 @@ class TorrentControllerTest extends TestCase
 
     public function testDownloadWhenStorageThrowsAnException(): void
     {
-        $torrent = factory(Torrent::class)->create(['uploader_id' => $this->user->id]);
+        $torrent = TorrentFactory::new()->create(['uploader_id' => $this->user->id]);
         Storage::shouldReceive('disk->get')->once()->with("{$torrent->id}.torrent")->andThrow(new FileNotFoundException());
         $response = $this->get($this->app->make(UrlGenerator::class)->route('torrents.download', $torrent));
         $response->assertStatus(Response::HTTP_NOT_FOUND);
@@ -649,7 +652,7 @@ class TorrentControllerTest extends TestCase
         /** @var Bencoder|MockObject $encoder */
         $encoder = $this->createMock(Bencoder::class);
 
-        $torrent = factory(Torrent::class)->create(['uploader_id' => $this->user->id, 'name' => 'xyz']);
+        $torrent = TorrentFactory::new()->create(['uploader_id' => $this->user->id, 'name' => 'xyz']);
 
         $storageReturnValue = 'something x264';
         Storage::shouldReceive('disk->get')->once()->with("{$torrent->id}.torrent")->andReturn($storageReturnValue);
@@ -681,7 +684,7 @@ class TorrentControllerTest extends TestCase
     {
         $this->app->make('auth')->guard()->logout();
 
-        $torrent = factory(Torrent::class)->create(['uploader_id' => $this->user->id, 'name' => 'xyz']);
+        $torrent = TorrentFactory::new()->create(['uploader_id' => $this->user->id, 'name' => 'xyz']);
 
         $response = $this->get($this->app->make(UrlGenerator::class)->route('torrents.download', ['torrent' => $torrent, 'passkey' => 'does-not-exist']));
         $response->assertStatus(302);
@@ -699,7 +702,7 @@ class TorrentControllerTest extends TestCase
     public function testGuestsCannotSeeTheTorrentPage(): void
     {
         $this->app->make('auth')->guard()->logout();
-        $torrent = factory(Torrent::class)->create(['uploader_id' => $this->user->id]);
+        $torrent = TorrentFactory::new()->create(['uploader_id' => $this->user->id]);
         $response = $this->get($this->app->make(UrlGenerator::class)->route('torrents.show', $torrent));
         $response->assertStatus(Response::HTTP_FOUND);
         $response->assertRedirect($this->app->make(UrlGenerator::class)->route('login'));
@@ -708,7 +711,7 @@ class TorrentControllerTest extends TestCase
     public function testGuestsCannotDownloadTorrentsIfPasskeyIsNotProvided(): void
     {
         $this->app->make('auth')->guard()->logout();
-        $torrent = factory(Torrent::class)->create(['uploader_id' => $this->user->id]);
+        $torrent = TorrentFactory::new()->create(['uploader_id' => $this->user->id]);
         $response = $this->get($this->app->make(UrlGenerator::class)->route('torrents.download', $torrent));
         $response->assertStatus(Response::HTTP_FOUND);
         $response->assertRedirect($this->app->make(UrlGenerator::class)->route('login'));
@@ -791,7 +794,7 @@ class TorrentControllerTest extends TestCase
 
     public function testNameMustBeUnique(): void
     {
-        $torrent = factory(Torrent::class)->create(['uploader_id' => $this->user->id]);
+        $torrent = TorrentFactory::new()->create(['uploader_id' => $this->user->id]);
         $response = $this->from($this->app->make(UrlGenerator::class)->route('torrents.create'))->post($this->app->make(UrlGenerator::class)->route('torrents.store'), $this->validParams([
             'name' => $torrent->name,
         ]));
@@ -840,7 +843,7 @@ class TorrentControllerTest extends TestCase
             'name'        => 'Test name',
             'description' => str_repeat('Test foobar', 5),
             'torrent'     => File::create('file.torrent'),
-            'category'    => factory(TorrentCategory::class)->create()->id,
+            'category'    => TorrentCategoryFactory::new()->create()->id,
         ], $overrides);
     }
 }

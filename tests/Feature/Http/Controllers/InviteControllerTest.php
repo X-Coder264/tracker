@@ -5,8 +5,9 @@ declare(strict_types=1);
 namespace Tests\Feature\Http\Controllers;
 
 use App\Models\Invite;
-use App\Models\User;
 use Carbon\CarbonImmutable;
+use Database\Factories\InviteFactory;
+use Database\Factories\UserFactory;
 use Illuminate\Contracts\Routing\UrlGenerator;
 use Illuminate\Contracts\Translation\Translator;
 use Illuminate\Database\Eloquent\Collection;
@@ -21,9 +22,9 @@ final class InviteControllerTest extends TestCase
     {
         $this->withoutExceptionHandling();
 
-        $user = factory(User::class)->states('has_available_invites')->create();
-        factory(User::class)->create(['inviter_user_id' => $user->id, 'name' => 'foo bar name']);
-        factory(Invite::class, 2)->create(['user_id' => $user->id]);
+        $user = UserFactory::new()->hasAvailableInvites()->create();
+        UserFactory::new()->create(['inviter_user_id' => $user->id, 'name' => 'foo bar name']);
+        InviteFactory::new()->count(2)->create(['user_id' => $user->id]);
 
         $this->actingAs($user);
 
@@ -71,7 +72,7 @@ final class InviteControllerTest extends TestCase
     {
         $this->withoutExceptionHandling();
 
-        $user = factory(User::class)->states('has_available_invites')->create();
+        $user = UserFactory::new()->hasAvailableInvites()->create();
 
         $this->actingAs($user);
 
@@ -107,7 +108,7 @@ final class InviteControllerTest extends TestCase
     {
         $this->withoutExceptionHandling();
 
-        $user = factory(User::class)->states('has_no_available_invites')->create();
+        $user = UserFactory::new()->hasNoAvailableInvites()->create();
 
         $this->actingAs($user);
 

@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Http\Controllers\RSS;
 
-use App\Models\Torrent;
-use App\Models\TorrentCategory;
-use App\Models\User;
+use Database\Factories\TorrentCategoryFactory;
+use Database\Factories\TorrentFactory;
+use Database\Factories\UserFactory;
 use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Tests\TestCase;
@@ -19,11 +19,11 @@ class TorrentFeedControllerTest extends TestCase
     {
         $this->withoutExceptionHandling();
 
-        $user = factory(User::class)->create();
+        $user = UserFactory::new()->create();
 
-        $torrents = factory(Torrent::class, 2)->states(['alive', 'v1'])->create();
+        $torrents = TorrentFactory::new()->count(2)->alive()->create();
 
-        factory(Torrent::class)->states(['dead', 'v1'])->create();
+        TorrentFactory::new()->dead()->create();
 
         $this->actingAs($user);
 
@@ -91,13 +91,13 @@ class TorrentFeedControllerTest extends TestCase
     {
         $this->withoutExceptionHandling();
 
-        $user = factory(User::class)->create();
+        $user = UserFactory::new()->create();
 
-        $torrentCategories = factory(TorrentCategory::class, 3)->create();
+        $torrentCategories = TorrentCategoryFactory::new()->count(3)->create();
 
-        $torrent = factory(Torrent::class)->states(['alive', 'v1'])->create(['category_id' => $torrentCategories[2]->id]);
-        factory(Torrent::class)->states(['alive', 'v1'])->create(['category_id' => $torrentCategories[0]->id]);
-        factory(Torrent::class)->states(['dead', 'v1'])->create(['category_id' => $torrentCategories[1]->id]);
+        $torrent = TorrentFactory::new()->alive()->create(['category_id' => $torrentCategories[2]->id]);
+        TorrentFactory::new()->alive()->create(['category_id' => $torrentCategories[0]->id]);
+        TorrentFactory::new()->dead()->create(['category_id' => $torrentCategories[1]->id]);
 
         $categories = sprintf('%d,%d', $torrentCategories[1]->id, $torrentCategories[2]->id);
 

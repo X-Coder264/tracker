@@ -7,6 +7,9 @@ namespace Tests\Feature\Models;
 use App\Models\Torrent;
 use App\Models\TorrentComment;
 use App\Models\User;
+use Database\Factories\TorrentCommentFactory;
+use Database\Factories\TorrentFactory;
+use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Tests\TestCase;
@@ -17,8 +20,8 @@ class TorrentCommentTest extends TestCase
 
     public function testTorrentCommentHasSlug()
     {
-        $user = factory(User::class)->create();
-        $torrent = factory(Torrent::class)->create(['uploader_id' => $user->id]);
+        $user = UserFactory::new()->create();
+        $torrent = TorrentFactory::new()->create(['uploader_id' => $user->id]);
         $torrentComment = new TorrentComment();
         $torrentComment->comment = 'test comment';
         $torrentComment->torrent_id = $torrent->id;
@@ -30,7 +33,7 @@ class TorrentCommentTest extends TestCase
 
     public function testUserRelationship()
     {
-        factory(TorrentComment::class)->create();
+        TorrentCommentFactory::new()->create();
 
         $user = User::firstOrFail();
         $torrentComment = TorrentComment::firstOrFail();
@@ -43,7 +46,7 @@ class TorrentCommentTest extends TestCase
 
     public function testTorrentRelationship()
     {
-        factory(TorrentComment::class)->create();
+        TorrentCommentFactory::new()->create();
 
         $torrent = Torrent::firstOrFail();
         $torrentComment = TorrentComment::firstOrFail();

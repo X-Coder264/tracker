@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Http\Controllers\RSS;
 
-use App\Models\TorrentCategory;
-use App\Models\User;
+use Database\Factories\TorrentCategoryFactory;
+use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Tests\TestCase;
@@ -18,9 +18,9 @@ class UserTorrentFeedControllerTest extends TestCase
     {
         $this->withoutExceptionHandling();
 
-        $user = factory(User::class)->create();
+        $user = UserFactory::new()->create();
 
-        $torrentCategories = factory(TorrentCategory::class, 2)->create();
+        $torrentCategories = TorrentCategoryFactory::new()->count(2)->create();
 
         $this->actingAs($user);
 
@@ -42,9 +42,9 @@ class UserTorrentFeedControllerTest extends TestCase
     {
         $this->withoutExceptionHandling();
 
-        $user = factory(User::class)->create();
+        $user = UserFactory::new()->create();
 
-        factory(TorrentCategory::class, 2)->create();
+        TorrentCategoryFactory::new()->count(2)->create();
 
         $this->actingAs($user);
 
@@ -58,9 +58,9 @@ class UserTorrentFeedControllerTest extends TestCase
     {
         $this->withoutExceptionHandling();
 
-        $user = factory(User::class)->create();
+        $user = UserFactory::new()->create();
 
-        $torrentCategories = factory(TorrentCategory::class, 3)->create();
+        $torrentCategories = TorrentCategoryFactory::new()->count(3)->create();
 
         $this->actingAs($user);
 
@@ -88,7 +88,7 @@ class UserTorrentFeedControllerTest extends TestCase
     {
         $this->withoutExceptionHandling();
 
-        $user = factory(User::class)->create();
+        $user = UserFactory::new()->create();
 
         $rssFeedUrl = route('torrents.rss', ['passkey' => $user->passkey]);
 

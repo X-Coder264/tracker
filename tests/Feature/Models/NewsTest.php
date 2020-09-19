@@ -6,6 +6,8 @@ namespace Tests\Feature\Models;
 
 use App\Models\News;
 use App\Models\User;
+use Database\Factories\NewsFactory;
+use Database\Factories\UserFactory;
 use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
@@ -17,7 +19,7 @@ class NewsTest extends TestCase
 
     public function testNewsHasSlug(): void
     {
-        $user = factory(User::class)->create();
+        $user = UserFactory::new()->create();
         $news = new News();
         $news->user_id = $user->id;
         $news->subject = 'test subject';
@@ -29,7 +31,7 @@ class NewsTest extends TestCase
 
     public function testAuthorRelationship(): void
     {
-        factory(News::class)->create();
+        NewsFactory::new()->create();
 
         $user = User::firstOrFail();
         $news = News::firstOrFail();
@@ -45,7 +47,7 @@ class NewsTest extends TestCase
 
         $this->assertTrue($cache->has('news'));
 
-        $user = factory(User::class)->create();
+        $user = UserFactory::new()->create();
 
         $news = new News();
         $news->user_id = $user->id;

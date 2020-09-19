@@ -6,6 +6,7 @@ namespace Tests\Feature\Models;
 
 use App\Models\Torrent;
 use App\Models\TorrentCategory;
+use Database\Factories\TorrentFactory;
 use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -27,7 +28,7 @@ class TorrentCategoryTest extends TestCase
 
     public function testTorrentsRelationship(): void
     {
-        factory(Torrent::class)->create();
+        TorrentFactory::new()->create();
 
         $torrent = Torrent::firstOrFail();
         $torrentCategory = TorrentCategory::firstOrFail();

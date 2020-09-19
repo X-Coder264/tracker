@@ -5,9 +5,7 @@ declare(strict_types=1);
 namespace Tests\Feature\Services;
 
 use App\Models\Torrent;
-use App\Models\TorrentCategory;
 use App\Models\TorrentInfoHash;
-use App\Models\User;
 use App\Services\Bdecoder;
 use App\Services\Bencoder;
 use App\Services\IMDb\IMDBImagesManager;
@@ -15,6 +13,10 @@ use App\Services\IMDb\IMDBManager;
 use App\Services\SizeFormatter;
 use App\Services\TorrentInfoService;
 use App\Services\TorrentUploadManager;
+use Database\Factories\TorrentCategoryFactory;
+use Database\Factories\TorrentFactory;
+use Database\Factories\TorrentInfoHashFactory;
+use Database\Factories\UserFactory;
 use Exception;
 use Illuminate\Cache\CacheManager;
 use Illuminate\Contracts\Auth\Guard;
@@ -40,8 +42,8 @@ class TorrentUploadManagerTest extends TestCase
     {
         $this->withoutExceptionHandling();
 
-        $torrentCategory = factory(TorrentCategory::class)->states('canHaveIMDB')->create();
-        $user = factory(User::class)->create(['torrents_per_page' => 5]);
+        $torrentCategory = TorrentCategoryFactory::new()->hasIMDB()->create();
+        $user = UserFactory::new()->create(['torrents_per_page' => 5]);
         $this->actingAs($user);
 
         $cacheManager = $this->app->make(CacheManager::class);
@@ -124,8 +126,8 @@ class TorrentUploadManagerTest extends TestCase
     {
         $this->withoutExceptionHandling();
 
-        $torrentCategory = factory(TorrentCategory::class)->states('canHaveIMDB')->create();
-        $user = factory(User::class)->create(['torrents_per_page' => 5]);
+        $torrentCategory = TorrentCategoryFactory::new()->hasIMDB()->create();
+        $user = UserFactory::new()->create(['torrents_per_page' => 5]);
         $this->actingAs($user);
 
         $cacheManager = $this->app->make(CacheManager::class);
@@ -201,8 +203,8 @@ class TorrentUploadManagerTest extends TestCase
     {
         $this->withoutExceptionHandling();
 
-        $torrentCategory = factory(TorrentCategory::class)->states('canHaveIMDB')->create();
-        $user = factory(User::class)->create(['torrents_per_page' => 5]);
+        $torrentCategory = TorrentCategoryFactory::new()->hasIMDB()->create();
+        $user = UserFactory::new()->create(['torrents_per_page' => 5]);
         $this->actingAs($user);
 
         $cacheManager = $this->app->make(CacheManager::class);
@@ -287,7 +289,7 @@ class TorrentUploadManagerTest extends TestCase
 
     public function testTorrentUploadIfTheTorrentFileIsNotAValidV1NorV2File(): void
     {
-        $user = factory(User::class)->create();
+        $user = UserFactory::new()->create();
         $this->actingAs($user);
 
         $decoder = $this->createMock(Bdecoder::class);
@@ -309,7 +311,7 @@ class TorrentUploadManagerTest extends TestCase
             'torrent'     => File::create('file.torrent'),
             'name'        => $torrentName,
             'description' => $torrentDescription,
-            'category'    => factory(TorrentCategory::class)->create()->id,
+            'category'    => TorrentCategoryFactory::new()->create()->id,
         ]);
 
         $this->assertSame(0, Torrent::count());
@@ -324,8 +326,8 @@ class TorrentUploadManagerTest extends TestCase
     {
         $this->withoutExceptionHandling();
 
-        $torrentCategory = factory(TorrentCategory::class)->states('canHaveIMDB')->create();
-        $user = factory(User::class)->create(['torrents_per_page' => 10]);
+        $torrentCategory = TorrentCategoryFactory::new()->hasIMDB()->create();
+        $user = UserFactory::new()->create(['torrents_per_page' => 10]);
         $this->actingAs($user);
 
         $cacheManager = $this->app->make(CacheManager::class);
@@ -401,8 +403,8 @@ class TorrentUploadManagerTest extends TestCase
     {
         $this->withoutExceptionHandling();
 
-        $torrentCategory = factory(TorrentCategory::class)->states('canHaveIMDB')->create();
-        $user = factory(User::class)->create(['torrents_per_page' => 5]);
+        $torrentCategory = TorrentCategoryFactory::new()->hasIMDB()->create();
+        $user = UserFactory::new()->create(['torrents_per_page' => 5]);
         $this->actingAs($user);
 
         $cacheManager = $this->app->make(CacheManager::class);
@@ -488,8 +490,8 @@ class TorrentUploadManagerTest extends TestCase
     {
         $this->withoutExceptionHandling();
 
-        $torrentCategory = factory(TorrentCategory::class)->states('cannotHaveIMDB')->create();
-        $user = factory(User::class)->create();
+        $torrentCategory = TorrentCategoryFactory::new()->doesNotHaveIMDB()->create();
+        $user = UserFactory::new()->create();
         $this->actingAs($user);
 
         Storage::fake('torrents');
@@ -549,8 +551,8 @@ class TorrentUploadManagerTest extends TestCase
     {
         $this->withoutExceptionHandling();
 
-        $torrentCategory = factory(TorrentCategory::class)->states('canHaveIMDB')->create();
-        $user = factory(User::class)->create(['torrents_per_page' => 5]);
+        $torrentCategory = TorrentCategoryFactory::new()->hasIMDB()->create();
+        $user = UserFactory::new()->create(['torrents_per_page' => 5]);
         $this->actingAs($user);
 
         $cacheManager = $this->app->make(CacheManager::class);
@@ -618,8 +620,8 @@ class TorrentUploadManagerTest extends TestCase
 
     public function testTorrentUploadWhenTheBdecoderThrowsAnException(): void
     {
-        $torrentCategory = factory(TorrentCategory::class)->states('canHaveIMDB')->create();
-        $user = factory(User::class)->create();
+        $torrentCategory = TorrentCategoryFactory::new()->hasIMDB()->create();
+        $user = UserFactory::new()->create();
         $this->actingAs($user);
 
         Storage::fake('torrents');
@@ -653,7 +655,7 @@ class TorrentUploadManagerTest extends TestCase
     {
         $this->withoutExceptionHandling();
 
-        $user = factory(User::class)->create();
+        $user = UserFactory::new()->create();
         $this->actingAs($user);
 
         Storage::fake('torrents');
@@ -677,7 +679,7 @@ class TorrentUploadManagerTest extends TestCase
             'torrent'     => $torrentFile,
             'name'        => $torrentName,
             'description' => $torrentDescription,
-            'category'    => factory(TorrentCategory::class)->create()->id,
+            'category'    => TorrentCategoryFactory::new()->create()->id,
         ]);
 
         $torrent = Torrent::firstOrFail();
@@ -695,7 +697,7 @@ class TorrentUploadManagerTest extends TestCase
     {
         $this->withoutExceptionHandling();
 
-        $user = factory(User::class)->create();
+        $user = UserFactory::new()->create();
         $this->actingAs($user);
 
         Storage::fake('torrents');
@@ -715,7 +717,7 @@ class TorrentUploadManagerTest extends TestCase
             'torrent'     => $torrentFile,
             'name'        => $torrentName,
             'description' => $torrentDescription,
-            'category'    => factory(TorrentCategory::class)->create()->id,
+            'category'    => TorrentCategoryFactory::new()->create()->id,
         ]);
 
         $torrent = Torrent::firstOrFail();
@@ -732,9 +734,9 @@ class TorrentUploadManagerTest extends TestCase
 
     public function testTorrentMustHaveAnUniqueInfoHash(): void
     {
-        factory(Torrent::class)->states('hybrid')->create();
+        TorrentFactory::new()->hybrid()->create();
         $torrent = Torrent::with('infoHashes')->firstOrFail();
-        $user = factory(User::class)->create();
+        $user = UserFactory::new()->create();
         $this->actingAs($user);
 
         Storage::fake('torrents');
@@ -795,7 +797,7 @@ class TorrentUploadManagerTest extends TestCase
             'torrent'     => File::create('file.torrent'),
             'name'        => $torrentName,
             'description' => $torrentDescription,
-            'category'    => factory(TorrentCategory::class)->create()->id,
+            'category'    => TorrentCategoryFactory::new()->create()->id,
         ]);
 
         $torrent = Torrent::latest('id')->with('infoHashes')->firstOrFail();
@@ -823,7 +825,7 @@ class TorrentUploadManagerTest extends TestCase
     {
         $this->withoutExceptionHandling();
 
-        $user = factory(User::class)->create();
+        $user = UserFactory::new()->create();
         $this->actingAs($user);
 
         Storage::fake('torrents');
@@ -843,7 +845,7 @@ class TorrentUploadManagerTest extends TestCase
             'torrent'     => $torrentFile,
             'name'        => $torrentName,
             'description' => $torrentDescription,
-            'category'    => factory(TorrentCategory::class)->create()->id,
+            'category'    => TorrentCategoryFactory::new()->create()->id,
         ]);
 
         $torrent = Torrent::firstOrFail();
@@ -860,7 +862,7 @@ class TorrentUploadManagerTest extends TestCase
 
     public function testTorrentGetsDeletedIfTheFileWasNotSuccessfullyWrittenToTheDisk(): void
     {
-        $user = factory(User::class)->create();
+        $user = UserFactory::new()->create();
         $this->actingAs($user);
 
         Storage::shouldReceive('disk->put')->once()->andReturn(false);
@@ -889,7 +891,7 @@ class TorrentUploadManagerTest extends TestCase
             'torrent'     => File::create('file.torrent'),
             'name'        => $torrentName,
             'description' => $torrentDescription,
-            'category'    => factory(TorrentCategory::class)->create()->id,
+            'category'    => TorrentCategoryFactory::new()->create()->id,
         ]);
 
         $this->assertSame(0, Torrent::count());
@@ -902,9 +904,11 @@ class TorrentUploadManagerTest extends TestCase
 
     public function testAreHashesUnique(): void
     {
-        $torrent = factory(Torrent::class)->create();
         $infoHash = sha1(Str::random(200));
-        factory(TorrentInfoHash::class)->create(['torrent_id' => $torrent->id, 'info_hash' => $infoHash]);
+
+        $torrent = TorrentFactory::new()
+            ->has(TorrentInfoHashFactory::new()->state(['info_hash' => $infoHash]), 'infoHashes')
+            ->create();
 
         $torrentUploadManager = $this->app->make(TorrentUploadManager::class);
         $reflectionClass = new ReflectionClass(TorrentUploadManager::class);

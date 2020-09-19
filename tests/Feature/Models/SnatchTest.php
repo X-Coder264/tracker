@@ -7,6 +7,7 @@ namespace Tests\Feature\Models;
 use App\Models\Snatch;
 use App\Models\Torrent;
 use App\Models\User;
+use Database\Factories\SnatchFactory;
 use Facades\App\Services\SecondsDurationFormatter;
 use Facades\App\Services\SizeFormatter;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -19,7 +20,7 @@ class SnatchTest extends TestCase
 
     public function testUploadedAccessor(): void
     {
-        factory(Snatch::class)->create();
+        SnatchFactory::new()->create();
         $snatch = Snatch::firstOrFail();
         $returnValue = '500 MB';
         SizeFormatter::shouldReceive('getFormattedSize')->once()->with($snatch->getRawOriginal('uploaded'))->andReturn($returnValue);
@@ -28,7 +29,7 @@ class SnatchTest extends TestCase
 
     public function testDownloadedAccessor(): void
     {
-        factory(Snatch::class)->create();
+        SnatchFactory::new()->create();
         $snatch = Snatch::firstOrFail();
         $returnValue = '500 MB';
         SizeFormatter::shouldReceive('getFormattedSize')->once()->with($snatch->getRawOriginal('downloaded'))->andReturn($returnValue);
@@ -37,7 +38,7 @@ class SnatchTest extends TestCase
 
     public function testLeftAccessor(): void
     {
-        factory(Snatch::class)->create();
+        SnatchFactory::new()->create();
         $snatch = Snatch::firstOrFail();
         $returnValue = '500 MB';
         SizeFormatter::shouldReceive('getFormattedSize')->once()->with($snatch->getRawOriginal('left'))->andReturn($returnValue);
@@ -46,7 +47,7 @@ class SnatchTest extends TestCase
 
     public function testSeedTimeAccessor(): void
     {
-        factory(Snatch::class)->create();
+        SnatchFactory::new()->create();
         $snatch = Snatch::firstOrFail();
         $returnValue = '500 MB';
         SecondsDurationFormatter::shouldReceive('format')->once()->with($snatch->getRawOriginal('seed_time'))->andReturn($returnValue);
@@ -55,7 +56,7 @@ class SnatchTest extends TestCase
 
     public function testLeechTimeAccessor(): void
     {
-        factory(Snatch::class)->create();
+        SnatchFactory::new()->create();
         $snatch = Snatch::firstOrFail();
         $returnValue = '500 MB';
         SecondsDurationFormatter::shouldReceive('format')->once()->with($snatch->getRawOriginal('leech_time'))->andReturn($returnValue);
@@ -64,7 +65,7 @@ class SnatchTest extends TestCase
 
     public function testTorrentRelationship(): void
     {
-        $snatch = factory(Snatch::class)->create();
+        $snatch = SnatchFactory::new()->create();
 
         $freshSnatch = $snatch->fresh();
         $this->assertInstanceOf(BelongsTo::class, $freshSnatch->torrent());
@@ -74,7 +75,7 @@ class SnatchTest extends TestCase
 
     public function testUserRelationship(): void
     {
-        $snatch = factory(Snatch::class)->create();
+        $snatch = SnatchFactory::new()->create();
 
         $freshSnatch = $snatch->fresh();
         $this->assertInstanceOf(BelongsTo::class, $freshSnatch->user());

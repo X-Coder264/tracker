@@ -6,6 +6,7 @@ namespace Tests\Feature\Models;
 
 use App\Models\Peer;
 use App\Models\PeerVersion;
+use Database\Factories\PeerVersionFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Tests\TestCase;
@@ -16,7 +17,7 @@ class PeerVersionTest extends TestCase
 
     public function testPeerRelationship(): void
     {
-        factory(PeerVersion::class)->create();
+        PeerVersionFactory::new()->create();
 
         $peerVersion = PeerVersion::firstOrFail();
         $peer = Peer::firstOrFail();

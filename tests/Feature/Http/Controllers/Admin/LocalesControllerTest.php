@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Http\Controllers\Admin;
 
-use App\Models\Locale;
-use App\Models\User;
+use Database\Factories\LocaleFactory;
+use Database\Factories\UserFactory;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Carbon;
 use Laravel\Passport\Passport;
@@ -19,8 +19,8 @@ class LocalesControllerTest extends AdminApiTestCase
     {
         $this->withoutExceptionHandling();
 
-        $locale = factory(Locale::class)->create();
-        $user = factory(User::class)->create();
+        $locale = LocaleFactory::new()->create();
+        $user = UserFactory::new()->create();
         Passport::actingAs($user);
         $response = $this->makeRequest('GET', route('admin.locales.index'));
         $jsonResponse = $response->getJsonResponse();

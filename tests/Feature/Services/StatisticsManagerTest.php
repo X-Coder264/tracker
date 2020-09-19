@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Services;
 
-use App\Models\Peer;
-use App\Models\Torrent;
-use App\Models\User;
 use App\Services\StatisticsManager;
+use Database\Factories\PeerFactory;
+use Database\Factories\TorrentFactory;
+use Database\Factories\UserFactory;
 use Illuminate\Database\Connection;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Tests\TestCase;
@@ -31,7 +31,7 @@ class StatisticsManagerTest extends TestCase
 
     public function testGetPeersCount(): void
     {
-        factory(Peer::class, 5)->create();
+        PeerFactory::new()->count(5)->create();
         $this->assertSame(5, $this->statisticsManager->getPeersCount());
         $beforeQueryLog = $this->connection->getQueryLog();
         $this->assertSame(5, $this->statisticsManager->getPeersCount());
@@ -41,8 +41,8 @@ class StatisticsManagerTest extends TestCase
 
     public function testGetSeedersCount(): void
     {
-        factory(Peer::class, 1)->states('seeder')->create();
-        factory(Peer::class, 3)->states('leecher')->create();
+        PeerFactory::new()->count(1)->seeder()->create();
+        PeerFactory::new()->count(3)->leecher()->create();
         $this->assertSame(1, $this->statisticsManager->getSeedersCount());
         $beforeQueryLog = $this->connection->getQueryLog();
         $this->assertSame(1, $this->statisticsManager->getSeedersCount());
@@ -52,8 +52,8 @@ class StatisticsManagerTest extends TestCase
 
     public function testGetLeechersCount(): void
     {
-        factory(Peer::class, 1)->states('seeder')->create();
-        factory(Peer::class, 3)->states('leecher')->create();
+        PeerFactory::new()->count(1)->seeder()->create();
+        PeerFactory::new()->count(3)->leecher()->create();
         $this->assertSame(3, $this->statisticsManager->getLeechersCount());
         $beforeQueryLog = $this->connection->getQueryLog();
         $this->assertSame(3, $this->statisticsManager->getLeechersCount());
@@ -63,7 +63,7 @@ class StatisticsManagerTest extends TestCase
 
     public function testGetUsersCount(): void
     {
-        factory(User::class, 2)->create();
+        UserFactory::new()->count(2)->create();
         $this->assertSame(2, $this->statisticsManager->getUsersCount());
         $beforeQueryLog = $this->connection->getQueryLog();
         $this->assertSame(2, $this->statisticsManager->getUsersCount());
@@ -73,8 +73,8 @@ class StatisticsManagerTest extends TestCase
 
     public function testGetBannedUsersCount(): void
     {
-        factory(User::class, 2)->create();
-        factory(User::class, 1)->states('banned')->create();
+        UserFactory::new()->count(2)->create();
+        UserFactory::new()->count(1)->banned()->create();
         $this->assertSame(1, $this->statisticsManager->getBannedUsersCount());
         $beforeQueryLog = $this->connection->getQueryLog();
         $this->assertSame(1, $this->statisticsManager->getBannedUsersCount());
@@ -84,8 +84,8 @@ class StatisticsManagerTest extends TestCase
 
     public function testGetTorrentsCount(): void
     {
-        factory(Torrent::class, 1)->states('alive')->create();
-        factory(Torrent::class, 2)->states('dead')->create();
+        TorrentFactory::new()->alive()->create();
+        TorrentFactory::new()->count(2)->dead()->create();
         $this->assertSame(3, $this->statisticsManager->getTorrentsCount());
         $beforeQueryLog = $this->connection->getQueryLog();
         $this->assertSame(3, $this->statisticsManager->getTorrentsCount());
@@ -95,8 +95,8 @@ class StatisticsManagerTest extends TestCase
 
     public function testGetDeadTorrentsCount(): void
     {
-        factory(Torrent::class, 1)->states('alive')->create();
-        factory(Torrent::class, 2)->states('dead')->create();
+        TorrentFactory::new()->alive()->create();
+        TorrentFactory::new()->count(2)->dead()->create();
         $this->assertSame(2, $this->statisticsManager->getDeadTorrentsCount());
         $beforeQueryLog = $this->connection->getQueryLog();
         $this->assertSame(2, $this->statisticsManager->getDeadTorrentsCount());
@@ -106,8 +106,8 @@ class StatisticsManagerTest extends TestCase
 
     public function testGetTotalTorrentSize(): void
     {
-        factory(Torrent::class)->create(['size' => 400]);
-        factory(Torrent::class)->create(['size' => 650]);
+        TorrentFactory::new()->create(['size' => 400]);
+        TorrentFactory::new()->create(['size' => 650]);
         $this->assertSame(1050, $this->statisticsManager->getTotalTorrentSize());
         $beforeQueryLog = $this->connection->getQueryLog();
         $this->assertSame(1050, $this->statisticsManager->getTotalTorrentSize());

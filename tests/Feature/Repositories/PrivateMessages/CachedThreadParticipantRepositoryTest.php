@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Repositories\PrivateMessages;
 
-use App\Models\PrivateMessages\Thread;
-use App\Models\PrivateMessages\ThreadParticipant;
-use App\Models\User;
 use App\Repositories\PrivateMessages\CachedThreadParticipantRepository;
+use Database\Factories\ThreadFactory;
+use Database\Factories\ThreadParticipantFactory;
+use Database\Factories\UserFactory;
 use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Database\Connection;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
@@ -19,11 +19,11 @@ class CachedThreadParticipantRepositoryTest extends TestCase
 
     public function testGetUnreadThreadsForUser(): void
     {
-        $user = factory(User::class)->create();
+        $user = UserFactory::new()->create();
 
-        $thread = factory(Thread::class)->create();
+        $thread = ThreadFactory::new()->create();
 
-        factory(ThreadParticipant::class)->create(
+        ThreadParticipantFactory::new()->create(
             [
                 'thread_id' => $thread->id,
                 'user_id' => $user->id,

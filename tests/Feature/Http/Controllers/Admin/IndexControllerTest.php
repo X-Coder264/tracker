@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Http\Controllers\Admin;
 
-use App\Models\User;
+use Database\Factories\UserFactory;
 use Illuminate\Contracts\Config\Repository;
 use Illuminate\Contracts\Routing\UrlGenerator;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
@@ -17,7 +17,7 @@ class IndexControllerTest extends TestCase
 
     public function testIndex(): void
     {
-        $user = factory(User::class)->create();
+        $user = UserFactory::new()->create();
         $this->actingAs($user);
         $response = $this->get($this->app->make(UrlGenerator::class)->route('admin.index'));
 

@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Http\Controllers\PrivateMessages;
 
-use App\Models\PrivateMessages\Thread;
-use App\Models\PrivateMessages\ThreadMessage;
-use App\Models\PrivateMessages\ThreadParticipant;
-use App\Models\User;
 use Carbon\Carbon;
+use Database\Factories\ThreadFactory;
+use Database\Factories\ThreadMessageFactory;
+use Database\Factories\ThreadParticipantFactory;
+use Database\Factories\UserFactory;
 use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
@@ -23,13 +23,13 @@ class ThreadControllerTest extends TestCase
     {
         $this->withoutExceptionHandling();
 
-        $user = factory(User::class)->create();
-        $irrelevantUser = factory(User::class)->create();
-        $threadOne = factory(Thread::class)->create(['subject' => 'test 1']);
-        $threadTwo = factory(Thread::class)->create(['user_id' => $irrelevantUser->id]);
-        $threadThree = factory(Thread::class)->create(['subject' => 'test 3']);
+        $user = UserFactory::new()->create();
+        $irrelevantUser = UserFactory::new()->create();
+        $threadOne = ThreadFactory::new()->create(['subject' => 'test 1']);
+        $threadTwo = ThreadFactory::new()->create(['user_id' => $irrelevantUser->id]);
+        $threadThree = ThreadFactory::new()->create(['subject' => 'test 3']);
 
-        factory(ThreadParticipant::class)->create(
+        ThreadParticipantFactory::new()->create(
             [
                 'user_id' => $user->id,
                 'thread_id' => $threadOne->id,
@@ -37,7 +37,7 @@ class ThreadControllerTest extends TestCase
             ]
         );
 
-        factory(ThreadParticipant::class)->create(
+        ThreadParticipantFactory::new()->create(
             [
                 'user_id' => $user->id,
                 'thread_id' => $threadThree->id,
@@ -45,7 +45,7 @@ class ThreadControllerTest extends TestCase
             ]
         );
 
-        factory(ThreadParticipant::class)->create(
+        ThreadParticipantFactory::new()->create(
             [
                 'user_id' => $irrelevantUser->id,
                 'thread_id' => $threadTwo->id,
@@ -81,10 +81,10 @@ class ThreadControllerTest extends TestCase
     {
         $this->withoutExceptionHandling();
 
-        $user = factory(User::class)->create();
-        $thread = factory(Thread::class)->create(['subject' => 'test 1']);
+        $user = UserFactory::new()->create();
+        $thread = ThreadFactory::new()->create(['subject' => 'test 1']);
 
-        $participant = factory(ThreadParticipant::class)->create(
+        $participant = ThreadParticipantFactory::new()->create(
             [
                 'user_id' => $user->id,
                 'thread_id' => $thread->id,
@@ -92,11 +92,11 @@ class ThreadControllerTest extends TestCase
             ]
         );
 
-        factory(ThreadParticipant::class)->create(['thread_id' => $thread->id]);
+        ThreadParticipantFactory::new()->create(['thread_id' => $thread->id]);
 
-        $messageOne = factory(ThreadMessage::class)->create(['thread_id' => $thread->id, 'user_id' => $user->id]);
-        $messageTwo = factory(ThreadMessage::class)->create(['thread_id' => $thread->id]);
-        factory(ThreadMessage::class)->create();
+        $messageOne = ThreadMessageFactory::new()->create(['thread_id' => $thread->id, 'user_id' => $user->id]);
+        $messageTwo = ThreadMessageFactory::new()->create(['thread_id' => $thread->id]);
+        ThreadMessageFactory::new()->create();
 
         $cache = $this->app->make(Repository::class);
         $cache->put(
@@ -128,10 +128,10 @@ class ThreadControllerTest extends TestCase
 
     public function testShowThreadWhenTheUserIsNotAParticipant(): void
     {
-        $user = factory(User::class)->create();
-        $thread = factory(Thread::class)->create(['subject' => 'test 1']);
+        $user = UserFactory::new()->create();
+        $thread = ThreadFactory::new()->create(['subject' => 'test 1']);
 
-        factory(ThreadParticipant::class)->create(['thread_id' => $thread->id]);
+        ThreadParticipantFactory::new()->create(['thread_id' => $thread->id]);
 
         $cache = $this->app->make(Repository::class);
         $cache->put(
@@ -151,7 +151,7 @@ class ThreadControllerTest extends TestCase
 
     public function testGuestsCannotSeeTheThread(): void
     {
-        $thread = factory(Thread::class)->create();
+        $thread = ThreadFactory::new()->create();
         $response = $this->get(route('threads.show', $thread));
         $response->assertStatus(302);
         $response->assertRedirect(route('login'));

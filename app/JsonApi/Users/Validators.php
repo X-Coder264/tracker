@@ -36,10 +36,11 @@ class Validators extends AbstractValidators
         'torrents', 'locale',
     ];
 
-    protected function rules($record = null): array
+    /**
+     * @param User|null $record
+     */
+    protected function rules($record, array $data): array
     {
-        /** @var User|null $record */
-
         // The JSON API spec says the client does not have to send all attributes for an update request, so
         // if the record already exists we need to include a 'sometimes' before required.
         $required = $record ? 'sometimes|required' : 'required';

@@ -2,68 +2,88 @@
 
 declare(strict_types=1);
 
+namespace Database\Factories;
+
 use App\Models\Torrent;
-use App\Models\TorrentCategory;
-use App\Models\TorrentInfoHash;
-use App\Models\User;
-use Faker\Generator as Faker;
-use Illuminate\Database\Eloquent\Factory;
-use Illuminate\Support\Str;
+use Illuminate\Database\Eloquent\Factories\Factory;
 
-/** @var Factory $factory */
-$factory->define(Torrent::class, function (Faker $faker) {
-    return [
-        'name' => $faker->unique()->firstName,
-        'size' => $faker->numberBetween(500, 500000),
-        'imdb_id' => null,
-        'uploader_id' => function () {
-            return factory(User::class)->create()->id;
-        },
-        'category_id' => function () {
-            return factory(TorrentCategory::class)->create()->id;
-        },
-        'description' => $faker->text(500),
-        'seeders' => $faker->numberBetween(0, 100),
-        'leechers' => $faker->numberBetween(0, 100),
-        'views_count' => $faker->numberBetween(0, 100),
-    ];
-});
+final class TorrentFactory extends Factory
+{
+    /**
+     * The name of the factory's corresponding model.
+     *
+     * @var string
+     */
+    protected $model = Torrent::class;
 
-$factory->state(Torrent::class, 'alive', [
-    'seeders' => 1,
-]);
+    /**
+     * Define the model's default state.
+     *
+     * @return array
+     */
+    public function definition()
+    {
+        return [
+            'name'        => $this->faker->unique()->firstName,
+            'size'        => $this->faker->numberBetween(500, 500000),
+            'imdb_id'     => null,
+            'uploader_id' => UserFactory::new(),
+            'category_id' => TorrentCategoryFactory::new(),
+            'description' => $this->faker->text(500),
+            'seeders'     => $this->faker->numberBetween(0, 100),
+            'leechers'    => $this->faker->numberBetween(0, 100),
+            'views_count' => $this->faker->numberBetween(0, 100),
+        ];
+    }
 
-$factory->state(Torrent::class, 'dead', [
-    'seeders' => 0,
-]);
+    public function alive(): self
+    {
+        return $this->state([
+            'seeders' => 1,
+        ]);
+    }
 
-$factory->state(Torrent::class, 'hasIMDB', [
-    'imdb_id' => '0468569',
-]);
+    public function dead(): self
+    {
+        return $this->state([
+            'seeders' => 0,
+        ]);
+    }
 
-$factory->state(Torrent::class, 'v1', [
+    public function hasIMDB(): self
+    {
+        return $this->state([
+            'imdb_id' => '0468569',
+        ]);
+    }
 
-]);
+    public function versionOne(): self
+    {
+        return $this->has(TorrentInfoHashFactory::new()->versionOne(), 'infoHashes');
+    }
 
-$factory->state(Torrent::class, 'v2', [
+    public function versionTwo(): self
+    {
+        return $this->has(TorrentInfoHashFactory::new()->versionTwo(), 'infoHashes');
+    }
 
-]);
+    public function hybrid(): self
+    {
+        return $this->has(TorrentInfoHashFactory::new()->versionOne(), 'infoHashes')
+            ->has(TorrentInfoHashFactory::new()->versionTwo(), 'infoHashes');
+    }
 
-$factory->state(Torrent::class, 'hybrid', [
-
-]);
-
-$factory->afterCreatingState(Torrent::class, 'v1', function (Torrent $torrent, Faker $faker) {
-    $torrent->infoHashes()->save(new TorrentInfoHash(['info_hash' => sha1(Str::random(200)), 'version' => 1]));
-});
-
-$factory->afterCreatingState(Torrent::class, 'v2', function (Torrent $torrent, Faker $faker) {
-    $torrent->infoHashes()->save(new TorrentInfoHash(['info_hash' => substr(hash('sha256', Str::random(200)), 0, 40), 'version' => 2]));
-});
-
-$factory->afterCreatingState(Torrent::class, 'hybrid', function (Torrent $torrent, Faker $faker) {
-    $torrent->infoHashes()->saveMany([
-        new TorrentInfoHash(['info_hash' => sha1(Str::random(200)), 'version' => 1]),
-        new TorrentInfoHash(['info_hash' => substr(hash('sha256', Str::random(200)), 0, 40), 'version' => 2]),
-    ]);
-});
+    /**
+     * Configure the model factory.
+     *
+     * @return $this
+     */
+    public function configure()
+    {
+        return $this->afterCreating(function (Torrent $torrent) {
+            if (! $torrent->infoHashes()->exists()) {
+                $torrent->infoHashes()->save(TorrentInfoHashFactory::new()->make(['torrent_id' => $torrent->id]));
+            }
+        });
+    }
+}

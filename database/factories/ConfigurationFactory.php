@@ -2,26 +2,48 @@
 
 declare(strict_types=1);
 
+namespace Database\Factories;
+
 use App\Enumerations\ConfigurationOptions;
 use App\Models\Configuration;
-use Faker\Generator as Faker;
-use Illuminate\Database\Eloquent\Factory;
+use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
 
-/** @var Factory $factory */
-$factory->define(Configuration::class, function (Faker $faker) {
-    return [
-        'name' => $faker->unique()->name,
-        'value' => Str::random(10),
-    ];
-});
+final class ConfigurationFactory extends Factory
+{
+    /**
+     * The name of the factory's corresponding model.
+     *
+     * @var string
+     */
+    protected $model = Configuration::class;
 
-$factory->state(Configuration::class, 'invite_only_signup', [
-    'name' => ConfigurationOptions::INVITE_ONLY_SIGNUP,
-    'value' => true,
-]);
+    /**
+     * Define the model's default state.
+     *
+     * @return array
+     */
+    public function definition()
+    {
+        return [
+            'name'  => $this->faker->unique()->name,
+            'value' => Str::random(10),
+        ];
+    }
 
-$factory->state(Configuration::class, 'non_invite_only_signup', [
-    'name' => ConfigurationOptions::INVITE_ONLY_SIGNUP,
-    'value' => false,
-]);
+    public function inviteOnlySignup(): self
+    {
+        return $this->state([
+            'name'  => ConfigurationOptions::INVITE_ONLY_SIGNUP,
+            'value' => true,
+        ]);
+    }
+
+    public function nonInviteOnlySignup(): self
+    {
+        return $this->state([
+            'name'  => ConfigurationOptions::INVITE_ONLY_SIGNUP,
+            'value' => false,
+        ]);
+    }
+}

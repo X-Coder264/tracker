@@ -5,7 +5,8 @@ declare(strict_types=1);
 namespace Tests\Feature\Http\Controllers\Admin\News;
 
 use App\Models\News;
-use App\Models\User;
+use Database\Factories\NewsFactory;
+use Database\Factories\UserFactory;
 use Illuminate\Contracts\Routing\UrlGenerator;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Laravel\Passport\Passport;
@@ -19,12 +20,12 @@ final class IndexEndpointTest extends AdminApiTestCase
     {
         $this->withoutExceptionHandling();
 
-        $user = factory(User::class)->create();
+        $user = UserFactory::new()->create();
 
         Passport::actingAs($user);
 
         /** @var News[] $news */
-        $news = factory(News::class, 2)->create();
+        $news = NewsFactory::new()->count(2)->create();
 
         $response = $this->makeRequest(
             'GET',
@@ -78,12 +79,12 @@ final class IndexEndpointTest extends AdminApiTestCase
     {
         $this->withoutExceptionHandling();
 
-        $user = factory(User::class)->create();
+        $user = UserFactory::new()->create();
 
         Passport::actingAs($user);
 
         /** @var News[] $news */
-        $news = factory(News::class, 2)->create();
+        $news = NewsFactory::new()->count(2)->create();
 
         $response = $this->makeRequest(
             'GET',
@@ -124,13 +125,13 @@ final class IndexEndpointTest extends AdminApiTestCase
     {
         $this->withoutExceptionHandling();
 
-        $user = factory(User::class)->create();
+        $user = UserFactory::new()->create();
 
         Passport::actingAs($user);
 
-        factory(News::class, 2)->create(['user_id' => $user->id]);
+        NewsFactory::new()->count(2)->create(['user_id' => $user->id]);
 
-        $news = factory(News::class)->create();
+        $news = NewsFactory::new()->create();
 
         $response = $this->makeRequest(
             'GET',

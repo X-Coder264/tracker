@@ -18,6 +18,7 @@ use App\Repositories\PrivateMessages\ThreadParticipantRepositoryInterface;
 use Carbon\CarbonImmutable;
 use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Contracts\Container\Container;
+use Illuminate\Pagination\Paginator;
 use Illuminate\Support\DateFactory;
 use Illuminate\Support\ServiceProvider;
 use Symfony\Component\HttpClient\HttpClient;
@@ -28,6 +29,7 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         DateFactory::useClass(CarbonImmutable::class);
+        Paginator::useBootstrap();
 
         User::observe(UserObserver::class);
         TorrentCategory::observe(TorrentCategoryObserver::class);

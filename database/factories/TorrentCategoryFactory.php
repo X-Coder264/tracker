@@ -2,22 +2,44 @@
 
 declare(strict_types=1);
 
+namespace Database\Factories;
+
 use App\Models\TorrentCategory;
-use Faker\Generator as Faker;
-use Illuminate\Database\Eloquent\Factory;
+use Illuminate\Database\Eloquent\Factories\Factory;
 
-/** @var Factory $factory */
-$factory->define(TorrentCategory::class, function (Faker $faker) {
-    return [
-        'name' => $faker->unique()->firstName,
-        'imdb' => $faker->boolean(),
-    ];
-});
+final class TorrentCategoryFactory extends Factory
+{
+    /**
+     * The name of the factory's corresponding model.
+     *
+     * @var string
+     */
+    protected $model = TorrentCategory::class;
 
-$factory->state(TorrentCategory::class, 'canHaveIMDB', [
-    'imdb' => true,
-]);
+    /**
+     * Define the model's default state.
+     *
+     * @return array
+     */
+    public function definition()
+    {
+        return [
+            'name' => $this->faker->unique()->firstName,
+            'imdb' => $this->faker->boolean(),
+        ];
+    }
 
-$factory->state(TorrentCategory::class, 'cannotHaveIMDB', [
-    'imdb' => false,
-]);
+    public function hasIMDB(): self
+    {
+        return $this->state([
+            'imdb' => true,
+        ]);
+    }
+
+    public function doesNotHaveIMDB(): self
+    {
+        return $this->state([
+            'imdb' => false,
+        ]);
+    }
+}

@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace Tests\Unit\Services;
 
-use App\Models\Torrent;
 use App\Services\Bdecoder;
 use App\Services\IMDb\IMDBManager;
 use App\Services\IMDb\TitleFactory;
 use App\Services\SizeFormatter;
 use App\Services\TorrentInfoService;
+use Database\Factories\TorrentFactory;
 use Exception;
 use Generator;
 use Illuminate\Contracts\Cache\Repository;
@@ -54,7 +54,7 @@ class TorrentInfoServiceTest extends TestCase
         /** @var SizeFormatter|MockObject $formatter */
         $formatter = $this->createMock(SizeFormatter::class);
 
-        $torrent = factory(Torrent::class)->make(['uploader_id' => 1, 'category_id' => 1]);
+        $torrent = TorrentFactory::new()->make(['uploader_id' => 1, 'category_id' => 1]);
 
         $storageReturnValue = 'xyz';
         Storage::shouldReceive('disk->get')->once()->with("{$torrent->id}.torrent")->andReturn($storageReturnValue);

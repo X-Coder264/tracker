@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Http\Controllers\Torrents;
 
-use App\Models\Peer;
-use App\Models\Torrent;
-use App\Models\User;
 use App\Services\Bdecoder;
 use App\Services\Bencoder;
+use Database\Factories\PeerFactory;
+use Database\Factories\TorrentFactory;
+use Database\Factories\UserFactory;
 use Illuminate\Contracts\Filesystem\Factory;
 use Illuminate\Contracts\Routing\UrlGenerator;
 use Illuminate\Contracts\Translation\Translator;
@@ -26,13 +26,13 @@ final class DownloadSeedingTorrentsZipArchiveControllerTest extends TestCase
     {
         $this->withoutExceptionHandling();
 
-        $user = factory(User::class)->create();
+        $user = UserFactory::new()->create();
 
         $this->actingAs($user);
 
-        $torrent = factory(Torrent::class)->create(['name' => 'test foo čćšđ % X']);
-        factory(Peer::class)->states('seeder')->create(['torrent_id' => $torrent->id, 'user_id' => $user->id]);
-        factory(Peer::class)->states('leecher')->create(['user_id' => $user->id]);
+        $torrent = TorrentFactory::new()->create(['name' => 'test foo čćšđ % X']);
+        PeerFactory::new()->seeder()->create(['torrent_id' => $torrent->id, 'user_id' => $user->id]);
+        PeerFactory::new()->leecher()->create(['user_id' => $user->id]);
 
         $torrentFileContent = file_get_contents(
             __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . '..' .
@@ -126,12 +126,12 @@ final class DownloadSeedingTorrentsZipArchiveControllerTest extends TestCase
     {
         $this->withoutExceptionHandling();
 
-        $user = factory(User::class)->create();
+        $user = UserFactory::new()->create();
 
         $this->actingAs($user);
 
-        factory(Peer::class)->states('seeder')->create();
-        factory(Peer::class)->states('leecher')->create(['user_id' => $user->id]);
+        PeerFactory::new()->seeder()->create();
+        PeerFactory::new()->leecher()->create(['user_id' => $user->id]);
 
         $urlGenerator = $this->app->make(UrlGenerator::class);
 

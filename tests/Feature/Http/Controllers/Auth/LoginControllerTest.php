@@ -4,8 +4,9 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Http\Controllers\Auth;
 
-use App\Models\Locale;
 use App\Models\User;
+use Database\Factories\LocaleFactory;
+use Database\Factories\UserFactory;
 use Illuminate\Contracts\Encryption\Encrypter;
 use Illuminate\Contracts\Hashing\Hasher;
 use Illuminate\Contracts\Routing\UrlGenerator;
@@ -32,7 +33,7 @@ class LoginControllerTest extends TestCase
     {
         $this->withoutExceptionHandling();
 
-        $locale = factory(Locale::class)->create();
+        $locale = LocaleFactory::new()->create();
         $email = 'test@gmail.com';
         $password = '12345678';
 
@@ -60,7 +61,7 @@ class LoginControllerTest extends TestCase
     {
         $this->withoutExceptionHandling();
 
-        $locale = factory(Locale::class)->create();
+        $locale = LocaleFactory::new()->create();
         $email = 'test@gmail.com';
         $password = '12345678';
 
@@ -94,7 +95,7 @@ class LoginControllerTest extends TestCase
     {
         $this->withoutExceptionHandling();
 
-        $locale = factory(Locale::class)->create();
+        $locale = LocaleFactory::new()->create();
         $email = 'test@gmail.com';
         $password = '12345678';
 
@@ -122,7 +123,7 @@ class LoginControllerTest extends TestCase
 
     public function testUserCannotLoginWithIncorrectPassword(): void
     {
-        $user = factory(User::class)->create([
+        $user = UserFactory::new()->create([
             'password' => $this->app->make(Hasher::class)->make('test123'),
         ]);
 
@@ -160,7 +161,7 @@ class LoginControllerTest extends TestCase
     {
         $password = 'test1234';
 
-        $user = factory(User::class)->create([
+        $user = UserFactory::new()->create([
             'password' => $this->app->make(Hasher::class)->make($password),
         ]);
 
@@ -216,7 +217,7 @@ class LoginControllerTest extends TestCase
     {
         $urlGenerator = $this->app->make(UrlGenerator::class);
 
-        $user = factory(User::class)->create();
+        $user = UserFactory::new()->create();
         $this->actingAs($user);
         $response = $this->get($urlGenerator->route('login'));
         $response->assertStatus(Response::HTTP_FOUND);
@@ -225,7 +226,7 @@ class LoginControllerTest extends TestCase
 
     public function testUserCanLogout(): void
     {
-        $user = factory(User::class)->create();
+        $user = UserFactory::new()->create();
         $this->actingAs($user);
         $response = $this->post($this->app->make(UrlGenerator::class)->route('logout'));
 
@@ -235,7 +236,7 @@ class LoginControllerTest extends TestCase
 
     public function testUserCannotMakeMoreThanFiveAttemptsInOneMinute(): void
     {
-        $user = factory(User::class)->create([
+        $user = UserFactory::new()->create([
             'password' => $this->app->make(Hasher::class)->make('test123'),
         ]);
 
@@ -268,7 +269,7 @@ class LoginControllerTest extends TestCase
 
     private function validParams(array $overrides = []): array
     {
-        $locale = factory(Locale::class)->create();
+        $locale = LocaleFactory::new()->create();
         $email = 'test@gmail.com';
         $password = '12345678';
 

@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+namespace Database\Seeders;
+
 use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Database\Seeder;
 use Spatie\Permission\Models\Permission;

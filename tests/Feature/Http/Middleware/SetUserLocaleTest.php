@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Http\Middleware;
 
-use App\Models\Locale;
-use App\Models\User;
 use Carbon\Carbon;
+use Database\Factories\LocaleFactory;
+use Database\Factories\UserFactory;
 use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\Route;
@@ -18,8 +18,8 @@ class SetUserLocaleTest extends TestCase
 
     public function testSettingUserLocale()
     {
-        $locale = factory(Locale::class)->create(['localeShort' => 'hr']);
-        $user = factory(User::class)->create(['locale_id' => $locale->id]);
+        $locale = LocaleFactory::new()->create(['localeShort' => 'hr']);
+        $user = UserFactory::new()->create(['locale_id' => $locale->id]);
         $this->actingAs($user);
 
         Route::middleware('web')->group(function () {

@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Http\Controllers;
 
-use App\Models\Snatch;
-use App\Models\Torrent;
-use App\Models\TorrentInfoHash;
-use App\Models\User;
 use App\Services\Bdecoder;
 use App\Services\Bencoder;
+use Database\Factories\SnatchFactory;
+use Database\Factories\TorrentFactory;
+use Database\Factories\TorrentInfoHashFactory;
+use Database\Factories\UserFactory;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Tests\TestCase;
 
@@ -21,12 +21,13 @@ class ScrapeControllerTest extends TestCase
     {
         $this->withoutExceptionHandling();
 
-        $user = factory(User::class)->create();
+        $user = UserFactory::new()->create();
         $infoHash = 'ccd285bd6d7fc749e9ed34d8b1e8a0f1b582d977';
-        $torrent = factory(Torrent::class)->create(['seeders' => 3, 'leechers' => 2]);
-        factory(TorrentInfoHash::class)->create(['info_hash' => $infoHash, 'torrent_id' => $torrent->id]);
-        factory(Snatch::class, 6)->states('snatched')->create(['torrent_id' => $torrent->id]);
-        factory(Snatch::class, 2)->create(['torrent_id' => $torrent->id, 'left' => 1200]);
+        $torrent = TorrentFactory::new()
+            ->has(TorrentInfoHashFactory::new()->state(['info_hash' => $infoHash]), 'infoHashes')
+            ->create(['seeders' => 3, 'leechers' => 2]);
+        SnatchFactory::new()->count(6)->snatched()->create(['torrent_id' => $torrent->id]);
+        SnatchFactory::new()->count(2)->create(['torrent_id' => $torrent->id, 'left' => 1200]);
 
         $response = $this->get(route('scrape', ['info_hash'  => hex2bin($infoHash), 'passkey' => $user->passkey]));
         $response->assertStatus(200);
@@ -47,17 +48,19 @@ class ScrapeControllerTest extends TestCase
     {
         $this->withoutExceptionHandling();
 
-        $user = factory(User::class)->create();
+        $user = UserFactory::new()->create();
         $infoHash = 'ccd285bd6d7fc749e9ed34d8b1e8a0f1b582d977';
-        $torrent = factory(Torrent::class)->create(['seeders' => 0, 'leechers' => 1]);
-        factory(TorrentInfoHash::class)->create(['info_hash' => $infoHash, 'torrent_id' => $torrent->id]);
+        $torrent = TorrentFactory::new()
+            ->has(TorrentInfoHashFactory::new()->state(['info_hash' => $infoHash]), 'infoHashes')
+            ->create(['seeders' => 0, 'leechers' => 1]);
         $infoHashTwo = 'ccd285bd6d7fc749e9ed34d8b1e8a0f1b582d978';
-        $torrentTwo = factory(Torrent::class)->create(['seeders' => 1, 'leechers' => 4]);
-        factory(TorrentInfoHash::class)->create(['info_hash' => $infoHashTwo, 'torrent_id' => $torrentTwo->id]);
-        factory(Snatch::class, 1)->states('snatched')->create(['torrent_id' => $torrent->id]);
-        factory(Snatch::class)->create(['torrent_id' => $torrent->id]);
-        factory(Snatch::class, 2)->states('snatched')->create(['torrent_id' => $torrentTwo->id]);
-        factory(Snatch::class)->create(['torrent_id' => $torrentTwo->id]);
+        $torrentTwo = TorrentFactory::new()
+            ->has(TorrentInfoHashFactory::new()->state(['info_hash' => $infoHashTwo]), 'infoHashes')
+            ->create(['seeders' => 1, 'leechers' => 4]);
+        SnatchFactory::new()->snatched()->create(['torrent_id' => $torrent->id]);
+        SnatchFactory::new()->create(['torrent_id' => $torrent->id]);
+        SnatchFactory::new()->count(2)->snatched()->create(['torrent_id' => $torrentTwo->id]);
+        SnatchFactory::new()->create(['torrent_id' => $torrentTwo->id]);
 
         $binaryInfoHash = hex2bin($infoHash);
         $binaryInfoHashTwo = hex2bin($infoHashTwo);
@@ -90,11 +93,12 @@ class ScrapeControllerTest extends TestCase
     {
         $this->withoutExceptionHandling();
 
-        $user = factory(User::class)->create();
+        $user = UserFactory::new()->create();
         $infoHash = 'ccd285bd6d7fc749e9ed34d8b1e8a0f1b582d977';
         $nonExistingHash = 'ccd285bd6d7fc749e9ed34d8b1e8a0f1b582d979';
-        $torrent = factory(Torrent::class)->create(['seeders' => 3, 'leechers' => 2]);
-        factory(TorrentInfoHash::class)->create(['info_hash' => $infoHash, 'torrent_id' => $torrent->id]);
+        $torrent = TorrentFactory::new()
+            ->has(TorrentInfoHashFactory::new()->state(['info_hash' => $infoHash]), 'infoHashes')
+            ->create(['seeders' => 3, 'leechers' => 2]);
 
         $response = $this->get(route('scrape', ['info_hash'  => hex2bin($nonExistingHash), 'passkey' => $user->passkey]));
         $response->assertStatus(200);
@@ -125,7 +129,7 @@ class ScrapeControllerTest extends TestCase
     {
         $this->withoutExceptionHandling();
 
-        $user = factory(User::class)->create();
+        $user = UserFactory::new()->create();
 
         $response = $this->get(route('scrape', ['passkey' => $user->passkey . 'XYZ']));
         $response->assertStatus(200);
@@ -159,7 +163,7 @@ class ScrapeControllerTest extends TestCase
     {
         $this->withoutExceptionHandling();
 
-        $user = factory(User::class)->states('banned')->create();
+        $user = UserFactory::new()->banned()->create();
 
         $response = $this->get(route('scrape', ['passkey' => $user->passkey]));
         $response->assertStatus(200);

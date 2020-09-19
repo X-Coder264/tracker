@@ -2,21 +2,44 @@
 
 declare(strict_types=1);
 
-use App\Models\Peer;
+namespace Database\Factories;
+
 use App\Models\PeerVersion;
-use Faker\Generator as Faker;
-use Illuminate\Database\Eloquent\Factory;
+use Illuminate\Database\Eloquent\Factories\Factory;
 
-/** @var Factory $factory */
-$factory->define(PeerVersion::class, function (Faker $faker) {
-    return [
-        'peer_id' => function () {
-            return factory(Peer::class)->create()->id;
-        },
-        'version' => 1,
-    ];
-});
+final class PeerVersionFactory extends Factory
+{
+    /**
+     * The name of the factory's corresponding model.
+     *
+     * @var string
+     */
+    protected $model = PeerVersion::class;
 
-$factory->state(PeerVersion::class, 'v2', [
-    'version' => 2,
-]);
+    /**
+     * Define the model's default state.
+     *
+     * @return array
+     */
+    public function definition()
+    {
+        return [
+            'peer_id' => PeerFactory::new(),
+            'version' => 1,
+        ];
+    }
+
+    public function versionOne(): self
+    {
+        return $this->state([
+            'version' => 1,
+        ]);
+    }
+
+    public function versionTwo(): self
+    {
+        return $this->state([
+            'version' => 2,
+        ]);
+    }
+}
