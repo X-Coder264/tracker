@@ -30,7 +30,8 @@ module.exports = function(env) {
 
         output: {
             path: paths.dist,
-            filename: isProduction ? '[name].[contenthash].js' : '[name].js',
+            // TODO: fix cache busting by using webpack-manifest-plugin (or by refactoring to Laravel Mix)
+            filename: isProduction ? '[name].js' : '[name].js',
             publicPath: paths.public
         },
 
@@ -158,17 +159,6 @@ module.exports = function(env) {
         webpackConfig.plugins.push(new webpack.LoaderOptionsPlugin({
             minimize: true,
             debug: false
-        }));
-
-        webpackConfig.plugins.push(new webpack.optimize.UglifyJsPlugin({
-            comments: false,
-            mangle: {
-                screw_ie8: true
-            },
-            compress: {
-                screw_ie8: true,
-                warnings: false
-            }
         }));
 
         webpackConfig.plugins.push(new webpack.optimize.ModuleConcatenationPlugin());
