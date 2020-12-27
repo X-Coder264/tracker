@@ -21,6 +21,8 @@ use Illuminate\Contracts\Container\Container;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\DateFactory;
 use Illuminate\Support\ServiceProvider;
+use PragmaRX\Google2FAQRCode\Google2FA;
+use PragmaRX\Google2FAQRCode\QRCode\Chillerlan;
 use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
@@ -35,7 +37,16 @@ class AppServiceProvider extends ServiceProvider
         TorrentCategory::observe(TorrentCategoryObserver::class);
         News::observe(NewsObserver::class);
 
-        $this->app->bind(HttpClientInterface::class, function () {
+        // https://github.com/antonioribeiro/google2fa-qrcode/pull/11
+        $this->app->bind(Google2FA::class, function (): Google2FA {
+            $chillerlan = new class() extends Chillerlan {
+                protected $options = ['imageBase64' => false];
+            };
+
+            return new Google2FA($chillerlan);
+        });
+
+        $this->app->bind(HttpClientInterface::class, function (): HttpClientInterface {
             return HttpClient::create();
         });
 

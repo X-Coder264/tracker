@@ -46,7 +46,7 @@ final class StatusControllerTest extends TestCase
         $response->assertViewHas('user', $user);
         $response->assertViewHas('barcode', $barCode);
 
-        $response->assertSee(sprintf('<img src="%s" alt="" />', $barCode), false);
+        $response->assertSee(sprintf('<img src="%s" alt="" style="max-height: 250px"/>', $barCode), false);
 
         $translator = $this->app->make(Translator::class);
 

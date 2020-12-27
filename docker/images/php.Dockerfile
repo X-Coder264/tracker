@@ -1,4 +1,4 @@
-FROM php:7.4-fpm-alpine
+FROM php:8.0-fpm-alpine
 
 ARG HOST_USER_ID
 ARG HOST_GROUP_ID
@@ -15,8 +15,6 @@ RUN set -xe && \
         git \
         openssh-client \
         zlib-dev \
-        imagemagick \
-        imagemagick-dev \
         libtool \
         libzip-dev && \
     # create app user
@@ -28,10 +26,10 @@ RUN set -xe && \
     php -r "unlink('composer-setup.php');" && \
     # install php extensions
     pecl channel-update pecl.php.net && \
-    pecl install xdebug apcu imagick && \
+    pecl install xdebug apcu && \
     docker-php-ext-install mbstring curl dom mysqli pdo_mysql zip && \
     # enable php extensions
-    docker-php-ext-enable xdebug apcu zip imagick && \
+    docker-php-ext-enable xdebug apcu zip && \
     # cleanup
     apk del --purge .phpize-deps && \
     rm -rf /tmp/* && \

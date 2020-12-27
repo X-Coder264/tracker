@@ -34,7 +34,7 @@
                                 <div class="form-group text-center">
                                     <p>{!! trans('messages.2fa.please_scan_barcode_message') !!}</p>
                                     <p>{!! trans('messages.2fa.use_secret_key_message', ['code' => $user->two_factor_secret_key]) !!}</p>
-                                    <img src="{{ $barcode }}" alt="" />
+                                    <img src="{{ $barcode }}" alt="" style="max-height: 250px"/>
                                 </div>
                             @endif
 
