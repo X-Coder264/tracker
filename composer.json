@@ -18,10 +18,10 @@
         "cviebrock/eloquent-sluggable": "^8.0",
         "fideloper/proxy": "^4.4",
         "imdbphp/imdbphp": "^6.4",
-        "laravel/framework": "^8.20",
+        "laravel/framework": "^8.22",
         "laravel/passport": "^10.1",
         "laravel/tinker": "^2.5",
-        "laravel/ui": "^3.1",
+        "laravel/ui": "^3.2",
         "nesbot/carbon": "^2.43",
         "pragmarx/google2fa": "^8.0",
         "pragmarx/google2fa-qrcode": "^2.1",
@@ -37,7 +37,7 @@
         "fakerphp/faker": "^1.13",
         "friendsofphp/php-cs-fixer": "^2.17",
         "mockery/mockery": "^1.4",
-        "nunomaduro/collision": "^5.1",
+        "nunomaduro/collision": "^5.2",
         "phpunit/phpunit": "^9.5"
     },
     "config": {
