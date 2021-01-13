@@ -20,11 +20,9 @@ use Illuminate\Contracts\Routing\Registrar;
 */
 
 /** @var Registrar $router */
-
 $router->get('announce', AnnounceController::class)->name('announce');
 $router->get('scrape', ScrapeController::class)->name('scrape');
 
-/** @var Registrar $router */
 $router->group(['middleware' => ['auth:api']], function () {
     JsonApi::register('default', ['namespace' => 'Admin'], function (RouteRegistrar $registrar) {
         $registrar->resource('users');
