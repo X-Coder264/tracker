@@ -3,7 +3,6 @@
 declare(strict_types=1);
 
 use App\Http\Controllers\Admin\IndexController as AdminIndexController;
-use App\Http\Controllers\AnnounceController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\Invites\CreateController as InviteCreateController;
 use App\Http\Controllers\Invites\StoreController as InviteStoreController;
@@ -14,7 +13,6 @@ use App\Http\Controllers\PrivateMessages\Threads\ShowController as PrivateMessag
 use App\Http\Controllers\RSS\TorrentFeedController;
 use App\Http\Controllers\RSS\UserTorrentFeed\ShowController as UserTorrentRSSFeedShowController;
 use App\Http\Controllers\RSS\UserTorrentFeed\StoreController as UserTorrentRSSFeedStoreController;
-use App\Http\Controllers\ScrapeController;
 use App\Http\Controllers\Snatches\ShowTorrentSnatchesController;
 use App\Http\Controllers\Snatches\ShowUserSnatchesController;
 use App\Http\Controllers\TorrentComments\CreateController as TorrentCommentCreateController;
@@ -73,9 +71,6 @@ $router->get('password/reset', 'App\Http\Controllers\Auth\ForgotPasswordControll
 $router->post('password/email', 'App\Http\Controllers\Auth\ForgotPasswordController@sendResetLinkEmail')->name('password.email');
 $router->get('password/reset/{token}', 'App\Http\Controllers\Auth\ResetPasswordController@showResetForm')->name('password.reset');
 $router->post('password/reset', 'App\Http\Controllers\Auth\ResetPasswordController@reset')->name('password.update');
-
-$router->get('announce', AnnounceController::class)->name('announce');
-$router->get('scrape', ScrapeController::class)->name('scrape');
 
 $router->get('torrents/download/{torrent}', DownloadController::class)->name('torrents.download');
 
