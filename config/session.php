@@ -196,4 +196,16 @@ return [
 
     'same_site' => 'lax',
 
+    /*
+    |--------------------------------------------------------------------------
+    | Session Blocking
+    |--------------------------------------------------------------------------
+    |
+    | Here you may change if the request will be blocked until the session data
+    | is written to the session storage. Blocking the request will prevent
+    | session data to be lost due to concurrent requests.
+    |
+    */
+    'block' => env('SESSION_BLOCKING', true),
+
 ];

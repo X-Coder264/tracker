@@ -12,10 +12,13 @@ use Database\Factories\PeerFactory;
 use Database\Factories\SnatchFactory;
 use Database\Factories\TorrentFactory;
 use Database\Factories\UserFactory;
+use Illuminate\Contracts\Cache\Factory as CacheFactory;
 use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Contracts\Translation\Translator;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Http\Response;
+use Illuminate\Session\Middleware\StartSession;
+use Illuminate\Session\SessionManager;
 use Illuminate\Support\Facades\Cache;
 use Tests\TestCase;
 
@@ -190,6 +193,17 @@ class UserControllerTest extends TestCase
         $timezone = 'Europe/Paris';
         $torrentsPerPage = 40;
 
+        // resolve the real cache implementation before we mock it to avoid
+        // getting that no expectations were specified on the mock driver method which the middleware calls
+        $cacheFactory = $this->app->make(CacheFactory::class);
+        $startSessionMiddleware = new StartSession(
+            $this->app->make(SessionManager::class),
+            function () use ($cacheFactory): CacheFactory {
+                return $cacheFactory;
+            }
+        );
+        $this->app->instance(StartSession::class, $startSessionMiddleware);
+
         Cache::shouldReceive('forget')->never();
 
         $response = $this->from(route('login'))->put(
@@ -226,6 +240,17 @@ class UserControllerTest extends TestCase
         $email = 'testtttt@gmail.com';
         $timezone = 'Europe/Paris';
         $torrentsPerPage = 40;
+
+        // resolve the real cache implementation before we mock it to avoid
+        // getting that no expectations were specified on the mock driver method which the middleware calls
+        $cacheFactory = $this->app->make(CacheFactory::class);
+        $startSessionMiddleware = new StartSession(
+            $this->app->make(SessionManager::class),
+            function () use ($cacheFactory): CacheFactory {
+                return $cacheFactory;
+            }
+        );
+        $this->app->instance(StartSession::class, $startSessionMiddleware);
 
         Cache::shouldReceive('forget')->never();
 
