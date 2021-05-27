@@ -35,6 +35,6 @@ class CheckIfTheUserIsBannedTest extends TestCase
 
         /** @var Router $router */
         $router = $this->app->make(Router::class);
-        $this->assertTrue(in_array(CheckIfTheUserIsBanned::class, $router->getMiddlewareGroups()['web']));
+        $this->assertTrue(in_array(CheckIfTheUserIsBanned::class, $router->getMiddlewareGroups()['web'], true));
     }
 }

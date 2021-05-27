@@ -21,24 +21,28 @@ use Laravel\Passport\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
 
 /**
- * @property string $passkey
+ * @property string               $passkey
  * @property Collection|Torrent[] $torrents
- * @property Locale $language
- * @property Collection|Snatch[] $snatches
- * @property Collection|Thread[] $threads
- * @property Collection|News[] $news
- * @property Collection|Invite[] $invites
- * @property int|null $inviter_user_id
- * @property User|null $inviter
+ * @property Locale               $language
+ * @property Collection|Snatch[]  $snatches
+ * @property Collection|Thread[]  $threads
+ * @property Collection|News[]    $news
+ * @property Collection|Invite[]  $invites
+ * @property int|null             $inviter_user_id
+ * @property User|null            $inviter
  * @property CarbonImmutable|null $last_seen_at
- * @property int $invites_amount
- * @property Collection|User[] $invitees
- * @property bool $is_two_factor_enabled
- * @property string $two_factor_secret_key
+ * @property int                  $invites_amount
+ * @property Collection|User[]    $invitees
+ * @property bool                 $is_two_factor_enabled
+ * @property string               $two_factor_secret_key
  */
 class User extends Authenticatable
 {
-    use Notifiable, Sluggable, SluggableScopeHelpers, HasRoles, HasApiTokens;
+    use Notifiable;
+    use Sluggable;
+    use SluggableScopeHelpers;
+    use HasRoles;
+    use HasApiTokens;
 
     /**
      * The attributes that are mass assignable.

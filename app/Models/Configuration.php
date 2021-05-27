@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Model;
 
 /**
  * @property string $name
- * @property mixed $value
+ * @property mixed  $value
  */
 class Configuration extends Model
 {

@@ -15,7 +15,8 @@ use Tests\TestCase;
 
 final class InviteTest extends TestCase
 {
-    use DatabaseTransactions, WithFaker;
+    use DatabaseTransactions;
+    use WithFaker;
 
     public function testUserRelationship(): void
     {

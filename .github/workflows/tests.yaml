@@ -16,7 +16,7 @@ jobs:
       - name: Setup env
         run: docker/run dev:php ./artisan storage:link && docker/run dev:php ./artisan migrate --env=testing
       - name: Execute lint
-        run: PHP_CS_FIXER_IGNORE_ENV=1 docker/run -e PHP_CS_FIXER_IGNORE_ENV dev:php vendor/bin/php-cs-fixer fix --no-interaction --dry-run --diff --using-cache=no -v
+        run: docker/run dev:php vendor/bin/php-cs-fixer fix --no-interaction --dry-run --diff --using-cache=no -v
       - name: Execute tests
         run: XDEBUG_MODE=coverage docker/run -e XDEBUG_MODE dev:php vendor/bin/phpunit --verbose --coverage-text --coverage-clover=build/logs/clover.xml
       - name: Upload coverage to Codecov

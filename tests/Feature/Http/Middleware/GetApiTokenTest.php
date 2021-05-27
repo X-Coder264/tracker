@@ -50,7 +50,7 @@ final class GetApiTokenTest extends TestCase
         $config = $this->app->make(Repository::class);
 
         if (Str::startsWith($key = $config->get('app.key'), 'base64:')) {
-            $key = base64_decode(substr($key, 7));
+            $key = base64_decode(substr($key, 7), true);
         }
 
         $sessionConfig = $config->get('session');
@@ -84,6 +84,6 @@ final class GetApiTokenTest extends TestCase
 
         /** @var Router $router */
         $router = $this->app->make(Router::class);
-        $this->assertTrue(in_array(CreateFreshApiToken::class, $router->getMiddlewareGroups()['web']));
+        $this->assertTrue(in_array(CreateFreshApiToken::class, $router->getMiddlewareGroups()['web'], true));
     }
 }

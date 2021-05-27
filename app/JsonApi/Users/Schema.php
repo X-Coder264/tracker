@@ -48,7 +48,7 @@ class Schema extends SchemaProvider
     {
         $relationships = [];
 
-        if (! empty($includeRelationships) && in_array('torrents', $includeRelationships)) {
+        if (! empty($includeRelationships) && in_array('torrents', $includeRelationships, true)) {
             $relationships['torrents'] = [
                 self::DATA => function () use ($resource) {
                     return $resource->torrents;
@@ -56,7 +56,7 @@ class Schema extends SchemaProvider
             ];
         }
 
-        if (! empty($includeRelationships) && in_array('locale', $includeRelationships)) {
+        if (! empty($includeRelationships) && in_array('locale', $includeRelationships, true)) {
             $relationships['locale'] = [
                 self::DATA => function () use ($resource) {
                     return $resource->language;

@@ -6,15 +6,15 @@ namespace App\Enumerations;
 
 final class Cache
 {
-    const TWO_MINUTES = 120;
+    public const TWO_MINUTES = 120;
 
-    const TEN_MINUTES = 600;
+    public const TEN_MINUTES = 600;
 
-    const THIRTY_MINUTES = 1800;
+    public const THIRTY_MINUTES = 1800;
 
-    const ONE_HOUR = 3600;
+    public const ONE_HOUR = 3600;
 
-    const ONE_DAY = 86400;
+    public const ONE_DAY = 86400;
 
-    const ONE_MONTH = 2592000;
+    public const ONE_MONTH = 2592000;
 }

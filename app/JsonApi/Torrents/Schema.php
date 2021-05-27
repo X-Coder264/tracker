@@ -48,7 +48,7 @@ class Schema extends SchemaProvider
     {
         $relationships = [];
 
-        if (! empty($includeRelationships) && in_array('uploader', $includeRelationships)) {
+        if (! empty($includeRelationships) && in_array('uploader', $includeRelationships, true)) {
             $relationships['uploader'] = [
                 self::DATA => function () use ($resource) {
                     return $resource->uploader;

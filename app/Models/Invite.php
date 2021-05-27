@@ -9,11 +9,11 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
- * @property int $id
- * @property string $code
+ * @property int             $id
+ * @property string          $code
  * @property CarbonImmutable $expires_at
- * @property int $user_id
- * @property User $user
+ * @property int             $user_id
+ * @property User            $user
  */
 class Invite extends Model
 {

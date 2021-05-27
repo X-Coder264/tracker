@@ -35,7 +35,7 @@
         "barryvdh/laravel-debugbar": "^3.5",
         "facade/ignition": "^2.9",
         "fakerphp/faker": "^1.14",
-        "friendsofphp/php-cs-fixer": "^2.19",
+        "friendsofphp/php-cs-fixer": "^3.0",
         "mockery/mockery": "^1.4",
         "nunomaduro/collision": "^5.4",
         "phpunit/phpunit": "^9.5"

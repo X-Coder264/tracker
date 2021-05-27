@@ -13,7 +13,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Thread extends Model
 {
-    use Sluggable, SluggableScopeHelpers;
+    use Sluggable;
+    use SluggableScopeHelpers;
 
     public function sluggable(): array
     {

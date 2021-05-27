@@ -18,7 +18,7 @@ class UpdateUserLastSeenAtInfo
     /**
      * @var int
      */
-    const FIVE_MINUTES_IN_SECONDS = 300;
+    public const FIVE_MINUTES_IN_SECONDS = 300;
 
     public function __construct(Guard $guard)
     {

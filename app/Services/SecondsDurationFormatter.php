@@ -6,13 +6,13 @@ namespace App\Services;
 
 class SecondsDurationFormatter
 {
-    const SECOND = 's';
+    public const SECOND = 's';
 
-    const MINUTE = 'm';
+    public const MINUTE = 'm';
 
-    const HOUR = 'h';
+    public const HOUR = 'h';
 
-    const DAY = 'd';
+    public const DAY = 'd';
 
     protected $map = [
         self::SECOND => 60,

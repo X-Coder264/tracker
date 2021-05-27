@@ -11,8 +11,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 /**
  * @property string $subject
  * @property string $text
- * @property int $user_id
- * @property User $author
+ * @property int    $user_id
+ * @property User   $author
  */
 class News extends Model
 {

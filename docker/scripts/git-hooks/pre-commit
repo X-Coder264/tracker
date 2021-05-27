@@ -1,0 +1,70 @@
+#!/usr/bin/env bash
+
+BASE_DIR=$(cd "$(dirname "$0")/../../" || exit ; pwd)
+
+function display_heading () {
+    printf "\n\e[1m%s\e[0m\n" "$1";
+}
+
+function display_separator () {
+    printf "\n\e[1m---\e[0m\n";
+}
+
+function display_error () {
+    printf "\e[31;1m%s\e[0m\n" "$1"
+}
+
+function display_success () {
+    printf "\e[32;1m%s\e[0m\n" "$1"
+}
+
+PHP_FILES=""
+while read -r line; do
+    PHP_FILES+="${line} "
+done < <(git diff --cached --name-only --diff-filter=ACRM | grep -E '\.php$');
+
+COMPOSER_FILE="$(git diff --cached --name-only --diff-filter=ACM | grep -E '^composer\.(json|lock)$')"
+
+PHP_CS_FIXER_PATH="vendor/bin/php-cs-fixer"
+
+PHP_CS_FIXER_BIN="${BASE_DIR}/docker/run dev:php ${PHP_CS_FIXER_PATH}"
+COMPOSER_CHECK_CMD="${BASE_DIR}/docker/run dev:php composer validate"
+
+if [ "${#COMPOSER_FILE}" -ne "0" ]; then
+    display_heading "Checking composer files…"
+
+
+    if ! ${COMPOSER_CHECK_CMD}
+    then
+        display_error "Invalid composer file. Please run $(composer update) or check your composer files"
+        exit 1
+    fi
+
+    display_success "No errors found."
+    display_separator
+fi
+
+if [ -n "$PHP_FILES" ]; then
+
+    if [ ! -x "${BASE_DIR}/${PHP_CS_FIXER_PATH}" ]; then
+        display_error "The \"PHP CS Fixer\" binary could not be found. Are your Composer dependencies up-to-date?"
+        exit 1
+    fi
+
+    display_heading "Linting and fixing PHP files…"
+
+    if ! ${PHP_CS_FIXER_BIN} fix --ansi -v --config=.php-cs-fixer.dist.php --path-mode=intersection "${PHP_FILES}"
+    then
+        exit 1
+    else
+        git add ${PHP_FILES}
+        display_success "No errors found, fixed files staged."
+    fi
+
+    display_separator
+
+fi
+
+if [[ -n "$PHP_FILES" ]]; then
+    printf "\n"
+fi

@@ -5,6 +5,9 @@ title "Symlinking files..."
 runCommand "ln -s ./docker/configurations/env/dev .env" "Creating symlink for .env file..."
 runCommand "ln -s ./docker/configurations/phpunit.xml phpunit.xml" "Creating symlink for phpunit.xml file..."
 
+# Git hooks
+runCommand "ln -sf ../../docker/scripts/git-hooks/pre-commit .git/hooks/pre-commit"
+
 title "Docker..."
 
 runCommand "docker/env dev on" "Building and upping Docker containers..."

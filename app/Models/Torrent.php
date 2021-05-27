@@ -14,13 +14,13 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
- * @property User $uploader
+ * @property User                         $uploader
  * @property Collection|TorrentInfoHash[] $infoHashes
- * @property Collection|Peer[] $peers
- * @property Collection|TorrentComment[] $comments
- * @property TorrentCategory $category
- * @property Collection|Snatch[] $snatches
- * @property int $views_count
+ * @property Collection|Peer[]            $peers
+ * @property Collection|TorrentComment[]  $comments
+ * @property TorrentCategory              $category
+ * @property Collection|Snatch[]          $snatches
+ * @property int                          $views_count
  */
 class Torrent extends Model
 {
