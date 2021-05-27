@@ -16,7 +16,7 @@ class TitleFactory
             ->setId($imdbTitle->imdbid())
             ->setName($imdbTitle->title())
             ->setPlotOutline($imdbTitle->plotoutline(true))
-            ->setRating($imdbTitle->rating())
+            ->setRating((string) $imdbTitle->rating())
             ->setGenres($imdbTitle->genres());
 
         return $title;
