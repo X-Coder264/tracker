@@ -39,7 +39,8 @@ class AppServiceProvider extends ServiceProvider
 
         // https://github.com/antonioribeiro/google2fa-qrcode/pull/11
         $this->app->bind(Google2FA::class, function (): Google2FA {
-            $chillerlan = new class() extends Chillerlan {
+            $chillerlan = new class() extends Chillerlan
+            {
                 protected $options = ['imageBase64' => false];
             };
 

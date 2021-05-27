@@ -22,14 +22,16 @@ class SetUserLocaleTest extends TestCase
         $guardMock = $this->createMock(Guard::class);
         $guardMock->expects($this->once())->method('check')->willReturn(true);
 
-        $user = new class() {
+        $user = new class()
+        {
             public $language;
 
             public $slug = 'test_slug';
 
             public function __construct()
             {
-                $this->language = new class() {
+                $this->language = new class()
+                {
                     public $localeShort = 'hr';
                 };
             }
@@ -48,7 +50,8 @@ class SetUserLocaleTest extends TestCase
         );
 
         $request = new Request();
-        $next = new class() {
+        $next = new class()
+        {
             public $called = false;
 
             public function __invoke(Request $request)
@@ -88,7 +91,8 @@ class SetUserLocaleTest extends TestCase
         );
 
         $request = new Request();
-        $next = new class() {
+        $next = new class()
+        {
             public $called = false;
 
             public function __invoke(Request $request)
